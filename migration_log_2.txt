@@ -1,0 +1,193 @@
+
+  Dropping all tables  50.72ms DONE
+
+   INFO  Preparing database.  
+
+  Creating migration table  9.77ms DONE
+
+   INFO  Running migrations.  
+
+  0001_01_01_000000_create_users_table  67.60ms DONE
+  0001_01_01_000001_create_cache_table  11.22ms DONE
+  0001_01_01_000002_create_jobs_table  62.92ms DONE
+  2025_12_17_092144_create_cycles_table  4.15ms DONE
+  2025_12_17_092150_create_class_groups_table  131.86ms DONE
+  2025_12_17_092154_create_students_table  34.83ms DONE
+  2025_12_17_092235_create_community_services_table  301.25ms DONE
+  2025_12_17_092239_create_infractions_table  9.70ms DONE
+  2025_12_17_092242_create_regulations_table  12.35ms DONE
+  2025_12_17_092315_create_notices_table  391.61ms FAIL
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[23000]: Integrity constraint violation: 1217 Cannot delete or update a parent row: a foreign key constraint fails (Connection: mysql, SQL: ALTER TABLE notices PARTITION BY RANGE (cycle_id) (
+            PARTITION p_legacy VALUES LESS THAN (20240801),
+            PARTITION p_2024_2025 VALUES LESS THAN (20250801),
+            PARTITION p_future VALUES LESS THAN MAXVALUE
+        ))
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:826
+    822Ôûò                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    823Ôûò                 );
+    824Ôûò             }
+    825Ôûò 
+  Ô×£ 826Ôûò             throw new QueryException(
+    827Ôûò                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    828Ôûò             );
+    829Ôûò         }
+    830Ôûò     }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+      PDOException::("SQLSTATE[23000]: Integrity constraint violation: 1217 Cannot delete or update a parent row: a foreign key constraint fails")
+
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+      PDOStatement::execute()
+
+  3   vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+      Illuminate\Database\Connection::Illuminate\Database\{closure}("ALTER TABLE notices PARTITION BY RANGE (cycle_id) (
+            PARTITION p_legacy VALUES LESS THAN (20240801),
+            PARTITION p_2024_2025 VALUES LESS THAN (20250801),
+            PARTITION p_future VALUES LESS THAN MAXVALUE
+        )", [])
+
+  4   vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+      Illuminate\Database\Connection::runQueryCallback("ALTER TABLE notices PARTITION BY RANGE (cycle_id) (
+            PARTITION p_legacy VALUES LESS THAN (20240801),
+            PARTITION p_2024_2025 VALUES LESS THAN (20250801),
+            PARTITION p_future VALUES LESS THAN MAXVALUE
+        )", [], Object(Closure))
+
+  5   vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+      Illuminate\Database\Connection::run("ALTER TABLE notices PARTITION BY RANGE (cycle_id) (
+            PARTITION p_legacy VALUES LESS THAN (20240801),
+            PARTITION p_2024_2025 VALUES LESS THAN (20250801),
+            PARTITION p_future VALUES LESS THAN MAXVALUE
+        )", [], Object(Closure))
+
+  6   vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php:491
+      Illuminate\Database\Connection::statement("ALTER TABLE notices PARTITION BY RANGE (cycle_id) (
+            PARTITION p_legacy VALUES LESS THAN (20240801),
+            PARTITION p_2024_2025 VALUES LESS THAN (20250801),
+            PARTITION p_future VALUES LESS THAN MAXVALUE
+        )")
+
+  7   vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+      Illuminate\Database\DatabaseManager::__call("statement")
+
+  8   database\migrations\2025_12_17_092315_create_notices_table.php:33
+      Illuminate\Support\Facades\Facade::__callStatic("statement")
+
+  9   vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:514
+      Illuminate\Database\Migrations\Migration@anonymous\C:\Users\juanp\Desktop\Apps\sm\database\migrations\2025_12_17_092315_create_notices_table.php:7$140::up()
+
+  10  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:439
+      Illuminate\Database\Migrations\Migrator::runMethod(Object(Illuminate\Database\MySqlConnection), Object(Illuminate\Database\Migrations\Migration@anonymous\C:\Users\juanp\Desktop\Apps\sm\database\migrations\2025_12_17_092315_create_notices_table.php:7$140), "up")
+
+  11  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:448
+      Illuminate\Database\Migrations\Migrator::Illuminate\Database\Migrations\{closure}()
+
+  12  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:250
+      Illuminate\Database\Migrations\Migrator::runMigration(Object(Illuminate\Database\Migrations\Migration@anonymous\C:\Users\juanp\Desktop\Apps\sm\database\migrations\2025_12_17_092315_create_notices_table.php:7$140), "up")
+
+  13  vendor\laravel\framework\src\Illuminate\Console\View\Components\Task.php:41
+      Illuminate\Database\Migrations\Migrator::Illuminate\Database\Migrations\{closure}()
+
+  14  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:809
+      Illuminate\Console\View\Components\Task::render("2025_12_17_092315_create_notices_table", Object(Closure))
+
+  15  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:250
+      Illuminate\Database\Migrations\Migrator::write("Illuminate\Console\View\Components\Task", "2025_12_17_092315_create_notices_table", Object(Closure))
+
+  16  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:210
+      Illuminate\Database\Migrations\Migrator::runUp("C:\Users\juanp\Desktop\Apps\sm\database\migrations/2025_12_17_092315_create_notices_table.php")
+
+  17  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:137
+      Illuminate\Database\Migrations\Migrator::runPending([])
+
+  18  vendor\laravel\framework\src\Illuminate\Database\Console\Migrations\MigrateCommand.php:116
+      Illuminate\Database\Migrations\Migrator::run([])
+
+  19  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:666
+      Illuminate\Database\Console\Migrations\MigrateCommand::Illuminate\Database\Console\Migrations\{closure}()
+
+  20  vendor\laravel\framework\src\Illuminate\Database\Console\Migrations\MigrateCommand.php:109
+      Illuminate\Database\Migrations\Migrator::usingConnection(Object(Closure))
+
+  21  vendor\laravel\framework\src\Illuminate\Database\Console\Migrations\MigrateCommand.php:88
+      Illuminate\Database\Console\Migrations\MigrateCommand::runMigrations()
+
+  22  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+      Illuminate\Database\Console\Migrations\MigrateCommand::handle()
+
+  23  vendor\laravel\framework\src\Illuminate\Container\Util.php:43
+      Illuminate\Container\BoundMethod::Illuminate\Container\{closure}()
+
+  24  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
+      Illuminate\Container\Util::unwrapIfClosure(Object(Closure))
+
+  25  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+      Illuminate\Container\BoundMethod::callBoundMethod(Object(Illuminate\Foundation\Application), Object(Closure))
+
+  26  vendor\laravel\framework\src\Illuminate\Container\Container.php:799
+      Illuminate\Container\BoundMethod::call(Object(Illuminate\Foundation\Application), [])
+
+  27  vendor\laravel\framework\src\Illuminate\Console\Command.php:211
+      Illuminate\Container\Container::call()
+
+  28  vendor\symfony\console\Command\Command.php:341
+      Illuminate\Console\Command::execute(Object(Symfony\Component\Console\Input\ArrayInput), Object(Illuminate\Console\OutputStyle))
+
+  29  vendor\laravel\framework\src\Illuminate\Console\Command.php:180
+      Symfony\Component\Console\Command\Command::run(Object(Symfony\Component\Console\Input\ArrayInput), Object(Illuminate\Console\OutputStyle))
+
+  30  vendor\laravel\framework\src\Illuminate\Console\Concerns\CallsCommands.php:68
+      Illuminate\Console\Command::run(Object(Symfony\Component\Console\Input\ArrayInput), Object(Illuminate\Console\OutputStyle))
+
+  31  vendor\laravel\framework\src\Illuminate\Console\Concerns\CallsCommands.php:29
+      Illuminate\Console\Command::runCommand("migrate", ["migrate"], Object(Illuminate\Console\OutputStyle))
+
+  32  vendor\laravel\framework\src\Illuminate\Database\Console\Migrations\FreshCommand.php:81
+      Illuminate\Console\Command::call("migrate", [])
+
+  33  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+      Illuminate\Database\Console\Migrations\FreshCommand::handle()
+
+  34  vendor\laravel\framework\src\Illuminate\Container\Util.php:43
+      Illuminate\Container\BoundMethod::Illuminate\Container\{closure}()
+
+  35  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
+      Illuminate\Container\Util::unwrapIfClosure(Object(Closure))
+
+  36  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+      Illuminate\Container\BoundMethod::callBoundMethod(Object(Illuminate\Foundation\Application), Object(Closure))
+
+  37  vendor\laravel\framework\src\Illuminate\Container\Container.php:799
+      Illuminate\Container\BoundMethod::call(Object(Illuminate\Foundation\Application), [])
+
+  38  vendor\laravel\framework\src\Illuminate\Console\Command.php:211
+      Illuminate\Container\Container::call()
+
+  39  vendor\symfony\console\Command\Command.php:341
+      Illuminate\Console\Command::execute(Object(Symfony\Component\Console\Input\ArgvInput), Object(Illuminate\Console\OutputStyle))
+
+  40  vendor\laravel\framework\src\Illuminate\Console\Command.php:180
+      Symfony\Component\Console\Command\Command::run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Illuminate\Console\OutputStyle))
+
+  41  vendor\symfony\console\Application.php:1102
+      Illuminate\Console\Command::run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  42  vendor\symfony\console\Application.php:356
+      Symfony\Component\Console\Application::doRunCommand(Object(Illuminate\Database\Console\Migrations\FreshCommand), Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  43  vendor\symfony\console\Application.php:195
+      Symfony\Component\Console\Application::doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  44  vendor\laravel\framework\src\Illuminate\Foundation\Console\Kernel.php:197
+      Symfony\Component\Console\Application::run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  45  vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1235
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  46  artisan:16
+      Illuminate\Foundation\Application::handleCommand(Object(Symfony\Component\Console\Input\ArgvInput))
+

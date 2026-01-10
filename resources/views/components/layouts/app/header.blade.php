@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head')
     </head>
@@ -38,7 +38,7 @@
                         icon="book-open-text"
                         href="https://laravel.com/docs/starter-kits#livewire"
                         target="_blank"
-                        label="Documentation"
+                        :label="__('Documentation')"
                     />
                 </flux:tooltip>
             </flux:navbar>

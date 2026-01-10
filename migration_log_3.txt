@@ -1,0 +1,181 @@
+
+  Dropping all tables  142.09ms DONE
+
+   INFO  Preparing database.  
+
+  Creating migration table  21.55ms DONE
+
+   INFO  Running migrations.  
+
+  0001_01_01_000000_create_users_table  101.70ms DONE
+  0001_01_01_000001_create_cache_table  14.91ms DONE
+  0001_01_01_000002_create_jobs_table  86.92ms DONE
+  2025_12_17_092144_create_cycles_table  10.06ms DONE
+  2025_12_17_092150_create_class_groups_table  156.47ms DONE
+  2025_12_17_092154_create_students_table  105.78ms DONE
+  2025_12_17_092235_create_community_services_table  844.42ms DONE
+  2025_12_17_092239_create_infractions_table  21.01ms DONE
+  2025_12_17_092242_create_regulations_table  15.74ms DONE
+  2025_12_17_092315_create_notices_table  106.43ms DONE
+  2025_12_17_092318_create_notice_signatures_table  66.92ms DONE
+  2025_12_17_092402_create_reports_table  3.66ms FAIL
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'infraction_id' (Connection: mysql, SQL: create table `reports` (`id` char(36) not null, `cycle_id` bigint unsigned not null, `student_id` varchar(50) not null, `teacher_id` varchar(50) not null, `infraction_id` int unsigned not null, `infraction_id` bigint unsigned not null, `subject` varchar(100) null, `description` text null, `date` datetime not null, `status` enum('PENDING_SIGNATURE', 'SIGNED') not null default 'PENDING_SIGNATURE', `signed_at` datetime null, `signed_by_parent_id` varchar(50) null, primary key (`id`, `cycle_id`)) default character set utf8mb4 collate 'utf8mb4_unicode_ci')
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:826
+    822Ôûò                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    823Ôûò                 );
+    824Ôûò             }
+    825Ôûò 
+  Ô×£ 826Ôûò             throw new QueryException(
+    827Ôûò                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    828Ôûò             );
+    829Ôûò         }
+    830Ôûò     }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+      PDOException::("SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'infraction_id'")
+
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+      PDOStatement::execute()
+
+  3   vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+      Illuminate\Database\Connection::Illuminate\Database\{closure}("create table `reports` (`id` char(36) not null, `cycle_id` bigint unsigned not null, `student_id` varchar(50) not null, `teacher_id` varchar(50) not null, `infraction_id` int unsigned not null, `infraction_id` bigint unsigned not null, `subject` varchar(100) null, `description` text null, `date` datetime not null, `status` enum('PENDING_SIGNATURE', 'SIGNED') not null default 'PENDING_SIGNATURE', `signed_at` datetime null, `signed_by_parent_id` varchar(50) null, primary key (`id`, `cycle_id`)) default character set utf8mb4 collate 'utf8mb4_unicode_ci'", [])
+
+  4   vendor\laravel\framework\src\Illuminate\Database\Connection.php:780
+      Illuminate\Database\Connection::runQueryCallback("create table `reports` (`id` char(36) not null, `cycle_id` bigint unsigned not null, `student_id` varchar(50) not null, `teacher_id` varchar(50) not null, `infraction_id` int unsigned not null, `infraction_id` bigint unsigned not null, `subject` varchar(100) null, `description` text null, `date` datetime not null, `status` enum('PENDING_SIGNATURE', 'SIGNED') not null default 'PENDING_SIGNATURE', `signed_at` datetime null, `signed_by_parent_id` varchar(50) null, primary key (`id`, `cycle_id`)) default character set utf8mb4 collate 'utf8mb4_unicode_ci'", [], Object(Closure))
+
+  5   vendor\laravel\framework\src\Illuminate\Database\Connection.php:559
+      Illuminate\Database\Connection::run("create table `reports` (`id` char(36) not null, `cycle_id` bigint unsigned not null, `student_id` varchar(50) not null, `teacher_id` varchar(50) not null, `infraction_id` int unsigned not null, `infraction_id` bigint unsigned not null, `subject` varchar(100) null, `description` text null, `date` datetime not null, `status` enum('PENDING_SIGNATURE', 'SIGNED') not null default 'PENDING_SIGNATURE', `signed_at` datetime null, `signed_by_parent_id` varchar(50) null, primary key (`id`, `cycle_id`)) default character set utf8mb4 collate 'utf8mb4_unicode_ci'", [], Object(Closure))
+
+  6   vendor\laravel\framework\src\Illuminate\Database\Schema\Blueprint.php:121
+      Illuminate\Database\Connection::statement("create table `reports` (`id` char(36) not null, `cycle_id` bigint unsigned not null, `student_id` varchar(50) not null, `teacher_id` varchar(50) not null, `infraction_id` int unsigned not null, `infraction_id` bigint unsigned not null, `subject` varchar(100) null, `description` text null, `date` datetime not null, `status` enum('PENDING_SIGNATURE', 'SIGNED') not null default 'PENDING_SIGNATURE', `signed_at` datetime null, `signed_by_parent_id` varchar(50) null, primary key (`id`, `cycle_id`)) default character set utf8mb4 collate 'utf8mb4_unicode_ci'")
+
+  7   vendor\laravel\framework\src\Illuminate\Database\Schema\Builder.php:650
+      Illuminate\Database\Schema\Blueprint::build()
+
+  8   vendor\laravel\framework\src\Illuminate\Database\Schema\Builder.php:504
+      Illuminate\Database\Schema\Builder::build(Object(Illuminate\Database\Schema\Blueprint))
+
+  9   vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:363
+      Illuminate\Database\Schema\Builder::create("reports", Object(Closure))
+
+  10  database\migrations\2025_12_17_092402_create_reports_table.php:14
+      Illuminate\Support\Facades\Facade::__callStatic("create")
+
+  11  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:514
+      Illuminate\Database\Migrations\Migration@anonymous\C:\Users\juanp\Desktop\Apps\sm\database\migrations\2025_12_17_092402_create_reports_table.php:7$142::up()
+
+  12  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:439
+      Illuminate\Database\Migrations\Migrator::runMethod(Object(Illuminate\Database\MySqlConnection), Object(Illuminate\Database\Migrations\Migration@anonymous\C:\Users\juanp\Desktop\Apps\sm\database\migrations\2025_12_17_092402_create_reports_table.php:7$142), "up")
+
+  13  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:448
+      Illuminate\Database\Migrations\Migrator::Illuminate\Database\Migrations\{closure}()
+
+  14  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:250
+      Illuminate\Database\Migrations\Migrator::runMigration(Object(Illuminate\Database\Migrations\Migration@anonymous\C:\Users\juanp\Desktop\Apps\sm\database\migrations\2025_12_17_092402_create_reports_table.php:7$142), "up")
+
+  15  vendor\laravel\framework\src\Illuminate\Console\View\Components\Task.php:41
+      Illuminate\Database\Migrations\Migrator::Illuminate\Database\Migrations\{closure}()
+
+  16  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:809
+      Illuminate\Console\View\Components\Task::render("2025_12_17_092402_create_reports_table", Object(Closure))
+
+  17  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:250
+      Illuminate\Database\Migrations\Migrator::write("Illuminate\Console\View\Components\Task", "2025_12_17_092402_create_reports_table", Object(Closure))
+
+  18  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:210
+      Illuminate\Database\Migrations\Migrator::runUp("C:\Users\juanp\Desktop\Apps\sm\database\migrations/2025_12_17_092402_create_reports_table.php")
+
+  19  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:137
+      Illuminate\Database\Migrations\Migrator::runPending([])
+
+  20  vendor\laravel\framework\src\Illuminate\Database\Console\Migrations\MigrateCommand.php:116
+      Illuminate\Database\Migrations\Migrator::run([])
+
+  21  vendor\laravel\framework\src\Illuminate\Database\Migrations\Migrator.php:666
+      Illuminate\Database\Console\Migrations\MigrateCommand::Illuminate\Database\Console\Migrations\{closure}()
+
+  22  vendor\laravel\framework\src\Illuminate\Database\Console\Migrations\MigrateCommand.php:109
+      Illuminate\Database\Migrations\Migrator::usingConnection(Object(Closure))
+
+  23  vendor\laravel\framework\src\Illuminate\Database\Console\Migrations\MigrateCommand.php:88
+      Illuminate\Database\Console\Migrations\MigrateCommand::runMigrations()
+
+  24  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+      Illuminate\Database\Console\Migrations\MigrateCommand::handle()
+
+  25  vendor\laravel\framework\src\Illuminate\Container\Util.php:43
+      Illuminate\Container\BoundMethod::Illuminate\Container\{closure}()
+
+  26  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
+      Illuminate\Container\Util::unwrapIfClosure(Object(Closure))
+
+  27  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+      Illuminate\Container\BoundMethod::callBoundMethod(Object(Illuminate\Foundation\Application), Object(Closure))
+
+  28  vendor\laravel\framework\src\Illuminate\Container\Container.php:799
+      Illuminate\Container\BoundMethod::call(Object(Illuminate\Foundation\Application), [])
+
+  29  vendor\laravel\framework\src\Illuminate\Console\Command.php:211
+      Illuminate\Container\Container::call()
+
+  30  vendor\symfony\console\Command\Command.php:341
+      Illuminate\Console\Command::execute(Object(Symfony\Component\Console\Input\ArrayInput), Object(Illuminate\Console\OutputStyle))
+
+  31  vendor\laravel\framework\src\Illuminate\Console\Command.php:180
+      Symfony\Component\Console\Command\Command::run(Object(Symfony\Component\Console\Input\ArrayInput), Object(Illuminate\Console\OutputStyle))
+
+  32  vendor\laravel\framework\src\Illuminate\Console\Concerns\CallsCommands.php:68
+      Illuminate\Console\Command::run(Object(Symfony\Component\Console\Input\ArrayInput), Object(Illuminate\Console\OutputStyle))
+
+  33  vendor\laravel\framework\src\Illuminate\Console\Concerns\CallsCommands.php:29
+      Illuminate\Console\Command::runCommand("migrate", ["migrate"], Object(Illuminate\Console\OutputStyle))
+
+  34  vendor\laravel\framework\src\Illuminate\Database\Console\Migrations\FreshCommand.php:81
+      Illuminate\Console\Command::call("migrate", [])
+
+  35  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+      Illuminate\Database\Console\Migrations\FreshCommand::handle()
+
+  36  vendor\laravel\framework\src\Illuminate\Container\Util.php:43
+      Illuminate\Container\BoundMethod::Illuminate\Container\{closure}()
+
+  37  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:96
+      Illuminate\Container\Util::unwrapIfClosure(Object(Closure))
+
+  38  vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+      Illuminate\Container\BoundMethod::callBoundMethod(Object(Illuminate\Foundation\Application), Object(Closure))
+
+  39  vendor\laravel\framework\src\Illuminate\Container\Container.php:799
+      Illuminate\Container\BoundMethod::call(Object(Illuminate\Foundation\Application), [])
+
+  40  vendor\laravel\framework\src\Illuminate\Console\Command.php:211
+      Illuminate\Container\Container::call()
+
+  41  vendor\symfony\console\Command\Command.php:341
+      Illuminate\Console\Command::execute(Object(Symfony\Component\Console\Input\ArgvInput), Object(Illuminate\Console\OutputStyle))
+
+  42  vendor\laravel\framework\src\Illuminate\Console\Command.php:180
+      Symfony\Component\Console\Command\Command::run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Illuminate\Console\OutputStyle))
+
+  43  vendor\symfony\console\Application.php:1102
+      Illuminate\Console\Command::run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  44  vendor\symfony\console\Application.php:356
+      Symfony\Component\Console\Application::doRunCommand(Object(Illuminate\Database\Console\Migrations\FreshCommand), Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  45  vendor\symfony\console\Application.php:195
+      Symfony\Component\Console\Application::doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  46  vendor\laravel\framework\src\Illuminate\Foundation\Console\Kernel.php:197
+      Symfony\Component\Console\Application::run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  47  vendor\laravel\framework\src\Illuminate\Foundation\Application.php:1235
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  48  artisan:16
+      Illuminate\Foundation\Application::handleCommand(Object(Symfony\Component\Console\Input\ArgvInput))
+

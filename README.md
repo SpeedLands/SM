@@ -46,11 +46,22 @@ Ejecute el siguiente comando para migrar la estructura de la base de datos e ins
 php artisan migrate --seed
 ```
 
-### Credenciales de Acceso Inicial
-Una vez ejecutado el comando anterior, podrá acceder con:
+### Datos de Prueba por Rol (Testing)
 
--   **Usuario:** `test@example.com`
--   **Contraseña:** `password`
+Si deseas probar el sistema con datos de prueba para cada uno de los roles (Admin, Maestro, Padre), puedes ejecutar el siguiente comando:
+
+```bash
+php artisan db:seed --class=RoleTestingSeeder
+```
+
+#### Credenciales de Prueba
+Una vez ejecutado, tendrás acceso a las siguientes cuentas (contraseña común: `password`):
+
+- **Admin:** `admin.test@escuela.edu.mx`
+- **Maestro:** `teacher.test@escuela.edu.mx`
+- **Padre:** `parent.test@escuela.edu.mx` (asociado al alumno `ALUMNO DE PRUEBAS`)
+
+---
 
 ## Ejecutando la aplicación
 

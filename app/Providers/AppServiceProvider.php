@@ -19,6 +19,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Gate::define('admin-only', function ($user) {
+            return $user->role === 'ADMIN';
+        });
+
+        \Illuminate\Support\Facades\Gate::define('teacher-or-admin', function ($user) {
+            return in_array($user->role, ['ADMIN', 'TEACHER']);
+        });
+
+        \Illuminate\Support\Facades\Gate::define('parent-only', function ($user) {
+            return $user->role === 'PARENT';
+        });
     }
 }

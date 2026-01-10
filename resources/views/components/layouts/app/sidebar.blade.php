@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head')
     </head>
@@ -12,8 +12,25 @@
             </a>
 
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                <flux:navlist.group heading="Plataforma" class="grid">
+                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>Tablero</flux:navlist.item>
+                    
+                    @can('admin-only')
+                        <flux:navlist.item href="{{ route('cycles.index') }}" wire:navigate icon="academic-cap">Ciclos Escolares</flux:navlist.item>
+                    @endcan
+
+                    <flux:navlist.item icon="user-group" href="{{ route('students.index') }}" :current="request()->routeIs('students.index')">Alumnos</flux:navlist.item>
+                    <flux:navlist.item icon="document-text" href="{{ route('reports.index') }}" :current="request()->routeIs('reports.index')">Reportes</flux:navlist.item>
+                    <flux:navlist.item icon="briefcase" href="{{ route('community-services.index') }}" :current="request()->routeIs('community-services.index')">Servicio Comunitario</flux:navlist.item>
+                    <flux:navlist.item icon="megaphone" href="{{ route('notices.index') }}" :current="request()->routeIs('notices.index')">Avisos</flux:navlist.item>
+                    <flux:navlist.item icon="calendar-days" href="{{ route('citations.index') }}" :current="request()->routeIs('citations.index')">Citatorios</flux:navlist.item>
+                    <flux:navlist.item icon="academic-cap" href="{{ route('exams.index') }}" wire:navigate>{{ __('Exámenes') }}</flux:navlist.item>
+                    
+                    @can('admin-only')
+                        <flux:navlist.item href="{{ route('users.index') }}" wire:navigate icon="users">Gestión de Usuarios</flux:navlist.item>
+                    @endcan
+
+                    <flux:navlist.item icon="book-open" href="{{ route('regulations.index') }}" :current="request()->routeIs('regulations.index')">Reglamento</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
@@ -21,11 +38,11 @@
 
             <flux:navlist variant="outline">
                 <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
+                Repositorio
                 </flux:navlist.item>
 
                 <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                {{ __('Documentation') }}
+                Documentación
                 </flux:navlist.item>
             </flux:navlist>
 
@@ -61,7 +78,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>Configuración</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
@@ -69,7 +86,7 @@
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
-                            {{ __('Log Out') }}
+                            Cerrar Sesión
                         </flux:menu.item>
                     </form>
                 </flux:menu>
@@ -111,7 +128,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>Configuración</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
@@ -119,7 +136,7 @@
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
-                            {{ __('Log Out') }}
+                            Cerrar Sesión
                         </flux:menu.item>
                     </form>
                 </flux:menu>

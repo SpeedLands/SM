@@ -1,0 +1,36 @@
+
+   PASS  Tests\Feature\ReportsTest
+  Ô£ô admins anÔÇª 2.10s  
+  Ô£ô communityÔÇª 0.27s  
+  Ô£ô reports cÔÇª 0.21s  
+
+   PASS  Tests\Feature\CommunityServicesTest
+  Ô£ô admins caÔÇª 0.24s  
+  Ô£ô status trÔÇª 0.13s  
+  Ô£ô it suggesÔÇª 0.13s  
+
+   PASS  Tests\Feature\NoticesAndCitationsTest
+  Ô£ô admins caÔÇª 0.23s  
+  Ô£ô parents cÔÇª 0.10s  
+  Ô£ô teachersÔÇª  0.34s  
+
+   PASS  Tests\Feature\ExamsTest
+  Ô£ô admins caÔÇª 0.27s  
+  Ô£ô parents cÔÇª 0.06s  
+  Ô£ô filteringÔÇª 0.12s  
+
+   PASS  Tests\Feature\StudentsTest
+  Ô£ô guests caÔÇª 0.05s  
+  Ô£ô admins caÔÇª 0.24s  
+  Ô£ô can searcÔÇª 0.21s  
+  Ô£ô admins caÔÇª 0.39s  
+  Ô£ô admins caÔÇª 0.30s  
+  Ô£ô admins caÔÇª 0.53s  
+
+   PASS  Tests\Feature\ClassGroupsTest
+  Ô£ô admins caÔÇª 0.49s  
+  Ô£ô enrollmenÔÇª 0.07s  
+
+  Tests:    20 passed (84 assertions)
+  Duration: 6.78s
+
