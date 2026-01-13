@@ -1,6 +1,6 @@
-<div class="flex aspect-square size-8 items-center justify-center rounded-md bg-accent-content text-accent-foreground">
-    <x-app-logo-icon class="size-5 fill-current text-white dark:text-black" />
+<div class="flex aspect-square size-8 items-center justify-center rounded-md bg-blue-600 text-white">
+    <span class="font-bold text-xs"></span>
 </div>
-<div class="ms-1 grid flex-1 text-start text-sm">
-    <span class="mb-0.5 truncate leading-tight font-semibold">Laravel Starter Kit</span>
+<div class="ms-1 grid flex-1 text-start text-sm leading-tight">
+    <span class="truncate font-semibold uppercase">Gestión Escolar</span>
 </div>
