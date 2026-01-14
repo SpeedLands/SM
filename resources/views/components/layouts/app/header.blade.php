@@ -26,6 +26,9 @@
 
             </flux:navbar>
 
+            <!-- PWA Install Button (hidden until beforeinstallprompt) -->
+            <button id="pwa-install-btn" style="display:none;" class="ms-2 me-2 inline-flex items-center px-3 py-1 rounded bg-teal-500 text-white text-sm">Instalar</button>
+
             <!-- Desktop User Menu -->
             <flux:dropdown position="top" align="end">
                 <flux:profile
@@ -93,6 +96,15 @@
         </flux:sidebar>
 
         {{ $slot }}
+
+        <!-- PWA install toast -->
+        <div id="pwa-toast" style="display:none;position:fixed;right:1rem;bottom:1rem;z-index:9999"> 
+            <div style="background:#0ea5a4;color:white;padding:10px 14px;border-radius:8px;box-shadow:0 6px 18px rgba(2,6,23,.12);display:flex;gap:8px;align-items:center">
+                <div style="font-weight:600">Instala la aplicación</div>
+                <button id="pwa-toast-install" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:white;padding:6px 10px;border-radius:6px;font-weight:600">Instalar</button>
+                <button id="pwa-toast-close" aria-label="Cerrar" style="background:transparent;border:none;color:white;font-size:18px;line-height:1">×</button>
+            </div>
+        </div>
 
         @fluxScripts
     </body>
