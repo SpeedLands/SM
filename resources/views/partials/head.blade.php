@@ -7,12 +7,6 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-<!-- PWA manifest -->
-@if (file_exists(public_path('build/manifest.webmanifest')))
-	<link rel="manifest" href="/build/manifest.webmanifest">
-@else
-	<link rel="manifest" href="/manifest.webmanifest">
-@endif
 <meta name="theme-color" content="#0ea5a4">
 
 <link rel="preconnect" href="https://fonts.bunny.net">
@@ -26,5 +20,5 @@
 	<script src="{{ asset('js/app.js') }}" defer></script>
 @endif
 
-{{-- Service worker registration is performed in `resources/js/app.js` --}}
+
 @fluxAppearance

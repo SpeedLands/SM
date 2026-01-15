@@ -7,6 +7,7 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <link rel="manifest" href="/manifest.json">
         @fluxAppearance
         <style>
             body { font-family: 'Instrument Sans', sans-serif; }
@@ -79,6 +80,15 @@
                 @endauth
             </div>
         </section>
+
+        <!-- PWA install toast (only on welcome) -->
+        <div id="pwa-toast" style="display:none;position:fixed;right:1rem;bottom:1rem;z-index:9999">
+            <div style="background:#0ea5a4;color:white;padding:10px 14px;border-radius:8px;box-shadow:0 6px 18px rgba(2,6,23,.12);display:flex;gap:8px;align-items:center">
+                <div style="font-weight:600">Instala la aplicación</div>
+                <button id="pwa-toast-install" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:white;padding:6px 10px;border-radius:6px;font-weight:600">Instalar</button>
+                <button id="pwa-toast-close" aria-label="Cerrar" style="background:transparent;border:none;color:white;font-size:18px;line-height:1">×</button>
+            </div>
+        </div>
 
         <!-- Features Grid -->
         <section id="features" class="max-w-7xl mx-auto px-6 py-24 border-t border-zinc-200 dark:border-white/5 relative">
