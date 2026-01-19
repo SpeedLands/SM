@@ -61,6 +61,18 @@ Una vez ejecutado, tendrás acceso a las siguientes cuentas (contraseña común:
 - **Maestro:** `teacher.test@escuela.edu.mx`
 - **Padre:** `parent.test@escuela.edu.mx` (asociado al alumno `ALUMNO DE PRUEBAS`)
 
+### 🚀 Restauración de Datos (Producción/Hosting)
+
+Para restaurar los datos reales del sistema (Usuarios, Alumnos, Reglamentos e Infracciones) en un nuevo servidor, el proyecto incluye un seeder especializado que usa un respaldo en formato JSON.
+
+**Comando de restauración:**
+```bash
+php artisan db:seed --class=ProductionDataSeeder
+```
+
+> [!IMPORTANT]
+> Este comando depende del archivo `database/seeders/data/extracted_data.json`. No elimine este archivo si desea conservar la capacidad de restauración rápida.
+
 ---
 
 ## Ejecutando la aplicación

@@ -187,7 +187,7 @@ new class extends Component {
 
                         <div class="flex justify-between items-start mb-6">
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-inner">
+                                <div class="w-12 h-12 rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-inner">
                                     {{ substr($student->name, 0, 1) }}
                                 </div>
                                 <div>
