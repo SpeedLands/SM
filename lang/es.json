@@ -38,7 +38,7 @@
     "Are you sure you want to delete your account?": "¿Estás seguro de que deseas eliminar tu cuenta?",
     "Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.": "Una vez que se elimine tu cuenta, todos sus recursos y datos se eliminarán de forma permanente. Ingresa tu contraseña para confirmar que deseas eliminar tu cuenta de forma permanente.",
     "Cancel": "Cancelar",
-    "Settings": "Configuraciones",
+    "Settings": "Configuración",
     "Manage your profile and account settings": "Administra tu perfil y la configuración de tu cuenta",
     "Dashboard": "Tablero",
     "Platform": "Plataforma",
@@ -115,5 +115,15 @@
     "Access the Platform": "Acceder a la Plataforma",
     "Features": "Características",
     "About SM": "Acerca de SM",
-    "Contact Support": "Soporte Técnico"
+    "Contact Support": "Soporte Técnico",
+    "Showing": "Mostrando",
+    "to": "al",
+    "of": "de",
+    "results": "resultados",
+    "Mostrando": "Mostrando",
+    "al": "al",
+    "de": "de",
+    "resultados": "resultados",
+    "Pagination Navigation": "Navegación de paginación",
+    "Go to page :page": "Ir a la página :page"
 }

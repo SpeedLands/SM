@@ -159,7 +159,7 @@ new class extends Component {
             ->when($this->status, fn($q) => $q->where('status', $this->status))
             ->when($this->severity, fn($q) => $q->whereHas('infraction', fn($iq) => $iq->where('severity', $this->severity)))
             ->when($this->search, function($q) {
-                $q->whereHas('student', fn($sq) => $sq->where('name', 'like', "%{$this->search}%")->orWhere('curp', 'like', "%{$this->search}%"))
+                $q->whereHas('student', fn($sq) => $sq->where('name', 'like', "%{$this->search}%"))
                   ->orWhere('subject', 'like', "%{$this->search}%");
             })
             ->orderBy('date', 'desc')
@@ -168,7 +168,6 @@ new class extends Component {
         $studentResults = [];
         if (strlen($this->studentSearch) >= 3 && !$this->selectedStudentId) {
             $studentResults = Student::where('name', 'like', "%{$this->studentSearch}%")
-                ->orWhere('curp', 'like', "%{$this->studentSearch}%")
                 ->limit(5)
                 ->get();
         }
@@ -230,7 +229,6 @@ new class extends Component {
                         </td>
                         <td class="py-4 px-2">
                             <div class="font-bold">{{ $report->student->name }}</div>
-                            <div class="text-xs text-zinc-500">{{ $report->student->curp }}</div>
                         </td>
                         <td class="py-4 px-2">
                             <div class="font-medium text-blue-600 dark:text-blue-400">{{ $report->infraction->description }}</div>
@@ -282,60 +280,62 @@ new class extends Component {
         </div>
     </div>
 
-    <!-- Create/Edit Modal -->
-    <flux:modal wire:model.self="showReportModal" class="md:w-160">
-        <form wire:submit="save" class="space-y-6">
-            <header>
-                <flux:heading size="lg">Registrar Reporte Disciplinario</flux:heading>
-                <flux:text>Complete los detalles de la incidencia académica o conductual.</flux:text>
-            </header>
+    @can('teacher-or-admin')
+        <!-- Create/Edit Modal -->
+        <flux:modal wire:model.self="showReportModal" class="md:w-160">
+            <form wire:submit="save" class="space-y-6">
+                <header>
+                    <flux:heading size="lg">Registrar Reporte Disciplinario</flux:heading>
+                    <flux:text>Complete los detalles de la incidencia académica o conductual.</flux:text>
+                </header>
 
-            <div class="space-y-4">
-                <!-- Student Search -->
-                <div class="relative">
-                    <flux:input wire:model.live.debounce.300ms="studentSearch" label="Buscar Alumno (Nombre o CURP)" icon="user" placeholder="Escriba al menos 3 caracteres..." />
-                    @if(count($studentResults) > 0)
-                        <div class="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden">
-                            @foreach($studentResults as $student)
-                                <button type="button" wire:click="selectStudent('{{ $student->id }}')" class="w-full text-left px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 flex flex-col">
-                                    <span class="font-bold text-sm">{{ $student->name }}</span>
-                                    <span class="text-xs text-zinc-500">{{ $student->curp }} - {{ $student->grade }}{{ $student->group_name }}</span>
-                                </button>
-                            @endforeach
-                        </div>
-                    @endif
-                    @if($selectedStudentId)
-                        <div class="mt-2 flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-medium">
-                            <flux:icon icon="check-circle" variant="micro" />
-                            Alumno seleccionado correctamente.
-                        </div>
-                    @endif
+                <div class="space-y-4">
+                    <!-- Student Search -->
+                    <div class="relative">
+                        <flux:input wire:model.live.debounce.300ms="studentSearch" label="Buscar Alumno (Nombre)" icon="user" placeholder="Escriba al menos 3 caracteres..." />
+                        @if(count($studentResults) > 0)
+                            <div class="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden">
+                                @foreach($studentResults as $student)
+                                    <button type="button" wire:click="selectStudent('{{ $student->id }}')" class="w-full text-left px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 flex flex-col">
+                                        <span class="font-bold text-sm">{{ $student->name }}</span>
+                                        <span class="text-xs text-zinc-500">{{ $student->grade }}{{ $student->group_name }}</span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
+                        @if($selectedStudentId)
+                            <div class="mt-2 flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-medium">
+                                <flux:icon icon="check-circle" variant="micro" />
+                                Alumno seleccionado correctamente.
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <flux:input type="date" wire:model="reportDate" label="Fecha" />
+                        <flux:input type="time" wire:model="reportTime" label="Hora" />
+                    </div>
+
+                    <flux:select label="Infracción (Reglamento)" wire:model="infractionId">
+                        <option value="">Seleccione el tipo de falta...</option>
+                        @foreach($infractions as $infraction)
+                            <option value="{{ $infraction->id }}">{{ $infraction->description }} ({{ $infraction->severity }})</option>
+                        @endforeach
+                    </flux:select>
+
+                    <flux:input wire:model="subject" label="Asunto / Materia (Opcional)" placeholder="Ej: Clase de Matemáticas, Receso..." />
+
+                    <flux:textarea wire:model="description" label="Descripción de los hechos" placeholder="Detalle lo sucedido de forma objetiva..." rows="4" />
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <flux:input type="date" wire:model="reportDate" label="Fecha" />
-                    <flux:input type="time" wire:model="reportTime" label="Hora" />
+                <div class="flex gap-2">
+                    <flux:spacer />
+                    <flux:button wire:click="$set('showReportModal', false)">Cancelar</flux:button>
+                    <flux:button variant="primary" type="submit">Guardar Reporte</flux:button>
                 </div>
-
-                <flux:select label="Infracción (Reglamento)" wire:model="infractionId">
-                    <option value="">Seleccione el tipo de falta...</option>
-                    @foreach($infractions as $infraction)
-                        <option value="{{ $infraction->id }}">{{ $infraction->description }} ({{ $infraction->severity }})</option>
-                    @endforeach
-                </flux:select>
-
-                <flux:input wire:model="subject" label="Asunto / Materia (Opcional)" placeholder="Ej: Clase de Matemáticas, Receso..." />
-
-                <flux:textarea wire:model="description" label="Descripción de los hechos" placeholder="Detalle lo sucedido de forma objetiva..." rows="4" />
-            </div>
-
-            <div class="flex gap-2">
-                <flux:spacer />
-                <flux:button wire:click="$set('showReportModal', false)">Cancelar</flux:button>
-                <flux:button variant="primary" type="submit">Guardar Reporte</flux:button>
-            </div>
-        </form>
-    </flux:modal>
+            </form>
+        </flux:modal>
+    @endcan
 
     <!-- Notification logic (Toast) would go here or in layout -->
 </div>

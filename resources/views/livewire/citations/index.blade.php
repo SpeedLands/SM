@@ -22,7 +22,7 @@ new class extends Component {
 
     public function mount(): void
     {
-        $this->citationDate = now()->addDay()->format('Y-m-d');
+        $this->citationDate = now()->format('Y-m-d');
         $this->citationTime = '08:00';
     }
 
@@ -36,7 +36,7 @@ new class extends Component {
     public function resetForm(): void
     {
         $this->reset(['selectedStudentId', 'studentSearch', 'reason']);
-        $this->citationDate = now()->addDay()->format('Y-m-d');
+        $this->citationDate = now()->format('Y-m-d');
         $this->citationTime = '08:00';
     }
 
@@ -289,7 +289,6 @@ new class extends Component {
                                 @foreach($studentResults as $student)
                                     <button type="button" wire:click="selectStudent('{{ $student->id }}')" class="w-full text-left px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 flex flex-col">
                                         <span class="font-bold text-sm">{{ $student->name }}</span>
-                                        <span class="text-xs text-zinc-500">{{ $student->curp }}</span>
                                     </button>
                                 @endforeach
                             </div>

@@ -2,14 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Student;
 use App\Models\Cycle;
 use App\Models\Infraction;
 use App\Models\Report;
+use App\Models\Student;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class RoleTestingSeeder extends Seeder
 {
@@ -20,7 +19,7 @@ class RoleTestingSeeder extends Seeder
     {
         // Get or create active cycle
         $cycle = Cycle::where('is_active', true)->first();
-        if (!$cycle) {
+        if (! $cycle) {
             $cycle = Cycle::create([
                 'name' => '2024-2025',
                 'start_date' => '2024-08-26',
@@ -33,7 +32,6 @@ class RoleTestingSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin.test@escuela.edu.mx'],
             [
-                'id' => (string) Str::uuid(),
                 'name' => 'Admin de Pruebas',
                 'password' => Hash::make('password'),
                 'role' => 'ADMIN',
@@ -46,7 +44,6 @@ class RoleTestingSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'teacher.test@escuela.edu.mx'],
             [
-                'id' => (string) Str::uuid(),
                 'name' => 'Maestro de Pruebas',
                 'password' => Hash::make('password'),
                 'role' => 'TEACHER',
@@ -59,7 +56,6 @@ class RoleTestingSeeder extends Seeder
         $parent = User::updateOrCreate(
             ['email' => 'parent.test@escuela.edu.mx'],
             [
-                'id' => (string) Str::uuid(),
                 'name' => 'Padre de Pruebas',
                 'password' => Hash::make('password'),
                 'role' => 'PARENT',
@@ -71,10 +67,8 @@ class RoleTestingSeeder extends Seeder
         );
 
         $student = Student::firstOrCreate(
-            ['curp' => 'TESTSTUDENT001'],
+            ['name' => 'ALUMNO DE PRUEBAS'],
             [
-                'id' => (string) Str::uuid(),
-                'name' => 'ALUMNO DE PRUEBAS',
                 'birth_date' => '2010-01-01',
                 'grade' => '1º',
                 'group_name' => 'A',
@@ -83,7 +77,7 @@ class RoleTestingSeeder extends Seeder
         );
 
         // Associate Parent and Student
-        if (!$parent->students()->where('student_id', $student->id)->exists()) {
+        if (! $parent->students()->where('student_id', $student->id)->exists()) {
             $parent->students()->attach($student->id, ['relationship' => 'PADRE']);
         }
 

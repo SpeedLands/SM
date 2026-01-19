@@ -32,11 +32,21 @@ new class extends Component {
             'totalStudents' => Student::count(),
             'totalReports' => $activeCycle ? Report::where('cycle_id', $activeCycle->id)->count() : 0,
             'activeCitations' => $activeCycle ? Citation::where('cycle_id', $activeCycle->id)->where('status', 'PENDING')->count() : 0,
-            'activeNotices' => Notice::count(),
+            'activeNotices' => $activeCycle ? Notice::where('cycle_id', $activeCycle->id)->count() : Notice::count(),
         ];
 
-        $recentReports = Report::with('student')->latest('date')->limit(5)->get();
-        $upcomingCitations = Citation::with(['student', 'teacher'])->where('status', 'PENDING')->orderBy('citation_date')->limit(5)->get();
+        $recentReports = Report::with('student')
+            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
+            ->latest('date')
+            ->limit(5)
+            ->get();
+            
+        $upcomingCitations = Citation::with(['student', 'teacher'])
+            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
+            ->where('status', 'PENDING')
+            ->orderBy('citation_date')
+            ->limit(5)
+            ->get();
 
         return array_merge($stats, [
             'recentReports' => $recentReports,
@@ -51,11 +61,14 @@ new class extends Component {
         $user = auth()->user();
         $myStudents = $user->students()->with(['reports' => function($q) use ($activeCycle) {
             if ($activeCycle) $q->where('cycle_id', $activeCycle->id);
-        }, 'communityServices'])->get();
+        }, 'communityServices' => function($q) use ($activeCycle) {
+             if ($activeCycle) $q->where('cycle_id', $activeCycle->id);
+        }])->get();
 
         $studentIds = $myStudents->pluck('id')->toArray();
         
         $citations = Citation::whereIn('student_id', $studentIds)
+            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
             ->where('status', 'PENDING')
             ->orderBy('citation_date')
             ->get();
@@ -64,6 +77,7 @@ new class extends Component {
                 $q->where('target_audience', 'ALL')
                   ->orWhere('target_audience', 'PARENTS');
             })
+            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
             ->latest('date')
             ->limit(5)
             ->get();

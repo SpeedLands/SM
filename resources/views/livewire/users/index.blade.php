@@ -26,6 +26,8 @@ new class extends Component {
     public string $userRole = 'TEACHER';
     public string $userPhone = '';
     public string $userOccupation = '';
+    public string $userPassword = '';
+    public bool $showPassword = false;
 
     protected $rules = [
         'userName' => 'required|string|max:255',
@@ -33,6 +35,7 @@ new class extends Component {
         'userRole' => 'required|in:ADMIN,TEACHER,PARENT',
         'userPhone' => 'nullable|string|max:20',
         'userOccupation' => 'nullable|string|max:100',
+        'userPassword' => 'nullable|string|min:8',
     ];
 
     public function updatingSearch(): void
@@ -48,7 +51,7 @@ new class extends Component {
 
     public function openCreateModal(): void
     {
-        $this->reset(['userId', 'userName', 'userEmail', 'userRole', 'userPhone', 'userOccupation']);
+        $this->reset(['userId', 'userName', 'userEmail', 'userRole', 'userPhone', 'userOccupation', 'userPassword', 'showPassword']);
         $this->showUserModal = true;
     }
 
@@ -60,6 +63,8 @@ new class extends Component {
         $this->userRole = $user->role;
         $this->userPhone = $user->phone ?? '';
         $this->userOccupation = $user->occupation ?? '';
+        $this->userPassword = '';
+        $this->showPassword = false;
         $this->showUserModal = true;
     }
 
@@ -67,28 +72,50 @@ new class extends Component {
     {
         $this->validate();
 
+        $transform = function($text) {
+            if (!$text) return null;
+            
+            $text = mb_strtoupper($text, 'UTF-8');
+            
+            $accents = [
+                'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U',
+                'Ü' => 'U', 'Ñ' => 'N', 'À' => 'A', 'È' => 'E', 'Ì' => 'I',
+                'Ò' => 'O', 'Ù' => 'U'
+            ];
+            
+            return strtr($text, $accents);
+        };
+
+        $cleanName = $transform($this->userName);
+        $cleanOccupation = $this->userRole === 'PARENT' ? $transform($this->userOccupation) : null;
+
         if ($this->userId) {
             $user = User::findOrFail($this->userId);
-            $user->update([
-                'name' => $this->userName,
+            $data = [
+                'name' => $cleanName,
                 'email' => $this->userEmail,
                 'role' => $this->userRole,
                 'phone' => $this->userRole === 'PARENT' ? $this->userPhone : null,
-                'occupation' => $this->userRole === 'PARENT' ? $this->userOccupation : null,
-            ]);
+                'occupation' => $cleanOccupation,
+            ];
+
+            if ($this->userPassword) {
+                $data['password'] = Hash::make($this->userPassword);
+            }
+
+            $user->update($data);
         } else {
-            $tempPassword = Str::random(10);
+            $password = $this->userPassword ?: Str::random(10);
             User::create([
                 'id' => (string) Str::uuid(),
-                'name' => $this->userName,
+                'name' => $cleanName,
                 'email' => $this->userEmail,
-                'password' => Hash::make($tempPassword),
+                'password' => Hash::make($password),
                 'role' => $this->userRole,
                 'status' => 'FORCE_PASSWORD_CHANGE',
                 'phone' => $this->userRole === 'PARENT' ? $this->userPhone : null,
-                'occupation' => $this->userRole === 'PARENT' ? $this->userOccupation : null,
+                'occupation' => $cleanOccupation,
             ]);
-            // In a real app, we would send an email with $tempPassword
         }
 
         $this->showUserModal = false;
@@ -174,7 +201,8 @@ new class extends Component {
             </flux:field>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2">
+        {{-- Status filters hidden as requested --}}
+        <div class="hidden flex flex-wrap items-center gap-2">
             <flux:text class="mr-2 text-sm font-medium">Estado:</flux:text>
             @foreach(['Todos', 'Activos', 'Bloqueados', 'Pendiente Cambio Pass'] as $status)
                 <button 
@@ -203,7 +231,7 @@ new class extends Component {
                     <tr class="border-b border-zinc-200 dark:border-zinc-700 text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                         <th class="py-3 px-2 font-semibold">Usuario</th>
                         <th class="py-3 px-2 font-semibold">Rol</th>
-                        <th class="py-3 px-2 font-semibold">Estado</th>
+                        {{-- <th class="py-3 px-2 font-semibold text-center">Estado</th> --}}
                         <th class="py-3 px-2 font-semibold">Último Acceso</th>
                         <th class="py-3 px-2 text-right font-semibold">Acciones</th>
                     </tr>
@@ -247,7 +275,7 @@ new class extends Component {
                                 @endphp
                                 <flux:badge color="{{ $roleColor }}" size="sm">{{ $roleLabel }}</flux:badge>
                             </td>
-                            <td class="py-4 px-2">
+                            {{-- <td class="py-4 px-2">
                                 <div class="flex items-center gap-2">
                                     @if($user->status === 'ACTIVE')
                                         <span class="w-2 h-2 rounded-full bg-green-500"></span>
@@ -260,7 +288,7 @@ new class extends Component {
                                         <span class="text-xs font-medium text-red-600 dark:text-red-400">Bloqueado</span>
                                     @endif
                                 </div>
-                            </td>
+                            </td> --}}
                             <td class="py-4 px-2 text-zinc-500 dark:text-zinc-400">
                                 {{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Nunca' }}
                             </td>
@@ -300,7 +328,7 @@ new class extends Component {
     </div>
 
     <!-- Protocol footer -->
-    <div class="p-6 rounded-xl border border-blue-100 bg-blue-50 dark:border-blue-900/30 dark:bg-blue-900/10 flex items-start gap-4">
+    {{-- <div class="p-6 rounded-xl border border-blue-100 bg-blue-50 dark:border-blue-900/30 dark:bg-blue-900/10 flex items-start gap-4">
         <flux:icon icon="information-circle" class="text-blue-600 dark:text-blue-400 mt-1" />
         <div class="space-y-1">
             <flux:heading size="sm" class="text-blue-900 dark:text-blue-300 font-bold">Protocolo de Seguridad</flux:heading>
@@ -308,7 +336,7 @@ new class extends Component {
                 Las contraseñas generadas temporalmente tienen una validez de 24 horas. Los usuarios deben estar físicamente presentes o verificados telefónicamente antes de realizar un desbloqueo manual.
             </flux:text>
         </div>
-    </div>
+    </div> --}}
 
     <!-- User Modal -->
     <flux:modal wire:model="showUserModal" class="w-full max-w-lg">
@@ -316,7 +344,18 @@ new class extends Component {
             <flux:heading size="lg">{{ $userId ? 'Editar Usuario' : 'Añadir Nuevo Usuario' }}</flux:heading>
 
             <form wire:submit="saveUser" class="space-y-4">
-                <flux:input label="Nombre completo" wire:model="userName" placeholder="Juan Pérez" />
+                <flux:input 
+                    label="Nombre completo" 
+                    wire:model="userName" 
+                    placeholder="Juan Pérez" 
+                    class="uppercase"
+                    x-on:input="
+                        let start = $el.selectionStart;
+                        let end = $el.selectionEnd;
+                        $el.value = $el.value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                        $el.setSelectionRange(start, end);
+                    "
+                />
                 <flux:input label="Correo electrónico" wire:model="userEmail" type="email" placeholder="email@escuela.edu.mx" />
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -332,13 +371,35 @@ new class extends Component {
                 </div>
 
                 @if($userRole === 'PARENT')
-                    <flux:input label="Ocupación" wire:model="userOccupation" placeholder="Ej. Ingeniero, Comerciante..." />
+                    <flux:input 
+                        label="Ocupación" 
+                        wire:model="userOccupation" 
+                        placeholder="Ej. Ingeniero, Comerciante..." 
+                        class="uppercase"
+                        x-on:input="
+                            let start = $el.selectionStart;
+                            let end = $el.selectionEnd;
+                            $el.value = $el.value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                            $el.setSelectionRange(start, end);
+                        "
+                    />
                 @endif
 
-                @if(!$userId)
+                <div class="flex items-end gap-2">
+                    <flux:input 
+                        label="{{ $userId ? 'Cambiar Contraseña (dejar vacío para mantener)' : 'Contraseña' }}" 
+                        wire:model="userPassword" 
+                        type="{{ $showPassword ? 'text' : 'password' }}" 
+                        placeholder="{{ $userId ? 'Nuevo password...' : 'Password para el usuario...' }}"
+                        class="flex-1"
+                    />
+                    <flux:button variant="ghost" icon="{{ $showPassword ? 'eye-slash' : 'eye' }}" wire:click="$toggle('showPassword')" class="mb-0.5" />
+                </div>
+
+                @if(!$userId && !$userPassword)
                     <div class="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
                         <flux:text size="sm" class="text-zinc-600 dark:text-zinc-400">
-                            <strong>Nota:</strong> Se generará una contraseña temporal automática y el usuario deberá cambiarla en su primer inicio de sesión.
+                            <strong>Nota:</strong> Si no ingresa una contraseña, se generará una automática. El usuario deberá cambiarla en su primer inicio.
                         </flux:text>
                     </div>
                 @endif

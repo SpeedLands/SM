@@ -141,7 +141,6 @@ new class extends Component {
         $studentResults = [];
         if (strlen($this->studentSearch) >= 3 && !$this->selectedStudentId) {
             $studentResults = Student::where('name', 'like', "%{$this->studentSearch}%")
-                ->orWhere('curp', 'like', "%{$this->studentSearch}%")
                 ->limit(5)
                 ->get();
         }
@@ -236,10 +235,12 @@ new class extends Component {
                         </td>
                         <td class="py-4 px-2 text-right">
                             <div class="flex justify-end gap-1">
-                                @if($service->status === 'PENDING')
-                                    <flux:button variant="ghost" size="sm" icon="check-circle" class="text-green-600" title="Marcar como cumplido" wire:click="updateStatus('{{ $service->id }}', 'COMPLETED')" />
-                                    <flux:button variant="ghost" size="sm" icon="x-circle" class="text-red-600" title="Marcar como no asistió" wire:click="updateStatus('{{ $service->id }}', 'MISSED')" />
-                                @endif
+                                @can('teacher-or-admin')
+                                    @if($service->status === 'PENDING')
+                                        <flux:button variant="ghost" size="sm" icon="check-circle" class="text-green-600" title="Marcar como cumplido" wire:click="updateStatus('{{ $service->id }}', 'COMPLETED')" />
+                                        <flux:button variant="ghost" size="sm" icon="x-circle" class="text-red-600" title="Marcar como no asistió" wire:click="updateStatus('{{ $service->id }}', 'MISSED')" />
+                                    @endif
+                                @endcan
                                 <flux:button variant="ghost" size="sm" icon="eye" />
                             </div>
                         </td>
@@ -266,13 +267,12 @@ new class extends Component {
 
             <div class="space-y-4">
                 <div class="relative">
-                    <flux:input wire:model.live.debounce.300ms="studentSearch" label="Buscar Alumno" icon="user" placeholder="Nombre o CURP..." />
+                    <flux:input wire:model.live.debounce.300ms="studentSearch" label="Buscar Alumno" icon="user" placeholder="Nombre..." />
                     @if(count($studentResults) > 0)
                         <div class="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden">
                             @foreach($studentResults as $student)
                                 <button type="button" wire:click="selectStudent('{{ $student->id }}')" class="w-full text-left px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 flex flex-col">
                                     <span class="font-bold text-sm">{{ $student->name }}</span>
-                                    <span class="text-xs text-zinc-500">{{ $student->curp }}</span>
                                 </button>
                             @endforeach
                         </div>

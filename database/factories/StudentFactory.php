@@ -17,7 +17,6 @@ class StudentFactory extends Factory
     public function definition(): array
     {
         return [
-            'curp' => strtoupper($this->faker->bothify('????######??????##')),
             'name' => strtoupper($this->faker->name),
             'birth_date' => $this->faker->date(),
             'grade' => '1º',

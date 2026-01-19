@@ -1,44 +1,120 @@
 
-   FAIL  Tests\Feature\Auth\RegistrationTest
-  Ô¿» registratÔÇª 0.36s  
-  Ô¿» new usersÔÇª 0.02s  
+   FAIL  Tests\Feature\StudentsTest
+  Ô¿» guests cannot access students page
+  Ô¿» admins can see students list
+  Ô¿» can search students by name or curp
+  Ô¿» admins can enroll a new student
+  Ô¿» admins can edit a student
+  Ô¿» admins can associate parents to a student
   ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
-   FAILED  Tests\Feature\Auth\RegistrationTest > registration screen can be rendered  RouteNotFoundException   
-  Route [register] not defined.
+  ÔÇª  QueryException   
+  SQLSTATE[HY000]: General error: 1 error in index students_curp_unique after drop column: no such column: curp (Connection: sqlite, SQL: alter table "students" drop column "curp")
 
-  at vendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php:526
-    522Ôûò             ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
-    523Ôûò             return $url;
-    524Ôûò         }
-    525Ôûò 
-  Ô×£ 526Ôûò         throw new RouteNotFoundException("Route [{$name}] not defined.");
-    527Ôûò     }
-    528Ôûò 
-    529Ôûò     /**
-    530Ôûò      * Get the URL for a given route instance.
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+    566Ôûò             $this->bindValues($statement, $this->prepareBindings($bindings));
+    567Ôûò 
+    568Ôûò             $this->recordsHaveBeenModified();
+    569Ôûò 
+  Ô×£ 570Ôûò             return $statement->execute();
+    571Ôûò         });
+    572Ôûò     }
+    573Ôûò 
+    574Ôûò     /**
 
-  1   vendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php:526
-  2   vendor\laravel\framework\src\Illuminate\Foundation\helpers.php:871
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
 
   ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
-   FAILED  Tests\Feature\Auth\RegistrationTest > new users can register  RouteNotFoundException   
-  Route [register.store] not defined.
+  ÔÇª  QueryException   
+  SQLSTATE[HY000]: General error: 1 error in index students_curp_unique after drop column: no such column: curp (Connection: sqlite, SQL: alter table "students" drop column "curp")
 
-  at vendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php:526
-    522Ôûò             ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
-    523Ôûò             return $url;
-    524Ôûò         }
-    525Ôûò 
-  Ô×£ 526Ôûò         throw new RouteNotFoundException("Route [{$name}] not defined.");
-    527Ôûò     }
-    528Ôûò 
-    529Ôûò     /**
-    530Ôûò      * Get the URL for a given route instance.
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+    566Ôûò             $this->bindValues($statement, $this->prepareBindings($bindings));
+    567Ôûò 
+    568Ôûò             $this->recordsHaveBeenModified();
+    569Ôûò 
+  Ô×£ 570Ôûò             return $statement->execute();
+    571Ôûò         });
+    572Ôûò     }
+    573Ôûò 
+    574Ôûò     /**
 
-  1   vendor\laravel\framework\src\Illuminate\Routing\UrlGenerator.php:526
-  2   vendor\laravel\framework\src\Illuminate\Foundation\helpers.php:871
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+  ÔÇª  QueryException   
+  SQLSTATE[HY000]: General error: 1 error in index students_curp_unique after drop column: no such column: curp (Connection: sqlite, SQL: alter table "students" drop column "curp")
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+    566Ôûò             $this->bindValues($statement, $this->prepareBindings($bindings));
+    567Ôûò 
+    568Ôûò             $this->recordsHaveBeenModified();
+    569Ôûò 
+  Ô×£ 570Ôûò             return $statement->execute();
+    571Ôûò         });
+    572Ôûò     }
+    573Ôûò 
+    574Ôûò     /**
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+  ÔÇª  QueryException   
+  SQLSTATE[HY000]: General error: 1 error in index students_curp_unique after drop column: no such column: curp (Connection: sqlite, SQL: alter table "students" drop column "curp")
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+    566Ôûò             $this->bindValues($statement, $this->prepareBindings($bindings));
+    567Ôûò 
+    568Ôûò             $this->recordsHaveBeenModified();
+    569Ôûò 
+  Ô×£ 570Ôûò             return $statement->execute();
+    571Ôûò         });
+    572Ôûò     }
+    573Ôûò 
+    574Ôûò     /**
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+  ÔÇª  QueryException   
+  SQLSTATE[HY000]: General error: 1 error in index students_curp_unique after drop column: no such column: curp (Connection: sqlite, SQL: alter table "students" drop column "curp")
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+    566Ôûò             $this->bindValues($statement, $this->prepareBindings($bindings));
+    567Ôûò 
+    568Ôûò             $this->recordsHaveBeenModified();
+    569Ôûò 
+  Ô×£ 570Ôûò             return $statement->execute();
+    571Ôûò         });
+    572Ôûò     }
+    573Ôûò 
+    574Ôûò     /**
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+  ÔÇª  QueryException   
+  SQLSTATE[HY000]: General error: 1 error in index students_curp_unique after drop column: no such column: curp (Connection: sqlite, SQL: alter table "students" drop column "curp")
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+    566Ôûò             $this->bindValues($statement, $this->prepareBindings($bindings));
+    567Ôûò 
+    568Ôûò             $this->recordsHaveBeenModified();
+    569Ôûò 
+  Ô×£ 570Ôûò             return $statement->execute();
+    571Ôûò         });
+    572Ôûò     }
+    573Ôûò 
+    574Ôûò     /**
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:570
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
 
 
-  Tests:    2 failed (0 assertions)
-  Duration: 0.63s
+  Tests:    6 failed (0 assertions)
+  Duration: 0.93s
 

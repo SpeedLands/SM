@@ -19,7 +19,6 @@ class Student extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'curp',
         'name',
         'birth_date',
         'grade',

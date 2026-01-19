@@ -23,8 +23,7 @@ test('admins can see students list', function () {
     $this->actingAs($admin)
         ->get(route('students.index'))
         ->assertOk()
-        ->assertSee($student->name)
-        ->assertSee($student->curp);
+        ->assertSee($student->name);
 });
 
 test('can search students by name or curp', function () {
@@ -32,17 +31,14 @@ test('can search students by name or curp', function () {
     $cycle = Cycle::factory()->create(['is_active' => true]);
     $group = ClassGroup::factory()->create(['cycle_id' => $cycle->id]);
 
-    $student1 = Student::factory()->create(['name' => 'JUAN PEREZ', 'curp' => 'PERE800101HDFRRR01', 'grade' => $group->grade, 'group_name' => $group->section]);
-    $student2 = Student::factory()->create(['name' => 'MARIA LOPEZ', 'curp' => 'LOPE900202MDFRRR02', 'grade' => $group->grade, 'group_name' => $group->section]);
+    $student1 = Student::factory()->create(['name' => 'JUAN PEREZ', 'grade' => $group->grade, 'group_name' => $group->section]);
+    $student2 = Student::factory()->create(['name' => 'MARIA LOPEZ', 'grade' => $group->grade, 'group_name' => $group->section]);
 
     Volt::actingAs($admin)
         ->test('students.index')
         ->set('search', 'JUAN')
         ->assertSee($student1->name)
-        ->assertDontSee($student2->name)
-        ->set('search', 'LOPE900')
-        ->assertSee($student2->name)
-        ->assertDontSee($student1->name);
+        ->assertDontSee($student2->name);
 });
 
 test('admins can enroll a new student', function () {
@@ -53,7 +49,6 @@ test('admins can enroll a new student', function () {
     Volt::actingAs($admin)
         ->test('students.index')
         ->call('openCreateModal')
-        ->set('curp', 'TEST123456HDFRRR01')
         ->set('name', 'ALUMNO NUEVO')
         ->set('birthDate', '2010-05-15')
         ->set('turn', 'MATUTINO')
@@ -63,7 +58,7 @@ test('admins can enroll a new student', function () {
         ->assertHasNoErrors()
         ->assertSet('showStudentModal', false);
 
-    $student = Student::where('curp', 'TEST123456HDFRRR01')->first();
+    $student = Student::where('name', 'ALUMNO NUEVO')->first();
     expect($student)->not->toBeNull();
     expect($student->name)->toBe('ALUMNO NUEVO');
     expect($student->grade)->toBe('2º');
