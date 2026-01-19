@@ -202,7 +202,7 @@ new class extends Component {
         </div>
 
         {{-- Status filters hidden as requested --}}
-        <div class="hidden flex flex-wrap items-center gap-2">
+        <div class="hidden flex-wrap items-center gap-2">
             <flux:text class="mr-2 text-sm font-medium">Estado:</flux:text>
             @foreach(['Todos', 'Activos', 'Bloqueados', 'Pendiente Cambio Pass'] as $status)
                 <button 
