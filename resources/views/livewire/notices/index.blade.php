@@ -15,6 +15,7 @@ new class extends Component {
 
     // Create Modal
     public bool $showCreateModal = false;
+    public ?string $editingNoticeId = null;
     public string $title = '';
     public string $content = '';
     public string $type = 'GENERAL';
@@ -31,6 +32,8 @@ new class extends Component {
 
     public function saveNotice(): void
     {
+        $this->authorize('teacher-or-admin');
+        
         $this->validate([
             'title' => 'required|string|max:100',
             'content' => 'required|string',
@@ -41,28 +44,68 @@ new class extends Component {
             'content.required' => 'El contenido es obligatorio.',
         ]);
 
-        $activeCycle = Cycle::where('is_active', true)->first();
-        if (!$activeCycle) {
-            $this->dispatch('notify', ['message' => 'No hay un ciclo escolar activo.', 'variant' => 'danger']);
-            return;
+        if ($this->editingNoticeId) {
+            $notice = Notice::findOrFail($this->editingNoticeId);
+            $notice->update([
+                'title' => $this->title,
+                'content' => $this->content,
+                'type' => $this->type,
+                'target_audience' => $this->targetAudience,
+                'requires_authorization' => $this->requiresAuthorization,
+                'event_date' => $this->eventDate ?: null,
+                'event_time' => $this->eventTime ?: null,
+            ]);
+            $message = 'Aviso actualizado exitosamente.';
+        } else {
+            $activeCycle = Cycle::where('is_active', true)->first();
+            if (!$activeCycle) {
+                $this->dispatch('notify', ['message' => 'No hay un ciclo escolar activo.', 'variant' => 'danger']);
+                return;
+            }
+
+            Notice::create([
+                'cycle_id' => $activeCycle->id,
+                'author_id' => auth()->id(),
+                'title' => $this->title,
+                'content' => $this->content,
+                'type' => $this->type,
+                'target_audience' => $this->targetAudience,
+                'requires_authorization' => $this->requiresAuthorization,
+                'event_date' => $this->eventDate ?: null,
+                'event_time' => $this->eventTime ?: null,
+                'date' => now(),
+            ]);
+            $message = 'Aviso publicado exitosamente.';
         }
 
-        Notice::create([
-            'cycle_id' => $activeCycle->id,
-            'author_id' => auth()->id(),
-            'title' => $this->title,
-            'content' => $this->content,
-            'type' => $this->type,
-            'target_audience' => $this->targetAudience,
-            'requires_authorization' => $this->requiresAuthorization,
-            'event_date' => $this->eventDate ?: null,
-            'event_time' => $this->eventTime ?: null,
-            'date' => now(),
-        ]);
-
         $this->showCreateModal = false;
-        $this->reset(['title', 'content', 'requiresAuthorization']);
-        $this->dispatch('notify', ['message' => 'Aviso publicado exitosamente.']);
+        $this->editingNoticeId = null;
+        $this->reset(['title', 'content', 'requiresAuthorization', 'type', 'targetAudience']);
+        $this->dispatch('notify', ['message' => $message]);
+    }
+
+    public function editNotice(string $id): void
+    {
+        $this->authorize('teacher-or-admin');
+        $notice = Notice::findOrFail($id);
+        
+        $this->editingNoticeId = $notice->id;
+        $this->title = $notice->title;
+        $this->content = $notice->content;
+        $this->type = $notice->type;
+        $this->targetAudience = $notice->target_audience;
+        $this->requiresAuthorization = (bool) $notice->requires_authorization;
+        $this->eventDate = $notice->event_date ? $notice->event_date->format('Y-m-d') : '';
+        $this->eventTime = $notice->event_time ?? '';
+        
+        $this->showCreateModal = true;
+    }
+
+    public function deleteNotice(string $id): void
+    {
+        $this->authorize('teacher-or-admin');
+        Notice::findOrFail($id)->delete();
+        $this->dispatch('notify', ['message' => 'Aviso eliminado correctamente.']);
     }
 
     public function signNotice(string $noticeId, string $studentId, bool $isAuthorized = true): void
@@ -154,6 +197,10 @@ new class extends Component {
                             <p class="mt-2 text-zinc-600 dark:text-zinc-400 line-clamp-2 text-sm leading-relaxed">{{ $notice->content }}</p>
                         </div>
                         <div class="flex flex-col items-end gap-2">
+                            <div class="flex gap-1 mb-1">
+                                <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editNotice('{{ $notice->id }}')" />
+                                <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="deleteNotice('{{ $notice->id }}')" />
+                            </div>
                             <flux:badge color="neutral" icon="finger-print" variant="outline">{{ $notice->signatures_count }} Firmas</flux:badge>
                             @if($notice->requires_authorization)
                                 <flux:badge color="purple" size="sm">Requiere Autorización</flux:badge>
@@ -284,8 +331,8 @@ new class extends Component {
     <flux:modal wire:model.self="showCreateModal" class="md:w-160">
         <form wire:submit="saveNotice" class="space-y-6">
             <header>
-                <flux:heading size="md">Nuevo Aviso Escolar</flux:heading>
-                <flux:text>Cree un comunicado para la comunidad escolar.</flux:text>
+                <flux:heading size="md">{{ $editingNoticeId ? 'Editar Aviso Escolar' : 'Nuevo Aviso Escolar' }}</flux:heading>
+                <flux:text>{{ $editingNoticeId ? 'Modifique los detalles del comunicado.' : 'Cree un comunicado para la comunidad escolar.' }}</flux:text>
             </header>
 
             <div class="space-y-4">
@@ -320,7 +367,7 @@ new class extends Component {
             <div class="flex gap-2">
                 <flux:spacer />
                 <flux:button wire:click="$set('showCreateModal', false)">Cancelar</flux:button>
-                <flux:button variant="primary" type="submit">Publicar Aviso</flux:button>
+                <flux:button variant="primary" type="submit">{{ $editingNoticeId ? 'Actualizar Aviso' : 'Publicar Aviso' }}</flux:button>
             </div>
         </form>
     </flux:modal>

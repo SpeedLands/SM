@@ -365,12 +365,18 @@ new class extends Component {
                     <flux:text>Complete los datos pedagógicos y personales del estudiante.</flux:text>
                 </header>
 
-                <form wire:submit="save" class="space-y-8">
+                <form wire:submit="save" class="space-y-8" x-data="{ name: @entangle('name'), emergencyContact: @entangle('emergencyContact') }">
                     <!-- Section: Basic Info -->
                     <div class="space-y-4">
                         <flux:separator text="Información Básica" />
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <flux:input label="Nombre Completo" wire:model="name" placeholder="Ej. Juan Pérez López" class="uppercase md:col-span-1" />
+                            <flux:input 
+                                label="Nombre Completo" 
+                                wire:model="name" 
+                                placeholder="Ej. JUAN PEREZ LOPEZ" 
+                                class="uppercase md:col-span-1"
+                                x-on:input="name = $event.target.value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z ]/g, '')"
+                            />
                             <flux:select label="Turno" wire:model="turn">
                                 <option value="MATUTINO">Matutino</option>
                                 <option value="VESPERTINO">Vespertino</option>
@@ -387,7 +393,12 @@ new class extends Component {
                         <flux:separator text="Información de Contacto" />
                         <flux:textarea label="Dirección" wire:model="address" placeholder="Calle, número, colonia..." rows="2" />
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <flux:input label="Teléfonos de contacto" wire:model="emergencyContact" placeholder="Ej. 12345678, 87654321" />
+                            <flux:input 
+                                label="Teléfonos de contacto" 
+                                wire:model="emergencyContact" 
+                                placeholder="Ej. 12345678, 87654321"
+                                x-on:input="emergencyContact = $event.target.value.replace(/\D/g, '')"
+                            />
                             <flux:input label="Otro contacto / Parentesco" wire:model="otherContact" placeholder="Ej. Abuela - 1234..." />
                         </div>
                     </div>

@@ -122,10 +122,18 @@ new class extends Component {
         // Get unique grades and groups for filters
         $availableGroups = $activeCycle ? ClassGroup::where('cycle_id', $activeCycle->id)->get() : collect();
 
+        $isWeekend = false;
+        if ($this->examDate) {
+            $date = \Carbon\Carbon::parse($this->examDate);
+            $isWeekend = $date->dayOfWeekIso > 5;
+        }
+
         return [
             'exams' => $exams,
             'isStaff' => $isStaff,
             'availableGroups' => $availableGroups,
+            'activeCycle' => $activeCycle,
+            'isWeekend' => $isWeekend,
         ];
     }
 }; ?>
@@ -217,7 +225,13 @@ new class extends Component {
             </header>
 
             <div class="space-y-4">
-                <flux:input wire:model="subject" label="Nombre de la Materia" placeholder="Ej: Matemáticas I, Historia, Geografía..." />
+                @if($isWeekend)
+                    <flux:callout variant="danger" icon="exclamation-triangle">
+                        La fecha seleccionada es fin de semana. Los exámenes deben programarse de Lunes a Viernes.
+                    </flux:callout>
+                @endif
+                
+                <flux:input wire:model.live="subject" label="Nombre de la Materia" placeholder="Ej: Matemáticas I, Historia, Geografía..." />
 
                 <div class="grid grid-cols-2 gap-4">
                     <flux:select wire:model="grade" label="Grado">
@@ -238,7 +252,7 @@ new class extends Component {
                         <option value="2">2º Trimestre</option>
                         <option value="3">3º Trimestre</option>
                     </flux:select>
-                    <flux:input type="date" wire:model="examDate" label="Fecha del Examen" />
+                    <flux:input type="date" wire:model.live="examDate" label="Fecha del Examen" />
                 </div>
                 
                 <flux:text size="xs" class="text-zinc-500 italic">El día de la semana se calculará automáticamente.</flux:text>
