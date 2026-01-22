@@ -70,6 +70,18 @@ new class extends Component {
                     <flux:button variant="primary" class="w-full">Ver Guía</flux:button>
                 </flux:modal.trigger>
             </div>
+            <div class="space-y-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
+                        <flux:icon.book-open class="text-zinc-500" />
+                    </div>
+                    <flux:heading size="lg">Ver Exámenes</flux:heading>
+                </div>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400">Consulta el calendario de exámenes de sus hijos</p>
+                <flux:modal.trigger name="tutorial-view-exams">
+                    <flux:button variant="primary" class="w-full">Ver Guía</flux:button>
+                </flux:modal.trigger>
+            </div>
         </div>
     </div>
     @endif
@@ -212,6 +224,20 @@ new class extends Component {
                 <p>1. Ve al menú <strong>"Citatorios"</strong>.</p>
                 <p>2. Si tienes un citatorio pendiente, verás la fecha, hora y el motivo.</p>
                 <p>3. Es importante asistir puntualmente. Si no puedes asistir, por favor comunícate con la escuela para reagendar.</p>
+            </div>
+        </div>
+    </flux:modal>
+
+    <flux:modal name="tutorial-view-exams" class="md:w-2/3 lg:w-1/2">
+        <div class="space-y-6">
+            <flux:heading size="lg">Ver Exámenes y Filtrar Resultados</flux:heading>
+            <div class="space-y-4 text-zinc-600 dark:text-zinc-300">
+                <p>1. Accede a <strong>"Calendario de Exámenes"</strong> desde el menú lateral.</p>
+                <p>2. Usa los filtros disponibles en la parte superior: <strong>Trimestre</strong>, <strong>Grado</strong> y <strong>Grupo</strong>. Por defecto, si eres padre, el sistema mostrará los exámenes del primer hijo registrado.</p>
+                <p>3. Si tienes más de un hijo (por ejemplo dos o más en distintos grados/secciones), selecciona <strong>"Todos los grados"</strong> y <strong>"Todos los grupos"</strong> en los selectores para ver el calendario completo de evaluaciones de todos tus hijos.</p>
+                <p>4. También puedes filtrar por <strong>Trimestre</strong> para ver solo las evaluaciones de un período específico.</p>
+                <p>5. Si necesitas ver exámenes de un hijo en particular, selecciona el <strong>Grado</strong> y el <strong>Grupo</strong> correspondientes a ese alumno; los filtros respetan la combinación grado+grupo.</p>
+                <div class="text-sm rounded-lg bg-zinc-100 p-3 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">Consejo: Cuando tenga hijos en diferentes secciones, usar los valores "Todos los grupos" y/o "Todos los grados" es la forma más rápida para obtener un calendario consolidado. Si falta algún examen, prueba a cambiar el trimestre o contactar al docente.</div>
             </div>
         </div>
     </flux:modal>
