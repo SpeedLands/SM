@@ -33,7 +33,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T21:52:05.000000Z",
-            "updated_at": "2026-01-18T21:52:05.000000Z"
+            "updated_at": "2026-01-18T21:52:05.000000Z",
+            "password": "<QI>U25:TI"
         },
         {
             "id": "01bff27b-4eb8-45c0-b1e6-2ad930e8e73f",
@@ -50,7 +51,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:00:24.000000Z",
-            "updated_at": "2026-01-18T23:00:24.000000Z"
+            "updated_at": "2026-01-18T23:00:24.000000Z",
+            "password": "Y8Y@OJUSQP"
         },
         {
             "id": "04a36711-4fcb-4c51-8786-f98ae081a71d",
@@ -67,7 +69,8 @@
             "profile_photo_path": null,
             "last_login_at": "2026-01-20T04:45:15.000000Z",
             "created_at": "2026-01-15T20:43:25.000000Z",
-            "updated_at": "2026-01-20T04:45:15.000000Z"
+            "updated_at": "2026-01-20T04:45:15.000000Z",
+            "password": "password"
         },
         {
             "id": "05849349-3444-4d13-9f50-b640467e7a6f",
@@ -84,7 +87,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:45:35.000000Z",
-            "updated_at": "2026-01-18T19:45:35.000000Z"
+            "updated_at": "2026-01-18T19:45:35.000000Z",
+            "password": "2@;P96H93Z"
         },
         {
             "id": "0be5fc0f-e4b1-4357-855a-384841baeacb",
@@ -101,7 +105,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:43:14.000000Z",
-            "updated_at": "2026-01-18T19:43:14.000000Z"
+            "updated_at": "2026-01-18T19:43:14.000000Z",
+            "password": "F01=RY3B@;"
         },
         {
             "id": "17eb26b3-68e8-4610-b59f-7dd9be27ad12",
@@ -118,7 +123,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T22:15:25.000000Z",
-            "updated_at": "2026-01-18T22:15:25.000000Z"
+            "updated_at": "2026-01-18T22:15:25.000000Z",
+            "password": "Y>;6IJ6MPN"
         },
         {
             "id": "188ee6b1-28b6-464e-b8bd-2b8007df0204",
@@ -135,7 +141,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:11:49.000000Z",
-            "updated_at": "2026-01-18T23:11:49.000000Z"
+            "updated_at": "2026-01-18T23:11:49.000000Z",
+            "password": "<F9FK;P8;K"
         },
         {
             "id": "19b0879c-4f45-4e57-ab42-b158ce72a7be",
@@ -152,7 +159,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:13:46.000000Z",
-            "updated_at": "2026-01-18T15:53:28.000000Z"
+            "updated_at": "2026-01-18T15:53:28.000000Z",
+            "password": "JBQR7@H@OK"
         },
         {
             "id": "1bde3ea4-0312-4a49-8d12-4a93c7bda49f",
@@ -169,7 +177,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:15:36.000000Z",
-            "updated_at": "2026-01-18T15:54:30.000000Z"
+            "updated_at": "2026-01-18T15:54:30.000000Z",
+            "password": "KJQ>=>3SSF"
         },
         {
             "id": "2009001c-2157-4e5e-b196-10aac7a313d9",
@@ -186,13 +195,14 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:04:21.000000Z",
-            "updated_at": "2026-01-18T23:04:21.000000Z"
+            "updated_at": "2026-01-18T23:04:21.000000Z",
+            "password": ";M412<5@VA"
         },
         {
             "id": "2089cff2-048d-4f6e-9ddd-6e206dd69ae1",
             "external_id": null,
             "name": "LUCIO CARVAJAL JUANA PETRA",
-            "email": "petra@escuela.edu.mx",
+            "email": "8781034287@escuela.edu.mx",
             "phone": null,
             "occupation": null,
             "email_verified_at": null,
@@ -203,7 +213,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T20:51:01.000000Z",
-            "updated_at": "2026-01-15T20:51:01.000000Z"
+            "updated_at": "2026-01-15T20:51:01.000000Z",
+            "password": "L?SM?DPY2I"
         },
         {
             "id": "21fca033-d7fd-4ff5-a99b-43294fff4f2d",
@@ -220,7 +231,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T16:51:52.000000Z",
-            "updated_at": "2026-01-18T16:51:52.000000Z"
+            "updated_at": "2026-01-18T16:51:52.000000Z",
+            "password": "<2F?OJI6=G"
         },
         {
             "id": "2500a0a7-d3e4-4118-a51a-83f1c6c866c5",
@@ -237,7 +249,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:55:55.000000Z",
-            "updated_at": "2026-01-18T16:24:45.000000Z"
+            "updated_at": "2026-01-18T16:24:45.000000Z",
+            "password": "=U8FVHFDY2"
         },
         {
             "id": "254f126c-f065-41a7-9b81-7735b62aab83",
@@ -254,7 +267,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:47:37.000000Z",
-            "updated_at": "2026-01-18T19:47:37.000000Z"
+            "updated_at": "2026-01-18T19:47:37.000000Z",
+            "password": "E2RO0@9OYW"
         },
         {
             "id": "25c1c09b-021a-4c93-a367-370c56569cbc",
@@ -271,7 +285,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:52:11.000000Z",
-            "updated_at": "2026-01-18T16:20:46.000000Z"
+            "updated_at": "2026-01-18T16:20:46.000000Z",
+            "password": "XV:ADP3VX="
         },
         {
             "id": "25f9eb37-e6f0-475c-84d9-1228775ce32f",
@@ -288,7 +303,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T22:14:30.000000Z",
-            "updated_at": "2026-01-18T22:14:30.000000Z"
+            "updated_at": "2026-01-18T22:14:30.000000Z",
+            "password": "JPZSVI7@9E"
         },
         {
             "id": "285ce35d-cae9-4dfb-b0a3-161426f2508c",
@@ -305,14 +321,15 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T20:56:53.000000Z",
-            "updated_at": "2026-01-15T20:56:53.000000Z"
+            "updated_at": "2026-01-15T20:56:53.000000Z",
+            "password": "1AASYZ52W:"
         },
         {
             "id": "28b8112f-d2e4-4ebd-b55d-2011ab73ab09",
             "external_id": null,
             "name": "PRESAS FRANCO ALVARO",
-            "email": "alvaro@escuela.edu.mx",
-            "phone": null,
+            "email": "8781500044@escuela.edu.mx",
+            "phone": "8781500044",
             "occupation": null,
             "email_verified_at": null,
             "role": "TEACHER",
@@ -322,7 +339,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T20:56:04.000000Z",
-            "updated_at": "2026-01-15T20:56:04.000000Z"
+            "updated_at": "2026-01-15T20:56:04.000000Z",
+            "password": "H9YNBOHK3Q"
         },
         {
             "id": "298f03cb-e497-43d3-be7d-d577781cedcc",
@@ -339,7 +357,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:44:31.000000Z",
-            "updated_at": "2026-01-18T19:44:31.000000Z"
+            "updated_at": "2026-01-18T19:44:31.000000Z",
+            "password": "P>>EU0AD?D"
         },
         {
             "id": "299fd5ef-a2cc-4cb6-a87b-bc4013fa8be0",
@@ -356,7 +375,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T20:01:13.000000Z",
-            "updated_at": "2026-01-18T20:01:13.000000Z"
+            "updated_at": "2026-01-18T20:01:13.000000Z",
+            "password": "F6<11EA1KI"
         },
         {
             "id": "2a03be87-6303-4463-b7cf-fcc5f04ec199",
@@ -373,7 +393,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:50:15.000000Z",
-            "updated_at": "2026-01-18T19:50:15.000000Z"
+            "updated_at": "2026-01-18T19:50:15.000000Z",
+            "password": "043HN9IX1Y"
         },
         {
             "id": "2b387320-aa38-4cf8-844a-24843aa7aed1",
@@ -390,7 +411,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:12:13.000000Z",
-            "updated_at": "2026-01-18T15:53:14.000000Z"
+            "updated_at": "2026-01-18T15:53:14.000000Z",
+            "password": "NDZOW15FWB"
         },
         {
             "id": "2c236d8a-ae58-4fe9-8f9b-b8f32ef335da",
@@ -407,7 +429,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:25:00.000000Z",
-            "updated_at": "2026-01-18T23:25:00.000000Z"
+            "updated_at": "2026-01-18T23:25:00.000000Z",
+            "password": "9V2YU55@X@"
         },
         {
             "id": "2dd8f0ec-1bd0-41f0-8db1-10a6ba7da34d",
@@ -424,7 +447,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T20:11:13.000000Z",
-            "updated_at": "2026-01-18T20:11:13.000000Z"
+            "updated_at": "2026-01-18T20:11:13.000000Z",
+            "password": "IC63PPXV0C"
         },
         {
             "id": "3bcb9990-e6b1-4feb-bfd9-4ca1ecf0ffec",
@@ -441,7 +465,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:05:08.000000Z",
-            "updated_at": "2026-01-18T23:05:08.000000Z"
+            "updated_at": "2026-01-18T23:05:08.000000Z",
+            "password": "XZ>U3>@F>Q"
         },
         {
             "id": "4342e1f8-a0b5-4df8-9801-4ba09de93568",
@@ -458,7 +483,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T16:27:30.000000Z",
-            "updated_at": "2026-01-18T16:27:30.000000Z"
+            "updated_at": "2026-01-18T16:27:30.000000Z",
+            "password": "GLQF@WD:AG"
         },
         {
             "id": "45e74df8-2b6a-4d0a-afaf-3c445c13670f",
@@ -475,14 +501,15 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:10:45.000000Z",
-            "updated_at": "2026-01-18T23:10:45.000000Z"
+            "updated_at": "2026-01-18T23:10:45.000000Z",
+            "password": "4TNRIEOPE5"
         },
         {
             "id": "47a453f2-23fa-4542-9a16-bd3952cff58f",
             "external_id": null,
             "name": "SAUCEDO SOSA LILIA EVANGELINA",
-            "email": "evangelina@escuela.edu.mx",
-            "phone": null,
+            "email": "8781467718@escuela.edu.mx",
+            "phone": "8781467718",
             "occupation": null,
             "email_verified_at": null,
             "role": "TEACHER",
@@ -492,7 +519,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:02:04.000000Z",
-            "updated_at": "2026-01-15T21:02:04.000000Z"
+            "updated_at": "2026-01-15T21:02:04.000000Z",
+            "password": "B6A5;CB?Q?"
         },
         {
             "id": "48afaa25-dce2-4acc-aba8-a6df8fb1959f",
@@ -509,7 +537,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T20:03:24.000000Z",
-            "updated_at": "2026-01-18T20:03:24.000000Z"
+            "updated_at": "2026-01-18T20:03:24.000000Z",
+            "password": "F=JB9@TLIA"
         },
         {
             "id": "49798a71-df97-4a42-88d5-2c876211ea37",
@@ -526,7 +555,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:39:53.000000Z",
-            "updated_at": "2026-01-18T19:39:53.000000Z"
+            "updated_at": "2026-01-18T19:39:53.000000Z",
+            "password": "3NZ928<CNY"
         },
         {
             "id": "4a88457c-0c4b-48ac-97e4-15fc4c83fdb8",
@@ -543,7 +573,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:59:56.000000Z",
-            "updated_at": "2026-01-18T16:25:47.000000Z"
+            "updated_at": "2026-01-18T16:25:47.000000Z",
+            "password": "8@WX844ZTR"
         },
         {
             "id": "4cf4dc3e-a3b6-404f-bda7-d30e0cdbff8d",
@@ -560,7 +591,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T22:03:54.000000Z",
-            "updated_at": "2026-01-18T22:03:54.000000Z"
+            "updated_at": "2026-01-18T22:03:54.000000Z",
+            "password": "=J0H9F3>UU"
         },
         {
             "id": "523b6b64-d154-4cdc-a7fa-c028545a9a3d",
@@ -577,7 +609,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:03:22.000000Z",
-            "updated_at": "2026-01-18T23:03:22.000000Z"
+            "updated_at": "2026-01-18T23:03:22.000000Z",
+            "password": "GLWN40TIQA"
         },
         {
             "id": "5450d381-a43f-4448-bed7-de7748e0c4f2",
@@ -594,7 +627,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:44:11.000000Z",
-            "updated_at": "2026-01-18T16:04:08.000000Z"
+            "updated_at": "2026-01-18T16:04:08.000000Z",
+            "password": "WV:GJ3;@;T"
         },
         {
             "id": "572654a0-a282-4978-9952-2ec76505fe78",
@@ -611,14 +645,15 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T22:04:42.000000Z",
-            "updated_at": "2026-01-18T22:04:42.000000Z"
+            "updated_at": "2026-01-18T22:04:42.000000Z",
+            "password": "6A59F?CLDX"
         },
         {
             "id": "587ec2d7-a406-44ae-a9e1-ccd64c4676a4",
             "external_id": null,
             "name": "VILLAREAL VILLALOBOS CARMEN BEATRIZ",
-            "email": "beatriz@escuela.edu.mx",
-            "phone": null,
+            "email": "8781179282@escuela.edu.mx",
+            "phone": "8781179282",
             "occupation": null,
             "email_verified_at": null,
             "role": "TEACHER",
@@ -628,7 +663,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:03:27.000000Z",
-            "updated_at": "2026-01-15T21:03:27.000000Z"
+            "updated_at": "2026-01-15T21:03:27.000000Z",
+            "password": "A9UAC5SB4@"
         },
         {
             "id": "59776ff7-26c7-473d-aba2-2f362c2b3024",
@@ -645,7 +681,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:10:14.000000Z",
-            "updated_at": "2026-01-18T23:10:14.000000Z"
+            "updated_at": "2026-01-18T23:10:14.000000Z",
+            "password": "KNKH<JVE3@"
         },
         {
             "id": "6124f504-caba-4baa-979a-f4cf0695253a",
@@ -662,14 +699,15 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:10:12.000000Z",
-            "updated_at": "2026-01-18T15:53:01.000000Z"
+            "updated_at": "2026-01-18T15:53:01.000000Z",
+            "password": ">71A4A2@<P"
         },
         {
             "id": "6141de2f-2ee4-4142-bcdb-2f74050ecc8c",
             "external_id": null,
             "name": "MIDOBUCHE POZOS VALERIA",
-            "email": "valeria@escuela.edu.mx",
-            "phone": null,
+            "email": "8787034092@escuela.edu.mx",
+            "phone": "8787034092",
             "occupation": null,
             "email_verified_at": null,
             "role": "TEACHER",
@@ -679,14 +717,15 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T20:53:09.000000Z",
-            "updated_at": "2026-01-15T20:53:09.000000Z"
+            "updated_at": "2026-01-15T20:53:09.000000Z",
+            "password": ">71A4A2@<P"
         },
         {
             "id": "65c1e955-8967-4e60-8d59-a8d886794524",
             "external_id": null,
             "name": "MIRELES ORTIZ MONICA",
-            "email": "monica@escuela.edu.mx",
-            "phone": null,
+            "email": "8781099809@escuela.edu.mx",
+            "phone": "8781099809",
             "occupation": null,
             "email_verified_at": null,
             "role": "ADMIN",
@@ -696,7 +735,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T20:51:41.000000Z",
-            "updated_at": "2026-01-15T20:53:26.000000Z"
+            "updated_at": "2026-01-15T20:53:26.000000Z",
+            "password": "HY51U5A55G"
         },
         {
             "id": "72814edb-3f0d-4009-bf62-1829385c09b7",
@@ -713,7 +753,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:18:55.000000Z",
-            "updated_at": "2026-01-18T15:57:28.000000Z"
+            "updated_at": "2026-01-18T15:57:28.000000Z",
+            "password": ":BEVGL<JBQ"
         },
         {
             "id": "7317abfd-bc65-4b98-b271-9f20720a0716",
@@ -730,7 +771,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T22:57:21.000000Z",
-            "updated_at": "2026-01-18T22:57:21.000000Z"
+            "updated_at": "2026-01-18T22:57:21.000000Z",
+            "password": "2ZJRBK1435"
         },
         {
             "id": "73689d3d-c3eb-483d-bcc5-5ddb80840fd8",
@@ -747,7 +789,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:41:40.000000Z",
-            "updated_at": "2026-01-18T19:41:40.000000Z"
+            "updated_at": "2026-01-18T19:41:40.000000Z",
+            "password": "<JXVM:GPLP"
         },
         {
             "id": "75b12972-5e62-4355-b9c8-01bc7a9b530b",
@@ -764,7 +807,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:11:15.000000Z",
-            "updated_at": "2026-01-18T23:11:15.000000Z"
+            "updated_at": "2026-01-18T23:11:15.000000Z",
+            "password": "1A0<ZYE=X1"
         },
         {
             "id": "7706a4fc-c091-410d-b6bd-baedac0f81a5",
@@ -781,7 +825,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:54:49.000000Z",
-            "updated_at": "2026-01-18T16:24:19.000000Z"
+            "updated_at": "2026-01-18T16:24:19.000000Z",
+            "password": "CLJLL;C@XV"
         },
         {
             "id": "7bea3d40-e7ea-422f-ba94-723dfd189ab7",
@@ -798,7 +843,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:20:40.000000Z",
-            "updated_at": "2026-01-18T15:58:24.000000Z"
+            "updated_at": "2026-01-18T15:58:24.000000Z",
+            "password": "LOD?:F3?BS"
         },
         {
             "id": "7c182b0e-a616-4722-a1f9-b8dd0e33442b",
@@ -815,7 +861,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:34:50.000000Z",
-            "updated_at": "2026-01-18T16:00:03.000000Z"
+            "updated_at": "2026-01-18T16:00:03.000000Z",
+            "password": "8S:=O8F:PB"
         },
         {
             "id": "7d8389d1-d8af-4520-980f-585139fb84b4",
@@ -832,7 +879,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T22:59:51.000000Z",
-            "updated_at": "2026-01-18T22:59:51.000000Z"
+            "updated_at": "2026-01-18T22:59:51.000000Z",
+            "password": "2M<?UHRGYM"
         },
         {
             "id": "7e7ac926-116c-408c-a9b0-75b4733b3b54",
@@ -849,7 +897,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T20:01:47.000000Z",
-            "updated_at": "2026-01-18T20:01:47.000000Z"
+            "updated_at": "2026-01-18T20:01:47.000000Z",
+            "password": "<S;KO7LDP2"
         },
         {
             "id": "84b50693-1224-4875-950a-c303bbf358ce",
@@ -866,7 +915,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:35:14.000000Z",
-            "updated_at": "2026-01-18T19:35:14.000000Z"
+            "updated_at": "2026-01-18T19:35:14.000000Z",
+            "password": "97TAC2<3PY"
         },
         {
             "id": "8d7a16fe-7f88-4d32-85b3-ed1b7f275219",
@@ -883,7 +933,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:47:22.000000Z",
-            "updated_at": "2026-01-18T16:19:27.000000Z"
+            "updated_at": "2026-01-18T16:19:27.000000Z",
+            "password": "@E48X?PFB>"
         },
         {
             "id": "8fa90a29-0615-4d56-becc-b92f1e2e6438",
@@ -900,7 +951,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:53:13.000000Z",
-            "updated_at": "2026-01-18T19:53:13.000000Z"
+            "updated_at": "2026-01-18T19:53:13.000000Z",
+            "password": "<RDB1H<ZKV"
         },
         {
             "id": "90140c06-01b2-4d85-b63e-7ff3a2c2c3dd",
@@ -917,7 +969,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:12:19.000000Z",
-            "updated_at": "2026-01-18T23:12:19.000000Z"
+            "updated_at": "2026-01-18T23:12:19.000000Z",
+            "password": "@GT56O0MWN"
         },
         {
             "id": "9139786e-c285-4005-9da3-6238f3ce5055",
@@ -934,14 +987,15 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:38:22.000000Z",
-            "updated_at": "2026-01-18T19:38:22.000000Z"
+            "updated_at": "2026-01-18T19:38:22.000000Z",
+            "password": "VYABXF><62"
         },
         {
             "id": "92341aa9-3e0b-43bc-8dbc-2ed055be2f2f",
             "external_id": null,
-            "name": "OLIVARES BAUTISTA ISAEL",
-            "email": "isable@escuela.edu.mx",
-            "phone": null,
+            "name": "OLIVARES BAUTISTA ISABEL",
+            "email": "8781403057@escuela.edu.mx",
+            "phone": "8781403057",
             "occupation": null,
             "email_verified_at": null,
             "role": "TEACHER",
@@ -951,7 +1005,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T20:55:27.000000Z",
-            "updated_at": "2026-01-15T20:55:27.000000Z"
+            "updated_at": "2026-01-15T20:55:27.000000Z",
+            "password": "WMGZXQ5FT2"
         },
         {
             "id": "931d0f7a-5994-4da9-af0f-2c0b0535caa0",
@@ -968,7 +1023,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:49:51.000000Z",
-            "updated_at": "2026-01-18T16:19:51.000000Z"
+            "updated_at": "2026-01-18T16:19:51.000000Z",
+            "password": "51:<ZI0R@3"
         },
         {
             "id": "9c8ab17c-ca7c-4883-b40b-934c2fdd8fa2",
@@ -985,14 +1041,15 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:02:39.000000Z",
-            "updated_at": "2026-01-18T23:02:39.000000Z"
+            "updated_at": "2026-01-18T23:02:39.000000Z",
+            "password": "D1B095GDS9"
         },
         {
             "id": "a210b2a9-d59e-4320-b7df-04f19343e703",
             "external_id": null,
             "name": "ROMERO SILVA SANDY JAZZIEL",
-            "email": "jazziel@escuela.edu.mx",
-            "phone": null,
+            "email": "8787884163@escuela.edu.mx",
+            "phone": "8787884163",
             "occupation": null,
             "email_verified_at": null,
             "role": "TEACHER",
@@ -1002,7 +1059,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:00:41.000000Z",
-            "updated_at": "2026-01-15T21:00:41.000000Z"
+            "updated_at": "2026-01-15T21:00:41.000000Z",
+            "password": ";<W>H?QN9Y"
         },
         {
             "id": "a647df0b-fb75-4e2f-a872-b63695399b9d",
@@ -1019,7 +1077,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:41:41.000000Z",
-            "updated_at": "2026-01-18T16:03:33.000000Z"
+            "updated_at": "2026-01-18T16:03:33.000000Z",
+            "password": "V<VMMYW9S7"
         },
         {
             "id": "a87fa737-62b4-4f69-8733-9ecb771b3546",
@@ -1036,7 +1095,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T22:58:25.000000Z",
-            "updated_at": "2026-01-18T22:58:25.000000Z"
+            "updated_at": "2026-01-18T22:58:25.000000Z",
+            "password": "A4@P>X<S68"
         },
         {
             "id": "a9414c20-5d8c-4fa3-95e4-d14dad9aae12",
@@ -1053,7 +1113,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:58:21.000000Z",
-            "updated_at": "2026-01-18T16:25:22.000000Z"
+            "updated_at": "2026-01-18T16:25:22.000000Z",
+            "password": "MP>O@FX>TQ"
         },
         {
             "id": "ab35b380-b94d-4362-940e-585091ad7234",
@@ -1070,7 +1131,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:23:35.000000Z",
-            "updated_at": "2026-01-18T23:23:35.000000Z"
+            "updated_at": "2026-01-18T23:23:35.000000Z",
+            "password": "M<NVBF9<:6"
         },
         {
             "id": "abaa306e-5e0a-4354-aff3-e9b5388aa197",
@@ -1087,7 +1149,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T22:13:52.000000Z",
-            "updated_at": "2026-01-18T22:13:52.000000Z"
+            "updated_at": "2026-01-18T22:13:52.000000Z",
+            "password": "2;PCL2OHWB"
         },
         {
             "id": "ac30236a-1fa8-431e-9422-3fbaf30a382a",
@@ -1104,14 +1167,15 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:59:49.000000Z",
-            "updated_at": "2026-01-18T19:59:49.000000Z"
+            "updated_at": "2026-01-18T19:59:49.000000Z",
+            "password": "N8U9C:NX0:"
         },
         {
             "id": "af11df59-152c-4f65-8e2d-679e46bafeb3",
             "external_id": null,
             "name": "RAMIREZ ESTRADA HUGO CESAR",
-            "email": "cesar@escuela.edu.mx",
-            "phone": null,
+            "email": "8781097941@escuela.edu.mx",
+            "phone": "8781097941",
             "occupation": null,
             "email_verified_at": null,
             "role": "TEACHER",
@@ -1121,14 +1185,15 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T20:57:52.000000Z",
-            "updated_at": "2026-01-15T20:57:52.000000Z"
+            "updated_at": "2026-01-15T20:57:52.000000Z",
+            "password": "=N4>BMF08T"
         },
         {
             "id": "afce2528-774b-4825-b7c5-7cff285c9f7f",
             "external_id": null,
             "name": "DE LOS SANTOS PALAFOX SAUL",
-            "email": "saul@escuela.edu.mx",
-            "phone": null,
+            "email": "8781170620@escuela.edu.mx",
+            "phone": "8781170620",
             "occupation": null,
             "email_verified_at": null,
             "role": "TEACHER",
@@ -1138,7 +1203,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T20:48:49.000000Z",
-            "updated_at": "2026-01-15T20:48:49.000000Z"
+            "updated_at": "2026-01-15T20:48:49.000000Z",
+            "password": "=F6T@BBPT1"
         },
         {
             "id": "b01fef12-3212-44bf-b783-e4da0a27ec6f",
@@ -1155,7 +1221,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:26:16.000000Z",
-            "updated_at": "2026-01-18T23:26:16.000000Z"
+            "updated_at": "2026-01-18T23:26:16.000000Z",
+            "password": ";J2MNINAB4"
         },
         {
             "id": "b07a8010-7442-4795-9e99-dbda2af18782",
@@ -1172,7 +1239,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:22:48.000000Z",
-            "updated_at": "2026-01-18T23:22:48.000000Z"
+            "updated_at": "2026-01-18T23:22:48.000000Z",
+            "password": "FNV=<<I;=O"
         },
         {
             "id": "b28de56c-9c61-4544-9bbb-1630dfad861b",
@@ -1189,7 +1257,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:17:17.000000Z",
-            "updated_at": "2026-01-18T15:55:56.000000Z"
+            "updated_at": "2026-01-18T15:55:56.000000Z",
+            "password": "N;EWWNJ@P0"
         },
         {
             "id": "b5c82a9d-3d75-4852-a592-21c1682eaf92",
@@ -1206,7 +1275,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:22:07.000000Z",
-            "updated_at": "2026-01-18T23:22:07.000000Z"
+            "updated_at": "2026-01-18T23:22:07.000000Z",
+            "password": "2WD:?8IZFB"
         },
         {
             "id": "b60e687d-448e-4e91-b573-00553e1ae980",
@@ -1223,7 +1293,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:37:11.000000Z",
-            "updated_at": "2026-01-18T16:01:40.000000Z"
+            "updated_at": "2026-01-18T16:01:40.000000Z",
+            "password": "OG4TP87WB;"
         },
         {
             "id": "b7334209-5a99-461b-91b0-d3a907849fab",
@@ -1240,7 +1311,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T20:06:34.000000Z",
-            "updated_at": "2026-01-18T20:06:34.000000Z"
+            "updated_at": "2026-01-18T20:06:34.000000Z",
+            "password": "?MDZGXNLM0"
         },
         {
             "id": "b783ec7b-6dc3-42b8-a695-62f769c0500f",
@@ -1257,7 +1329,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:01:44.000000Z",
-            "updated_at": "2026-01-18T23:01:44.000000Z"
+            "updated_at": "2026-01-18T23:01:44.000000Z",
+            "password": "T875@TT4A<"
         },
         {
             "id": "b9b16048-5a6a-4f59-ac2b-8d946577a2bc",
@@ -1274,7 +1347,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:36:08.000000Z",
-            "updated_at": "2026-01-18T19:36:08.000000Z"
+            "updated_at": "2026-01-18T19:36:08.000000Z",
+            "password": "RBQVIJ4S<G"
         },
         {
             "id": "c380a833-dbbd-468a-a77d-9412591334ca",
@@ -1291,7 +1365,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:36:11.000000Z",
-            "updated_at": "2026-01-18T16:01:02.000000Z"
+            "updated_at": "2026-01-18T16:01:02.000000Z",
+            "password": "VB?CW34UB2"
         },
         {
             "id": "c6fb6ad0-0dd2-49bc-a38d-e3d1b9e704ac",
@@ -1308,7 +1383,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T16:28:59.000000Z",
-            "updated_at": "2026-01-18T16:28:59.000000Z"
+            "updated_at": "2026-01-18T16:28:59.000000Z",
+            "password": "J<FH29@YR7"
         },
         {
             "id": "c9a213fb-09bf-47b3-a600-6d10490ff3e6",
@@ -1325,7 +1401,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:38:57.000000Z",
-            "updated_at": "2026-01-18T16:02:34.000000Z"
+            "updated_at": "2026-01-18T16:02:34.000000Z",
+            "password": "=I1SH=OVBF"
         },
         {
             "id": "cb24ece7-f863-484a-bcbf-83e9fe7626b6",
@@ -1342,7 +1419,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T16:53:01.000000Z",
-            "updated_at": "2026-01-18T16:53:01.000000Z"
+            "updated_at": "2026-01-18T16:53:01.000000Z",
+            "password": ";0C1@J?3WF"
         },
         {
             "id": "cc41a043-7f4b-42db-a2a7-ed8244ee27c3",
@@ -1359,7 +1437,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T22:58:52.000000Z",
-            "updated_at": "2026-01-18T22:58:52.000000Z"
+            "updated_at": "2026-01-18T22:58:52.000000Z",
+            "password": "R>;E<7XCD1"
         },
         {
             "id": "d065c38a-4f62-41f6-ac9e-b476a95c20bc",
@@ -1376,7 +1455,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T16:50:28.000000Z",
-            "updated_at": "2026-01-18T16:50:28.000000Z"
+            "updated_at": "2026-01-18T16:50:28.000000Z",
+            "password": "Q=6Q>O0569"
         },
         {
             "id": "d2d85424-7e4c-4632-81eb-0215c06be452",
@@ -1393,14 +1473,15 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:24:47.000000Z",
-            "updated_at": "2026-01-18T15:59:04.000000Z"
+            "updated_at": "2026-01-18T15:59:04.000000Z",
+            "password": "M@KH?3J0CN"
         },
         {
             "id": "d65c1c8e-1eaf-4350-bd20-d65078b22066",
             "external_id": null,
             "name": "RIQUEJO JORDAN NESTOR DAMIAN",
-            "email": "damian@escuela.edu.mx",
-            "phone": null,
+            "email": "8781223015@escuela.edu.mx",
+            "phone": "8781223015",
             "occupation": null,
             "email_verified_at": null,
             "role": "ADMIN",
@@ -1410,14 +1491,15 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T20:59:24.000000Z",
-            "updated_at": "2026-01-15T20:59:24.000000Z"
+            "updated_at": "2026-01-15T20:59:24.000000Z",
+            "password": "5HIXNHD73U"
         },
         {
             "id": "d6d30c2a-233b-46ff-9757-fa7f04f219d4",
             "external_id": null,
             "name": "MORENO GARCIA FABIOLA",
-            "email": "fabiola@escuela.edu.mx",
-            "phone": null,
+            "email": "8781350237@escuela.edu.mx",
+            "phone": "8781350237",
             "occupation": null,
             "email_verified_at": null,
             "role": "TEACHER",
@@ -1427,7 +1509,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T20:54:22.000000Z",
-            "updated_at": "2026-01-15T20:54:22.000000Z"
+            "updated_at": "2026-01-15T20:54:22.000000Z",
+            "password": "1DMAD6FY<8"
         },
         {
             "id": "d8e514b3-ae26-436d-9f0a-671925ddf99e",
@@ -1444,7 +1527,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:24:14.000000Z",
-            "updated_at": "2026-01-18T23:24:14.000000Z"
+            "updated_at": "2026-01-18T23:24:14.000000Z",
+            "password": "TH7V08>C8?"
         },
         {
             "id": "df9e1e69-b0f5-48b4-b358-93f41e412039",
@@ -1461,7 +1545,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T23:01:09.000000Z",
-            "updated_at": "2026-01-18T23:01:09.000000Z"
+            "updated_at": "2026-01-18T23:01:09.000000Z",
+            "password": "@>60ITLE<O"
         },
         {
             "id": "e82c0bdf-fdaa-4ab6-b722-b4dd0d167055",
@@ -1478,7 +1563,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T20:50:00.000000Z",
-            "updated_at": "2026-01-15T20:50:13.000000Z"
+            "updated_at": "2026-01-15T20:50:13.000000Z",
+            "password": "62540KOE<="
         },
         {
             "id": "e9298e15-5b9b-49ec-b28c-6e1c917c9200",
@@ -1495,7 +1581,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:57:10.000000Z",
-            "updated_at": "2026-01-18T19:57:10.000000Z"
+            "updated_at": "2026-01-18T19:57:10.000000Z",
+            "password": "TTNSL?@M7I"
         },
         {
             "id": "e986535f-2067-4391-b5fa-abc6c71092df",
@@ -1512,7 +1599,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T22:00:46.000000Z",
-            "updated_at": "2026-01-18T16:26:10.000000Z"
+            "updated_at": "2026-01-18T16:26:10.000000Z",
+            "password": "83ML=J27KP"
         },
         {
             "id": "f7cf32fa-2311-4686-893f-b53ae8286b57",
@@ -1529,7 +1617,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-18T19:42:17.000000Z",
-            "updated_at": "2026-01-18T19:42:17.000000Z"
+            "updated_at": "2026-01-18T19:42:17.000000Z",
+            "password": "?NXUS9?8A9"
         },
         {
             "id": "fc1189de-5c08-4854-ad45-87720a066853",
@@ -1546,7 +1635,8 @@
             "profile_photo_path": null,
             "last_login_at": null,
             "created_at": "2026-01-15T21:32:43.000000Z",
-            "updated_at": "2026-01-18T15:59:28.000000Z"
+            "updated_at": "2026-01-18T15:59:28.000000Z",
+            "password": "ZPCVSKE90G"
         }
     ],
     "students": [
@@ -2016,7 +2106,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8787837737 \/ 8781544915",
+            "other_contact_encrypted": "8787837737 / 8781544915",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2029,7 +2119,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8447888398 \/ 8781261827",
+            "other_contact_encrypted": "8447888398 / 8781261827",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2042,7 +2132,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8787918399 \/ 8787957962",
+            "other_contact_encrypted": "8787918399 / 8787957962",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2068,7 +2158,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8787954814 \/ 8787000350",
+            "other_contact_encrypted": "8787954814 / 8787000350",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2172,7 +2262,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8787839633 \/ 8781167672",
+            "other_contact_encrypted": "8787839633 / 8781167672",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2250,7 +2340,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8781234152 \/ 8787899129",
+            "other_contact_encrypted": "8781234152 / 8787899129",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2263,7 +2353,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8787832846 \/ 8781465764",
+            "other_contact_encrypted": "8787832846 / 8781465764",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2289,7 +2379,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8781023257 \/ 878123252",
+            "other_contact_encrypted": "8781023257 / 878123252",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2315,7 +2405,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8787953852 \/ 5539172942",
+            "other_contact_encrypted": "8787953852 / 5539172942",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2341,7 +2431,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8787835556 \/ 8781488861",
+            "other_contact_encrypted": "8787835556 / 8781488861",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2354,7 +2444,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8787863554 \/ 8781376796",
+            "other_contact_encrypted": "8787863554 / 8781376796",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2367,7 +2457,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8781040289 \/ 8781160526",
+            "other_contact_encrypted": "8781040289 / 8781160526",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2406,7 +2496,7 @@
             "emergency_contact_encrypted": null,
             "mother_name_encrypted": "",
             "father_name_encrypted": "",
-            "other_contact_encrypted": "8787836319 \/ 8787021363",
+            "other_contact_encrypted": "8787836319 / 8787021363",
             "mother_workplace_encrypted": "",
             "father_workplace_encrypted": ""
         },
@@ -2831,7 +2921,7 @@
         {
             "id": 1,
             "title": "Reglamento Escolar General",
-            "content": "<h1 class=\"ql-align-center\">Escuela Secundaria General No.5<\/h1><h2 class=\"ql-align-center\">\u201cDr. Rogelio Montemayor Seguy\u201d<\/h2><p><strong>Reglamento Interno para alumnos<\/strong><\/p><p><strong>I. Asistencia y puntualidad<\/strong><\/p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Llegar puntualmente, la hora de entrada para el turno matutino es 7:20 am y la salida es a la 1:15 pm. El port\u00f3n se cierra a la 7: 30 am<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Para el turno vespertino la entrada es a la 1:20 pm y la salida es a la 7:15 de la tarde. El port\u00f3n se abre a las 1:10 para el TV.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Solo se justifica casos de enfermedad, accidentes y la muerte de familiares directos. Las dem\u00e1s situaciones son responsabilidad de los padres y aparecer\u00e1 la falta (tambi\u00e9n se aplica en caso de que se retire un alumno, para evitar el salir a cualquier hora).<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>En temporada de frio y lluvia, los alumnos pasan directamente al sal\u00f3n de clases.<\/li><\/ol><p><strong>II. Cuidado de recursos materiales<\/strong><\/p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Respetar y cuidar el mobiliario, recursos materiales de los salones, patios y jardines. Los alumnos que destruyan material, vidrio, barandales, cortinas, tuber\u00edas de agua, rayar butacas etc. Pagaran el da\u00f1o.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Depositar la basura en los botes y cestos de cada sal\u00f3n. Las botellas de pl\u00e1stico se reciclan en las canastillas negras de cada sal\u00f3n. No tirar envolturas de alimentos ni botellas en los jardines o patios. (somos una comunidad escolar que recicla re\u00fasa y separa la basura).<\/li><\/ol><p><strong>III. Presentaci\u00f3n Personal<\/strong><\/p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Tanto en hombres y mujeres es necesario el ba\u00f1o diario, corte de u\u00f1as, no se permite depilaci\u00f3n de cejas. Se recomienda uso de desodorante, traer limpio y completo su uniforme. Solo en educaci\u00f3n f\u00edsica pueden traer tenis obscuros (negro o gris), calcetas blancas al tobillo, no tines (hombres). Portar permanentemente su identificaci\u00f3n personal o gafete desde antes de entra a la escuela y diariamente.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>En el caso de hombres el corte de pelo natural no se permiten cortes de pelo con rayas ni copetes. No traer aretes.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>En el caso de mujeres el pelo totalmente recogido limpio, sin piojos con su mo\u00f1o. Sin pintura en labios y cejas , aretes apropiados a su edad, la falda debajo de su rodilla.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>En temporada de frio el uso del uniforme deportivo es obligatorio. chaquetin con escudo y pants gris oficial de la escuela. El uniforme deber\u00e1 traerlo desde el primer d\u00eda de clases.<\/li><\/ol><p><strong>IV. Convivencia escolar<\/strong><\/p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Mantener buenas relaciones con maestros y entre compa\u00f1eros. En caso de cualquier tipo de agresi\u00f3n que sea denunciada se mandara a llamar a los padres de los alumnos. Se aplica sanci\u00f3n correspondiente de acuerdo con la falta o gravedad de la situaci\u00f3n.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Evitar manifestaciones afectivas en parejas de novios (besos e la boca, abrazarse o tomarse de la mano dentro de las instalaciones de la escuela o sus alrededores)<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Usar un lenguaje adecuado para comunicarse evitando burlas o apodos entre compa\u00f1eros<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Las denuncias de agresi\u00f3n por celular deber\u00e1n ser solucionadas por padres de, ya que ellos proporciona el tel\u00e9fono sus hijos y deben vigilar su uso.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Queda prohibido portar y usar celular en la instituci\u00f3n; o de lo contrario, la escuela actuara conforme al protocolo de convivencia y no se hace responsable por perdida de este.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Uso de instalaciones del sal\u00f3n de computaci\u00f3n:<\/li><li data-list=\"bullet\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Las computadoras del taller solamente pueden ser utilizadas con autorizaci\u00f3n del maestro o maestra en horas de clase. Dentro de la clase no se  permite estar sacando fotos, hacer grabaciones o enviar mensajes, descargar juegos o actividades que sean diferentes del objetivo de los temas .<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Evitar desconectar cables y destruir los teclados. El uso inadecuado  de las computadoras y que sea reportado ser\u00e1 motivo de sanci\u00f3n y reposici\u00f3n de los materiales.<\/li><\/ol><p><strong>V. cumplimiento de actividades escolares <\/strong><\/p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Traer el material revisando su horario con anterioridad. No se permite el tel\u00e9fono para pedir tareas.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>No se permite salir a la papeler\u00eda durante el horario de clase.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>No se permite imprimir tareas o trabajos durante clases.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Respetar el horario de la clase y no interrumpir a los maestros en sus clases para entregar tareas.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Situaciones especiales. En caso de padecer alg\u00fan problema de salud comunicarlo a la direcci\u00f3n, con documento que lo compruebe, ya sea por discapacidad o enfermedad cr\u00f3nica.<\/li><\/ol><p class=\"ql-align-justify\"><strong>VI. cuidado de libros y cuadernos<\/strong><\/p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Los libro y cuadernos de cada alumno deben estar forrados y etiquetados con su nombre completo, grado sesi\u00f3n y escudo de la escuela, no se reponen libros perdidos.<\/li><\/ol><p class=\"ql-align-justify\"><strong>VII. revisi\u00f3n de mochila<\/strong><\/p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Por ordenes de la secretaria de la educaci\u00f3n se revisar\u00e1 continuamente la mochila a sus hijos por lo que se les pide evitar traer comida no permitida: fritos, bebidas energizantes, chetos, chicles, chocolates, sustancias nocivas a la salud. Adem\u00e1s, no traer plumas, marcadores de tinta permanente. Solo deben traer su l\u00e1piz, colores de palo o cera.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>A los alumnos que se les encuentre sustancias t\u00f3xicas ser\u00e1n canalizados a PRONNIF aplicando el protocolo que marca la secretaria de educaci\u00f3n, ser\u00e1 necesario realizar un antidoping presentar sus resultados de atenci\u00f3n cada semana durante toda su estancia escolar.<\/li><\/ol><p><strong>VIII. Participaci\u00f3n de padres de familia<\/strong><\/p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Los padres de familia deben estar al pendiente de su hijo para observar su desempe\u00f1o escolar el cual se dar\u00e1 a conocer en su cuaderno de tutor\u00eda. Dicho cuadernillo servir\u00e1 para establecer comunicaci\u00f3n y mandar informaci\u00f3n al d\u00eda acerca del comportamiento, falta de tareas, uniformes o situaciones de sus hijos en la escuela. Los padres deben acudir a la entrega de clasificaciones cada bimestre no se entregar\u00e1n resultados a familiares ni hermanos mayores. Cualquier cambio de domicilio y tel\u00e9fono deber\u00e1 comunicarlo de inmediato a la direcci\u00f3n de la escuela.<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Participar y apoyar a sus hijos, en las actividades econ\u00f3micas (rifas, candidatas) culturales (platicas, escuela para padres).<\/li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Revisar diariamente el cuadernillo de tutor\u00eda, firmar y supervisar que cumpla con las actividades encomendadas por el maestro.<\/li><\/ol><p class=\"ql-align-justify\"><strong>Notas:<\/strong><\/p><ol><li data-list=\"bullet\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Se les llamara a los padres de familia ante cualquier situaci\u00f3n que se requiera y se firmara una carta compromiso por el alumno y sus padres. Se establecer\u00e1n sanciones de acuerdo con la gravedad de la falta.<\/li><li data-list=\"bullet\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Al dejar y recoger a sus hijos, favor de respetar a los se\u00f1alamientos de vitalidad, no obstruir la calle y estacionamiento de la escuela.<\/li><li data-list=\"bullet\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>Solamente el padre o tutor es el autorizado para retirar al alumno de la escuela.<\/li><li data-list=\"bullet\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"><\/span>En caso de da\u00f1o a las instalaciones el alumno deber\u00e1 pagar su costo.<\/li><\/ol>",
+            "content": "<h1 class=\"ql-align-center\">Escuela Secundaria General No.5</h1><h2 class=\"ql-align-center\">\u201cDr. Rogelio Montemayor Seguy\u201d</h2><p><strong>Reglamento Interno para alumnos</strong></p><p><strong>I. Asistencia y puntualidad</strong></p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Llegar puntualmente, la hora de entrada para el turno matutino es 7:20 am y la salida es a la 1:15 pm. El port\u00f3n se cierra a la 7: 30 am</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Para el turno vespertino la entrada es a la 1:20 pm y la salida es a la 7:15 de la tarde. El port\u00f3n se abre a las 1:10 para el TV.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Solo se justifica casos de enfermedad, accidentes y la muerte de familiares directos. Las dem\u00e1s situaciones son responsabilidad de los padres y aparecer\u00e1 la falta (tambi\u00e9n se aplica en caso de que se retire un alumno, para evitar el salir a cualquier hora).</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>En temporada de frio y lluvia, los alumnos pasan directamente al sal\u00f3n de clases.</li></ol><p><strong>II. Cuidado de recursos materiales</strong></p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Respetar y cuidar el mobiliario, recursos materiales de los salones, patios y jardines. Los alumnos que destruyan material, vidrio, barandales, cortinas, tuber\u00edas de agua, rayar butacas etc. Pagaran el da\u00f1o.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Depositar la basura en los botes y cestos de cada sal\u00f3n. Las botellas de pl\u00e1stico se reciclan en las canastillas negras de cada sal\u00f3n. No tirar envolturas de alimentos ni botellas en los jardines o patios. (somos una comunidad escolar que recicla re\u00fasa y separa la basura).</li></ol><p><strong>III. Presentaci\u00f3n Personal</strong></p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Tanto en hombres y mujeres es necesario el ba\u00f1o diario, corte de u\u00f1as, no se permite depilaci\u00f3n de cejas. Se recomienda uso de desodorante, traer limpio y completo su uniforme. Solo en educaci\u00f3n f\u00edsica pueden traer tenis obscuros (negro o gris), calcetas blancas al tobillo, no tines (hombres). Portar permanentemente su identificaci\u00f3n personal o gafete desde antes de entra a la escuela y diariamente.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>En el caso de hombres el corte de pelo natural no se permiten cortes de pelo con rayas ni copetes. No traer aretes.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>En el caso de mujeres el pelo totalmente recogido limpio, sin piojos con su mo\u00f1o. Sin pintura en labios y cejas , aretes apropiados a su edad, la falda debajo de su rodilla.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>En temporada de frio el uso del uniforme deportivo es obligatorio. chaquetin con escudo y pants gris oficial de la escuela. El uniforme deber\u00e1 traerlo desde el primer d\u00eda de clases.</li></ol><p><strong>IV. Convivencia escolar</strong></p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Mantener buenas relaciones con maestros y entre compa\u00f1eros. En caso de cualquier tipo de agresi\u00f3n que sea denunciada se mandara a llamar a los padres de los alumnos. Se aplica sanci\u00f3n correspondiente de acuerdo con la falta o gravedad de la situaci\u00f3n.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Evitar manifestaciones afectivas en parejas de novios (besos e la boca, abrazarse o tomarse de la mano dentro de las instalaciones de la escuela o sus alrededores)</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Usar un lenguaje adecuado para comunicarse evitando burlas o apodos entre compa\u00f1eros</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Las denuncias de agresi\u00f3n por celular deber\u00e1n ser solucionadas por padres de, ya que ellos proporciona el tel\u00e9fono sus hijos y deben vigilar su uso.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Queda prohibido portar y usar celular en la instituci\u00f3n; o de lo contrario, la escuela actuara conforme al protocolo de convivencia y no se hace responsable por perdida de este.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Uso de instalaciones del sal\u00f3n de computaci\u00f3n:</li><li data-list=\"bullet\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Las computadoras del taller solamente pueden ser utilizadas con autorizaci\u00f3n del maestro o maestra en horas de clase. Dentro de la clase no se  permite estar sacando fotos, hacer grabaciones o enviar mensajes, descargar juegos o actividades que sean diferentes del objetivo de los temas .</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Evitar desconectar cables y destruir los teclados. El uso inadecuado  de las computadoras y que sea reportado ser\u00e1 motivo de sanci\u00f3n y reposici\u00f3n de los materiales.</li></ol><p><strong>V. cumplimiento de actividades escolares </strong></p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Traer el material revisando su horario con anterioridad. No se permite el tel\u00e9fono para pedir tareas.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>No se permite salir a la papeler\u00eda durante el horario de clase.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>No se permite imprimir tareas o trabajos durante clases.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Respetar el horario de la clase y no interrumpir a los maestros en sus clases para entregar tareas.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Situaciones especiales. En caso de padecer alg\u00fan problema de salud comunicarlo a la direcci\u00f3n, con documento que lo compruebe, ya sea por discapacidad o enfermedad cr\u00f3nica.</li></ol><p class=\"ql-align-justify\"><strong>VI. cuidado de libros y cuadernos</strong></p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Los libro y cuadernos de cada alumno deben estar forrados y etiquetados con su nombre completo, grado sesi\u00f3n y escudo de la escuela, no se reponen libros perdidos.</li></ol><p class=\"ql-align-justify\"><strong>VII. revisi\u00f3n de mochila</strong></p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Por ordenes de la secretaria de la educaci\u00f3n se revisar\u00e1 continuamente la mochila a sus hijos por lo que se les pide evitar traer comida no permitida: fritos, bebidas energizantes, chetos, chicles, chocolates, sustancias nocivas a la salud. Adem\u00e1s, no traer plumas, marcadores de tinta permanente. Solo deben traer su l\u00e1piz, colores de palo o cera.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>A los alumnos que se les encuentre sustancias t\u00f3xicas ser\u00e1n canalizados a PRONNIF aplicando el protocolo que marca la secretaria de educaci\u00f3n, ser\u00e1 necesario realizar un antidoping presentar sus resultados de atenci\u00f3n cada semana durante toda su estancia escolar.</li></ol><p><strong>VIII. Participaci\u00f3n de padres de familia</strong></p><ol><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Los padres de familia deben estar al pendiente de su hijo para observar su desempe\u00f1o escolar el cual se dar\u00e1 a conocer en su cuaderno de tutor\u00eda. Dicho cuadernillo servir\u00e1 para establecer comunicaci\u00f3n y mandar informaci\u00f3n al d\u00eda acerca del comportamiento, falta de tareas, uniformes o situaciones de sus hijos en la escuela. Los padres deben acudir a la entrega de clasificaciones cada bimestre no se entregar\u00e1n resultados a familiares ni hermanos mayores. Cualquier cambio de domicilio y tel\u00e9fono deber\u00e1 comunicarlo de inmediato a la direcci\u00f3n de la escuela.</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Participar y apoyar a sus hijos, en las actividades econ\u00f3micas (rifas, candidatas) culturales (platicas, escuela para padres).</li><li data-list=\"ordered\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Revisar diariamente el cuadernillo de tutor\u00eda, firmar y supervisar que cumpla con las actividades encomendadas por el maestro.</li></ol><p class=\"ql-align-justify\"><strong>Notas:</strong></p><ol><li data-list=\"bullet\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Se les llamara a los padres de familia ante cualquier situaci\u00f3n que se requiera y se firmara una carta compromiso por el alumno y sus padres. Se establecer\u00e1n sanciones de acuerdo con la gravedad de la falta.</li><li data-list=\"bullet\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Al dejar y recoger a sus hijos, favor de respetar a los se\u00f1alamientos de vitalidad, no obstruir la calle y estacionamiento de la escuela.</li><li data-list=\"bullet\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Solamente el padre o tutor es el autorizado para retirar al alumno de la escuela.</li><li data-list=\"bullet\" class=\"ql-align-justify\"><span class=\"ql-ui\" contenteditable=\"false\"></span>En caso de da\u00f1o a las instalaciones el alumno deber\u00e1 pagar su costo.</li></ol>",
             "last_updated": "2025-12-10T22:11:37.000000Z"
         }
     ],
