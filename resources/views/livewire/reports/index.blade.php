@@ -261,7 +261,6 @@ new class extends Component {
                                 @if(auth()->user()->isParent() && $report->status !== 'SIGNED')
                                     <flux:button variant="primary" size="sm" icon="finger-print" wire:click="signReport('{{ $report->id }}')">Firmar</flux:button>
                                 @endif
-                                <flux:button variant="ghost" size="sm" icon="eye" />
                                 @can('admin-only')
                                     <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteReport('{{ $report->id }}')" />
                                 @endcan

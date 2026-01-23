@@ -338,7 +338,6 @@ new class extends Component {
                                         <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
                                         <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteStudent('{{ $student->id }}')" />
                                     @endcan
-                                    <flux:button variant="ghost" size="sm" icon="eye" />
                                 </div>
                             </td>
                         </tr>
