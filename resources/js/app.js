@@ -1,10 +1,10 @@
 // Register manual service worker for development / manual control
 if ('serviceWorker' in navigator) {
-	window.addEventListener('load', () => {
-		navigator.serviceWorker.register('/sw.js').then(reg => {
-			// registration successful
-		}).catch(() => {});
-	});
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            // registration successful
+        }).catch(() => { });
+    });
 }
 
 // PWA install prompt handling (only show toast if present on page)
@@ -31,8 +31,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 window.addEventListener('appinstalled', () => {
-	const toast = document.getElementById('pwa-toast');
-	if (toast) toast.style.display = 'none';
+    const toast = document.getElementById('pwa-toast');
+    if (toast) toast.style.display = 'none';
 });
 
 // Place any application bootstrap code below (Livewire/Vite loaded by @vite)

@@ -13,6 +13,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // To restore the exported production data, uncomment the line below:
+        // $this->call(ProductionDataSeeder::class);
+
+        // Standard seeders:
         // 1. Create Admin User
         $admin = User::firstOrCreate(
             ['email' => 'admin@escuela.edu.mx'],

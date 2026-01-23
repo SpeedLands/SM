@@ -70,18 +70,6 @@ new class extends Component {
                     <flux:button variant="primary" class="w-full">Ver Guía</flux:button>
                 </flux:modal.trigger>
             </div>
-            <div class="space-y-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-                        <flux:icon.book-open class="text-zinc-500" />
-                    </div>
-                    <flux:heading size="lg">Ver Exámenes</flux:heading>
-                </div>
-                <p class="text-sm text-zinc-500 dark:text-zinc-400">Consulta el calendario de exámenes de sus hijos</p>
-                <flux:modal.trigger name="tutorial-view-exams">
-                    <flux:button variant="primary" class="w-full">Ver Guía</flux:button>
-                </flux:modal.trigger>
-            </div>
         </div>
     </div>
     @endif
@@ -148,43 +136,6 @@ new class extends Component {
                         <flux:button variant="primary" class="w-full">Ver Guía</flux:button>
                     </flux:modal.trigger>
                 </div>
-                <div class="space-y-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-                    <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-                            <flux:icon.document-text class="text-zinc-500" />
-                        </div>
-                        <flux:heading size="lg">Modificación de Reglamento</flux:heading>
-                    </div>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Edite el reglamento escolar: título, contenido y publique los cambios.</p>
-                    <flux:modal.trigger name="tutorial-modify-regulation">
-                        <flux:button variant="primary" class="w-full">Ver Guía</flux:button>
-                    </flux:modal.trigger>
-                </div>
-                <div class="space-y-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-                    <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-                            <flux:icon.user-plus class="text-zinc-500" />
-                        </div>
-                        <flux:heading size="lg">Inscribir Alumno</flux:heading>
-                    </div>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Registro rápido de un nuevo estudiante y vinculación de padres.</p>
-                    <flux:modal.trigger name="tutorial-inscribe-student">
-                        <flux:button variant="primary" class="w-full">Ver Guía</flux:button>
-                    </flux:modal.trigger>
-                </div>
-
-                <div class="space-y-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-                    <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-                            <flux:icon.megaphone class="text-zinc-500" />
-                        </div>
-                        <flux:heading size="lg">Crear Aviso</flux:heading>
-                    </div>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Publica comunicados, eventos y solicita autorizaciones a los padres.</p>
-                    <flux:modal.trigger name="tutorial-create-notice">
-                        <flux:button variant="primary" class="w-full">Ver Guía</flux:button>
-                    </flux:modal.trigger>
-                </div>
             </div>
         </div>
         @endif
@@ -224,20 +175,6 @@ new class extends Component {
                 <p>1. Ve al menú <strong>"Citatorios"</strong>.</p>
                 <p>2. Si tienes un citatorio pendiente, verás la fecha, hora y el motivo.</p>
                 <p>3. Es importante asistir puntualmente. Si no puedes asistir, por favor comunícate con la escuela para reagendar.</p>
-            </div>
-        </div>
-    </flux:modal>
-
-    <flux:modal name="tutorial-view-exams" class="md:w-2/3 lg:w-1/2">
-        <div class="space-y-6">
-            <flux:heading size="lg">Ver Exámenes y Filtrar Resultados</flux:heading>
-            <div class="space-y-4 text-zinc-600 dark:text-zinc-300">
-                <p>1. Accede a <strong>"Calendario de Exámenes"</strong> desde el menú lateral.</p>
-                <p>2. Usa los filtros disponibles en la parte superior: <strong>Trimestre</strong>, <strong>Grado</strong> y <strong>Grupo</strong>. Por defecto, si eres padre, el sistema mostrará los exámenes del primer hijo registrado.</p>
-                <p>3. Si tienes más de un hijo (por ejemplo dos o más en distintos grados/secciones), selecciona <strong>"Todos los grados"</strong> y <strong>"Todos los grupos"</strong> en los selectores para ver el calendario completo de evaluaciones de todos tus hijos.</p>
-                <p>4. También puedes filtrar por <strong>Trimestre</strong> para ver solo las evaluaciones de un período específico.</p>
-                <p>5. Si necesitas ver exámenes de un hijo en particular, selecciona el <strong>Grado</strong> y el <strong>Grupo</strong> correspondientes a ese alumno; los filtros respetan la combinación grado+grupo.</p>
-                <div class="text-sm rounded-lg bg-zinc-100 p-3 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">Consejo: Cuando tenga hijos en diferentes secciones, usar los valores "Todos los grupos" y/o "Todos los grados" es la forma más rápida para obtener un calendario consolidado. Si falta algún examen, prueba a cambiar el trimestre o contactar al docente.</div>
             </div>
         </div>
     </flux:modal>
@@ -289,50 +226,6 @@ new class extends Component {
                 <p>1. Ve a <strong>"Ciclos Escolares"</strong>.</p>
                 <p>2. Aquí puedes crear nuevos ciclos escolares (ej. "2024-2025").</p>
                 <p>3. Asegúrate de marcar el ciclo correspondiente como <strong>"Activo"</strong> para que sea el predeterminado en toda la plataforma.</p>
-            </div>
-        </div>
-    </flux:modal>
-    
-    <flux:modal name="tutorial-inscribe-student" class="md:w-2/3 lg:w-1/2">
-        <div class="space-y-6">
-            <flux:heading size="lg">Inscribir Alumno</flux:heading>
-            <div class="space-y-4 text-zinc-600 dark:text-zinc-300">
-                <p>1. Accede a <strong>"Gestión de Alumnos"</strong> desde el menú lateral.</p>
-                <p>2. Haz clic en el botón <strong>"Inscribir Alumno"</strong> (visible para docentes y administradores).</p>
-                <p>3. Completa la sección <strong>Información Básica</strong>: Nombre completo, Turno y selecciona el <strong>Grupo / Grado</strong>.</p>
-                <p>4. En <strong>Información de Contacto</strong> añade Dirección y Teléfonos de emergencia.</p>
-                <p>5. Pulsa <strong>"Inscribir Alumno"</strong> para guardar. El sistema creará el registro y lo asociará al ciclo activo y al grupo seleccionado.</p>
-                <p>6. Después de guardar, utiliza la sección <strong>Padres de Familia</strong> para vincular las cuentas de los padres mediante la búsqueda por nombre o email.</p>
-                <div class="text-sm rounded-lg bg-zinc-100 p-3 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">Nota: Debe existir un ciclo activo y grupos académicos configurados para poder inscribir alumnos. Si faltan, crea o activa un ciclo en la sección de Ciclos.</div>
-            </div>
-        </div>
-    </flux:modal>
-
-    <flux:modal name="tutorial-create-notice" class="md:w-2/3 lg:w-1/2">
-        <div class="space-y-6">
-            <flux:heading size="lg">Crear Aviso</flux:heading>
-            <div class="space-y-4 text-zinc-600 dark:text-zinc-300">
-                <p>1. Ve a <strong>"Avisos y Comunicados"</strong> desde el menú.</p>
-                <p>2. Haz clic en <strong>"Nuevo Aviso"</strong> (opción disponible para personal y administración).</p>
-                <p>3. Rellena el <strong>Título</strong>, selecciona el <strong>Tipo</strong> (General / Urgente / Evento) y la <strong>Audiencia</strong> (Todo / Padres).</p>
-                <p>4. Si es un evento, añade la <strong>Fecha</strong> y la <strong>Hora</strong>.</p>
-                <p>5. Escribe el <strong>Mensaje</strong> y activa <strong>"Requiere Autorización"</strong> solo si necesitas permiso explícito de los padres.</p>
-                <p>6. Pulsa <strong>"Publicar Aviso"</strong>. Los padres verán el comunicado y podrán confirmar o autorizar según corresponda.</p>
-                <div class="text-sm rounded-lg bg-zinc-100 p-3 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">Consejo: Comprueba que hay un ciclo activo antes de publicar avisos vinculados al ciclo escolar.</div>
-            </div>
-        </div>
-    </flux:modal>
-
-    <flux:modal name="tutorial-modify-regulation" class="md:w-2/3 lg:w-1/2">
-        <div class="space-y-6">
-            <flux:heading size="lg">Modificación de Reglamento</flux:heading>
-            <div class="space-y-4 text-zinc-600 dark:text-zinc-300">
-                <p>1. Accede a <strong>"Reglamento Escolar"</strong> desde el menú lateral.</p>
-                <p>2. Haz clic en <strong>"Editar Reglamento"</strong> (solo disponible para administradores).</p>
-                <p>3. Usa el editor enriquecido para actualizar el <strong>Título</strong> y el <strong>Contenido</strong>. Puedes aplicar formato, listas y encabezados.</p>
-                <p>4. Verifica el contenido en el panel de vista previa y, cuando estés listo, pulsa <strong>"Guardar Cambios"</strong>.</p>
-                <p>5. El sistema guardará la fecha de última actualización y el reglamento quedará visible para toda la comunidad.</p>
-                <div class="text-sm rounded-lg bg-zinc-100 p-3 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">Precaución: Solo los usuarios con permisos de administrador pueden editar el reglamento. Revisa los cambios antes de guardar.</div>
             </div>
         </div>
     </flux:modal>

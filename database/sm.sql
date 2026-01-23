@@ -148,7 +148,6 @@ CREATE TABLE `class_groups` (
 DROP TABLE IF EXISTS `students`;
 CREATE TABLE `students` (
   `id` varchar(50) NOT NULL,
-  `curp` varchar(18) NOT NULL,
   `name` varchar(100) NOT NULL,
   `birth_date` date NOT NULL,
   `grade` varchar(10) NOT NULL,
@@ -156,8 +155,7 @@ CREATE TABLE `students` (
   `turn` enum('MATUTINO','VESPERTINO') NOT NULL,
   `siblings_count` int(11) DEFAULT 0,
   `birth_order` int(11) DEFAULT 1,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `curp` (`curp`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `community_services`;

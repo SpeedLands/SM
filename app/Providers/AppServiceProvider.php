@@ -20,7 +20,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Do not force HTTPS here — allow runtime scheme (useful for tunnels/dev).
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Auth\Events\Login::class,
+            function ($event) {
+                $event->user->update([
+                    'last_login_at' => now(),
+                ]);
+            }
+        );
 
         \Illuminate\Support\Facades\Gate::define('admin-only', function ($user) {
             return $user->role === 'ADMIN';

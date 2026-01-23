@@ -14,6 +14,7 @@ new class extends Component {
 
     // Create Modal
     public bool $showCreateModal = false;
+    public ?string $editingCitationId = null;
     public string $studentSearch = '';
     public ?string $selectedStudentId = null;
     public string $reason = '';
@@ -22,7 +23,7 @@ new class extends Component {
 
     public function mount(): void
     {
-        $this->citationDate = now()->addDay()->format('Y-m-d');
+        $this->citationDate = now()->format('Y-m-d');
         $this->citationTime = '08:00';
     }
 
@@ -36,7 +37,7 @@ new class extends Component {
     public function resetForm(): void
     {
         $this->reset(['selectedStudentId', 'studentSearch', 'reason']);
-        $this->citationDate = now()->addDay()->format('Y-m-d');
+        $this->citationDate = now()->format('Y-m-d');
         $this->citationTime = '08:00';
     }
 
@@ -59,24 +60,58 @@ new class extends Component {
             'reason.required' => 'El motivo es obligatorio.',
         ]);
 
-        $activeCycle = Cycle::where('is_active', true)->first();
-        if (!$activeCycle) {
-             $this->dispatch('notify', ['message' => 'No hay un ciclo activo.', 'variant' => 'danger']);
-             return;
+        if ($this->editingCitationId) {
+            $citation = Citation::findOrFail($this->editingCitationId);
+            $citation->update([
+                'student_id' => $this->selectedStudentId,
+                'reason' => $this->reason,
+                'citation_date' => \Carbon\Carbon::parse($this->citationDate . ' ' . $this->citationTime),
+            ]);
+            $message = 'Citatorio actualizado correctamente.';
+        } else {
+            $activeCycle = Cycle::where('is_active', true)->first();
+            if (!$activeCycle) {
+                 $this->dispatch('notify', ['message' => 'No hay un ciclo activo.', 'variant' => 'danger']);
+                 return;
+            }
+            
+            Citation::create([
+                'cycle_id' => $activeCycle->id,
+                'student_id' => $this->selectedStudentId,
+                'teacher_id' => auth()->id(),
+                'reason' => $this->reason,
+                'citation_date' => \Carbon\Carbon::parse($this->citationDate . ' ' . $this->citationTime),
+                'status' => 'PENDING',
+            ]);
+            $message = 'Citatorio generado correctamente.';
         }
-        
-        Citation::create([
-            'cycle_id' => $activeCycle->id,
-            'student_id' => $this->selectedStudentId,
-            'teacher_id' => auth()->id(),
-            'reason' => $this->reason,
-            'citation_date' => \Carbon\Carbon::parse($this->citationDate . ' ' . $this->citationTime),
-            'status' => 'PENDING',
-        ]);
 
         $this->showCreateModal = false;
+        $this->editingCitationId = null;
         $this->resetForm();
-        $this->dispatch('notify', ['message' => 'Citatorio generado correctamente.']);
+        $this->dispatch('notify', ['message' => $message]);
+    }
+
+    public function editCitation(string $id): void
+    {
+        $this->authorize('teacher-or-admin');
+        $citation = Citation::findOrFail($id);
+        
+        $this->editingCitationId = $citation->id;
+        $this->selectedStudentId = $citation->student_id;
+        $this->studentSearch = $citation->student->name;
+        $this->reason = $citation->reason;
+        $this->citationDate = $citation->citation_date->format('Y-m-d');
+        $this->citationTime = $citation->citation_date->format('H:i');
+        
+        $this->showCreateModal = true;
+    }
+
+    public function deleteCitation(string $id): void
+    {
+        $this->authorize('teacher-or-admin');
+        Citation::findOrFail($id)->delete();
+        $this->dispatch('notify', ['message' => 'Citatorio eliminado correctamente.']);
     }
 
     public function updateStatus(string $id, string $status): void
@@ -196,6 +231,8 @@ new class extends Component {
                                     @if($citation->status === 'PENDING')
                                         <flux:button variant="ghost" size="sm" icon="check-circle" class="text-green-600" title="Marcar asistencia" wire:click="updateStatus('{{ $citation->id }}', 'ATTENDED')" />
                                         <flux:button variant="ghost" size="sm" icon="x-circle" class="text-red-600" title="Marcar inasistencia" wire:click="updateStatus('{{ $citation->id }}', 'NO_SHOW')" />
+                                        <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editCitation('{{ $citation->id }}')" />
+                                        <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="deleteCitation('{{ $citation->id }}')" />
                                     @endif
                                     <flux:button variant="ghost" size="sm" icon="eye" />
                                 </div>
@@ -277,8 +314,8 @@ new class extends Component {
         <flux:modal wire:model.self="showCreateModal" class="md:w-160">
             <form wire:submit="saveCitation" class="space-y-6">
                 <header>
-                    <flux:heading size="md">Generar Citatorio</flux:heading>
-                    <flux:text>Solicite una reunión presencial con los padres de familia.</flux:text>
+                    <flux:heading size="md">{{ $editingCitationId ? 'Editar Citatorio' : 'Generar Citatorio' }}</flux:heading>
+                    <flux:text>{{ $editingCitationId ? 'Modifique los detalles de la reunión presencial.' : 'Solicite una reunión presencial con los padres de familia.' }}</flux:text>
                 </header>
 
                 <div class="space-y-4">
@@ -289,7 +326,6 @@ new class extends Component {
                                 @foreach($studentResults as $student)
                                     <button type="button" wire:click="selectStudent('{{ $student->id }}')" class="w-full text-left px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 flex flex-col">
                                         <span class="font-bold text-sm">{{ $student->name }}</span>
-                                        <span class="text-xs text-zinc-500">{{ $student->curp }}</span>
                                     </button>
                                 @endforeach
                             </div>
@@ -307,7 +343,7 @@ new class extends Component {
                 <div class="flex gap-2">
                     <flux:spacer />
                     <flux:button wire:click="$set('showCreateModal', false)">Cancelar</flux:button>
-                    <flux:button variant="primary" type="submit">Generar Citatorio</flux:button>
+                    <flux:button variant="primary" type="submit">{{ $editingCitationId ? 'Actualizar Citatorio' : 'Generar Citatorio' }}</flux:button>
                 </div>
             </form>
         </flux:modal>

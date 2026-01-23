@@ -26,5 +26,10 @@ class StudentPii extends Model
         'allergies_encrypted',
         'medical_conditions_encrypted',
         'emergency_contact_encrypted',
+        'mother_name_encrypted',
+        'father_name_encrypted',
+        'other_contact_encrypted',
+        'mother_workplace_encrypted',
+        'father_workplace_encrypted',
     ];
 }

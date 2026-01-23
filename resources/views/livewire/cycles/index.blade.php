@@ -24,6 +24,7 @@ new class extends Component {
     public string $grade = '';
     public string $section = '';
     public string $tutorId = '';
+    public ?ClassGroup $editingGroup = null;
 
     protected $rules = [
         'name' => 'required|string|max:50',
@@ -85,7 +86,7 @@ new class extends Component {
         $this->showGroupsModal = true;
     }
 
-    public function addGroup(): void
+    public function saveGroup(): void
     {
         $this->validate([
             'grade' => 'required|string',
@@ -93,15 +94,38 @@ new class extends Component {
             'tutorId' => 'nullable|exists:users,id',
         ]);
 
-        ClassGroup::create([
-            'cycle_id' => $this->groupCycle->id,
-            'grade' => $this->grade,
-            'section' => $this->section,
-            'tutor_teacher_id' => $this->tutorId ?: null,
-        ]);
+        if ($this->editingGroup) {
+            $this->editingGroup->update([
+                'grade' => $this->grade,
+                'section' => $this->section,
+                'tutor_teacher_id' => $this->tutorId ?: null,
+            ]);
+            $this->editingGroup = null;
+        } else {
+            ClassGroup::create([
+                'cycle_id' => $this->groupCycle->id,
+                'grade' => $this->grade,
+                'section' => $this->section,
+                'tutor_teacher_id' => $this->tutorId ?: null,
+            ]);
+        }
 
         $this->reset(['grade', 'section', 'tutorId']);
         $this->groupCycle->load('groups');
+    }
+
+    public function editGroup(ClassGroup $group): void
+    {
+        $this->editingGroup = $group;
+        $this->grade = $group->grade;
+        $this->section = $group->section;
+        $this->tutorId = (string) $group->tutor_teacher_id;
+    }
+
+    public function cancelGroupEdit(): void
+    {
+        $this->editingGroup = null;
+        $this->reset(['grade', 'section', 'tutorId']);
     }
 
     public function deleteGroup(string $id): void
@@ -119,13 +143,11 @@ new class extends Component {
 
         $activeCycle = Cycle::where('is_active', true)->first();
         $totalCycles = Cycle::count();
-        $nextCycle = Cycle::where('start_date', '>', now())->orderBy('start_date', 'asc')->first();
 
         return [
             'cycles' => $cycles,
             'activeCycle' => $activeCycle,
             'totalCycles' => $totalCycles,
-            'nextCycle' => $nextCycle,
             'teachers' => User::where('role', 'TEACHER')->get(),
             'currentGroups' => $this->groupCycle ? ClassGroup::with('tutor')->where('cycle_id', $this->groupCycle->id)->get() : collect(),
         ];
@@ -166,17 +188,9 @@ new class extends Component {
         </div>
 
         <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm">
-            <flux:text class="uppercase text-xs font-semibold tracking-wider text-zinc-500 dark:text-zinc-400">Próximo Inicio</flux:text>
-            <flux:heading size="xl" class="mt-2">
-                {{ $nextCycle ? \Carbon\Carbon::parse($nextCycle->start_date)->format('M Y') : 'TBD' }}
-            </flux:heading>
-            <flux:text class="mt-4 text-xs text-blue-600 font-medium dark:text-blue-400">
-                @if($nextCycle)
-                    Faltan {{ now()->diffInDays($nextCycle->start_date) }} días
-                @else
-                    Sin planeación futura
-                @endif
-            </flux:text>
+            <flux:text class="uppercase text-xs font-semibold tracking-wider text-zinc-500 dark:text-zinc-400">Estado del Sistema</flux:text>
+            <flux:heading size="xl" class="mt-2">{{ $activeCycle ? 'En Operación' : 'Inactivo' }}</flux:heading>
+            <flux:text class="mt-4 text-xs">Monitoreo de disponibilidad</flux:text>
         </div>
     </div>
 
@@ -191,9 +205,9 @@ new class extends Component {
             <form wire:submit="save" class="space-y-4">
                 <flux:input wire:model="name" :label="__('Nombre del Ciclo')" placeholder="Ej: 2024-2025" />
 
-                <div class="grid grid-cols-2 gap-4">
-                    <flux:input type="date" wire:model="start_date" :label="__('Inicio')" />
-                    <flux:input type="date" wire:model="end_date" :label="__('Fin')" />
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <flux:input type="date" wire:model="start_date" :label="__('Inicio')" class="w-full" />
+                    <flux:input type="date" wire:model="end_date" :label="__('Fin')" class="w-full" />
                 </div>
 
                 <div class="flex items-center justify-between py-2">
@@ -238,10 +252,16 @@ new class extends Component {
                                     {{ \Carbon\Carbon::parse($cycle->start_date)->format('M d, Y') }} - {{ \Carbon\Carbon::parse($cycle->end_date)->format('M d, Y') }}
                                 </td>
                                 <td class="py-4 px-2">
+                                    @php
+                                        $remaining = (int) now()->diffInDays($cycle->end_date);
+                                        $until = (int) now()->diffInDays(\Carbon\Carbon::parse($cycle->start_date));
+                                    @endphp
                                     @if($cycle->is_active)
                                         <flux:badge color="green" size="sm" inset="left">Activo</flux:badge>
+                                        <flux:text class="text-xs text-zinc-500">Días restantes: {{ $remaining }}</flux:text>
                                     @elseif(\Carbon\Carbon::parse($cycle->start_date) > now())
                                         <flux:badge color="blue" size="sm" inset="left">Planificado</flux:badge>
+                                        <flux:text class="text-xs text-zinc-500">Inicia en: {{ $until }} días</flux:text>
                                     @else
                                         <flux:badge color="neutral" size="sm" inset="left">Cerrado</flux:badge>
                                     @endif
@@ -273,40 +293,50 @@ new class extends Component {
                 <flux:text>Administra los grupos asignados a este periodo académico.</flux:text>
             </header>
 
-            <form wire:submit="addGroup" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700">
-                <flux:select label="Grado" wire:model="grade">
+            <form wire:submit="saveGroup" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                <flux:select label="Grado" wire:model="grade" class="w-full">
                     <option value="">Grado...</option>
                     <option value="1º">1º Secundaria</option>
                     <option value="2º">2º Secundaria</option>
                     <option value="3º">3º Secundaria</option>
                 </flux:select>
-                <flux:select label="Sección" wire:model="section">
+                <flux:select label="Sección" wire:model="section" class="w-full">
                     <option value="">Sección...</option>
                     @foreach(range('A', 'F') as $letter)
                         <option value="{{ $letter }}">{{ $letter }}</option>
                     @endforeach
                 </flux:select>
-                <flux:select label="Tutor" wire:model="tutorId">
+                <flux:select label="Tutor" wire:model="tutorId" class="w-full">
                     <option value="">Seleccione tutor...</option>
                     @foreach($teachers as $teacher)
                         <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
                     @endforeach
                 </flux:select>
-                <flux:button variant="primary" type="submit">Añadir</flux:button>
+                <div class="flex gap-2 w-full">
+                    <flux:button variant="primary" type="submit" class="flex-1">{{ $editingGroup ? 'Actualizar' : 'Añadir' }}</flux:button>
+                    @if($editingGroup)
+                        <flux:button wire:click="cancelGroupEdit" class="shrink-0">X</flux:button>
+                    @endif
+                </div>
             </form>
 
             <div class="space-y-2">
                 <flux:heading size="sm">Grupos Registrados</flux:heading>
                 <div class="divide-y divide-zinc-100 dark:divide-zinc-800 border rounded-lg overflow-hidden border-zinc-200 dark:border-zinc-700">
                     @forelse($currentGroups as $group)
-                        <div class="flex items-center justify-between p-3 bg-white dark:bg-zinc-900" wire:key="group-{{ $group->id }}">
-                            <div class="flex items-center gap-4">
-                                <div class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold rounded text-lg">{{ $group->grade }} {{ $group->section }}</div>
-                                <div>
-                                    <div class="text-sm font-medium uppercase">Tutor: {{ $group->tutor?->name ?? 'No asignado' }}</div>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white dark:bg-zinc-900 gap-3" wire:key="group-{{ $group->id }}">
+                            <div class="flex items-center gap-4 min-w-0">
+                                <div class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold rounded text-lg shrink-0">{{ $group->grade }} {{ $group->section }}</div>
+                                <div class="min-w-0">
+                                    <div class="text-sm font-medium uppercase truncate" title="Tutor: {{ $group->tutor?->name ?? 'No asignado' }}">
+                                        Tutor: {{ $group->tutor?->name ?? 'No asignado' }}
+                                    </div>
                                 </div>
                             </div>
-                            <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteGroup('{{ $group->id }}')" />
+                            <div class="flex items-center gap-1">
+                                <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editGroup('{{ $group->id }}')" />
+                                <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteGroup('{{ $group->id }}')" />
+                            </div>
                         </div>
                     @empty
                         <div class="p-8 text-center bg-zinc-50 dark:bg-zinc-800/20 italic text-zinc-500">

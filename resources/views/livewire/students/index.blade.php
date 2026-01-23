@@ -22,7 +22,6 @@ new class extends Component {
     public string $studentId = '';
     
     // Core Student Fields
-    public string $curp = '';
     public string $name = '';
     public string $birthDate = '';
     public string $turn = 'MATUTINO';
@@ -37,6 +36,11 @@ new class extends Component {
     public string $allergies = '';
     public string $medicalConditions = '';
     public string $emergencyContact = '';
+    public string $otherContact = '';
+    public string $motherName = '';
+    public string $fatherName = '';
+    public string $motherWorkplace = '';
+    public string $fatherWorkplace = '';
 
     public function updatingSearch(): void
     {
@@ -46,7 +50,7 @@ new class extends Component {
     public function openCreateModal(): void
     {
         $this->authorize('teacher-or-admin');
-        $this->reset(['studentId', 'curp', 'name', 'birthDate', 'turn', 'siblingsCount', 'birthOrder', 'classGroupId', 'address', 'allergies', 'medicalConditions', 'emergencyContact']);
+        $this->reset(['studentId', 'name', 'birthDate', 'turn', 'siblingsCount', 'birthOrder', 'classGroupId', 'address', 'allergies', 'medicalConditions', 'emergencyContact', 'otherContact', 'motherName', 'fatherName', 'motherWorkplace', 'fatherWorkplace']);
         $this->showStudentModal = true;
     }
 
@@ -84,7 +88,6 @@ new class extends Component {
         $student = Student::with(['pii', 'currentCycleAssociation', 'parents'])->findOrFail($id);
         
         $this->studentId = $student->id;
-        $this->curp = $student->curp;
         $this->name = $student->name;
         $this->birthDate = $student->birth_date->format('Y-m-d');
         $this->turn = $student->turn;
@@ -98,6 +101,11 @@ new class extends Component {
             $this->allergies = $student->pii->allergies_encrypted ?? '';
             $this->medicalConditions = $student->pii->medical_conditions_encrypted ?? '';
             $this->emergencyContact = $student->pii->contact_phone_encrypted ?? '';
+            $this->otherContact = $student->pii->other_contact_encrypted ?? '';
+            $this->motherName = $student->pii->mother_name_encrypted ?? '';
+            $this->fatherName = $student->pii->father_name_encrypted ?? '';
+            $this->motherWorkplace = $student->pii->mother_workplace_encrypted ?? '';
+            $this->fatherWorkplace = $student->pii->father_workplace_encrypted ?? '';
         }
 
         $this->parentSearch = '';
@@ -109,9 +117,7 @@ new class extends Component {
     {
         $this->authorize('teacher-or-admin');
         $this->validate([
-            'curp' => 'required|string|size:18',
             'name' => 'required|string|max:100',
-            'birthDate' => 'required|date',
             'turn' => 'required|in:MATUTINO,VESPERTINO',
             'classGroupId' => 'required|exists:class_groups,id',
         ]);
@@ -127,26 +133,20 @@ new class extends Component {
         if ($this->studentId) {
             $student = Student::findOrFail($this->studentId);
             $student->update([
-                'curp' => strtoupper($this->curp),
                 'name' => strtoupper($this->name),
-                'birth_date' => $this->birthDate,
+                'birth_date' => $this->birthDate ?: now()->subYears(12)->format('Y-m-d'),
                 'grade' => $group->grade,
                 'group_name' => $group->section,
                 'turn' => $this->turn,
-                'siblings_count' => $this->siblingsCount,
-                'birth_order' => $this->birthOrder,
             ]);
         } else {
             $student = Student::create([
                 'id' => (string) Str::uuid(),
-                'curp' => strtoupper($this->curp),
                 'name' => strtoupper($this->name),
-                'birth_date' => $this->birthDate,
+                'birth_date' => $this->birthDate ?: now()->subYears(12)->format('Y-m-d'),
                 'grade' => $group->grade,
                 'group_name' => $group->section,
                 'turn' => $this->turn,
-                'siblings_count' => $this->siblingsCount,
-                'birth_order' => $this->birthOrder,
             ]);
             $this->studentId = $student->id; // Set ID for new student so parents can be added
         }
@@ -159,6 +159,11 @@ new class extends Component {
                 'allergies_encrypted' => $this->allergies,
                 'medical_conditions_encrypted' => $this->medicalConditions,
                 'contact_phone_encrypted' => $this->emergencyContact,
+                'other_contact_encrypted' => $this->otherContact,
+                'mother_name_encrypted' => $this->motherName,
+                'father_name_encrypted' => $this->fatherName,
+                'mother_workplace_encrypted' => $this->motherWorkplace,
+                'father_workplace_encrypted' => $this->fatherWorkplace,
             ]
         );
 
@@ -178,6 +183,13 @@ new class extends Component {
         $this->dispatch('student-saved');
     }
 
+    public function deleteStudent(string $id): void
+    {
+        $this->authorize('teacher-or-admin');
+        Student::findOrFail($id)->delete();
+        $this->dispatch('student-saved'); // Trigger refresh
+    }
+
     public function with(): array
     {
         $activeCycle = Cycle::where('is_active', true)->first();
@@ -193,8 +205,7 @@ new class extends Component {
 
         if ($this->search) {
             $query->where(function($q) {
-                $q->where('name', 'like', "%{$this->search}%")
-                  ->orWhere('curp', 'like', "%{$this->search}%");
+                $q->where('name', 'like', "%{$this->search}%");
             });
         }
 
@@ -259,7 +270,7 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <flux:field>
                 <flux:label>Buscar Alumno</flux:label>
-                <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="CURP o Nombre..." />
+                <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Nombre..." />
             </flux:field>
 
             <flux:field>
@@ -291,7 +302,6 @@ new class extends Component {
                 <thead>
                     <tr class="border-b border-zinc-200 dark:border-zinc-700 text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                         <th class="py-3 px-2 font-semibold">Alumno</th>
-                        <th class="py-3 px-2 font-semibold text-center">CURP</th>
                         <th class="py-3 px-2 font-semibold text-center">Grado / Grupo</th>
                         <th class="py-3 px-2 font-semibold text-center">Turno</th>
                         <th class="py-3 px-2 text-right font-semibold">Acciones</th>
@@ -311,9 +321,6 @@ new class extends Component {
                                     </div>
                                 </div>
                             </td>
-                            <td class="py-4 px-2 text-center font-mono text-xs text-zinc-600 dark:text-zinc-400 uppercase">
-                                {{ $student->curp }}
-                            </td>
                             <td class="py-4 px-2 text-center">
                                 <div class="inline-flex items-center gap-1">
                                     <flux:badge size="sm" color="blue">{{ $student->grade }}</flux:badge>
@@ -327,14 +334,17 @@ new class extends Component {
                             </td>
                             <td class="py-4 px-2 text-right">
                                 <div class="flex justify-end gap-1">
-                                    <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
+                                    @can('teacher-or-admin')
+                                        <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
+                                        <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteStudent('{{ $student->id }}')" />
+                                    @endcan
                                     <flux:button variant="ghost" size="sm" icon="eye" />
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-12 text-center text-zinc-500 italic">No se encontraron alumnos coincidentes</td>
+                            <td colspan="4" class="py-12 text-center text-zinc-500 italic">No se encontraron alumnos coincidentes</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -346,128 +356,158 @@ new class extends Component {
         </div>
     </div>
 
-    <!-- Student Modal -->
-    <flux:modal wire:model="showStudentModal" class="w-full max-w-2xl">
-        <div class="space-y-6">
-            <header>
-                <flux:heading size="lg">{{ $studentId ? 'Editar Información de Alumno' : 'Inscripción de Nuevo Alumno' }}</flux:heading>
-                <flux:text>Complete los datos pedagógicos y personales del estudiante.</flux:text>
-            </header>
+    @can('teacher-or-admin')
+        <!-- Student Modal -->
+        <flux:modal wire:model="showStudentModal" class="w-full max-w-2xl">
+            <div class="space-y-6">
+                <header>
+                    <flux:heading size="lg">{{ $studentId ? 'Editar Información de Alumno' : 'Inscripción de Nuevo Alumno' }}</flux:heading>
+                    <flux:text>Complete los datos pedagógicos y personales del estudiante.</flux:text>
+                </header>
 
-            <form wire:submit="save" class="space-y-8">
-                <!-- Section: Basic Info -->
-                <div class="space-y-4">
-                    <flux:separator text="Información Básica" />
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <flux:input label="CURP" wire:model="curp" placeholder="ABCD123456H..." class="uppercase" maxlength="18" />
-                        <flux:input label="Nombre Completo" wire:model="name" placeholder="Ej. Juan Pérez López" class="uppercase" />
+                <form wire:submit="save" class="space-y-8" x-data="{ name: @entangle('name'), emergencyContact: @entangle('emergencyContact') }">
+                    <!-- Section: Basic Info -->
+                    <div class="space-y-4">
+                        <flux:separator text="Información Básica" />
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <flux:input 
+                                label="Nombre Completo" 
+                                wire:model="name" 
+                                placeholder="Ej. JUAN PEREZ LOPEZ" 
+                                class="uppercase md:col-span-1"
+                                x-on:input="name = $event.target.value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z ]/g, '')"
+                            />
+                            <flux:select label="Turno" wire:model="turn">
+                                <option value="MATUTINO">Matutino</option>
+                                <option value="VESPERTINO">Vespertino</option>
+                            </flux:select>
+                            <flux:select label="Grupo / Grado" wire:model="classGroupId">
+                                <option value="">Seleccione grupo...</option>
+                                @foreach($classGroups as $group)
+                                    <option value="{{ $group->id }}">{{ $group->grade }} {{ $group->section }}</option>
+                                @endforeach
+                            </flux:select>
+                        </div>
+                    <!-- Section: Contact Info -->
+                    <div class="space-y-4">
+                        <flux:separator text="Información de Contacto" />
+                        <flux:textarea label="Dirección" wire:model="address" placeholder="Calle, número, colonia..." rows="2" />
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <flux:input 
+                                label="Teléfonos de contacto" 
+                                wire:model="emergencyContact" 
+                                placeholder="Ej. 12345678, 87654321"
+                                x-on:input="emergencyContact = $event.target.value.replace(/\D/g, '')"
+                            />
+                            <flux:input label="Otro contacto / Parentesco" wire:model="otherContact" placeholder="Ej. Abuela - 1234..." />
+                        </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <flux:input label="Fecha de Nacimiento" type="date" wire:model="birthDate" />
-                        <flux:select label="Turno" wire:model="turn">
-                            <option value="MATUTINO">Matutino</option>
-                            <option value="VESPERTINO">Vespertino</option>
-                        </flux:select>
-                        <flux:select label="Grupo / Grado" wire:model="classGroupId">
-                            <option value="">Seleccione grupo...</option>
-                            @foreach($classGroups as $group)
-                                <option value="{{ $group->id }}">{{ $group->grade }} {{ $group->section }}</option>
-                            @endforeach
-                        </flux:select>
+
+                    <!-- Hidden Fields (Stored for compatibility but not shown) -->
+                    <div class="hidden">
+                        <input type="date" wire:model="birthDate">
+                        <input type="number" wire:model="siblingsCount">
+                        <input type="number" wire:model="birthOrder">
+                        <input type="text" wire:model="motherName">
+                        <input type="text" wire:model="motherWorkplace">
+                        <input type="text" wire:model="fatherName">
+                        <input type="text" wire:model="fatherWorkplace">
+                        <input type="text" wire:model="allergies">
+                        <input type="text" wire:model="medicalConditions">
                     </div>
-                </div>
 
-                <!-- Section: Family Context -->
-                <div class="space-y-4">
-                    <flux:separator text="Contexto Familiar" />
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <flux:input label="Número de hermanos" type="number" wire:model="siblingsCount" />
-                        <flux:input label="Lugar entre hermanos" type="number" wire:model="birthOrder" />
-                    </div>
-                </div>
-
-                <!-- Section: Parents / Tutores -->
-                <div class="space-y-4">
-                    <flux:separator text="Padres y Tutores" />
-                    
-                    @if($studentId)
-                        <div class="space-y-4">
-                            <!-- Parent Search -->
-                            <div class="flex gap-2 items-end">
-                                <flux:field class="grow">
-                                    <flux:label>Vincular nuevo Padre/Tutor</flux:label>
-                                    <flux:input wire:model.live.debounce.300ms="parentSearch" icon="user-plus" placeholder="Buscar por nombre o email..." />
-                                </flux:field>
-                                <flux:select wire:model="parentRelationship" class="w-1/3">
-                                    <option value="PADRE">Padre</option>
-                                    <option value="MADRE">Madre</option>
-                                    <option value="TUTOR">Tutor</option>
-                                </flux:select>
-                                <flux:button wire:click="addParent" variant="primary" :disabled="!$selectedParentId">Vincular</flux:button>
-                            </div>
-
-                            @if(count($parentSearchResults) > 0)
-                                <div class="p-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 shadow-inner max-h-40 overflow-y-auto">
-                                    @foreach($parentSearchResults as $parent)
-                                        <button type="button" 
-                                            wire:click="$set('selectedParentId', '{{ $parent->id }}')"
-                                            @class([
-                                                'w-full flex items-center justify-between p-2 rounded text-left transition-colors',
-                                                'bg-blue-100 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800' => $selectedParentId === $parent->id,
-                                                'hover:bg-zinc-200 dark:hover:bg-zinc-700' => $selectedParentId !== $parent->id
-                                            ])
-                                        >
-                                            <div class="flex items-center gap-2">
-                                                <div class="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-600 flex items-center justify-center text-xs font-bold">{{ $parent->initials() }}</div>
-                                                <div>
-                                                    <div class="text-xs font-bold">{{ $parent->name }}</div>
-                                                    <div class="text-[10px] text-zinc-500">{{ $parent->email }}</div>
-                                                </div>
-                                            </div>
-                                            @if($selectedParentId === $parent->id)
-                                                <flux:icon icon="check" size="sm" class="text-blue-600" />
-                                            @endif
-                                        </button>
-                                    @endforeach
-                                </div>
-                            @endif
-
-                            <!-- Current Parents List -->
-                            <div class="space-y-2">
-                                <flux:heading size="sm">Padres Vinculados</flux:heading>
-                                <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
-                                    @forelse($currentParents as $parent)
-                                        <div class="flex items-center justify-between py-2">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-xs font-bold text-purple-600">{{ $parent->initials() }}</div>
-                                                <div>
-                                                    <div class="text-sm font-bold uppercase">{{ $parent->name }}</div>
-                                                    <div class="text-xs text-zinc-500">{{ $parent->pivot->relationship }} · {{ $parent->phone ?? 'Sin teléfono' }}</div>
-                                                </div>
-                                            </div>
-                                            <flux:button variant="ghost" size="sm" icon="x-mark" class="text-red-500" wire:click="removeParent('{{ $parent->id }}')" />
-                                        </div>
-                                    @empty
-                                        <flux:text class="italic text-xs text-zinc-500">No hay padres vinculados a este alumno.</flux:text>
-                                    @endforelse
-                                </div>
+                    <!-- Section: Parents / Tutores -->
+                    <div class="space-y-4">
+                        <flux:separator text="Padres de Familia" />
+                        
+                        <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30">
+                            <div class="flex items-start gap-3">
+                                <flux:icon icon="information-circle" class="text-blue-600 dark:text-blue-400 shrink-0" />
+                                <flux:text size="sm" class="text-blue-900 dark:text-blue-200">
+                                    Los datos de contacto detallados, puestos y ocupaciones de los padres se gestionan directamente a través de sus <b>Cuentas de Usuario</b> vinculadas aquí.
+                                </flux:text>
                             </div>
                         </div>
-                    @else
-                        <div class="p-4 rounded-lg bg-zinc-100 dark:bg-zinc-800/50 border border-dashed border-zinc-300 dark:border-zinc-700 text-center">
-                            <flux:text size="sm" class="italic text-zinc-500">Primero debe guardar los datos básicos del alumno para poder vincular padres o tutores.</flux:text>
-                        </div>
-                    @endif
-                </div>
 
-                <div class="flex gap-2 pt-4">
-                    <flux:spacer />
-                    <flux:button wire:click="$set('showStudentModal', false)">Cancelar</flux:button>
-                    <flux:button type="submit" variant="primary">
-                        {{ $studentId ? 'Actualizar Registro' : 'Inscribir Alumno' }}
-                    </flux:button>
-                </div>
-            </form>
-        </div>
-    </flux:modal>
+                        @if($studentId)
+                            <div class="space-y-4">
+                                <!-- Parent Search -->
+                                <div class="flex gap-2 items-end">
+                                    <flux:field class="grow">
+                                        <flux:label>Vincular nuevo Padre/Madre</flux:label>
+                                        <flux:input wire:model.live.debounce.300ms="parentSearch" icon="user-plus" placeholder="Buscar por nombre o email..." />
+                                    </flux:field>
+                                    <flux:select wire:model="parentRelationship" class="w-1/3">
+                                        <option value="PADRE">Padre</option>
+                                        <option value="MADRE">Madre</option>
+                                    </flux:select>
+                                    <flux:button wire:click="addParent" variant="primary" :disabled="!$selectedParentId">Vincular</flux:button>
+                                </div>
+
+                                @if(count($parentSearchResults) > 0)
+                                    <div class="p-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 shadow-inner max-h-40 overflow-y-auto">
+                                        @foreach($parentSearchResults as $parent)
+                                            <button type="button" 
+                                                wire:click="$set('selectedParentId', '{{ $parent->id }}')"
+                                                @class([
+                                                    'w-full flex items-center justify-between p-2 rounded text-left transition-colors',
+                                                    'bg-blue-100 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800' => $selectedParentId === $parent->id,
+                                                    'hover:bg-zinc-200 dark:hover:bg-zinc-700' => $selectedParentId !== $parent->id
+                                                ])
+                                            >
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-600 flex items-center justify-center text-xs font-bold">{{ $parent->initials() }}</div>
+                                                    <div>
+                                                        <div class="text-xs font-bold">{{ $parent->name }}</div>
+                                                        <div class="text-[10px] text-zinc-500">{{ $parent->email }}</div>
+                                                    </div>
+                                                </div>
+                                                @if($selectedParentId === $parent->id)
+                                                    <flux:icon icon="check" size="sm" class="text-blue-600" />
+                                                @endif
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+
+                                <!-- Current Parents List -->
+                                <div class="space-y-2">
+                                    <flux:heading size="sm">Padres Vinculados</flux:heading>
+                                    <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                                        @forelse($currentParents as $parent)
+                                            <div class="flex items-center justify-between py-2">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-xs font-bold text-purple-600">{{ $parent->initials() }}</div>
+                                                    <div>
+                                                        <div class="text-sm font-bold uppercase">{{ $parent->name }}</div>
+                                                        <div class="text-xs text-zinc-500">{{ $parent->pivot->relationship }} · {{ $parent->phone ?? 'Sin teléfono' }}</div>
+                                                    </div>
+                                                </div>
+                                                <flux:button variant="ghost" size="sm" icon="x-mark" class="text-red-500" wire:click="removeParent('{{ $parent->id }}')" />
+                                            </div>
+                                        @empty
+                                            <flux:text class="italic text-xs text-zinc-500">No hay padres vinculados a este alumno.</flux:text>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="p-4 rounded-lg bg-zinc-100 dark:bg-zinc-800/50 border border-dashed border-zinc-300 dark:border-zinc-700 text-center">
+                                <flux:text size="sm" class="italic text-zinc-500">Primero debe guardar los datos básicos del alumno para poder vincular padres o tutores.</flux:text>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="flex gap-2 pt-4">
+                        <flux:spacer />
+                        <flux:button wire:click="$set('showStudentModal', false)">Cancelar</flux:button>
+                        <flux:button type="submit" variant="primary">
+                            {{ $studentId ? 'Actualizar Registro' : 'Inscribir Alumno' }}
+                        </flux:button>
+                    </div>
+                </form>
+            </div>
+        </flux:modal>
+    @endcan
 </div>

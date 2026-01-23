@@ -1,22 +1,24 @@
 {
-  "name": "SM Application",
-  "short_name": "SM",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0ea5a4",
-  "lang": "en",
-  "scope": "/",
-  "icons": [
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+    "name": "SM Application",
+    "short_name": "SM",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#0ea5a4",
+    "lang": "en",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
 }

@@ -22,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('avisos', 'notices.index')->name('notices.index');
     Volt::route('citatorios', 'citations.index')->name('citations.index');
     Volt::route('examenes', 'exams.index')->name('exams.index');
+    Volt::route('tutoriales', 'tutorials.index')->name('tutorials.index');
 });
 
 Route::middleware(['auth'])->group(function () {
