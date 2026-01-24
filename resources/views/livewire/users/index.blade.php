@@ -35,7 +35,8 @@ new class extends Component {
         'userRole' => 'required|in:ADMIN,TEACHER,PARENT',
         'userPhone' => 'nullable|string|max:20',
         'userOccupation' => 'nullable|string|max:100',
-        'userPassword' => 'nullable|string|min:8',
+        // Password is required when creating a new user (userId empty).
+        'userPassword' => 'required_without:userId|string|min:8',
     ];
 
     public function updatingSearch(): void
@@ -385,7 +386,8 @@ new class extends Component {
                     />
                 @endif
 
-                <div class="flex items-end gap-2">
+                {{-- Password field: keep input and eye button inline. Hide internal component error and render our own below. --}}
+                <div id="user-password-field" class="flex items-end gap-2">
                     <flux:input 
                         label="{{ $userId ? 'Cambiar Contraseña (dejar vacío para mantener)' : 'Contraseña' }}" 
                         wire:model="userPassword" 
@@ -396,13 +398,20 @@ new class extends Component {
                     <flux:button variant="ghost" icon="{{ $showPassword ? 'eye-slash' : 'eye' }}" wire:click="$toggle('showPassword')" class="mb-0.5" />
                 </div>
 
-                @if(!$userId && !$userPassword)
-                    <div class="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
-                        <flux:text size="sm" class="text-zinc-600 dark:text-zinc-400">
-                            <strong>Nota:</strong> Si no ingresa una contraseña, se generará una automática. El usuario deberá cambiarla en su primer inicio.
-                        </flux:text>
-                    </div>
-                @endif
+                {{-- Hide internal flux:input error visuals for this specific field to avoid duplicate messages and layout shift. --}}
+                <style>
+                    /* Target common Tailwind error classes rendered by the input component inside this wrapper */
+                    #user-password-field .text-red-600, #user-password-field .text-red-500, #user-password-field .text-red-700 {
+                        display: none !important;
+                    }
+                </style>
+
+                {{-- Our reserved error area (fixed height) to show a single consistent validation message. --}}
+                <div class="min-h-5">
+                    @error('userPassword')
+                        <div class="text-red-600 text-sm mt-1">{{ $message }}</div>
+                    @enderror
+                </div>
 
                 <div class="flex gap-2 pt-4">
                     <flux:spacer />
