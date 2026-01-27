@@ -23,10 +23,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('citatorios', 'citations.index')->name('citations.index');
     Volt::route('examenes', 'exams.index')->name('exams.index');
     Volt::route('tutoriales', 'tutorials.index')->name('tutorials.index');
+    Volt::route('reportes/tipos', 'infractions.index')->name('infractions.index');
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
+    Route::get('settings', function () {
+        return auth()->user()->isAdmin()
+            ? redirect()->route('profile.edit')
+            : redirect()->route('appearance.edit');
+    });
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');

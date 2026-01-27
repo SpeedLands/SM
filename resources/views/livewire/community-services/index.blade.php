@@ -241,7 +241,7 @@ new class extends Component {
                                         <flux:button variant="ghost" size="sm" icon="x-circle" class="text-red-600" title="Marcar como no asistió" wire:click="updateStatus('{{ $service->id }}', 'MISSED')" />
                                     @endif
                                 @endcan
-                                <flux:button variant="ghost" size="sm" icon="eye" />
+
                             </div>
                         </td>
                     </tr>

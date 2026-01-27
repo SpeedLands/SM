@@ -38,6 +38,18 @@ new class extends Component {
         'userPassword' => 'nullable|string|min:8',
     ];
 
+    public function rules() 
+    {
+        $rules = $this->rules;
+        
+        // If creating a new user, password is required
+        if (!$this->userId) {
+            $rules['userPassword'] = 'required|string|min:8';
+        }
+
+        return $rules;
+    }
+
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -105,12 +117,11 @@ new class extends Component {
 
             $user->update($data);
         } else {
-            $password = $this->userPassword ?: Str::random(10);
             User::create([
                 'id' => (string) Str::uuid(),
                 'name' => $cleanName,
                 'email' => $this->userEmail,
-                'password' => Hash::make($password),
+                'password' => Hash::make($this->userPassword),
                 'role' => $this->userRole,
                 'status' => 'FORCE_PASSWORD_CHANGE',
                 'phone' => $this->userRole === 'PARENT' ? $this->userPhone : null,
@@ -396,13 +407,7 @@ new class extends Component {
                     <flux:button variant="ghost" icon="{{ $showPassword ? 'eye-slash' : 'eye' }}" wire:click="$toggle('showPassword')" class="mb-0.5" />
                 </div>
 
-                @if(!$userId && !$userPassword)
-                    <div class="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
-                        <flux:text size="sm" class="text-zinc-600 dark:text-zinc-400">
-                            <strong>Nota:</strong> Si no ingresa una contraseña, se generará una automática. El usuario deberá cambiarla en su primer inicio.
-                        </flux:text>
-                    </div>
-                @endif
+
 
                 <div class="flex gap-2 pt-4">
                     <flux:spacer />

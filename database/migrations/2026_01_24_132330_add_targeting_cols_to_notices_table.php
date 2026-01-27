@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->timestamp('last_login_at')->nullable()->after('password');
+        Schema::table('notices', function (Blueprint $table) {
+            $table->json('target_grades')->nullable()->after('target_audience');
+            $table->json('target_class_groups')->nullable()->after('target_grades');
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
+        Schema::table('notices', function (Blueprint $table) {
+            $table->dropColumn(['target_grades', 'target_class_groups']);
         });
     }
 };

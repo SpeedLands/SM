@@ -234,7 +234,7 @@ new class extends Component {
                                         <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editCitation('{{ $citation->id }}')" />
                                         <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="deleteCitation('{{ $citation->id }}')" />
                                     @endif
-                                    <flux:button variant="ghost" size="sm" icon="eye" />
+
                                 </div>
                             </td>
                         </tr>
