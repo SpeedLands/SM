@@ -11,6 +11,14 @@ new class extends Component {
     public string $password_confirmation = '';
 
     /**
+     * Mount the component.
+     */
+    public function mount(): void
+    {
+        abort_unless(Auth::user()->isAdmin(), 403);
+    }
+
+    /**
      * Update the password for the currently authenticated user.
      */
     public function updatePassword(): void

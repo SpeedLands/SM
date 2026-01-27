@@ -20,9 +20,18 @@ new class extends Component {
     public string $content = '';
     public string $type = 'GENERAL';
     public string $targetAudience = 'PARENTS';
+    public array $targetGrades = [];
+    public array $targetClassGroups = [];
     public bool $requiresAuthorization = false;
     public string $eventDate = '';
     public string $eventTime = '';
+    
+    // Signatures Modal
+    public bool $showSignaturesModal = false;
+    public ?string $viewingSignaturesNoticeId = null;
+    public array $signatureStats = [];
+    public $signedList = [];
+    public $pendingList = [];
 
     public function mount(): void
     {
@@ -51,6 +60,8 @@ new class extends Component {
                 'content' => $this->content,
                 'type' => $this->type,
                 'target_audience' => $this->targetAudience,
+                'target_grades' => count($this->targetGrades) > 0 ? $this->targetGrades : null,
+                'target_class_groups' => count($this->targetClassGroups) > 0 ? $this->targetClassGroups : null,
                 'requires_authorization' => $this->requiresAuthorization,
                 'event_date' => $this->eventDate ?: null,
                 'event_time' => $this->eventTime ?: null,
@@ -70,6 +81,8 @@ new class extends Component {
                 'content' => $this->content,
                 'type' => $this->type,
                 'target_audience' => $this->targetAudience,
+                'target_grades' => count($this->targetGrades) > 0 ? $this->targetGrades : null,
+                'target_class_groups' => count($this->targetClassGroups) > 0 ? $this->targetClassGroups : null,
                 'requires_authorization' => $this->requiresAuthorization,
                 'event_date' => $this->eventDate ?: null,
                 'event_time' => $this->eventTime ?: null,
@@ -80,7 +93,7 @@ new class extends Component {
 
         $this->showCreateModal = false;
         $this->editingNoticeId = null;
-        $this->reset(['title', 'content', 'requiresAuthorization', 'type', 'targetAudience']);
+        $this->reset(['title', 'content', 'requiresAuthorization', 'type', 'targetAudience', 'targetGrades', 'targetClassGroups']);
         $this->dispatch('notify', ['message' => $message]);
     }
 
@@ -94,6 +107,8 @@ new class extends Component {
         $this->content = $notice->content;
         $this->type = $notice->type;
         $this->targetAudience = $notice->target_audience;
+        $this->targetGrades = $notice->target_grades ?? [];
+        $this->targetClassGroups = $notice->target_class_groups ?? [];
         $this->requiresAuthorization = (bool) $notice->requires_authorization;
         $this->eventDate = $notice->event_date ? $notice->event_date->format('Y-m-d') : '';
         $this->eventTime = $notice->event_time ?? '';
@@ -106,6 +121,33 @@ new class extends Component {
         $this->authorize('teacher-or-admin');
         Notice::findOrFail($id)->delete();
         $this->dispatch('notify', ['message' => 'Aviso eliminado correctamente.']);
+    }
+
+    public function viewSignatures(string $id): void
+    {
+        $this->authorize('teacher-or-admin');
+        $notice = Notice::with(['signatures.parent', 'signatures.student'])->findOrFail($id);
+        $this->viewingSignaturesNoticeId = $notice->id;
+        
+        $stats = $notice->getSignatureStats();
+        $this->signatureStats = $stats;
+        
+        // Get signed list
+        $this->signedList = $notice->signatures->map(fn($s) => [
+            'student_name' => $s->student->name,
+            'parent_name' => $s->parent->name,
+            'date' => $s->signed_at->format('d/m/Y H:i'),
+            'authorized' => $s->authorized,
+        ])->toArray();
+        
+        // Get pending list
+        $signedStudentIds = $notice->signatures->pluck('student_id')->toArray();
+        $this->pendingList = $notice->getExpectedRecipientsQuery()
+            ->whereNotIn('id', $signedStudentIds)
+            ->get(['name'])
+            ->toArray();
+            
+        $this->showSignaturesModal = true;
     }
 
     public function signNotice(string $noticeId, string $studentId, bool $isAuthorized = true): void
@@ -135,16 +177,46 @@ new class extends Component {
             return [
                 'notices' => $notices,
                 'isStaff' => true,
+                'availableGroups' => $activeCycle ? \App\Models\ClassGroup::where('cycle_id', $activeCycle->id)->get() : collect(),
             ];
         } else {
             // Parent view
-            $studentIds = auth()->user()->students->pluck('id');
+            $students = auth()->user()->students;
+            $studentIds = $students->pluck('id');
+            $studentGrades = $students->pluck('grade')->unique()->toArray();
+            $studentGroupIds = $students->pluck('currentCycleAssociation.class_group_id')->filter()->unique()->toArray();
             
             $notices = Notice::with(['author', 'signatures' => fn($q) => $q->whereIn('student_id', $studentIds)])
                 ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
                 ->whereIn('target_audience', ['PARENTS', 'ALL'])
                 ->orderBy('date', 'desc')
-                ->get();
+                ->get()
+                ->filter(function($notice) use ($studentGrades, $studentGroupIds) {
+                    // If no targeting specified, show to all
+                    if (empty($notice->target_grades) && empty($notice->target_class_groups)) {
+                        return true;
+                    }
+                    
+                    // Check if any student grade matches
+                    if (!empty($notice->target_grades)) {
+                        foreach ($studentGrades as $grade) {
+                            if (in_array($grade, $notice->target_grades)) {
+                                return true;
+                            }
+                        }
+                    }
+                    
+                    // Check if any student group matches
+                    if (!empty($notice->target_class_groups)) {
+                        foreach ($studentGroupIds as $groupId) {
+                            if (in_array($groupId, $notice->target_class_groups)) {
+                                return true;
+                            }
+                        }
+                    }
+                    
+                    return false;
+                });
 
             return [
                 'notices' => $notices,
@@ -201,7 +273,22 @@ new class extends Component {
                                 <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editNotice('{{ $notice->id }}')" />
                                 <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="deleteNotice('{{ $notice->id }}')" />
                             </div>
-                            <flux:badge color="neutral" icon="finger-print" variant="outline">{{ $notice->signatures_count }} Firmas</flux:badge>
+                            
+                            @php
+                                $stats = $notice->getSignatureStats();
+                            @endphp
+                            
+                            <flux:button 
+                                variant="outline" 
+                                size="sm" 
+                                icon="finger-print" 
+                                color="{{ $stats['percentage'] === 100 ? 'green' : 'zinc' }}"
+                                wire:click="viewSignatures('{{ $notice->id }}')"
+                                class="cursor-pointer"
+                            >
+                                {{ $stats['signed'] }} de {{ $stats['expected'] }}
+                            </flux:button>
+
                             @if($notice->requires_authorization)
                                 <flux:badge color="purple" size="sm">Requiere Autorización</flux:badge>
                             @endif
@@ -350,6 +437,42 @@ new class extends Component {
                     </flux:select>
                 </div>
 
+                @if($targetAudience === 'PARENTS')
+                    <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/30 space-y-4">
+                        <flux:text size="sm" class="font-semibold text-blue-900 dark:text-blue-200">Filtros de Audiencia (Opcional)</flux:text>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <flux:text size="sm" class="font-medium mb-2">Por Grado</flux:text>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach(['1º', '2º', '3º'] as $grade)
+                                        <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-colors {{ in_array($grade, $targetGrades) ? 'bg-blue-100 border-blue-300 dark:bg-blue-900/40 dark:border-blue-700' : 'bg-white border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700' }}">
+                                            <input type="checkbox" wire:model="targetGrades" value="{{ $grade }}" class="rounded">
+                                            <span class="text-sm font-medium">{{ $grade }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div>
+                                <flux:text size="sm" class="font-medium mb-2">Por Grupo Específico</flux:text>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($availableGroups as $group)
+                                        <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-colors {{ in_array($group->id, $targetClassGroups) ? 'bg-blue-100 border-blue-300 dark:bg-blue-900/40 dark:border-blue-700' : 'bg-white border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700' }}">
+                                            <input type="checkbox" wire:model="targetClassGroups" value="{{ $group->id }}" class="rounded">
+                                            <span class="text-sm font-medium">{{ $group->grade }} {{ $group->section }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <flux:text size="xs" class="text-blue-700 dark:text-blue-300 italic">
+                                Si no selecciona ningún filtro, el aviso se enviará a todos los padres.
+                            </flux:text>
+                        </div>
+                    </div>
+                @endif
+
                 @if($type === 'EVENT')
                     <div class="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                         <flux:input type="date" wire:model="eventDate" label="Fecha del Evento" />
@@ -370,5 +493,85 @@ new class extends Component {
                 <flux:button variant="primary" type="submit">{{ $editingNoticeId ? 'Actualizar Aviso' : 'Publicar Aviso' }}</flux:button>
             </div>
         </form>
+    </flux:modal>
+
+    <!-- Signatures Detail Modal -->
+    <flux:modal wire:model="showSignaturesModal" class="md:w-160">
+        <div class="space-y-6">
+            <header>
+                <flux:heading size="lg">Detalles de Firmas</flux:heading>
+                @if($viewingSignaturesNoticeId)
+                    <flux:text size="sm" class="mt-1">Progreso para: <span class="font-bold">{{ App\Models\Notice::find($viewingSignaturesNoticeId)?->title }}</span></flux:text>
+                @endif
+            </header>
+
+            @if(!empty($signatureStats))
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="p-4 rounded-xl bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-800/30 text-center">
+                        <flux:text size="xs" class="uppercase tracking-wider font-bold text-green-700 dark:text-green-300">Firmados</flux:text>
+                        <flux:heading size="xl" class="text-green-800 dark:text-green-200">{{ $signatureStats['signed'] }}</flux:heading>
+                    </div>
+                    <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 text-center">
+                        <flux:text size="xs" class="uppercase tracking-wider font-bold text-zinc-500">Esperados</flux:text>
+                        <flux:heading size="xl">{{ $signatureStats['expected'] }}</flux:heading>
+                    </div>
+                    <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 text-center">
+                        <flux:text size="xs" class="uppercase tracking-wider font-bold text-blue-700 dark:text-blue-300">Progreso</flux:text>
+                        <flux:heading size="xl" class="text-blue-800 dark:text-blue-200">{{ $signatureStats['percentage'] }}%</flux:heading>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <flux:tab.group>
+                        <flux:tabs>
+                            <flux:tab name="signed">Firmados ({{ count($signedList) }})</flux:tab>
+                            <flux:tab name="pending">Pendientes ({{ count($pendingList) }})</flux:tab>
+                        </flux:tabs>
+
+                        <flux:tab.panel name="signed">
+                            <div class="mt-4 max-h-80 overflow-y-auto space-y-2 pr-2">
+                                @forelse($signedList as $item)
+                                    <div class="flex items-center justify-between p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+                                        <div>
+                                            <flux:text font="medium">{{ $item['student_name'] }}</flux:text>
+                                            <flux:text size="xs" color="subdued">Firmado por: {{ $item['parent_name'] }}</flux:text>
+                                        </div>
+                                        <div class="text-right">
+                                            <flux:text size="xs" color="subdued">{{ $item['date'] }}</flux:text>
+                                            @if($item['authorized'] !== null)
+                                                <flux:badge size="xs" color="{{ $item['authorized'] ? 'green' : 'red' }}" class="mt-1">
+                                                    {{ $item['authorized'] ? 'Autorizado' : 'No Autorizado' }}
+                                                </flux:badge>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @empty
+                                    <flux:text align="center" font="italic" class="py-8">Nadie ha firmado todavía.</flux:text>
+                                @endforelse
+                            </div>
+                        </flux:tab.panel>
+
+                        <flux:tab.panel name="pending">
+                            <div class="mt-4 max-h-80 overflow-y-auto space-y-2 pr-2">
+                                @forelse($pendingList as $item)
+                                    <div class="p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+                                        <flux:text font="medium">{{ $item['name'] }}</flux:text>
+                                        <flux:text size="xs" color="subdued">Esperando firma del tutor</flux:text>
+                                    </div>
+                                @empty
+                                    <flux:text align="center" font="italic" class="py-10 text-green-600 dark:text-green-400">
+                                        ¡Todos han firmado! 🎉
+                                    </flux:text>
+                                @endforelse
+                            </div>
+                        </flux:tab.panel>
+                    </flux:tab.group>
+                </div>
+            @endif
+
+            <div class="flex justify-end">
+                <flux:button wire:click="$set('showSignaturesModal', false)">Cerrar</flux:button>
+            </div>
+        </div>
     </flux:modal>
 </div>

@@ -39,6 +39,18 @@ new class extends Component {
         'userPassword' => 'required_without:userId|string|min:8',
     ];
 
+    public function rules() 
+    {
+        $rules = $this->rules;
+        
+        // If creating a new user, password is required
+        if (!$this->userId) {
+            $rules['userPassword'] = 'required|string|min:8';
+        }
+
+        return $rules;
+    }
+
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -106,12 +118,11 @@ new class extends Component {
 
             $user->update($data);
         } else {
-            $password = $this->userPassword ?: Str::random(10);
             User::create([
                 'id' => (string) Str::uuid(),
                 'name' => $cleanName,
                 'email' => $this->userEmail,
-                'password' => Hash::make($password),
+                'password' => Hash::make($this->userPassword),
                 'role' => $this->userRole,
                 'status' => 'FORCE_PASSWORD_CHANGE',
                 'phone' => $this->userRole === 'PARENT' ? $this->userPhone : null,
@@ -398,20 +409,7 @@ new class extends Component {
                     <flux:button variant="ghost" icon="{{ $showPassword ? 'eye-slash' : 'eye' }}" wire:click="$toggle('showPassword')" class="mb-0.5" />
                 </div>
 
-                {{-- Hide internal flux:input error visuals for this specific field to avoid duplicate messages and layout shift. --}}
-                <style>
-                    /* Target common Tailwind error classes rendered by the input component inside this wrapper */
-                    #user-password-field .text-red-600, #user-password-field .text-red-500, #user-password-field .text-red-700 {
-                        display: none !important;
-                    }
-                </style>
 
-                {{-- Our reserved error area (fixed height) to show a single consistent validation message. --}}
-                <div class="min-h-5">
-                    @error('userPassword')
-                        <div class="text-red-600 text-sm mt-1">{{ $message }}</div>
-                    @enderror
-                </div>
 
                 <div class="flex gap-2 pt-4">
                     <flux:spacer />

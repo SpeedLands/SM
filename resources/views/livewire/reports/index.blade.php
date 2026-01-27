@@ -188,7 +188,12 @@ new class extends Component {
             <flux:text class="text-zinc-500 dark:text-zinc-400">Seguimiento de conducta y faltas al reglamento.</flux:text>
         </div>
         @can('teacher-or-admin')
-            <flux:button variant="primary" icon="plus-circle" wire:click="openCreateModal">Nuevo Reporte</flux:button>
+            <div class="flex gap-2">
+                @can('admin-only')
+                    <flux:button variant="ghost" icon="cog-6-tooth" href="{{ route('infractions.index') }}" wire:navigate>Gestionar Tipos</flux:button>
+                @endcan
+                <flux:button variant="primary" icon="plus-circle" wire:click="openCreateModal">Nuevo Reporte</flux:button>
+            </div>
         @endcan
     </div>
 
@@ -215,7 +220,7 @@ new class extends Component {
                     <th class="py-3 px-2 font-semibold">Fecha</th>
                     <th class="py-3 px-2 font-semibold">Alumno</th>
                     <th class="py-3 px-2 font-semibold">Infracción / Asunto</th>
-                    <th class="py-3 px-2 font-semibold text-center">Gravedad</th>
+                    {{-- <th class="py-3 px-2 font-semibold text-center">Gravedad</th> --}}
                     <th class="py-3 px-2 font-semibold text-center">Estado</th>
                     <th class="py-3 px-2 text-right font-semibold">Acciones</th>
                 </tr>
@@ -237,13 +242,13 @@ new class extends Component {
                             @endif
                             <div class="text-xs text-zinc-500 whitespace-normal line-clamp-1 italic">{{ $report->description }}</div>
                         </td>
-                        <td class="py-4 px-2 text-center">
+                        {{-- <td class="py-4 px-2 text-center">
                             @if($report->infraction->severity === 'GRAVE')
                                 <flux:badge color="red" size="sm" inset="left">Grave</flux:badge>
                             @else
                                 <flux:badge color="neutral" size="sm" inset="left">Normal</flux:badge>
                             @endif
-                        </td>
+                        </td> --}}
                         <td class="py-4 px-2 text-center">
                             @if($report->status === 'SIGNED')
                                 <div class="flex flex-col items-center">
@@ -261,6 +266,7 @@ new class extends Component {
                                 @if(auth()->user()->isParent() && $report->status !== 'SIGNED')
                                     <flux:button variant="primary" size="sm" icon="finger-print" wire:click="signReport('{{ $report->id }}')">Firmar</flux:button>
                                 @endif
+
                                 @can('admin-only')
                                     <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteReport('{{ $report->id }}')" />
                                 @endcan
@@ -318,7 +324,7 @@ new class extends Component {
                     <flux:select label="Infracción (Reglamento)" wire:model="infractionId">
                         <option value="">Seleccione el tipo de falta...</option>
                         @foreach($infractions as $infraction)
-                            <option value="{{ $infraction->id }}">{{ $infraction->description }} ({{ $infraction->severity }})</option>
+                            <option value="{{ $infraction->id }}">{{ $infraction->description }}</option>
                         @endforeach
                     </flux:select>
 

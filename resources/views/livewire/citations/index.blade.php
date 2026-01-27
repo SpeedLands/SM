@@ -233,7 +233,8 @@ new class extends Component {
                                         <flux:button variant="ghost" size="sm" icon="x-circle" class="text-red-600" title="Marcar inasistencia" wire:click="updateStatus('{{ $citation->id }}', 'NO_SHOW')" />
                                         <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editCitation('{{ $citation->id }}')" />
                                         <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="deleteCitation('{{ $citation->id }}')" />
-                                        @endif
+                                    @endif
+
                                 </div>
                             </td>
                         </tr>

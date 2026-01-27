@@ -33,6 +33,23 @@ class ProductionDataSeeder extends Seeder
         }
 
         // Truncate tables (order matters or use disable checks)
+        // System / support tables
+        DB::table('jobs')->truncate();
+        DB::table('cache')->truncate();
+        DB::table('job_batches')->truncate();
+        DB::table('failed_jobs')->truncate();
+        DB::table('sessions')->truncate();
+        DB::table('password_reset_tokens')->truncate();
+
+        // Application tables
+        DB::table('notice_signatures')->truncate();
+        DB::table('notices')->truncate();
+        DB::table('citations')->truncate();
+        DB::table('reports')->truncate();
+        DB::table('exam_schedules')->truncate();
+        DB::table('community_services')->truncate();
+        DB::table('student_cycle_association')->truncate();
+        
         Infraction::truncate();
         Regulation::truncate();
         StudentParent::truncate();

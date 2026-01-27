@@ -3,14 +3,20 @@
 use App\Models\User;
 use Livewire\Volt\Volt;
 
-test('profile page is displayed', function () {
-    $this->actingAs($user = User::factory()->create());
+test('profile page is displayed for admin', function () {
+    $this->actingAs($user = User::factory()->create(['role' => 'ADMIN']));
 
     $this->get(route('profile.edit'))->assertOk();
 });
 
-test('profile information can be updated', function () {
-    $user = User::factory()->create();
+test('profile page is forbidden for non-admin', function () {
+    $this->actingAs($user = User::factory()->create(['role' => 'TEACHER']));
+
+    $this->get(route('profile.edit'))->assertForbidden();
+});
+
+test('profile information can be updated by admin', function () {
+    $user = User::factory()->create(['role' => 'ADMIN']);
 
     $this->actingAs($user);
 
@@ -26,6 +32,17 @@ test('profile information can be updated', function () {
     expect($user->name)->toEqual('Test User');
     expect($user->email)->toEqual('test@example.com');
     expect($user->email_verified_at)->toBeNull();
+});
+
+test('profile information cannot be updated by non-admin', function () {
+    $user = User::factory()->create(['role' => 'TEACHER']);
+
+    $this->actingAs($user);
+
+    Volt::test('settings.profile')
+        ->set('name', 'Test User')
+        ->call('updateProfileInformation')
+        ->assertForbidden();
 });
 
 test('email verification status is unchanged when email address is unchanged', function () {
