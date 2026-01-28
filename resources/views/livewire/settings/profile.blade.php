@@ -113,6 +113,6 @@ new class extends Component {
             </div>
         </form>
 
-        <livewire:settings.delete-user-form />
+
     </x-settings.layout>
 </section>

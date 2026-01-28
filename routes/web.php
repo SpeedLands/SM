@@ -31,7 +31,7 @@ Route::middleware(['auth'])->group(function () {
         return auth()->user()->isAdmin()
             ? redirect()->route('profile.edit')
             : redirect()->route('appearance.edit');
-    });
+    })->name('settings');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');

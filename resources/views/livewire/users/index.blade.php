@@ -396,7 +396,7 @@ new class extends Component {
                     />
                 @endif
 
-                <div class="flex items-end gap-2">
+                <div id="user-password-field" class="flex items-end gap-2">
                     <flux:input 
                         label="{{ $userId ? 'Cambiar Contraseña (dejar vacío para mantener)' : 'Contraseña' }}" 
                         wire:model="userPassword" 
@@ -407,7 +407,21 @@ new class extends Component {
                     <flux:button variant="ghost" icon="{{ $showPassword ? 'eye-slash' : 'eye' }}" wire:click="$toggle('showPassword')" class="mb-0.5" />
                 </div>
 
+                <style>
+                    /* Target common Tailwind error classes rendered by the input component inside this wrapper */
+                    #user-password-field .text-red-600, #user-password-field .text-red-500, #user-password-field .text-red-700 {
+                        display: none !important;
+                    }
+                </style>
 
+                <div role="alert" aria-live="polite" aria-atomic="true" class="mt-3 text-sm font-medium text-red-500 dark:text-red-400" data-flux-error="">
+                    @error('userPassword')
+                        <svg class="shrink-0 [:where(&amp;)]:size-5 inline" data-flux-icon="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                            <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"></path>
+                        </svg>
+                        {{ $message }}
+                    @enderror
+                </div>
 
                 <div class="flex gap-2 pt-4">
                     <flux:spacer />

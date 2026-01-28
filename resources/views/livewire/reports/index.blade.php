@@ -121,7 +121,15 @@ new class extends Component {
     public function deleteReport(string $id): void
     {
         $this->authorize('admin-only');
-        Report::findOrFail($id)->delete();
+        $report = Report::findOrFail($id);
+
+        if ($report->status === 'SIGNED') {
+            $this->dispatch('notify', ['message' => 'No se puede eliminar un reporte que ya ha sido firmado.', 'variant' => 'danger']);
+            return;
+        }
+
+        $report->delete();
+        $this->dispatch('notify', ['message' => 'Reporte eliminado correctamente.']);
     }
 
     public function signReport(string $id): void

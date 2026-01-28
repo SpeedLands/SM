@@ -186,7 +186,14 @@ new class extends Component {
     public function deleteStudent(string $id): void
     {
         $this->authorize('teacher-or-admin');
-        Student::findOrFail($id)->delete();
+        $student = Student::findOrFail($id);
+        
+        if ($student->reports()->exists() || $student->communityServices()->exists()) {
+            $this->dispatch('notify', ['type' => 'error', 'message' => 'No se puede eliminar un alumno que tiene reportes o servicios registrados.']);
+            return;
+        }
+
+        $student->delete();
         $this->dispatch('student-saved'); // Trigger refresh
     }
 
@@ -231,7 +238,7 @@ new class extends Component {
         $currentStudent = $this->studentId ? Student::with('parents')->find($this->studentId) : null;
 
         return [
-            'students' => $query->latest('name')->paginate(10),
+            'students' => $query->withCount(['reports', 'communityServices'])->latest('name')->paginate(10),
             'classGroups' => $classGroups,
             'activeCycle' => $activeCycle,
             'parentSearchResults' => $parentSearchResults,
@@ -336,7 +343,11 @@ new class extends Component {
                                 <div class="flex justify-end gap-1">
                                     @can('teacher-or-admin')
                                         <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
-                                        <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteStudent('{{ $student->id }}')" />
+                                        @if($student->reports_count === 0 && $student->community_services_count === 0)
+                                            <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteStudent('{{ $student->id }}')" wire:confirm="¿Está seguro de eliminar este registro?" />
+                                        @else
+                                            <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por registros asociados" disabled />
+                                        @endif
                                     @endcan
 
                                 </div>

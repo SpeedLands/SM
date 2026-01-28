@@ -76,7 +76,18 @@ new class extends Component {
 
     public function delete(Cycle $cycle): void
     {
+        if ($cycle->is_active) {
+            $this->dispatch('notify', ['message' => 'No se puede eliminar el ciclo activo.', 'variant' => 'danger']);
+            return;
+        }
+
+        if ($cycle->groups()->exists() || $cycle->reports()->exists() || $cycle->notices()->exists() || $cycle->citations()->exists()) {
+            $this->dispatch('notify', ['message' => 'No se puede eliminar un ciclo que tiene registros asociados (grupos, reportes, avisos, etc).', 'variant' => 'danger']);
+            return;
+        }
+
         $cycle->delete();
+        $this->dispatch('cycle-saved');
     }
 
     // Group Management Methods
@@ -130,13 +141,22 @@ new class extends Component {
 
     public function deleteGroup(string $id): void
     {
-        ClassGroup::findOrFail($id)->delete();
+        $group = ClassGroup::findOrFail($id);
+        
+        // Check if group has students
+        if ($group->studentAssociations()->exists()) {
+            $this->dispatch('notify', ['message' => 'No se puede eliminar un grupo que tiene alumnos inscritos.', 'variant' => 'danger']);
+            return;
+        }
+
+        $group->delete();
         $this->groupCycle->load('groups');
     }
 
     public function with(): array
     {
         $cycles = Cycle::query()
+            ->withCount(['groups', 'reports', 'notices', 'citations'])
             ->when($this->search, fn ($query) => $query->where('name', 'like', "%{$this->search}%"))
             ->orderBy('start_date', 'desc')
             ->paginate(10);
@@ -149,7 +169,12 @@ new class extends Component {
             'activeCycle' => $activeCycle,
             'totalCycles' => $totalCycles,
             'teachers' => User::where('role', 'TEACHER')->get(),
-            'currentGroups' => $this->groupCycle ? ClassGroup::with('tutor')->where('cycle_id', $this->groupCycle->id)->get() : collect(),
+            'currentGroups' => $this->groupCycle 
+                ? ClassGroup::with('tutor')
+                    ->withCount('studentAssociations')
+                    ->where('cycle_id', $this->groupCycle->id)
+                    ->get() 
+                : collect(),
         ];
     }
 }; ?>
@@ -270,7 +295,11 @@ new class extends Component {
                                     <div class="flex justify-end gap-1">
                                         <flux:button variant="ghost" size="sm" icon="users" wire:click="openGroupsModal('{{ $cycle->id }}')" />
                                         <flux:button variant="ghost" size="sm" icon="pencil" wire:click="edit({{ $cycle->id }})" />
-                                        <flux:button variant="ghost" size="sm" icon="trash" wire:click="delete({{ $cycle->id }})" />
+                                        @if($cycle->groups_count === 0 && $cycle->reports_count === 0 && $cycle->notices_count === 0 && $cycle->citations_count === 0)
+                                            <flux:button variant="ghost" size="sm" icon="trash" wire:click="delete({{ $cycle->id }})" wire:confirm="¿Está seguro de eliminar este ciclo?" />
+                                        @else
+                                            <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por registros asociados" disabled />
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -335,7 +364,11 @@ new class extends Component {
                             </div>
                             <div class="flex items-center gap-1">
                                 <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editGroup('{{ $group->id }}')" />
-                                <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteGroup('{{ $group->id }}')" />
+                                @if($group->student_associations_count === 0)
+                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteGroup('{{ $group->id }}')" wire:confirm="¿Está seguro de eliminar este grupo?" />
+                                @else
+                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar porque tiene alumnos" disabled />
+                                @endif
                             </div>
                         </div>
                     @empty

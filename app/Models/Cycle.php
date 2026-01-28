@@ -34,4 +34,18 @@ class Cycle extends Model
     {
         return $this->hasMany(ExamSchedule::class);
     }
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
+    }
+
+    public function notices()
+    {
+        return $this->hasMany(Notice::class);
+    }
+
+    public function citations()
+    {
+        return $this->hasMany(Citation::class);
+    }
 }

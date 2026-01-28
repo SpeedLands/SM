@@ -109,4 +109,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Student::class, 'student_parents', 'parent_id', 'student_id')
             ->withPivot('relationship');
     }
+
+    public function reports(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Report::class, 'teacher_id');
+    }
 }
