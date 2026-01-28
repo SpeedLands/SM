@@ -411,7 +411,7 @@ new class extends Component {
                         <flux:icon icon="megaphone" size="xl" />
                     </div>
                     <flux:heading size="md" class="text-zinc-400">Sin avisos pendientes</flux:heading>
-                    <flux:text variant="subdued">Por el momento no hay comunicados nuevos para sus hijos.</flux:text>
+                    <flux:text class="text-zinc-500">Por el momento no hay comunicados nuevos para sus hijos.</flux:text>
                 </div>
             @endforelse
         </div>
@@ -556,10 +556,10 @@ new class extends Component {
                                     <div class="flex items-center justify-between p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
                                         <div>
                                             <flux:text font="medium">{{ $item['student_name'] }}</flux:text>
-                                            <flux:text size="xs" color="subdued">Firmado por: {{ $item['parent_name'] }}</flux:text>
+                                            <flux:text size="xs" class="text-zinc-500">Firmado por: {{ $item['parent_name'] }}</flux:text>
                                         </div>
                                         <div class="text-right">
-                                            <flux:text size="xs" color="subdued">{{ $item['date'] }}</flux:text>
+                                            <flux:text size="xs" class="text-zinc-500">{{ $item['date'] }}</flux:text>
                                             @if($item['authorized'] !== null)
                                                 <flux:badge size="xs" color="{{ $item['authorized'] ? 'green' : 'red' }}" class="mt-1">
                                                     {{ $item['authorized'] ? 'Autorizado' : 'No Autorizado' }}
@@ -578,7 +578,7 @@ new class extends Component {
                                 @forelse($pendingList as $item)
                                     <div class="p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
                                         <flux:text font="medium">{{ $item['name'] }}</flux:text>
-                                        <flux:text size="xs" color="subdued">Esperando firma del tutor</flux:text>
+                                        <flux:text size="xs" class="text-zinc-500">Esperando firma del tutor</flux:text>
                                     </div>
                                 @empty
                                     <div class="py-16 text-center text-green-600 dark:text-green-400 font-medium">

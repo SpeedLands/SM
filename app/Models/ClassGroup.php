@@ -29,4 +29,9 @@ class ClassGroup extends Model
     {
         return $this->belongsTo(User::class, 'tutor_teacher_id');
     }
+
+    public function studentCycleAssociations()
+    {
+        return $this->hasMany(StudentCycleAssociation::class, 'class_group_id');
+    }
 }

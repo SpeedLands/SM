@@ -144,7 +144,7 @@ new class extends Component {
         $group = ClassGroup::findOrFail($id);
         
         // Check if group has students
-        if ($group->studentAssociations()->exists()) {
+        if ($group->studentCycleAssociations()->exists()) {
             $this->dispatch('notify', ['message' => 'No se puede eliminar un grupo que tiene alumnos inscritos.', 'variant' => 'danger']);
             return;
         }
@@ -171,7 +171,7 @@ new class extends Component {
             'teachers' => User::where('role', 'TEACHER')->get(),
             'currentGroups' => $this->groupCycle 
                 ? ClassGroup::with('tutor')
-                    ->withCount('studentAssociations')
+                    ->withCount('studentCycleAssociations')
                     ->where('cycle_id', $this->groupCycle->id)
                     ->get() 
                 : collect(),
@@ -364,7 +364,7 @@ new class extends Component {
                             </div>
                             <div class="flex items-center gap-1">
                                 <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editGroup('{{ $group->id }}')" />
-                                @if($group->student_associations_count === 0)
+                                @if($group->student_cycle_associations_count === 0)
                                     <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteGroup('{{ $group->id }}')" wire:confirm="¿Está seguro de eliminar este grupo?" />
                                 @else
                                     <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar porque tiene alumnos" disabled />

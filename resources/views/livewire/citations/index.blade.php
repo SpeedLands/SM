@@ -259,7 +259,7 @@ new class extends Component {
                             <flux:icon icon="calendar-days" class="text-blue-500" size="xl" />
                             <div>
                                 <flux:heading level="3" size="md">Citatorio Escolar</flux:heading>
-                                <flux:text size="sm" variant="subdued">Para padre/tutor de: <strong>{{ $citation->student->name }}</strong></flux:text>
+                                <flux:text size="sm" class="text-zinc-500">Para padre/tutor de: <strong>{{ $citation->student->name }}</strong></flux:text>
                             </div>
                         </div>
                         @if($citation->parent_signature)
@@ -284,7 +284,7 @@ new class extends Component {
                             </div>
                         </div>
                         
-                        <flux:text size="sm" variant="subdued" class="italic">Solicitado por: Prof(a). {{ $citation->teacher->name }}</flux:text>
+                        <flux:text size="sm" class="text-zinc-500 italic">Solicitado por: Prof(a). {{ $citation->teacher->name }}</flux:text>
                     </div>
 
                     @if(!$citation->parent_signature)
@@ -302,8 +302,8 @@ new class extends Component {
             @empty
                 <div class="md:col-span-2 py-20 text-center border border-dashed rounded-3xl border-zinc-300 dark:border-zinc-700">
                     <flux:icon icon="calendar" class="mx-auto text-zinc-300 mb-4" size="xl" />
-                    <flux:heading size="md" variant="subdued">No tiene citatorios pendientes</flux:heading>
-                    <flux:text variant="subdued">Agradecemos su compromiso con la educación de sus hijos.</flux:text>
+                    <flux:heading size="md" class="text-zinc-500">No tiene citatorios pendientes</flux:heading>
+                    <flux:text class="text-zinc-500">Agradecemos su compromiso con la educación de sus hijos.</flux:text>
                 </div>
             @endforelse
         </div>
