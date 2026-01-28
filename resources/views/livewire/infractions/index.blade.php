@@ -72,23 +72,23 @@ new class extends Component {
 
     public function delete(Infraction $infraction): void
     {
-        // Check if infraction is used in reports? 
-        // For now, let's allow delete but maybe we should check.
-        // If strict foreign keys are on, it might fail if used.
-        // Assuming soft deletes or cascading isn't handled here directly unless specified.
-        // Let's just try delete.
+        if ($infraction->reports()->exists()) {
+            $this->dispatch('notify', ['message' => 'No se puede eliminar un tipo de reporte que ya ha sido utilizado.', 'variant' => 'danger']);
+            return;
+        }
         
         try {
             $infraction->delete();
             $this->dispatch('notify', ['message' => 'Tipo de reporte eliminado.']);
         } catch (\Exception $e) {
-            $this->dispatch('notify', ['message' => 'No se puede eliminar porque está en uso.', 'variant' => 'danger']);
+            $this->dispatch('notify', ['message' => 'No se pudo eliminar el registro.', 'variant' => 'danger']);
         }
     }
 
     public function with(): array
     {
         $infractions = Infraction::query()
+            ->withCount('reports')
             ->when($this->search, fn($q) => $q->where('description', 'like', "%{$this->search}%"))
             ->orderBy('description', 'asc')
             ->paginate(10);
@@ -139,7 +139,11 @@ new class extends Component {
                         <td class="py-4 px-2 text-right">
                             <div class="flex justify-end gap-1">
                                 <flux:button variant="ghost" size="sm" icon="pencil" wire:click="openEditModal({{ $infraction->id }})" />
-                                <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="delete({{ $infraction->id }})" wire:confirm="¿Está seguro de eliminar este tipo de reporte? Esto podría afectar reportes existentes." />
+                                @if($infraction->reports_count === 0)
+                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="delete({{ $infraction->id }})" wire:confirm="¿Está seguro de eliminar este tipo de reporte?" />
+                                @else
+                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar porque tiene reportes asociados" disabled />
+                                @endif
                             </div>
                         </td>
                     </tr>

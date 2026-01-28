@@ -32,6 +32,7 @@ new class extends Component {
     public array $signatureStats = [];
     public $signedList = [];
     public $pendingList = [];
+    public string $activeTab = 'signed';
 
     public function mount(): void
     {
@@ -147,6 +148,7 @@ new class extends Component {
             ->get(['name'])
             ->toArray();
             
+        $this->activeTab = 'signed';
         $this->showSignaturesModal = true;
     }
 
@@ -222,6 +224,7 @@ new class extends Component {
                 'notices' => $notices,
                 'isStaff' => false,
                 'myStudents' => auth()->user()->students,
+                'availableGroups' => collect(),
             ];
         }
     }
@@ -414,122 +417,141 @@ new class extends Component {
         </div>
     @endif
 
-    <!-- Create Modal -->
-    <flux:modal wire:model.self="showCreateModal" class="md:w-160">
-        <form wire:submit="saveNotice" class="space-y-6">
-            <header>
-                <flux:heading size="md">{{ $editingNoticeId ? 'Editar Aviso Escolar' : 'Nuevo Aviso Escolar' }}</flux:heading>
-                <flux:text>{{ $editingNoticeId ? 'Modifique los detalles del comunicado.' : 'Cree un comunicado para la comunidad escolar.' }}</flux:text>
-            </header>
-
-            <div class="space-y-4">
-                <flux:input wire:model="title" label="Título del Aviso" placeholder="Ej: Suspensión por consejo técnico, Festival de primavera..." />
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <flux:select wire:model.live="type" label="Tipo de Aviso">
-                        <option value="GENERAL">General</option>
-                        <option value="URGENT">Urgente</option>
-                        <option value="EVENT">Evento</option>
-                    </flux:select>
-                    <flux:select wire:model="targetAudience" label="Dirigido a">
-                        <option value="ALL">Todo el plantel</option>
-                        <option value="PARENTS">Solo Padres</option>
-                    </flux:select>
-                </div>
-
-                @if($targetAudience === 'PARENTS')
-                    <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/30 space-y-4">
-                        <flux:text size="sm" class="font-semibold text-blue-900 dark:text-blue-200">Filtros de Audiencia (Opcional)</flux:text>
-                        
-                        <div class="space-y-3">
-                            <div>
-                                <flux:text size="sm" class="font-medium mb-2">Por Grado</flux:text>
-                                <div class="flex flex-wrap gap-2">
-                                    @foreach(['1º', '2º', '3º'] as $grade)
-                                        <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-colors {{ in_array($grade, $targetGrades) ? 'bg-blue-100 border-blue-300 dark:bg-blue-900/40 dark:border-blue-700' : 'bg-white border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700' }}">
-                                            <input type="checkbox" wire:model="targetGrades" value="{{ $grade }}" class="rounded">
-                                            <span class="text-sm font-medium">{{ $grade }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <div>
-                                <flux:text size="sm" class="font-medium mb-2">Por Grupo Específico</flux:text>
-                                <div class="flex flex-wrap gap-2">
-                                    @foreach($availableGroups as $group)
-                                        <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-colors {{ in_array($group->id, $targetClassGroups) ? 'bg-blue-100 border-blue-300 dark:bg-blue-900/40 dark:border-blue-700' : 'bg-white border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700' }}">
-                                            <input type="checkbox" wire:model="targetClassGroups" value="{{ $group->id }}" class="rounded">
-                                            <span class="text-sm font-medium">{{ $group->grade }} {{ $group->section }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <flux:text size="xs" class="text-blue-700 dark:text-blue-300 italic">
-                                Si no selecciona ningún filtro, el aviso se enviará a todos los padres.
-                            </flux:text>
-                        </div>
-                    </div>
-                @endif
-
-                @if($type === 'EVENT')
-                    <div class="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <flux:input type="date" wire:model="eventDate" label="Fecha del Evento" />
-                        <flux:input type="time" wire:model="eventTime" label="Hora" />
-                    </div>
-                @endif
-
-                <flux:textarea wire:model="content" label="Mensaje" rows="6" placeholder="Escriba el detalle del comunicado aquí..." />
-
-                <div class="p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-200 dark:border-zinc-700">
-                    <flux:checkbox wire:model="requiresAuthorization" label="Requiere Autorización" description="Active esta opción si necesita que el padre de familia otorgue un permiso explícito (Sí/No) además de darse por enterado." />
-                </div>
-            </div>
-
-            <div class="flex gap-2">
-                <flux:spacer />
-                <flux:button wire:click="$set('showCreateModal', false)">Cancelar</flux:button>
-                <flux:button variant="primary" type="submit">{{ $editingNoticeId ? 'Actualizar Aviso' : 'Publicar Aviso' }}</flux:button>
-            </div>
-        </form>
-    </flux:modal>
-
-    <!-- Signatures Detail Modal -->
-    <flux:modal wire:model="showSignaturesModal" class="md:w-160">
-        <div class="space-y-6">
-            <header>
-                <flux:heading size="lg">Detalles de Firmas</flux:heading>
-                @if($viewingSignaturesNoticeId)
-                    <flux:text size="sm" class="mt-1">Progreso para: <span class="font-bold">{{ App\Models\Notice::find($viewingSignaturesNoticeId)?->title }}</span></flux:text>
-                @endif
-            </header>
-
-            @if(!empty($signatureStats))
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="p-4 rounded-xl bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-800/30 text-center">
-                        <flux:text size="xs" class="uppercase tracking-wider font-bold text-green-700 dark:text-green-300">Firmados</flux:text>
-                        <flux:heading size="xl" class="text-green-800 dark:text-green-200">{{ $signatureStats['signed'] }}</flux:heading>
-                    </div>
-                    <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 text-center">
-                        <flux:text size="xs" class="uppercase tracking-wider font-bold text-zinc-500">Esperados</flux:text>
-                        <flux:heading size="xl">{{ $signatureStats['expected'] }}</flux:heading>
-                    </div>
-                    <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 text-center">
-                        <flux:text size="xs" class="uppercase tracking-wider font-bold text-blue-700 dark:text-blue-300">Progreso</flux:text>
-                        <flux:heading size="xl" class="text-blue-800 dark:text-blue-200">{{ $signatureStats['percentage'] }}%</flux:heading>
-                    </div>
-                </div>
+    @if($isStaff)
+        <!-- Create Modal -->
+        <flux:modal wire:model.self="showCreateModal" class="md:w-160">
+            <form wire:submit="saveNotice" class="space-y-6">
+                <!-- ... existing form content ... -->
+                <header>
+                    <flux:heading size="md">{{ $editingNoticeId ? 'Editar Aviso Escolar' : 'Nuevo Aviso Escolar' }}</flux:heading>
+                    <flux:text>{{ $editingNoticeId ? 'Modifique los detalles del comunicado.' : 'Cree un comunicado para la comunidad escolar.' }}</flux:text>
+                </header>
 
                 <div class="space-y-4">
-                    <flux:tab.group>
-                        <flux:tabs>
-                            <flux:tab name="signed">Firmados ({{ count($signedList) }})</flux:tab>
-                            <flux:tab name="pending">Pendientes ({{ count($pendingList) }})</flux:tab>
-                        </flux:tabs>
+                    <flux:input wire:model="title" label="Título del Aviso" placeholder="Ej: Suspensión por consejo técnico, Festival de primavera..." />
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <flux:select wire:model.live="type" label="Tipo de Aviso">
+                            <option value="GENERAL">General</option>
+                            <option value="URGENT">Urgente</option>
+                            <option value="EVENT">Evento</option>
+                        </flux:select>
+                        <flux:select wire:model="targetAudience" label="Dirigido a">
+                            <option value="ALL">Todo el plantel</option>
+                            <option value="PARENTS">Solo Padres</option>
+                        </flux:select>
+                    </div>
 
-                        <flux:tab.panel name="signed">
-                            <div class="mt-4 max-h-80 overflow-y-auto space-y-2 pr-2">
+                    @if($targetAudience === 'PARENTS')
+                        <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/30 space-y-4">
+                            <flux:text size="sm" class="font-semibold text-blue-900 dark:text-blue-200">Filtros de Audiencia (Opcional)</flux:text>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <flux:text size="sm" class="font-medium mb-2">Por Grado</flux:text>
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach(['1º', '2º', '3º'] as $grade)
+                                            <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-colors {{ in_array($grade, $targetGrades) ? 'bg-blue-100 border-blue-300 dark:bg-blue-900/40 dark:border-blue-700' : 'bg-white border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700' }}">
+                                                <input type="checkbox" wire:model="targetGrades" value="{{ $grade }}" class="rounded">
+                                                <span class="text-sm font-medium">{{ $grade }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <flux:text size="sm" class="font-medium mb-2">Por Grupo Específico</flux:text>
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach($availableGroups as $group)
+                                            <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-colors {{ in_array($group->id, $targetClassGroups) ? 'bg-blue-100 border-blue-300 dark:bg-blue-900/40 dark:border-blue-700' : 'bg-white border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700' }}">
+                                                <input type="checkbox" wire:model="targetClassGroups" value="{{ $group->id }}" class="rounded">
+                                                <span class="text-sm font-medium">{{ $group->grade }} {{ $group->section }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <flux:text size="xs" class="text-blue-700 dark:text-blue-300 italic">
+                                    Si no selecciona ningún filtro, el aviso se enviará a todos los padres.
+                                </flux:text>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($type === 'EVENT')
+                        <div class="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <flux:input type="date" wire:model="eventDate" label="Fecha del Evento" />
+                            <flux:input type="time" wire:model="eventTime" label="Hora" />
+                        </div>
+                    @endif
+
+                    <flux:textarea wire:model="content" label="Mensaje" rows="6" placeholder="Escriba el detalle del comunicado aquí..." />
+
+                    <div class="p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-200 dark:border-zinc-700">
+                        <flux:checkbox wire:model="requiresAuthorization" label="Requiere Autorización" description="Active esta opción si necesita que el padre de familia otorgue un permiso explícito (Sí/No) además de darse por enterado." />
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <flux:spacer />
+                    <flux:button wire:click="$set('showCreateModal', false)">Cancelar</flux:button>
+                    <flux:button variant="primary" type="submit">{{ $editingNoticeId ? 'Actualizar Aviso' : 'Publicar Aviso' }}</flux:button>
+                </div>
+            </form>
+        </flux:modal>
+
+        <!-- Signatures Detail Modal -->
+        <flux:modal wire:model="showSignaturesModal" class="md:w-160">
+            <div class="space-y-6">
+                <header>
+                    <flux:heading size="lg">Detalles de Firmas</flux:heading>
+                    @if($viewingSignaturesNoticeId)
+                        <flux:text size="sm" class="mt-1">Progreso para: <span class="font-bold">{{ App\Models\Notice::find($viewingSignaturesNoticeId)?->title }}</span></flux:text>
+                    @endif
+                </header>
+
+                @if(!empty($signatureStats))
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="p-4 rounded-xl bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-800/30 text-center">
+                            <flux:text size="xs" class="uppercase tracking-wider font-bold text-green-700 dark:text-green-300">Firmados</flux:text>
+                            <flux:heading size="xl" class="text-green-800 dark:text-green-200">{{ $signatureStats['signed'] }}</flux:heading>
+                        </div>
+                        <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 text-center">
+                            <flux:text size="xs" class="uppercase tracking-wider font-bold text-zinc-500">Esperados</flux:text>
+                            <flux:heading size="xl">{{ $signatureStats['expected'] }}</flux:heading>
+                        </div>
+                        <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 text-center">
+                            <flux:text size="xs" class="uppercase tracking-wider font-bold text-blue-700 dark:text-blue-300">Progreso</flux:text>
+                            <flux:heading size="xl" class="text-blue-800 dark:text-blue-200">{{ $signatureStats['percentage'] }}%</flux:heading>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex border-b border-zinc-200 dark:border-zinc-700">
+                            <button 
+                                type="button"
+                                wire:click="$set('activeTab', 'signed')"
+                                class="px-4 py-2 text-sm font-medium transition-colors relative {{ $activeTab === 'signed' ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300' }}"
+                            >
+                                Firmados ({{ count($signedList) }})
+                                @if($activeTab === 'signed')
+                                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400"></div>
+                                @endif
+                            </button>
+                            <button 
+                                type="button"
+                                wire:click="$set('activeTab', 'pending')"
+                                class="px-4 py-2 text-sm font-medium transition-colors relative {{ $activeTab === 'pending' ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300' }}"
+                            >
+                                Pendientes ({{ count($pendingList) }})
+                                @if($activeTab === 'pending')
+                                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400"></div>
+                                @endif
+                            </button>
+                        </div>
+
+                        @if($activeTab === 'signed')
+                            <div class="max-h-80 overflow-y-auto space-y-2 pr-2 animate-in fade-in duration-200">
                                 @forelse($signedList as $item)
                                     <div class="flex items-center justify-between p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
                                         <div>
@@ -546,32 +568,33 @@ new class extends Component {
                                         </div>
                                     </div>
                                 @empty
-                                    <flux:text align="center" font="italic" class="py-8">Nadie ha firmado todavía.</flux:text>
+                                    <div class="py-12 text-center text-zinc-500 italic">
+                                        Nadie ha firmado todavía.
+                                    </div>
                                 @endforelse
                             </div>
-                        </flux:tab.panel>
-
-                        <flux:tab.panel name="pending">
-                            <div class="mt-4 max-h-80 overflow-y-auto space-y-2 pr-2">
+                        @else
+                            <div class="max-h-80 overflow-y-auto space-y-2 pr-2 animate-in fade-in duration-200">
                                 @forelse($pendingList as $item)
                                     <div class="p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
                                         <flux:text font="medium">{{ $item['name'] }}</flux:text>
                                         <flux:text size="xs" color="subdued">Esperando firma del tutor</flux:text>
                                     </div>
                                 @empty
-                                    <flux:text align="center" font="italic" class="py-10 text-green-600 dark:text-green-400">
+                                    <div class="py-16 text-center text-green-600 dark:text-green-400 font-medium">
+                                        <flux:icon icon="check-circle" class="mx-auto mb-2" />
                                         ¡Todos han firmado! 🎉
-                                    </flux:text>
+                                    </div>
                                 @endforelse
                             </div>
-                        </flux:tab.panel>
-                    </flux:tab.group>
-                </div>
-            @endif
+                        @endif
+                    </div>
+                @endif
 
-            <div class="flex justify-end">
-                <flux:button wire:click="$set('showSignaturesModal', false)">Cerrar</flux:button>
+                <div class="flex justify-end">
+                    <flux:button wire:click="$set('showSignaturesModal', false)">Cerrar</flux:button>
+                </div>
             </div>
-        </div>
-    </flux:modal>
+        </flux:modal>
+    @endif
 </div>

@@ -14,5 +14,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\CheckUserStatus::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->respond(function ($response) {
+            if ($response->getStatusCode() === 419) {
+                return back()->with([
+                    'message' => 'La sesión ha expirado por inactividad. Por favor, intente de nuevo.',
+                    'variant' => 'warning',
+                ]);
+            }
+
+            return $response;
+        });
     })->create();

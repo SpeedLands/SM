@@ -1,4 +1,4 @@
-<flux:menu class="w-[220px]">
+<flux:menu class="w-55">
     <flux:menu.radio.group>
         <div class="p-0 text-sm font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
@@ -21,7 +21,7 @@
     <flux:menu.separator />
 
     <flux:menu.radio.group>
-        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+        <flux:menu.item :href="auth()->user()->isAdmin() ? route('profile.edit') : route('appearance.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
     </flux:menu.radio.group>
 
     <flux:menu.separator />

@@ -57,7 +57,16 @@ new class extends Component {
         $this->validate([
             'selectedStudentId' => 'required|exists:students,id',
             'activity' => 'required|string|max:255',
-            'scheduledDate' => 'required|date|after_or_equal:today',
+            'scheduledDate' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+                function ($attribute, $value, $fail) {
+                    if (Carbon::parse($value)->isSunday()) {
+                        $fail('No se permite programar servicio comunitario los domingos.');
+                    }
+                },
+            ],
         ], [
             'selectedStudentId.required' => 'Debe seleccionar un alumno.',
             'activity.required' => 'La actividad es obligatoria.',
@@ -286,7 +295,7 @@ new class extends Component {
 
                 <flux:textarea wire:model="description" label="Instrucciones adicionales" placeholder="Opcional..." rows="3" />
 
-                <flux:input type="date" wire:model="scheduledDate" label="Fecha de Cumplimiento" />
+                <flux:input type="date" wire:model="scheduledDate" label="Fecha de Cumplimiento" description="Disponible de lunes a sábado. No se permite programar los domingos." />
             </div>
 
             <div class="flex gap-2">
