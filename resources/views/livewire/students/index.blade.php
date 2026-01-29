@@ -305,7 +305,8 @@ new class extends Component {
     <!-- Students Table -->
     <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+            <div x-data="studentPopover()" x-init="init()" x-cloak class="relative">
+                <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-zinc-200 dark:border-zinc-700 text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                         <th class="py-3 px-2 font-semibold">Alumno</th>
@@ -316,7 +317,13 @@ new class extends Component {
                 </thead>
                 <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                     @forelse ($students as $student)
-                        <tr wire:key="{{ $student->id }}" class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors">
+                        <tr wire:key="{{ $student->id }}" 
+                            @can('teacher-or-admin')
+                                x-on:click="select($event)" data-id="{{ $student->id }}" data-name="{{ $student->name }}" class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                            @else
+                                class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors"
+                            @endcan
+                        >
                             <td class="py-4 px-2">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
@@ -360,6 +367,17 @@ new class extends Component {
                     @endforelse
                 </tbody>
             </table>
+
+                <!-- Popover (fixed) -->
+                <div x-show="show" x-transition class="z-50" x-bind:style="`position:fixed; left:${x}px; top:${y}px;`" @click.away="hide()">
+                    <div class="w-44 bg-white dark:bg-zinc-900 rounded shadow-lg p-2 border border-zinc-200 dark:border-zinc-700">
+                        <button class="w-full text-left px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded" x-on:click="goToReport()">Reporte</button>
+                        <button class="w-full text-left px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded" x-on:click="goToService()">Servicio Comunitario</button>
+                        <button class="w-full text-left px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded" x-on:click="goToCitation()">Citatorio</button>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
         <div class="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-sm text-zinc-500">
@@ -522,3 +540,52 @@ new class extends Component {
         </flux:modal>
     @endcan
 </div>
+
+<script>
+function studentPopover(){
+    return {
+        show: false,
+        x: 0,
+        y: 0,
+        studentId: null,
+        studentName: null,
+        init(){
+            // close popover when scrolling to avoid misplacement
+            window.addEventListener('scroll', () => { if(this.show) this.hide(); }, true);
+        },
+        select(ev){
+            const tr = ev.currentTarget;
+            const rect = tr.getBoundingClientRect();
+            this.studentId = tr.dataset.id;
+            this.studentName = tr.dataset.name;
+            // position to the right of the row, but keep inside viewport
+            const padding = 8;
+            const popWidth = 180; // approx
+            let left = rect.right + padding;
+            if (left + popWidth > window.innerWidth) left = rect.left - popWidth - padding;
+            let top = rect.top + (rect.height/2) - 20; // center
+            if (top < 8) top = 8;
+            if (top + 120 > window.innerHeight) top = window.innerHeight - 128;
+            this.x = Math.round(left);
+            this.y = Math.round(top);
+            this.show = true;
+        },
+        hide(){ this.show = false; this.studentId = null; this.studentName = null; },
+        goToReport(){
+            if(!this.studentId) return;
+            const url = '{{ route('reports.index') }}' + '?open_create=1&student_id=' + encodeURIComponent(this.studentId) + '&student_name=' + encodeURIComponent(this.studentName);
+            window.location.href = url;
+        },
+        goToService(){
+            if(!this.studentId) return;
+            const url = '{{ route('community-services.index') }}' + '?open_create=1&student_id=' + encodeURIComponent(this.studentId) + '&student_name=' + encodeURIComponent(this.studentName);
+            window.location.href = url;
+        },
+        goToCitation(){
+            if(!this.studentId) return;
+            const url = '{{ route('citations.index') }}' + '?open_create=1&student_id=' + encodeURIComponent(this.studentId) + '&student_name=' + encodeURIComponent(this.studentName);
+            window.location.href = url;
+        }
+    }
+}
+</script>

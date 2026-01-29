@@ -35,6 +35,12 @@ new class extends Component {
     {
         $this->reportDate = now()->format('Y-m-d');
         $this->reportTime = now()->format('H:i');
+        // Open create modal automatically when navigated with query params
+        if (request()->query('open_create')) {
+            $this->selectedStudentId = request()->query('student_id');
+            $this->studentSearch = request()->query('student_name') ?? '';
+            $this->showReportModal = true;
+        }
     }
 
     public function openCreateModal(): void
