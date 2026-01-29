@@ -27,6 +27,12 @@ new class extends Component {
     public function mount(): void
     {
         $this->scheduledDate = now()->addDay()->format('Y-m-d');
+        // Open create modal automatically when navigated with query params
+        if (request()->query('open_create')) {
+            $this->selectedStudentId = request()->query('student_id');
+            $this->studentSearch = request()->query('student_name') ?? '';
+            $this->showServiceModal = true;
+        }
     }
 
     public function openCreateModal(?string $studentId = null): void

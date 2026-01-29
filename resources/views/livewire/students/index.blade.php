@@ -349,11 +349,11 @@ new class extends Component {
                             <td class="py-4 px-2 text-right">
                                 <div class="flex justify-end gap-1">
                                     @can('teacher-or-admin')
-                                        <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
+                                        <flux:button x-on:click.stop variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
                                         @if($student->reports_count === 0 && $student->community_services_count === 0)
-                                            <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteStudent('{{ $student->id }}')" wire:confirm="¿Está seguro de eliminar este registro?" />
+                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteStudent('{{ $student->id }}')" wire:confirm="¿Está seguro de eliminar este registro?" />
                                         @else
-                                            <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por registros asociados" disabled />
+                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por registros asociados" disabled />
                                         @endif
                                     @endcan
 
@@ -369,8 +369,8 @@ new class extends Component {
             </table>
 
                 <!-- Popover (fixed) -->
-                <div x-show="show" x-transition class="z-50" x-bind:style="`position:fixed; left:${x}px; top:${y}px;`" @click.away="hide()">
-                    <div class="w-44 bg-white dark:bg-zinc-900 rounded shadow-lg p-2 border border-zinc-200 dark:border-zinc-700">
+                <div x-show="show" x-transition class="z-50" x-bind:style="popoverStyle()" @click.away="hide()">
+                    <div :class="popoverClass" class="bg-white dark:bg-zinc-900 rounded shadow-lg p-2 border border-zinc-200 dark:border-zinc-700" x-ref="popover">
                         <button class="w-full text-left px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded" x-on:click="goToReport()">Reporte</button>
                         <button class="w-full text-left px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded" x-on:click="goToService()">Servicio Comunitario</button>
                         <button class="w-full text-left px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded" x-on:click="goToCitation()">Citatorio</button>
@@ -547,27 +547,56 @@ function studentPopover(){
         show: false,
         x: 0,
         y: 0,
+        width: 180,
         studentId: null,
         studentName: null,
+        popoverClass: '',
         init(){
             // close popover when scrolling to avoid misplacement
             window.addEventListener('scroll', () => { if(this.show) this.hide(); }, true);
+            window.addEventListener('resize', () => { if(this.show) this.hide(); });
+        },
+        popoverStyle(){
+            return `position:fixed; left:${this.x}px; top:${this.y}px; width:${this.width}px; z-index:9999;`;
         },
         select(ev){
+            // prevent the click from bubbling to the document and triggering @click.away
+            ev.stopPropagation();
             const tr = ev.currentTarget;
             const rect = tr.getBoundingClientRect();
             this.studentId = tr.dataset.id;
             this.studentName = tr.dataset.name;
-            // position to the right of the row, but keep inside viewport
+
             const padding = 8;
-            const popWidth = 180; // approx
-            let left = rect.right + padding;
-            if (left + popWidth > window.innerWidth) left = rect.left - popWidth - padding;
-            let top = rect.top + (rect.height/2) - 20; // center
-            if (top < 8) top = 8;
-            if (top + 120 > window.innerHeight) top = window.innerHeight - 128;
-            this.x = Math.round(left);
-            this.y = Math.round(top);
+            const estimatedHeight = 120; // approximate popover height
+
+            // Responsive width: full width on small screens with small margins
+            if (window.innerWidth <= 640) {
+                this.width = Math.max(200, Math.min(window.innerWidth - 32, 360));
+                this.popoverClass = '';
+                // horizontal center
+                this.x = Math.round((window.innerWidth - this.width) / 2);
+            } else {
+                this.width = 180;
+                // center horizontally above the row
+                let left = rect.left + (rect.width / 2) - (this.width / 2);
+                if (left < padding) left = padding;
+                if (left + this.width > window.innerWidth - padding) left = window.innerWidth - this.width - padding;
+                this.x = Math.round(left);
+            }
+
+            // position above the row if there's space, otherwise below
+            let top = rect.top - estimatedHeight - padding;
+            if (top < 8) {
+                top = rect.bottom + padding; // place below
+            }
+
+            // ensure popover not off-screen vertically
+            if (top + estimatedHeight > window.innerHeight - padding) {
+                top = Math.max(padding, window.innerHeight - estimatedHeight - padding);
+            }
+
+            this.y = Math.round(top + window.scrollY - window.scrollY); // keep fixed viewport coords
             this.show = true;
         },
         hide(){ this.show = false; this.studentId = null; this.studentName = null; },
