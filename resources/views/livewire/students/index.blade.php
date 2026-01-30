@@ -248,7 +248,7 @@ new class extends Component {
 }; ?>
 
 <div class="space-y-6 text-zinc-900 dark:text-white pb-10">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <flux:heading size="xl" level="1">Gestión de Alumnos</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Administre el padrón de estudiantes, sus datos de contacto y su situación académica.</flux:text>
@@ -305,7 +305,8 @@ new class extends Component {
     <!-- Students Table -->
     <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+            <div x-data="studentPopover()" x-init="init()" x-cloak class="relative">
+                <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-zinc-200 dark:border-zinc-700 text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                         <th class="py-3 px-2 font-semibold">Alumno</th>
@@ -316,7 +317,13 @@ new class extends Component {
                 </thead>
                 <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                     @forelse ($students as $student)
-                        <tr wire:key="{{ $student->id }}" class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors">
+                        <tr wire:key="{{ $student->id }}" 
+                            @can('teacher-or-admin')
+                                x-on:click="select($event)" data-id="{{ $student->id }}" data-name="{{ $student->name }}" class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                            @else
+                                class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors"
+                            @endcan
+                        >
                             <td class="py-4 px-2">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
@@ -342,11 +349,11 @@ new class extends Component {
                             <td class="py-4 px-2 text-right">
                                 <div class="flex justify-end gap-1">
                                     @can('teacher-or-admin')
-                                        <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
+                                        <flux:button x-on:click.stop variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
                                         @if($student->reports_count === 0 && $student->community_services_count === 0)
-                                            <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteStudent('{{ $student->id }}')" wire:confirm="¿Está seguro de eliminar este registro?" />
+                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteStudent('{{ $student->id }}')" wire:confirm="¿Está seguro de eliminar este registro?" />
                                         @else
-                                            <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por registros asociados" disabled />
+                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por registros asociados" disabled />
                                         @endif
                                     @endcan
 
@@ -360,6 +367,17 @@ new class extends Component {
                     @endforelse
                 </tbody>
             </table>
+
+                <!-- Popover (fixed) -->
+                <div x-show="show" class="z-50" x-bind:style="popoverStyle()" @click.away="hide()">
+                    <div :class="popoverClass" class="bg-white dark:bg-zinc-900 rounded shadow-lg p-2 border border-zinc-200 dark:border-zinc-700" x-ref="popover">
+                        <button class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToReport()">Reporte</button>
+                        <button class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToService()">Servicio Comunitario</button>
+                        <button class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToCitation()">Citatorio</button>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
         <div class="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-sm text-zinc-500">
@@ -522,3 +540,81 @@ new class extends Component {
         </flux:modal>
     @endcan
 </div>
+
+<script>
+function studentPopover(){
+    return {
+        show: false,
+        x: 0,
+        y: 0,
+        width: 180,
+        studentId: null,
+        studentName: null,
+        popoverClass: '',
+        init(){
+            // close popover when scrolling to avoid misplacement
+            window.addEventListener('scroll', () => { if(this.show) this.hide(); }, true);
+            window.addEventListener('resize', () => { if(this.show) this.hide(); });
+        },
+        popoverStyle(){
+            return `position:fixed; left:${this.x}px; top:${this.y}px; width:${this.width}px; z-index:9999;`;
+        },
+        select(ev){
+            // prevent the click from bubbling to the document and triggering @click.away
+            ev.stopPropagation();
+            const tr = ev.currentTarget;
+            const rect = tr.getBoundingClientRect();
+            this.studentId = tr.dataset.id;
+            this.studentName = tr.dataset.name;
+
+            const padding = 8;
+            const estimatedHeight = 120; // approximate popover height
+
+            // Responsive width: full width on small screens with small margins
+            if (window.innerWidth <= 640) {
+                this.width = Math.max(200, Math.min(window.innerWidth - 32, 360));
+                this.popoverClass = '';
+                // horizontal center
+                this.x = Math.round((window.innerWidth - this.width) / 2);
+            } else {
+                this.width = 180;
+                // center horizontally above the row
+                let left = rect.left + (rect.width / 2) - (this.width / 2);
+                if (left < padding) left = padding;
+                if (left + this.width > window.innerWidth - padding) left = window.innerWidth - this.width - padding;
+                this.x = Math.round(left);
+            }
+
+            // position above the row if there's space, otherwise below
+            let top = rect.top - estimatedHeight - padding;
+            if (top < 8) {
+                top = rect.bottom + padding; // place below
+            }
+
+            // ensure popover not off-screen vertically
+            if (top + estimatedHeight > window.innerHeight - padding) {
+                top = Math.max(padding, window.innerHeight - estimatedHeight - padding);
+            }
+
+            this.y = Math.round(top + window.scrollY - window.scrollY); // keep fixed viewport coords
+            this.show = true;
+        },
+        hide(){ this.show = false; this.studentId = null; this.studentName = null; },
+        goToReport(){
+            if(!this.studentId) return;
+            const url = '{{ route('reports.index') }}' + '?open_create=1&student_id=' + encodeURIComponent(this.studentId) + '&student_name=' + encodeURIComponent(this.studentName);
+            window.location.href = url;
+        },
+        goToService(){
+            if(!this.studentId) return;
+            const url = '{{ route('community-services.index') }}' + '?open_create=1&student_id=' + encodeURIComponent(this.studentId) + '&student_name=' + encodeURIComponent(this.studentName);
+            window.location.href = url;
+        },
+        goToCitation(){
+            if(!this.studentId) return;
+            const url = '{{ route('citations.index') }}' + '?open_create=1&student_id=' + encodeURIComponent(this.studentId) + '&student_name=' + encodeURIComponent(this.studentName);
+            window.location.href = url;
+        }
+    }
+}
+</script>

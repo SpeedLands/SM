@@ -1,4 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {{ $attributes }}>
-  <path d="M11.7 2.805a.75.75 0 01.6 0l10.5 4.5a.75.75 0 010 1.39l-10.5 4.5a.75.75 0 01-.6 0l-10.5-4.5a.75.75 0 010-1.39l10.5-4.5z" />
-  <path d="M2.25 11.235v5.127c0 .484.286.924.73 1.12l8.36 3.682a1.25 1.25 0 001.07 0l8.36-3.682a1.25 1.25 0 00.73-1.12v-5.127a.75.75 0 00-1.077-.684l-8.093 3.51a.75.75 0 01-.58 0l-8.093-3.51a.75.75 0 00-1.077.684z" />
-</svg>
+<div {{ $attributes->merge(['class' => 'flex aspect-square items-center justify-center rounded-lg bg-blue-600 font-bold text-white shadow-sm shadow-blue-500/20']) }}>
+    <span class="text-[0.7em] leading-none">SM</span>
+</div>

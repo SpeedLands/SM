@@ -25,6 +25,12 @@ new class extends Component {
     {
         $this->citationDate = now()->format('Y-m-d');
         $this->citationTime = '08:00';
+        // Open create modal automatically when navigated with query params
+        if (request()->query('open_create')) {
+            $this->selectedStudentId = request()->query('student_id');
+            $this->studentSearch = request()->query('student_name') ?? '';
+            $this->showCreateModal = true;
+        }
     }
 
     public function openCreateModal(): void
@@ -328,6 +334,12 @@ new class extends Component {
                                         <span class="font-bold text-sm">{{ $student->name }}</span>
                                     </button>
                                 @endforeach
+                            </div>
+                        @endif
+                        @if($selectedStudentId)
+                            <div class="mt-2 flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-medium">
+                                <flux:icon icon="check-circle" variant="micro" />
+                                Alumno seleccionado correctamente.
                             </div>
                         @endif
                     </div>
