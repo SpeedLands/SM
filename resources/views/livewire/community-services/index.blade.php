@@ -26,7 +26,7 @@ new class extends Component {
 
     public function mount(): void
     {
-        $this->scheduledDate = now()->addDay()->format('Y-m-d');
+        $this->scheduledDate = now()->format('Y-m-d');
         // Open create modal automatically when navigated with query params
         if (request()->query('open_create')) {
             $this->selectedStudentId = request()->query('student_id');
@@ -48,7 +48,7 @@ new class extends Component {
     public function resetForm(): void
     {
         $this->reset(['selectedStudentId', 'studentSearch', 'activity', 'description']);
-        $this->scheduledDate = now()->addDay()->format('Y-m-d');
+        $this->scheduledDate = now()->format('Y-m-d');
     }
 
     public function selectStudent(string $id): void
@@ -293,7 +293,10 @@ new class extends Component {
                         </div>
                     @endif
                     @if($selectedStudentId)
-                        <div class="mt-2 text-green-600 text-xs font-medium">Alumno seleccionado.</div>
+                        <div class="mt-2 flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-medium">
+                            <flux:icon icon="check-circle" variant="micro" />
+                            Alumno seleccionado correctamente.
+                        </div>
                     @endif
                 </div>
 

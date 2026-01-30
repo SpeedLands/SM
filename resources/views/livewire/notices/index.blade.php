@@ -183,47 +183,26 @@ new class extends Component {
             ];
         } else {
             // Parent view
-            $students = auth()->user()->students;
-            $studentIds = $students->pluck('id');
-            $studentGrades = $students->pluck('grade')->unique()->toArray();
-            $studentGroupIds = $students->pluck('currentCycleAssociation.class_group_id')->filter()->unique()->toArray();
+            $students = auth()->user()->students()->with(['currentCycleAssociation'])->get();
             
-            $notices = Notice::with(['author', 'signatures' => fn($q) => $q->whereIn('student_id', $studentIds)])
+            $notices = Notice::with(['author', 'signatures' => fn($q) => $q->whereIn('student_id', $students->pluck('id'))])
                 ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
                 ->whereIn('target_audience', ['PARENTS', 'ALL'])
                 ->orderBy('date', 'desc')
                 ->get()
-                ->filter(function($notice) use ($studentGrades, $studentGroupIds) {
-                    // If no targeting specified, show to all
-                    if (empty($notice->target_grades) && empty($notice->target_class_groups)) {
-                        return true;
-                    }
-                    
-                    // Check if any student grade matches
-                    if (!empty($notice->target_grades)) {
-                        foreach ($studentGrades as $grade) {
-                            if (in_array($grade, $notice->target_grades)) {
-                                return true;
-                            }
+                ->filter(function($notice) use ($students) {
+                    foreach ($students as $student) {
+                        if ($notice->isTargeting($student)) {
+                            return true;
                         }
                     }
-                    
-                    // Check if any student group matches
-                    if (!empty($notice->target_class_groups)) {
-                        foreach ($studentGroupIds as $groupId) {
-                            if (in_array($groupId, $notice->target_class_groups)) {
-                                return true;
-                            }
-                        }
-                    }
-                    
                     return false;
                 });
 
             return [
                 'notices' => $notices,
                 'isStaff' => false,
-                'myStudents' => auth()->user()->students,
+                'myStudents' => $students,
                 'availableGroups' => collect(),
             ];
         }
@@ -312,10 +291,11 @@ new class extends Component {
         <div class="space-y-8 max-w-3xl mx-auto">
             @forelse($notices as $notice)
                 @foreach($myStudents as $student)
-                    @php 
-                        $signature = $notice->signatures->where('student_id', $student->id)->first();
-                    @endphp
-                    <div wire:key="n-{{ $notice->id }}-s-{{ $student->id }}" class="p-6 rounded-2xl border {{ $signature ? 'border-zinc-200 bg-zinc-50/50' : 'border-blue-200 bg-white' }} dark:border-zinc-700 dark:bg-zinc-900 shadow-lg relative transition-all hover:shadow-xl">
+                    @if($notice->isTargeting($student))
+                        @php 
+                            $signature = $notice->signatures->where('student_id', $student->id)->first();
+                        @endphp
+                        <div wire:key="n-{{ $notice->id }}-s-{{ $student->id }}" class="p-6 rounded-2xl border {{ $signature ? 'border-zinc-200 bg-zinc-50/50' : 'border-blue-200 bg-white' }} dark:border-zinc-700 dark:bg-zinc-900 shadow-lg relative transition-all hover:shadow-xl">
                         @if(!$signature && $notice->type === 'URGENT')
                             <div class="absolute -top-3 -right-3">
                                 <flux:badge color="red" size="sm" class="animate-pulse shadow-md">Urgente</flux:badge>
@@ -404,6 +384,7 @@ new class extends Component {
                             @endif
                         </div>
                     </div>
+                    @endif
                 @endforeach
             @empty
                 <div class="py-20 text-center">

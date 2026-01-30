@@ -336,6 +336,12 @@ new class extends Component {
                                 @endforeach
                             </div>
                         @endif
+                        @if($selectedStudentId)
+                            <div class="mt-2 flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-medium">
+                                <flux:icon icon="check-circle" variant="micro" />
+                                Alumno seleccionado correctamente.
+                            </div>
+                        @endif
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">

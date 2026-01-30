@@ -186,7 +186,7 @@ new class extends Component {
 }; ?>
 
 <div class="space-y-6 text-zinc-900 dark:text-white">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <flux:heading size="xl" level="1">Gestión de Usuarios y Roles</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Administre el acceso, asigne roles y gestione credenciales de seguridad. Los nuevos usuarios requerirán cambio de contraseña al primer inicio.</flux:text>

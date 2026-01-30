@@ -248,7 +248,7 @@ new class extends Component {
 }; ?>
 
 <div class="space-y-6 text-zinc-900 dark:text-white pb-10">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <flux:heading size="xl" level="1">Gestión de Alumnos</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Administre el padrón de estudiantes, sus datos de contacto y su situación académica.</flux:text>
@@ -369,11 +369,11 @@ new class extends Component {
             </table>
 
                 <!-- Popover (fixed) -->
-                <div x-show="show" x-transition class="z-50" x-bind:style="popoverStyle()" @click.away="hide()">
+                <div x-show="show" class="z-50" x-bind:style="popoverStyle()" @click.away="hide()">
                     <div :class="popoverClass" class="bg-white dark:bg-zinc-900 rounded shadow-lg p-2 border border-zinc-200 dark:border-zinc-700" x-ref="popover">
-                        <button class="w-full text-left px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded" x-on:click="goToReport()">Reporte</button>
-                        <button class="w-full text-left px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded" x-on:click="goToService()">Servicio Comunitario</button>
-                        <button class="w-full text-left px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded" x-on:click="goToCitation()">Citatorio</button>
+                        <button class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToReport()">Reporte</button>
+                        <button class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToService()">Servicio Comunitario</button>
+                        <button class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToCitation()">Citatorio</button>
                     </div>
                 </div>
 

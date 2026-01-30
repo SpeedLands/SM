@@ -103,4 +103,36 @@ class Notice extends Model
             'percentage' => $percentage,
         ];
     }
+    /**
+     * Check if a specific student is a target recipient of this notice.
+     */
+    public function isTargeting(Student $student): bool
+    {
+        // If target audience is ALL, then yes.
+        if ($this->target_audience === 'ALL') {
+            return true;
+        }
+
+        // If PARENTS, but no specific targeting filters, then all parents (all students).
+        if (empty($this->target_grades) && empty($this->target_class_groups)) {
+            return true;
+        }
+
+        // Check Grade targeting
+        if (!empty($this->target_grades)) {
+            if (in_array($student->grade, $this->target_grades)) {
+                return true;
+            }
+        }
+
+        // Check Class Group targeting
+        if (!empty($this->target_class_groups)) {
+            $groupAssociation = $student->currentCycleAssociation;
+            if ($groupAssociation && in_array($groupAssociation->class_group_id, $this->target_class_groups)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

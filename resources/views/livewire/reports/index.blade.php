@@ -202,7 +202,7 @@ new class extends Component {
             <flux:text class="text-zinc-500 dark:text-zinc-400">Seguimiento de conducta y faltas al reglamento.</flux:text>
         </div>
         @can('teacher-or-admin')
-            <div class="flex gap-2">
+            <div class="flex flex-col sm:flex-row gap-2">
                 @can('admin-only')
                     <flux:button variant="ghost" icon="cog-6-tooth" href="{{ route('infractions.index') }}" wire:navigate>Gestionar Tipos</flux:button>
                 @endcan
