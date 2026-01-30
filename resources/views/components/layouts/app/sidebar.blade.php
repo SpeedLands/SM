@@ -25,6 +25,9 @@
                     <flux:navlist.item icon="megaphone" href="{{ route('notices.index') }}" :current="request()->routeIs('notices.index')">Avisos</flux:navlist.item>
                     <flux:navlist.item icon="calendar-days" href="{{ route('citations.index') }}" :current="request()->routeIs('citations.index')">Citatorios</flux:navlist.item>
                     <flux:navlist.item icon="academic-cap" href="{{ route('exams.index') }}">{{ __('Exámenes') }}</flux:navlist.item>
+                    @can('teacher-or-admin')
+                        <flux:navlist.item icon="calendar" href="{{ route('calendar.index') }}" :current="request()->routeIs('calendar.index')">Calendario General</flux:navlist.item>
+                    @endcan
                     
                     @can('admin-only')
                         <flux:navlist.item href="{{ route('users.index') }}" icon="users">Gestión de Usuarios</flux:navlist.item>
