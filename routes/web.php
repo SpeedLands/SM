@@ -24,6 +24,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('examenes', 'exams.index')->name('exams.index');
     Volt::route('tutoriales', 'tutorials.index')->name('tutorials.index');
     Volt::route('reportes/tipos', 'infractions.index')->name('infractions.index');
+
+    Route::post('toggle-view', function () {
+        $user = auth()->user();
+        if (! $user->hasStudents()) {
+            return back();
+        }
+
+        $current = session('active_view', 'staff');
+        $new = $current === 'staff' ? 'parent' : 'staff';
+
+        session(['active_view' => $new]);
+
+        return back()->with('notify', [
+            'message' => 'Cambiando a vista de '.($new === 'parent' ? 'Padre' : 'Personal'),
+            'variant' => 'success',
+        ]);
+    })->name('toggle-view');
 });
 
 Route::middleware(['auth'])->group(function () {

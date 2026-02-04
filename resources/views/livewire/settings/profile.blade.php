@@ -26,6 +26,8 @@ new class extends Component {
      */
     public function updateProfileInformation(): void
     {
+        abort_unless(Auth::user()->isAdmin(), 403);
+
         $user = Auth::user();
 
         $validated = $this->validate([

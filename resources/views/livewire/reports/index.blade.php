@@ -17,6 +17,7 @@ new class extends Component {
     public string $search = '';
     public string $status = '';
     public string $severity = '';
+    public bool $onlyPending = false;
     
     // Modal state
     public bool $showReportModal = false;
@@ -30,6 +31,26 @@ new class extends Component {
     public string $description = '';
     public string $reportDate = '';
     public string $reportTime = '';
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatus(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSeverity(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingOnlyPending(): void
+    {
+        $this->resetPage();
+    }
 
     public function mount(): void
     {
@@ -156,6 +177,7 @@ new class extends Component {
             'signed_by_parent_id' => auth()->id(),
         ]);
 
+        $this->dispatch('navigation-refresh');
         $this->dispatch('notify', ['message' => 'Reporte firmado correctamente.']);
     }
 
@@ -164,7 +186,7 @@ new class extends Component {
         $activeCycle = Cycle::where('is_active', true)->first();
 
         $reports = Report::with(['student', 'teacher', 'infraction', 'parent'])
-            ->when(auth()->user()->isParent(), function ($q) {
+            ->when(auth()->user()->isViewParent(), function ($q) {
                 $q->whereHas('student.parents', function ($pq) {
                     $pq->where('users.id', auth()->id());
                 });
@@ -172,6 +194,7 @@ new class extends Component {
             ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
             ->when($this->status, fn($q) => $q->where('status', $this->status))
             ->when($this->severity, fn($q) => $q->whereHas('infraction', fn($iq) => $iq->where('severity', $this->severity)))
+            ->when($this->onlyPending, fn($q) => $q->where('status', 'PENDING_SIGNATURE'))
             ->when($this->search, function($q) {
                 $q->whereHas('student', fn($sq) => $sq->where('name', 'like', "%{$this->search}%"))
                   ->orWhere('subject', 'like', "%{$this->search}%");
@@ -201,14 +224,14 @@ new class extends Component {
             <flux:heading size="xl" level="1">Reportes Disciplinarios</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Seguimiento de conducta y faltas al reglamento.</flux:text>
         </div>
-        @can('teacher-or-admin')
+        @if(auth()->user()->isViewStaff())
             <div class="flex flex-col sm:flex-row gap-2">
                 @can('admin-only')
                     <flux:button variant="ghost" icon="cog-6-tooth" href="{{ route('infractions.index') }}" wire:navigate>Gestionar Tipos</flux:button>
                 @endcan
                 <flux:button variant="primary" icon="plus-circle" wire:click="openCreateModal">Nuevo Reporte</flux:button>
             </div>
-        @endcan
+        @endif
     </div>
 
     <!-- Filters -->
@@ -224,6 +247,12 @@ new class extends Component {
             <option value="NORMAL">Normal</option>
             <option value="GRAVE">Grave</option>
         </flux:select>
+
+        @if(auth()->user()->isViewParent())
+            <div class="flex items-center gap-2 px-2">
+                <flux:checkbox wire:model.live="onlyPending" label="Solo pendientes" />
+            </div>
+        @endif
     </div>
 
     <!-- Reports Table -->
@@ -277,13 +306,13 @@ new class extends Component {
                         </td>
                         <td class="py-4 px-2 text-right">
                             <div class="flex justify-end gap-1">
-                                @if(auth()->user()->isParent() && $report->status !== 'SIGNED')
+                                @if(auth()->user()->isViewParent() && $report->status !== 'SIGNED')
                                     <flux:button variant="primary" size="sm" icon="finger-print" wire:click="signReport('{{ $report->id }}')">Firmar</flux:button>
                                 @endif
 
-                                @can('admin-only')
+                                @if(auth()->user()->isAdmin() && auth()->user()->isViewStaff())
                                     <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteReport('{{ $report->id }}')" />
-                                @endcan
+                                @endif
                             </div>
                         </td>
                     </tr>

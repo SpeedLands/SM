@@ -22,10 +22,12 @@ new class extends Component {
     {{-- Tabs Navigation --}}
     <div class="flex gap-2 overflow-x-auto border-b border-zinc-200 pb-2 dark:border-zinc-700">
         <flux:button :variant="$tab === 'parents' ? 'primary' : 'ghost'" wire:click="setTab('parents')" icon="users">Padres de Familia</flux:button>
-        <flux:button :variant="$tab === 'teachers' ? 'primary' : 'ghost'" wire:click="setTab('teachers')" icon="academic-cap">Docentes</flux:button>
-        @can('admin-only')
-            <flux:button :variant="$tab === 'admin' ? 'primary' : 'ghost'" wire:click="setTab('admin')" icon="shield-check">Administración</flux:button>
-        @endcan
+        @if(auth()->user()->isViewStaff())
+            <flux:button :variant="$tab === 'teachers' ? 'primary' : 'ghost'" wire:click="setTab('teachers')" icon="academic-cap">Docentes</flux:button>
+            @can('admin-only')
+                <flux:button :variant="$tab === 'admin' ? 'primary' : 'ghost'" wire:click="setTab('admin')" icon="shield-check">Administración</flux:button>
+            @endcan
+        @endif
     </div>
 
     {{-- Parents Content --}}

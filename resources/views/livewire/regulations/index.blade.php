@@ -24,7 +24,7 @@ new class extends Component {
 
     public function toggleEdit(): void
     {
-        if (!auth()->user()->isAdmin()) {
+        if (!auth()->user()->isAdmin() || !auth()->user()->isViewStaff()) {
             return;
         }
         $this->isEditing = !$this->isEditing;
@@ -32,7 +32,7 @@ new class extends Component {
 
     public function save(): void
     {
-        if (!auth()->user()->isAdmin()) {
+        if (!auth()->user()->isAdmin() || !auth()->user()->isViewStaff()) {
             return;
         }
 
@@ -70,7 +70,7 @@ new class extends Component {
             <flux:text class="text-zinc-500 dark:text-zinc-400">Consulta las normas y estatutos de convivencia de la institución.</flux:text>
         </div>
         
-        @if(auth()->user()->isAdmin())
+        @if(auth()->user()->isAdmin() && auth()->user()->isViewStaff())
             <flux:button variant="primary" icon="{{ $isEditing ? 'x-mark' : 'pencil' }}" wire:click="toggleEdit">
                 {{ $isEditing ? 'Cancelar Edición' : 'Editar Reglamento' }}
             </flux:button>
@@ -123,7 +123,7 @@ new class extends Component {
                         }"
                         wire:ignore
                     >
-                        <div x-ref="editor" class="min-h-[500px] text-lg"></div>
+                        <div x-ref="editor" class="min-h-125 text-lg"></div>
                     </div>
                 </div>
 
@@ -138,7 +138,7 @@ new class extends Component {
                     {{ $title }}
                 </h2>
                 
-                <div class="regulation-html-content ql-editor !p-0">
+                <div class="regulation-html-content ql-editor p-0!">
                     {!! $content !!}
                 </div>
 

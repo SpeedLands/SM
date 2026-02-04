@@ -12,6 +12,7 @@ new class extends Component {
 
     public string $search = '';
     public string $typeFilter = '';
+    public bool $onlyPending = false;
 
     // Create Modal
     public bool $showCreateModal = false;
@@ -33,6 +34,21 @@ new class extends Component {
     public $signedList = [];
     public $pendingList = [];
     public string $activeTab = 'signed';
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingTypeFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingOnlyPending(): void
+    {
+        $this->resetPage();
+    }
 
     public function mount(): void
     {
@@ -154,20 +170,24 @@ new class extends Component {
 
     public function signNotice(string $noticeId, string $studentId, bool $isAuthorized = true): void
     {
+        $this->authorize('parent-only');
+        
         NoticeSignature::updateOrCreate(
             ['notice_id' => $noticeId, 'student_id' => $studentId, 'parent_id' => auth()->id()],
             ['signed_at' => now(), 'authorized' => $isAuthorized]
         );
 
+        $this->dispatch('navigation-refresh');
         $this->dispatch('notify', ['message' => 'Firma registrada correctamente.']);
     }
 
     public function with(): array
     {
+        $user = auth()->user();
+        $isStaffView = $user->isViewStaff();
         $activeCycle = Cycle::where('is_active', true)->first();
-        $isStaff = in_array(auth()->user()->role, ['ADMIN', 'TEACHER']);
 
-        if ($isStaff) {
+        if ($isStaffView) {
             $notices = Notice::with(['author'])
                 ->withCount('signatures')
                 ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
@@ -182,8 +202,8 @@ new class extends Component {
                 'availableGroups' => $activeCycle ? \App\Models\ClassGroup::where('cycle_id', $activeCycle->id)->get() : collect(),
             ];
         } else {
-            // Parent view
-            $students = auth()->user()->students()->with(['currentCycleAssociation'])->get();
+            // Parent view (Normal parent or Staff in Parent mode)
+            $students = $user->students()->with(['currentCycleAssociation'])->get();
             
             $notices = Notice::with(['author', 'signatures' => fn($q) => $q->whereIn('student_id', $students->pluck('id'))])
                 ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
@@ -193,6 +213,11 @@ new class extends Component {
                 ->filter(function($notice) use ($students) {
                     foreach ($students as $student) {
                         if ($notice->isTargeting($student)) {
+                            // If onlyPending is true, only include if not signed for this student
+                            if ($this->onlyPending) {
+                                $isSigned = $notice->signatures->where('student_id', $student->id)->isNotEmpty();
+                                if ($isSigned) continue;
+                            }
                             return true;
                         }
                     }
@@ -287,6 +312,11 @@ new class extends Component {
             </div>
         </div>
     @else
+        <!-- Parent View Filters -->
+        <div class="flex items-center gap-4 mb-6">
+            <flux:checkbox wire:model.live="onlyPending" label="Solo mostrar avisos pendientes" />
+        </div>
+
         <!-- Parent View: Feed style -->
         <div class="space-y-8 max-w-3xl mx-auto">
             @forelse($notices as $notice)

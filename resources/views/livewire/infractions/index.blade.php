@@ -19,9 +19,14 @@ new class extends Component {
     public string $description = '';
     public string $severity = 'NORMAL';
 
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
     public function mount(): void
     {
-        abort_unless(auth()->user()->isAdmin(), 403);
+        abort_unless(auth()->user()->isAdmin() && auth()->user()->isViewStaff(), 403);
     }
 
     public function openCreateModal(): void

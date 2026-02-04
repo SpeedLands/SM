@@ -11,7 +11,7 @@ new class extends Component {
 
     public function mount(): void
     {
-        $this->authorize('admin-only');
+        abort_unless(auth()->user()->isAdmin() && auth()->user()->isViewStaff(), 403);
     }
 
     public string $search = '';
@@ -38,10 +38,16 @@ new class extends Component {
         'userPassword' => 'nullable|string|min:8',
     ];
 
+    protected $messages = [
+        'userEmail.unique' => 'Este correo electrónico ya está registrado en el sistema.',
+    ];
+
     public function rules() 
     {
         $rules = $this->rules;
         
+        $rules['userEmail'] = 'required|email|max:255|unique:users,email' . ($this->userId ? ',' . $this->userId : '');
+
         // If creating a new user, password is required
         if (!$this->userId) {
             $rules['userPassword'] = 'required|string|min:8';
@@ -51,6 +57,11 @@ new class extends Component {
     }
 
     public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingRoleFilter(): void
     {
         $this->resetPage();
     }

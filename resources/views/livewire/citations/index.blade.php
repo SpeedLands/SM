@@ -21,6 +21,16 @@ new class extends Component {
     public string $citationDate = '';
     public string $citationTime = '';
 
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function mount(): void
     {
         $this->citationDate = now()->format('Y-m-d');
@@ -131,6 +141,7 @@ new class extends Component {
     {
         $this->authorize('parent-only');
         Citation::findOrFail($id)->update(['parent_signature' => true]);
+        $this->dispatch('navigation-refresh');
         $this->dispatch('notify', ['message' => 'Citatorio firmado correctamente.']);
     }
 
@@ -138,7 +149,7 @@ new class extends Component {
     {
         $activeCycle = Cycle::where('is_active', true)->first();
         $user = auth()->user();
-        $isStaff = $user->isAdmin() || $user->isTeacher();
+        $isStaff = $user->isViewStaff();
 
         $query = Citation::with(['student', 'teacher'])
             ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
@@ -293,13 +304,13 @@ new class extends Component {
                         <flux:text size="sm" class="text-zinc-500 italic">Solicitado por: Prof(a). {{ $citation->teacher->name }}</flux:text>
                     </div>
 
-                    @if(!$citation->parent_signature)
+                    @if($user->isViewParent() && !$citation->parent_signature)
                         <div class="mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
                             <flux:button variant="primary" class="w-full py-4 shadow-lg shadow-blue-500/20" icon="finger-print" wire:click="signCitation('{{ $citation->id }}')">
                                 Confirmar de Enterado
                             </flux:button>
                         </div>
-                    @else
+@elseif($citation->parent_signature)
                         <div class="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 text-center">
                             <flux:text size="xs" color="green" class="font-bold">✓ USTED HA CONFIRMADO LA RECEPCIÓN DE ESTE CITATORIO</flux:text>
                         </div>

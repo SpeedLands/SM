@@ -16,7 +16,7 @@ test('admins can manage class groups for a cycle', function () {
         ->set('grade', '1º')
         ->set('section', 'A')
         ->set('tutorId', $teacher->id)
-        ->call('addGroup')
+        ->call('saveGroup')
         ->assertHasNoErrors()
         ->assertSee('1º A')
         ->assertSee($teacher->name);

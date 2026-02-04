@@ -29,15 +29,15 @@ class AppServiceProvider extends ServiceProvider
         );
 
         \Illuminate\Support\Facades\Gate::define('admin-only', function ($user) {
-            return $user->role === 'ADMIN';
+            return $user->isAdmin() && $user->isViewStaff();
         });
 
         \Illuminate\Support\Facades\Gate::define('teacher-or-admin', function ($user) {
-            return in_array($user->role, ['ADMIN', 'TEACHER']);
+            return ($user->isAdmin() || $user->isTeacher()) && $user->isViewStaff();
         });
 
         \Illuminate\Support\Facades\Gate::define('parent-only', function ($user) {
-            return $user->role === 'PARENT';
+            return $user->isViewParent();
         });
     }
 }
