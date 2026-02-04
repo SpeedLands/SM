@@ -4,6 +4,7 @@ use App\Models\CommunityService;
 use App\Models\Citation;
 use App\Models\Notice;
 use App\Models\ExamSchedule;
+use App\Models\Report;
 use App\Models\Cycle;
 use Livewire\Volt\Component;
 use Carbon\Carbon;
@@ -19,6 +20,7 @@ new class extends Component {
     public array $dayNotices = [];
     public array $dayCitations = [];
     public array $dayExams = [];
+    public array $dayReports = [];
 
     // Dates with events (for badges)
     public array $datesWithEvents = [];
@@ -100,6 +102,14 @@ new class extends Component {
             $dates[$e->exam_date->format('Y-m-d')] = true;
         }
 
+        // Reports
+        $reports = Report::where('cycle_id', $activeCycle->id)
+            ->whereBetween('date', [$startOfMonth, $endOfMonth])
+            ->get();
+        foreach ($reports as $r) {
+            $dates[$r->date->format('Y-m-d')] = true;
+        }
+
         $this->datesWithEvents = $dates;
     }
 
@@ -153,6 +163,13 @@ new class extends Component {
         // Exams
         $this->dayExams = ExamSchedule::where('cycle_id', $activeCycle->id)
             ->whereDate('exam_date', $targetDate)
+            ->get()
+            ->toArray();
+
+        // Reports
+        $this->dayReports = Report::with('student', 'teacher', 'infraction')
+            ->where('cycle_id', $activeCycle->id)
+            ->whereDate('date', $targetDate)
             ->get()
             ->toArray();
     }
@@ -311,7 +328,7 @@ new class extends Component {
             <!-- Content -->
             <div class="p-4 space-y-6">
                 @php
-                    $totalActivities = count($dayServices) + count($dayNotices) + count($dayCitations) + count($dayExams);
+                    $totalActivities = count($dayServices) + count($dayNotices) + count($dayCitations) + count($dayExams) + count($dayReports);
                 @endphp
 
                 @if($totalActivities === 0)
@@ -425,6 +442,41 @@ new class extends Component {
                                     </div>
                                     <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">
                                         <span class="font-medium">Periodo:</span> {{ $exam['period'] }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <!-- Reports -->
+                    @if(count($dayReports) > 0)
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-2">
+                                <flux:icon icon="document-text" class="text-red-600" />
+                                <flux:heading size="sm">Reportes</flux:heading>
+                                <flux:badge size="sm" color="red">{{ count($dayReports) }}</flux:badge>
+                            </div>
+                            @foreach($dayReports as $report)
+                                <div class="p-4 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20">
+                                    <div class="font-bold text-red-900 dark:text-red-100">{{ $report['student']['name'] ?? 'N/A' }}</div>
+                                    <div class="text-sm text-red-700 dark:text-red-300 mt-1">
+                                        <span class="font-medium">Infracción:</span> {{ $report['infraction']['name'] ?? 'N/A' }}
+                                    </div>
+                                    @if(!empty($report['subject']))
+                                        <div class="text-xs text-red-600 dark:text-red-400 mt-1">
+                                            <span class="font-medium">Materia:</span> {{ $report['subject'] }}
+                                        </div>
+                                    @endif
+                                    <div class="text-xs text-red-600 dark:text-red-400 mt-1 line-clamp-2 italic">{{ $report['description'] }}</div>
+                                    <div class="text-xs text-red-500 dark:text-red-400 mt-2">
+                                        Reportado por: {{ $report['teacher']['name'] ?? 'N/A' }}
+                                    </div>
+                                    <div class="mt-2">
+                                        @if($report['status'] === 'PENDING_SIGNATURE')
+                                            <flux:badge size="sm" color="amber">Pendiente firma</flux:badge>
+                                        @elseif($report['status'] === 'SIGNED')
+                                            <flux:badge size="sm" color="green">Firmado</flux:badge>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach
