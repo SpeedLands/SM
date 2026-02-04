@@ -24,6 +24,16 @@ new class extends Component {
     public string $description = '';
     public string $scheduledDate = '';
 
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function mount(): void
     {
         $this->scheduledDate = now()->format('Y-m-d');
@@ -101,20 +111,24 @@ new class extends Component {
         $this->dispatch('notify', ['message' => 'Servicio comunitario asignado.']);
     }
 
-    public function updateStatus(string $id, string $status): void
+    public function signService(string $id): void
     {
-        $this->authorize('teacher-or-admin');
+        $this->authorize('parent-only');
         $service = CommunityService::findOrFail($id);
-        $service->update(['status' => $status]);
         
-        if ($status === 'COMPLETED') {
-            $service->update([
-                'completed_at' => now(),
-                'authority_signature_id' => auth()->id()
-            ]);
+        // Ensure the service belongs to one of the parent's students
+        $parentStudentIds = auth()->user()->students->pluck('id')->toArray();
+        if (!in_array($service->student_id, $parentStudentIds)) {
+            abort(403, 'No tiene permiso para firmar este registro.');
         }
+
+        $service->update([
+            'parent_signature' => true,
+            'parent_signed_at' => now(),
+        ]);
         
-        $this->dispatch('notify', ['message' => 'Estado actualizado.']);
+        $this->dispatch('navigation-refresh');
+        $this->dispatch('notify', ['message' => 'Servicio firmado correctamente.']);
     }
 
     public function with(): array
@@ -122,7 +136,7 @@ new class extends Component {
         $activeCycle = Cycle::where('is_active', true)->first();
 
         $services = CommunityService::with(['student', 'assignedBy'])
-            ->when(auth()->user()->isParent(), function ($q) {
+            ->when(auth()->user()->isViewParent(), function ($q) {
                 $q->whereHas('student.parents', function ($pq) {
                     $pq->where('users.id', auth()->id());
                 });
@@ -138,7 +152,7 @@ new class extends Component {
 
         // Suggestions logic
         $suggestedStudents = [];
-        if ($activeCycle && !auth()->user()->isParent()) {
+        if ($activeCycle && auth()->user()->isViewStaff()) {
             $suggestedStudents = Student::whereHas('reports', function($q) use ($activeCycle) {
                 $q->where('cycle_id', $activeCycle->id);
             })
@@ -174,9 +188,9 @@ new class extends Component {
             <flux:heading size="xl" level="1">Servicio Comunitario</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Asignación y seguimiento de actividades reparatorias.</flux:text>
         </div>
-        @can('teacher-or-admin')
+        @if(auth()->user()->isViewStaff())
             <flux:button variant="primary" icon="plus" wire:click="openCreateModal()">Asignar Servicio</flux:button>
-        @endcan
+        @endif
     </div>
 
     <!-- Suggested Actions (Alert-like) -->
@@ -250,12 +264,18 @@ new class extends Component {
                         </td>
                         <td class="py-4 px-2 text-right">
                             <div class="flex justify-end gap-1">
-                                @can('teacher-or-admin')
+                                @if(auth()->user()->isViewStaff())
                                     @if($service->status === 'PENDING')
                                         <flux:button variant="ghost" size="sm" icon="check-circle" class="text-green-600" title="Marcar como cumplido" wire:click="updateStatus('{{ $service->id }}', 'COMPLETED')" />
                                         <flux:button variant="ghost" size="sm" icon="x-circle" class="text-red-600" title="Marcar como no asistió" wire:click="updateStatus('{{ $service->id }}', 'MISSED')" />
                                     @endif
-                                @endcan
+                                @elseif(auth()->user()->isViewParent())
+                                    @if(!$service->parent_signature)
+                                        <flux:button variant="primary" size="sm" icon="finger-print" wire:click="signService('{{ $service->id }}')">Firmar</flux:button>
+                                    @else
+                                        <flux:badge color="green" size="sm" inset="left" icon="check">Enterado</flux:badge>
+                                    @endif
+                                @endif
 
                             </div>
                         </td>

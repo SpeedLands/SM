@@ -47,8 +47,19 @@ new class extends Component {
         $this->resetPage();
     }
 
+    public function updatingGradeFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingGroupFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function openCreateModal(): void
     {
+        if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
         $this->reset(['studentId', 'name', 'birthDate', 'turn', 'siblingsCount', 'birthOrder', 'classGroupId', 'address', 'allergies', 'medicalConditions', 'emergencyContact', 'otherContact', 'motherName', 'fatherName', 'motherWorkplace', 'fatherWorkplace']);
         $this->showStudentModal = true;
@@ -61,6 +72,7 @@ new class extends Component {
 
     public function addParent(): void
     {
+        if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
         if (!$this->studentId || !$this->selectedParentId) return;
 
@@ -75,6 +87,7 @@ new class extends Component {
 
     public function removeParent(string $parentId): void
     {
+        if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
         if (!$this->studentId) return;
 
@@ -84,6 +97,7 @@ new class extends Component {
 
     public function editStudent(string $id): void
     {
+        if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
         $student = Student::with(['pii', 'currentCycleAssociation', 'parents'])->findOrFail($id);
         
@@ -115,6 +129,7 @@ new class extends Component {
 
     public function save(): void
     {
+        if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
         $this->validate([
             'name' => 'required|string|max:100',
@@ -185,6 +200,7 @@ new class extends Component {
 
     public function deleteStudent(string $id): void
     {
+        if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
         $student = Student::findOrFail($id);
         
@@ -202,13 +218,12 @@ new class extends Component {
         $activeCycle = Cycle::where('is_active', true)->first();
         $classGroups = $activeCycle ? ClassGroup::where('cycle_id', $activeCycle->id)->get() : collect();
         
-        $query = Student::query();
-
-        if (auth()->user()->isParent()) {
-            $query->whereHas('parents', function ($q) {
-                $q->where('users.id', auth()->id());
+        $query = Student::query()
+            ->when(auth()->user()->isViewParent(), function ($q) {
+                $q->whereHas('parents', function ($pq) {
+                    $pq->where('users.id', auth()->id());
+                });
             });
-        }
 
         if ($this->search) {
             $query->where(function($q) {
@@ -253,9 +268,9 @@ new class extends Component {
             <flux:heading size="xl" level="1">Gestión de Alumnos</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Administre el padrón de estudiantes, sus datos de contacto y su situación académica.</flux:text>
         </div>
-        @can('teacher-or-admin')
+        @if(auth()->user()->isViewStaff())
             <flux:button variant="primary" icon="user-plus" wire:click="openCreateModal" :disabled="count($classGroups) === 0">Inscribir Alumno</flux:button>
-        @endcan
+        @endif
     </div>
 
     @if($activeCycle && count($classGroups) === 0)
@@ -318,11 +333,11 @@ new class extends Component {
                 <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                     @forelse ($students as $student)
                         <tr wire:key="{{ $student->id }}" 
-                            @can('teacher-or-admin')
-                                x-on:click="select($event)" data-id="{{ $student->id }}" data-name="{{ $student->name }}" class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                            @else
-                                class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors"
-                            @endcan
+                        @if(auth()->user()->isViewStaff())
+                            x-on:click="select($event)" data-id="{{ $student->id }}" data-name="{{ $student->name }}" class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                        @else
+                            class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors"
+                        @endif
                         >
                             <td class="py-4 px-2">
                                 <div class="flex items-center gap-3">
@@ -348,14 +363,14 @@ new class extends Component {
                             </td>
                             <td class="py-4 px-2 text-right">
                                 <div class="flex justify-end gap-1">
-                                    @can('teacher-or-admin')
+                                    @if(auth()->user()->isViewStaff())
                                         <flux:button x-on:click.stop variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
                                         @if($student->reports_count === 0 && $student->community_services_count === 0)
                                             <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteStudent('{{ $student->id }}')" wire:confirm="¿Está seguro de eliminar este registro?" />
                                         @else
                                             <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por registros asociados" disabled />
                                         @endif
-                                    @endcan
+                                    @endif
 
                                 </div>
                             </td>
@@ -385,9 +400,10 @@ new class extends Component {
         </div>
     </div>
 
-    @can('teacher-or-admin')
+    @if(auth()->user()->isViewStaff())
         <!-- Student Modal -->
         <flux:modal wire:model="showStudentModal" class="w-full max-w-2xl">
+            <!-- ... -->
             <div class="space-y-6">
                 <header>
                     <flux:heading size="lg">{{ $studentId ? 'Editar Información de Alumno' : 'Inscripción de Nuevo Alumno' }}</flux:heading>

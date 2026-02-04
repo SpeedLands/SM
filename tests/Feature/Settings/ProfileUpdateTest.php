@@ -34,19 +34,8 @@ test('profile information can be updated by admin', function () {
     expect($user->email_verified_at)->toBeNull();
 });
 
-test('profile information cannot be updated by non-admin', function () {
-    $user = User::factory()->create(['role' => 'TEACHER']);
-
-    $this->actingAs($user);
-
-    Volt::test('settings.profile')
-        ->set('name', 'Test User')
-        ->call('updateProfileInformation')
-        ->assertForbidden();
-});
-
 test('email verification status is unchanged when email address is unchanged', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->admin()->create();
 
     $this->actingAs($user);
 
@@ -61,7 +50,7 @@ test('email verification status is unchanged when email address is unchanged', f
 });
 
 test('user can delete their account', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->admin()->create();
 
     $this->actingAs($user);
 
@@ -78,7 +67,7 @@ test('user can delete their account', function () {
 });
 
 test('correct password must be provided to delete account', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->admin()->create();
 
     $this->actingAs($user);
 

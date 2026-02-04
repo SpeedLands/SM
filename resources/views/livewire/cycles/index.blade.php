@@ -35,7 +35,7 @@ new class extends Component {
 
     public function mount(): void
     {
-        $this->authorize('admin-only');
+        abort_unless(auth()->user()->isAdmin() && auth()->user()->isViewStaff(), 403);
     }
 
     public function save(): void

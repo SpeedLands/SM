@@ -54,6 +54,7 @@ new class extends Component {
 
     public function saveExam(): void
     {
+        if (!auth()->user()->isViewStaff()) abort(403);
         $this->validate([
             'grade' => 'required',
             'groupName' => 'required',
@@ -93,6 +94,7 @@ new class extends Component {
 
     public function deleteExam(string $id): void
     {
+        if (!auth()->user()->isViewStaff()) abort(403);
         ExamSchedule::findOrFail($id)->delete();
         $this->dispatch('notify', ['message' => 'Examen eliminado.']);
     }
@@ -100,7 +102,7 @@ new class extends Component {
     public function with(): array
     {
         $activeCycle = Cycle::where('is_active', true)->first();
-        $isStaff = in_array(auth()->user()->role, ['ADMIN', 'TEACHER']);
+        $isStaff = auth()->user()->isViewStaff();
         
         $query = ExamSchedule::query()
             ->when(auth()->user()->isParent(), function ($q) {
@@ -139,7 +141,7 @@ new class extends Component {
 }; ?>
 
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <flux:heading size="lg" level="1">Calendario de Exámenes</flux:heading>
             <flux:text class="text-zinc-500">Programación de evaluaciones por trimestre.</flux:text>

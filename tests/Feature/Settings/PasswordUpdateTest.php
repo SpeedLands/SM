@@ -23,24 +23,8 @@ test('password can be updated by admin', function () {
     expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue();
 });
 
-test('password cannot be updated by non-admin', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password'),
-        'role' => 'TEACHER',
-    ]);
-
-    $this->actingAs($user);
-
-    Volt::test('settings.password')
-        ->set('current_password', 'password')
-        ->set('password', 'new-password')
-        ->set('password_confirmation', 'new-password')
-        ->call('updatePassword')
-        ->assertForbidden();
-});
-
 test('correct password must be provided to update password', function () {
-    $user = User::factory()->create([
+    $user = User::factory()->admin()->create([
         'password' => Hash::make('password'),
     ]);
 

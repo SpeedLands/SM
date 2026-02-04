@@ -87,6 +87,7 @@ new class extends Component {
             'citations' => $citations,
             'notices' => $notices,
             'activeCycle' => $activeCycle,
+            'totalPending' => $user->getPendingNotificationsCount(),
             'isParent' => true,
         ];
     }
@@ -101,6 +102,15 @@ new class extends Component {
             </flux:text>
         </div>
     </div>
+
+    @if(auth()->user()->isParent() && ($totalPending ?? 0) > 0)
+        <flux:callout variant="danger" heading="Trámites Pendientes de Atención" icon="exclamation-triangle">
+            Tienes {{ $totalPending }} documento(s) o aviso(s) que requieren tu firma o revisión.
+            <x-slot name="actions">
+                <flux:button size="sm" variant="primary" href="{{ route('reports.index') }}" icon="pencil-square">Revisar Pendientes</flux:button>
+            </x-slot>
+        </flux:callout>
+    @endif
 
     @if(isset($isAdmin) && $isAdmin)
         <!-- Admin/Teacher Dashboard -->
@@ -209,7 +219,7 @@ new class extends Component {
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     @forelse($myStudents as $student)
-                        <div class="p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden group">
+                        <div class="p-6 rounded-4xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden group">
                             <!-- Background Accent -->
                             <div class="absolute top-0 right-0 size-24 bg-blue-500/5 dark:bg-blue-500/10 rounded-bl-full -mr-8 -mt-8"></div>
                             
@@ -247,6 +257,20 @@ new class extends Component {
                                 </div>
                             </div>
 
+                            @php
+                                $studentPending = auth()->user()->getPendingNotificationsCount($student->id);
+                            @endphp
+
+                            @if($studentPending > 0)
+                                <div class="mt-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-800/20 flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="size-2 rounded-full bg-red-500 animate-pulse"></div>
+                                        <span class="text-xs font-bold text-red-700 dark:text-red-400">{{ $studentPending }} Trámite(s) Pendiente(s)</span>
+                                    </div>
+                                    <flux:button size="xs" variant="ghost" icon="chevron-right" href="{{ route('reports.index') }}" />
+                                </div>
+                            @endif
+
                             <div class="mt-6">
                                 <flux:button variant="primary" block href="{{ route('students.index') }}" icon:trailing="arrow-right">Ver Detalles</flux:button>
                             </div>
@@ -264,7 +288,7 @@ new class extends Component {
             <!-- Side Column: Citations and Notices -->
             <div class="space-y-8">
                 <!-- Upcoming Citations -->
-                <div class="p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                <div class="p-6 rounded-4xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <flux:heading size="lg" class="mb-6">Citatorios Próximos</flux:heading>
                     <div class="space-y-4">
                         @forelse($citations as $citation)
@@ -291,7 +315,7 @@ new class extends Component {
                 </div>
 
                 <!-- Recent Notices -->
-                <div class="p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                <div class="p-6 rounded-4xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <flux:heading size="lg" class="mb-6">Avisos Generales</flux:heading>
                     <div class="space-y-4">
                         @forelse($notices as $notice)

@@ -13,11 +13,16 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
-    
+
+    /**
+     * Cache for hasStudents check to avoid repeated DB queries.
+     */
+    protected ?bool $hasStudentsCache = null;
+
     protected static function booted(): void
     {
         static::creating(function (User $user) {
-            if (!$user->id) {
+            if (! $user->id) {
                 $user->id = (string) Str::uuid();
             }
         });
@@ -101,7 +106,54 @@ class User extends Authenticatable
 
     public function isParent(): bool
     {
-        return $this->role === 'PARENT';
+        return $this->role === 'PARENT' || $this->hasStudents();
+    }
+
+    /**
+     * Check if the user has students associated (memoized).
+     */
+    public function hasStudents(): bool
+    {
+        if ($this->hasStudentsCache !== null) {
+            return $this->hasStudentsCache;
+        }
+
+        return $this->hasStudentsCache = $this->students()->exists();
+    }
+
+    /**
+     * Check if the active view is set to Parent mode.
+     */
+    public function isViewParent(): bool
+    {
+        // If the user ONLY has the PARENT role, they are always in parent view
+        if ($this->role === 'PARENT') {
+            return true;
+        }
+
+        // If they have dual roles (Staff + Parent), check the session
+        if ($this->hasStudents()) {
+            return session('active_view') === 'parent';
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if the active view is set to Staff mode.
+     */
+    public function isViewStaff(): bool
+    {
+        if ($this->isAdmin() || $this->isTeacher()) {
+            // If they have kids, respect the session switcher
+            if ($this->hasStudents()) {
+                return session('active_view', 'staff') === 'staff';
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function students(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -113,5 +165,131 @@ class User extends Authenticatable
     public function reports(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Report::class, 'teacher_id');
+    }
+
+    /**
+     * Get the count of unsigned notices for the parent.
+     */
+    public function getUnsignedNoticesCount(?string $studentId = null): int
+    {
+        if (! $this->isParent()) {
+            return 0;
+        }
+
+        $students = $this->students()
+            ->when($studentId, fn ($q) => $q->where('students.id', $studentId))
+            ->with(['currentCycleAssociation'])->get();
+
+        $activeCycle = Cycle::where('is_active', true)->first();
+
+        if (! $activeCycle) {
+            return 0;
+        }
+
+        return Notice::where('cycle_id', $activeCycle->id)
+            ->whereIn('target_audience', ['PARENTS', 'ALL'])
+            ->get()
+            ->filter(function ($notice) use ($students, $studentId) {
+                // If a specific studentId is requested, we only care about that student
+                $targetStudents = $studentId
+                    ? $students->filter(fn ($s) => (string) $s->id === (string) $studentId)
+                    : $students;
+
+                foreach ($targetStudents as $student) {
+                    if ($notice->isTargeting($student)) {
+                        // Check if signed for this student
+                        $signed = $notice->signatures()->where('student_id', (string) $student->id)->exists();
+                        if (! $signed) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            })
+            ->count();
+    }
+
+    public function getUnsignedReportsCount(?string $studentId = null): int
+    {
+        if (! $this->isParent()) {
+            return 0;
+        }
+
+        $query = Report::where('status', 'PENDING_SIGNATURE');
+
+        if ($studentId) {
+            // Verify ownership first
+            $ownsStudent = $this->students()->where('students.id', $studentId)->exists();
+            if (! $ownsStudent) {
+                return 0;
+            }
+            $query->where('student_id', $studentId);
+        } else {
+            $query->whereHas('student.parents', fn ($q) => $q->where('users.id', $this->id));
+        }
+
+        return $query->count();
+    }
+
+    /**
+     * Get the count of unsigned community services for the parent.
+     */
+    public function getUnsignedCommunityServicesCount(?string $studentId = null): int
+    {
+        if (! $this->isParent()) {
+            return 0;
+        }
+
+        $query = CommunityService::where('parent_signature', false);
+
+        if ($studentId) {
+            // Verify ownership first
+            $ownsStudent = $this->students()->where('students.id', $studentId)->exists();
+            if (! $ownsStudent) {
+                return 0;
+            }
+            $query->where('student_id', $studentId);
+        } else {
+            $query->whereHas('student.parents', fn ($q) => $q->where('users.id', $this->id));
+        }
+
+        return $query->count();
+    }
+
+    /**
+     * Get the count of unsigned citations for the parent.
+     */
+    public function getUnsignedCitationsCount(?string $studentId = null): int
+    {
+        if (! $this->isParent()) {
+            return 0;
+        }
+
+        $query = Citation::where('parent_signature', false);
+
+        if ($studentId) {
+            // Verify ownership first
+            $ownsStudent = $this->students()->where('students.id', $studentId)->exists();
+            if (! $ownsStudent) {
+                return 0;
+            }
+            $query->where('student_id', $studentId);
+        } else {
+            $query->whereHas('student.parents', fn ($q) => $q->where('users.id', $this->id));
+        }
+
+        return $query->count();
+    }
+
+    /**
+     * Get the total pending notifications count.
+     */
+    public function getPendingNotificationsCount(?string $studentId = null): int
+    {
+        return $this->getUnsignedNoticesCount($studentId) +
+               $this->getUnsignedReportsCount($studentId) +
+               $this->getUnsignedCommunityServicesCount($studentId) +
+               $this->getUnsignedCitationsCount($studentId);
     }
 }

@@ -11,32 +11,33 @@
                 <x-app-logo />
             </a>
 
-            <flux:navlist variant="outline">
-                <flux:navlist.group heading="Plataforma" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')">Tablero</flux:navlist.item>
-                    
-                    @can('admin-only')
-                        <flux:navlist.item href="{{ route('cycles.index') }}" icon="academic-cap">Ciclos Escolares</flux:navlist.item>
-                    @endcan
+            @php
+                $user = auth()->user();
+                $isViewParent = $user->isViewParent();
+                $isViewStaff = $user->isViewStaff();
+                $hasDualRole = ($user->isAdmin() || $user->isTeacher()) && $user->hasStudents();
 
-                    <flux:navlist.item icon="user-group" href="{{ route('students.index') }}" :current="request()->routeIs('students.index')">Alumnos</flux:navlist.item>
-                    <flux:navlist.item icon="document-text" href="{{ route('reports.index') }}" :current="request()->routeIs('reports.index')">Reportes</flux:navlist.item>
-                    <flux:navlist.item icon="briefcase" href="{{ route('community-services.index') }}" :current="request()->routeIs('community-services.index')">Servicio Comunitario</flux:navlist.item>
-                    <flux:navlist.item icon="megaphone" href="{{ route('notices.index') }}" :current="request()->routeIs('notices.index')">Avisos</flux:navlist.item>
-                    <flux:navlist.item icon="calendar-days" href="{{ route('citations.index') }}" :current="request()->routeIs('citations.index')">Citatorios</flux:navlist.item>
-                    <flux:navlist.item icon="academic-cap" href="{{ route('exams.index') }}">{{ __('Exámenes') }}</flux:navlist.item>
-                    @can('teacher-or-admin')
-                        <flux:navlist.item icon="calendar" href="{{ route('calendar.index') }}" :current="request()->routeIs('calendar.index')">Calendario General</flux:navlist.item>
-                    @endcan
-                    
-                    @can('admin-only')
-                        <flux:navlist.item href="{{ route('users.index') }}" icon="users">Gestión de Usuarios</flux:navlist.item>
-                    @endcan
+                if ($isViewParent) {
+                    $reportsCount = $user->getUnsignedReportsCount();
+                    $servicesCount = $user->getUnsignedCommunityServicesCount();
+                    $noticesCount = $user->getUnsignedNoticesCount();
+                    $citationsCount = $user->getUnsignedCitationsCount();
+                    $totalPending = $reportsCount + $servicesCount + $noticesCount + $citationsCount;
+                }
+            @endphp
 
-                    <flux:navlist.item icon="book-open" href="{{ route('regulations.index') }}" :current="request()->routeIs('regulations.index')">Reglamento</flux:navlist.item>
-                    <flux:navlist.item icon="question-mark-circle" href="{{ route('tutorials.index') }}" :current="request()->routeIs('tutorials.index')">Tutoriales</flux:navlist.item>
-                </flux:navlist.group>
-            </flux:navlist>
+            <livewire:layout.navigation />
+
+            @if($hasDualRole)
+                <div class="px-3 py-4 mt-auto">
+                    <form action="{{ route('toggle-view') }}" method="POST">
+                        @csrf
+                        <flux:button type="submit" variant="filled" icon="{{ $isViewParent ? 'briefcase' : 'user-group' }}" class="w-full justify-start text-xs font-bold uppercase tracking-wider shadow-sm transition-all active:scale-95">
+                            {{ $isViewParent ? 'Vista Personal' : 'Vista Familiar' }}
+                        </flux:button>
+                    </form>
+                </div>
+            @endif
 
             <flux:spacer />
 
@@ -54,21 +55,7 @@
 
         </flux:sidebar>
 
-        <!-- Mobile User Menu -->
-        <flux:header class="lg:hidden">
-            <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
-
-            <flux:spacer />
-
-            <flux:dropdown position="top" align="end">
-                <flux:profile
-                    :initials="auth()->user()->initials()"
-                    icon-trailing="chevron-down"
-                />
-
-                @include('partials.app.user-menu')
-            </flux:dropdown>
-        </flux:header>
+        <livewire:layout.mobile-header />
 
         {{ $slot }}
 
@@ -83,6 +70,37 @@
                         }
                     });
                 });
+
+                // Local Notifications Logic for Parents
+                @if($isViewParent && ($totalPending ?? 0) > 0)
+                    const totalPending = {{ $totalPending }};
+                    
+                    if ("Notification" in window) {
+                        // Check if we should show a notification (e.g. once per session)
+                        if (!sessionStorage.getItem('notified_pending')) {
+                            const requestPermissionAndNotify = () => {
+                                Notification.requestPermission().then(permission => {
+                                    if (permission === "granted") {
+                                        new Notification("⚠️ Trámites Pendientes", {
+                                            body: `Tienes ${totalPending} documentos o avisos que requieren tu atención.`,
+                                            icon: "/apple-touch-icon.png",
+                                            tag: "pending-notifications"
+                                        });
+                                        sessionStorage.setItem('notified_pending', 'true');
+                                    }
+                                });
+                            };
+
+                            if (Notification.permission === "granted") {
+                                requestPermissionAndNotify();
+                            } else if (Notification.permission !== "denied") {
+                                // Optional: You might want a button to trigger this instead of auto-requesting
+                                // but for a PWA it's common to request on interaction or dashboard entry.
+                                setTimeout(requestPermissionAndNotify, 2000);
+                            }
+                        }
+                    }
+                @endif
             });
         </script>
     </body>

@@ -213,6 +213,15 @@ new class extends Component {
         .badge-pulse {
             animation: pulse-badge 1.5s ease-in-out infinite;
         }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 4px;
+        }
+        .calendar-day-cell {
+            aspect-ratio: 1 / 1;
+            width: 100%;
+        }
     </style>
 
     <div class="flex items-center justify-between flex-wrap gap-4">
@@ -228,26 +237,26 @@ new class extends Component {
     </div>
 
     <!-- Calendar Grid -->
-    <div class="p-4 md:p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm">
+    <div class="p-4 md:p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-hidden">
         <!-- Month Header -->
         <div class="text-center mb-6">
             <flux:heading size="lg" class="capitalize">{{ $monthName }}</flux:heading>
         </div>
 
         <!-- Day Names Header -->
-        <div class="grid grid-cols-7 gap-1 mb-2">
+        <div class="calendar-grid mb-2">
             @foreach(['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'] as $dayName)
-                <div class="text-center text-xs md:text-sm font-semibold text-zinc-500 dark:text-zinc-400 py-2">
+                <div class="text-center text-xs md:text-sm font-bold text-zinc-500 dark:text-zinc-400 py-2">
                     {{ $dayName }}
                 </div>
             @endforeach
         </div>
 
         <!-- Calendar Days -->
-        <div class="grid grid-cols-7 gap-1">
+        <div class="calendar-grid">
             @foreach($calendarDays as $day)
                 @if($day === null)
-                    <div class="aspect-square"></div>
+                    <div class="calendar-day-cell"></div>
                 @else
                     @php
                         $dateStr = sprintf('%04d-%02d-%02d', $currentYear, $currentMonth, $day);
@@ -256,17 +265,17 @@ new class extends Component {
                     @endphp
                     <button
                         wire:click="selectDate('{{ $dateStr }}')"
-                        class="aspect-square relative flex flex-col items-center justify-center rounded-lg border transition-all
+                        class="calendar-day-cell relative flex flex-col items-center justify-center rounded-lg border transition-all
                             {{ $isToday 
-                                ? 'bg-blue-600 text-white border-blue-600 font-bold' 
-                                : 'border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600' 
+                                ? 'bg-blue-600 text-white border-blue-600 font-bold shadow-sm' 
+                                : 'border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-800/20 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600' 
                             }}"
                     >
                         <span class="text-sm md:text-base lg:text-lg">{{ $day }}</span>
                         
                         @if($hasEvents)
-                            <span class="absolute bottom-1 md:bottom-2 w-2 h-2 md:w-2.5 md:h-2.5 rounded-full badge-pulse
-                                {{ $isToday ? 'bg-white' : 'bg-zinc-900 dark:bg-white' }}">
+                            <span class="absolute bottom-1 md:bottom-2 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full badge-pulse
+                                {{ $isToday ? 'bg-white' : 'bg-blue-500' }}">
                             </span>
                         @endif
                     </button>
@@ -305,7 +314,7 @@ new class extends Component {
 
         <!-- Panel -->
         <div
-            class="absolute top-0 right-0 h-full w-full sm:w-96 md:w-[28rem] bg-white dark:bg-zinc-900 shadow-xl overflow-y-auto"
+            class="absolute top-0 right-0 h-full w-full sm:w-96 md:w-md bg-white dark:bg-zinc-900 shadow-xl overflow-y-auto"
             x-show="open"
             x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="translate-x-full"
