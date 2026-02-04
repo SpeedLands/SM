@@ -131,6 +131,24 @@ new class extends Component {
         $this->dispatch('notify', ['message' => 'Servicio firmado correctamente.']);
     }
 
+    public function updateStatus(string $id, string $status): void
+    {
+        $this->authorize('teacher-or-admin');
+        
+        $service = CommunityService::findOrFail($id);
+        
+        $data = ['status' => $status];
+        
+        if ($status === 'COMPLETED') {
+            $data['completed_at'] = now();
+            $data['authority_signature_id'] = auth()->id();
+        }
+
+        $service->update($data);
+        
+        $this->dispatch('notify', ['message' => 'Estado del servicio actualizado.']);
+    }
+
     public function with(): array
     {
         $activeCycle = Cycle::where('is_active', true)->first();
