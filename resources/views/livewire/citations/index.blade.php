@@ -170,6 +170,7 @@ new class extends Component {
         return [
             'citations' => $citations,
             'isStaff' => $isStaff,
+            'user' => $user,
             'studentResults' => $isStaff && strlen($this->studentSearch) >= 3 && !$this->selectedStudentId
                 ? Student::where('name', 'like', "%{$this->studentSearch}%")->limit(5)->get()
                 : [],
