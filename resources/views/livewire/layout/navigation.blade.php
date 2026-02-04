@@ -71,6 +71,12 @@ new class extends Component {
         </flux:navlist.item>
 
         <flux:navlist.item icon="academic-cap" href="{{ route('exams.index') }}">{{ __('Exámenes') }}</flux:navlist.item>
+
+        @if($isViewStaff)
+            @can('teacher-or-admin')
+                <flux:navlist.item icon="calendar" href="{{ route('calendar.index') }}" :current="request()->routeIs('calendar.index')">Calendario General</flux:navlist.item>
+            @endcan
+        @endif
         
         @if($isViewStaff)
             @can('admin-only')
