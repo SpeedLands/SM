@@ -275,7 +275,7 @@ new class extends Component {
                         
                         @if($hasEvents)
                             <span class="absolute bottom-1 md:bottom-2 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full badge-pulse
-                                {{ $isToday ? 'bg-white' : 'bg-blue-500' }}">
+                                {{ $isToday ? 'bg-white' : 'bg-zinc-900 dark:bg-white' }}">
                             </span>
                         @endif
                     </button>
