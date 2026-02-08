@@ -61,7 +61,7 @@ class Notice extends Model
     public function getExpectedRecipientsQuery()
     {
         return Student::query()
-            ->whereHas('cycleAssociations', function ($query) {
+            ->whereHas('currentCycleAssociation', function ($query) {
                 $query->where('cycle_id', $this->cycle_id);
             })
             ->when($this->target_audience === 'PARENTS', function ($query) {
@@ -81,8 +81,6 @@ class Notice extends Model
      */
     public function getExpectedRecipientsCount(): int
     {
-        // If target_audience is ALL, it targets all students in the cycle
-        // If PARENTS, it follows the filters
         return $this->getExpectedRecipientsQuery()->count();
     }
 
@@ -103,11 +101,17 @@ class Notice extends Model
             'percentage' => $percentage,
         ];
     }
+
     /**
      * Check if a specific student is a target recipient of this notice.
      */
     public function isTargeting(Student $student): bool
     {
+        // Must be in the cycle of the notice
+        if (!$student->currentCycleAssociation || $student->currentCycleAssociation->cycle_id !== $this->cycle_id) {
+            return false;
+        }
+
         // If target audience is ALL, then yes.
         if ($this->target_audience === 'ALL') {
             return true;
@@ -127,8 +131,8 @@ class Notice extends Model
 
         // Check Class Group targeting
         if (!empty($this->target_class_groups)) {
-            $groupAssociation = $student->currentCycleAssociation;
-            if ($groupAssociation && in_array($groupAssociation->class_group_id, $this->target_class_groups)) {
+            $assoc = $student->currentCycleAssociation;
+            if ($assoc && in_array($assoc->class_group_id, $this->target_class_groups)) {
                 return true;
             }
         }

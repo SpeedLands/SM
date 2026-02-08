@@ -96,7 +96,7 @@ new class extends Component {
             return;
         }
 
-        CommunityService::create([
+        $service = CommunityService::create([
             'cycle_id' => $activeCycle->id,
             'student_id' => $this->selectedStudentId,
             'assigned_by_id' => auth()->id(),
@@ -105,6 +105,19 @@ new class extends Component {
             'scheduled_date' => $this->scheduledDate,
             'status' => 'PENDING',
         ]);
+
+        // Notify parents via FCM
+        $student = Student::find($this->selectedStudentId);
+        foreach ($student->parents as $parent) {
+            $parent->sendFcmNotification(
+                'Nuevo Servicio Comunitario Asignado',
+                "Se ha asignado una actividad de servicio comunitario para {$student->name}: {$this->activity}.",
+                [],
+                null,
+                null,
+                route('community-services.index')
+            );
+        }
 
         $this->showServiceModal = false;
         $this->resetForm();

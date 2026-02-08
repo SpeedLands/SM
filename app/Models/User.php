@@ -53,6 +53,7 @@ class User extends Authenticatable
         'last_login_at',
         'phone',
         'occupation',
+        'fcm_token',
     ];
 
     /**
@@ -291,5 +292,25 @@ class User extends Authenticatable
                $this->getUnsignedReportsCount($studentId) +
                $this->getUnsignedCommunityServicesCount($studentId) +
                $this->getUnsignedCitationsCount($studentId);
+    }
+
+    /**
+     * Send a FCM notification to this user.
+     */
+    public function sendFcmNotification(string $title, string $body, array $data = [], ?string $icon = null, ?string $image = null, ?string $url = null): bool
+    {
+        if (! $this->fcm_token) {
+            return false;
+        }
+
+        return app(\App\Services\FcmService::class)->sendNotification(
+            $this->fcm_token,
+            $title,
+            $body,
+            $data,
+            $icon,
+            $image,
+            $url
+        );
     }
 }

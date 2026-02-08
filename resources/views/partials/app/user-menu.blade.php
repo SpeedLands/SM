@@ -21,7 +21,13 @@
     <flux:menu.separator />
 
     <flux:menu.radio.group>
-        <flux:menu.item :href="auth()->user()->isAdmin() ? route('profile.edit') : route('appearance.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+        @php
+            $isParentView = auth()->user()->isViewParent();
+            $settingsLabel = $isParentView ? __('Appearance') : __('Settings');
+            $settingsRoute = $isParentView ? route('appearance.edit') : (auth()->user()->isAdmin() ? route('profile.edit') : route('appearance.edit'));
+            $settingsIcon = $isParentView ? 'paint-brush' : 'cog';
+        @endphp
+        <flux:menu.item :href="$settingsRoute" :icon="$settingsIcon" wire:navigate>{{ $settingsLabel }}</flux:menu.item>
     </flux:menu.radio.group>
 
     <flux:menu.separator />

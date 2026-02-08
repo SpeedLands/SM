@@ -3,6 +3,7 @@
 use App\Models\ExamSchedule;
 use App\Models\ClassGroup;
 use App\Models\Cycle;
+use App\Models\Student;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
@@ -77,7 +78,7 @@ new class extends Component {
             return;
         }
 
-        ExamSchedule::create([
+        $exam = ExamSchedule::create([
             'cycle_id' => $activeCycle->id,
             'grade' => $this->grade,
             'group_name' => $this->groupName,
@@ -86,6 +87,30 @@ new class extends Component {
             'exam_date' => $this->examDate,
             'day_of_week' => $this->daysOfWeek[$dayNum],
         ]);
+
+        // Notify parents of this grade and group
+        $activeCycle = Cycle::where('is_active', true)->first();
+        $students = Student::where('grade', $this->grade)
+            ->whereHas('currentCycleAssociation', function($q) use ($activeCycle) {
+                $q->where('cycle_id', $activeCycle->id)
+                  ->whereHas('group', function($sq) {
+                      $sq->where('section', $this->groupName);
+                  });
+            })
+            ->with('parents')
+            ->get();
+        
+        $parents = $students->flatMap(fn($s) => $s->parents)->unique('id');
+        foreach ($parents as $parent) {
+            $parent->sendFcmNotification(
+                'Nuevo Examen Programado',
+                "Se ha programado un examen de {$this->subject} para el {$exam->exam_date->format('d/m/Y')}.",
+                [],
+                null,
+                null,
+                route('exams.index')
+            );
+        }
 
         $this->showCreateModal = false;
         $this->reset(['subject']);
@@ -106,7 +131,6 @@ new class extends Component {
         
         $query = ExamSchedule::query()
             ->when(auth()->user()->isParent(), function ($q) {
-                $studentIds = auth()->user()->students->pluck('id');
                 $students = auth()->user()->students;
                 $grades = $students->pluck('grade')->unique();
                 $groups = $students->pluck('group_name')->unique();
@@ -159,7 +183,7 @@ new class extends Component {
             <option value="2">2º Trimestre</option>
             <option value="3">3º Trimestre</option>
         </flux:select>
-
+ 
         <flux:select wire:model.live="gradeFilter" placeholder="Grado (Todos)">
             <option value="">Todos los grados</option>
             @foreach($availableGroups->pluck('grade')->unique() as $grade)

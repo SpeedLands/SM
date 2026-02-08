@@ -6,6 +6,7 @@ use App\Models\Student;
 use App\Models\Cycle;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Str;
 
 new class extends Component {
     use WithPagination;
@@ -91,7 +92,7 @@ new class extends Component {
                 return;
             }
 
-            Notice::create([
+            $notice = Notice::create([
                 'cycle_id' => $activeCycle->id,
                 'author_id' => auth()->id(),
                 'title' => $this->title,
@@ -105,6 +106,22 @@ new class extends Component {
                 'event_time' => $this->eventTime ?: null,
                 'date' => now(),
             ]);
+
+            // Notify parents via FCM
+            $students = $notice->getExpectedRecipientsQuery()->with('parents')->get();
+            $parents = $students->flatMap(fn($s) => $s->parents)->unique('id');
+            
+            foreach ($parents as $parent) {
+                $parent->sendFcmNotification(
+                    'Nuevo Aviso Escolar: ' . $this->title,
+                    Str::limit($this->content, 100),
+                    [],
+                    null,
+                    null,
+                    route('notices.index')
+                );
+            }
+
             $message = 'Aviso publicado exitosamente.';
         }
 
@@ -432,7 +449,6 @@ new class extends Component {
         <!-- Create Modal -->
         <flux:modal wire:model.self="showCreateModal" class="md:w-160">
             <form wire:submit="saveNotice" class="space-y-6">
-                <!-- ... existing form content ... -->
                 <header>
                     <flux:heading size="md">{{ $editingNoticeId ? 'Editar Aviso Escolar' : 'Nuevo Aviso Escolar' }}</flux:heading>
                     <flux:text>{{ $editingNoticeId ? 'Modifique los detalles del comunicado.' : 'Cree un comunicado para la comunidad escolar.' }}</flux:text>

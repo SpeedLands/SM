@@ -69,45 +69,41 @@ new class extends Component {
 
         $dates = [];
 
-        // Community Services
-        $services = CommunityService::where('cycle_id', $activeCycle->id)
-            ->whereBetween('scheduled_date', [$startOfMonth, $endOfMonth])
-            ->get();
-        foreach ($services as $s) {
-            $dates[$s->scheduled_date->format('Y-m-d')] = true;
-        }
+        // All activities - optimized queries using pluck for performance
+        $models = [
+            CommunityService::class => 'scheduled_date',
+            Citation::class => 'citation_date',
+            Notice::class => 'event_date',
+            ExamSchedule::class => 'exam_date',
+            Report::class => 'date',
+        ];
 
-        // Citations
-        $citations = Citation::where('cycle_id', $activeCycle->id)
-            ->whereBetween('citation_date', [$startOfMonth, $endOfMonth])
-            ->get();
-        foreach ($citations as $c) {
-            $dates[$c->citation_date->format('Y-m-d')] = true;
-        }
+        foreach ($models as $model => $column) {
+            $query = $model::where('cycle_id', $activeCycle->id)
+                ->whereBetween($column, [$startOfMonth, $endOfMonth]);
+            
+            if ($model === Notice::class) {
+                $query->whereNotNull('event_date');
+            }
 
-        // Notices with event_date
-        $notices = Notice::where('cycle_id', $activeCycle->id)
-            ->whereNotNull('event_date')
-            ->whereBetween('event_date', [$startOfMonth, $endOfMonth])
-            ->get();
-        foreach ($notices as $n) {
-            $dates[$n->event_date->format('Y-m-d')] = true;
-        }
-
-        // Exams
-        $exams = ExamSchedule::where('cycle_id', $activeCycle->id)
-            ->whereBetween('exam_date', [$startOfMonth, $endOfMonth])
-            ->get();
-        foreach ($exams as $e) {
-            $dates[$e->exam_date->format('Y-m-d')] = true;
-        }
-
-        // Reports
-        $reports = Report::where('cycle_id', $activeCycle->id)
-            ->whereBetween('date', [$startOfMonth, $endOfMonth])
-            ->get();
-        foreach ($reports as $r) {
-            $dates[$r->date->format('Y-m-d')] = true;
+            // Fetch only the date column for efficiency
+            $items = $query->pluck($column);
+            
+            foreach ($items as $dateValue) {
+                if ($dateValue) {
+                    try {
+                        // Handle both objects and strings safely
+                        $dt = $dateValue instanceof \DateTimeInterface 
+                            ? Carbon::instance($dateValue) 
+                            : Carbon::parse($dateValue);
+                            
+                        $dates[$dt->format('Y-m-d')] = true;
+                    } catch (\Exception $e) {
+                        // Skip unparseable dates
+                        continue;
+                    }
+                }
+            }
         }
 
         $this->datesWithEvents = $dates;
@@ -260,23 +256,25 @@ new class extends Component {
                 @else
                     @php
                         $dateStr = sprintf('%04d-%02d-%02d', $currentYear, $currentMonth, $day);
-                        $isToday = $dateStr === now()->format('Y-m-d');
+                        $isToday = $dateStr === now()->tz(config('app.timezone', 'UTC'))->format('Y-m-d');
                         $hasEvents = isset($datesWithEvents[$dateStr]);
                     @endphp
                     <button
                         wire:click="selectDate('{{ $dateStr }}')"
-                        class="calendar-day-cell relative flex flex-col items-center justify-center rounded-lg border transition-all
+                        class="calendar-day-cell relative flex flex-col items-center justify-center rounded-xl border transition-all pt-2 min-h-12 md:min-h-16
                             {{ $isToday 
-                                ? 'bg-blue-600 text-white border-blue-600 font-bold shadow-sm' 
+                                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 dark:border-blue-400 ring-2 ring-blue-500/20 dark:ring-blue-400/20 z-10' 
                                 : 'border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-800/20 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600' 
                             }}"
                     >
-                        <span class="text-sm md:text-base lg:text-lg">{{ $day }}</span>
+                        <span class="text-sm md:text-base lg:text-lg {{ $isToday ? 'font-bold text-blue-600 dark:text-blue-400' : 'text-zinc-700 dark:text-zinc-200' }}">
+                            {{ $day }}
+                        </span>
                         
                         @if($hasEvents)
-                            <span class="absolute bottom-1 md:bottom-2 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full badge-pulse
-                                {{ $isToday ? 'bg-white' : 'bg-blue-500' }}">
-                            </span>
+                            <div class="absolute bottom-1 left-1/2 -translate-x-1/2">
+                                <span class="block w-1.5 h-1.5 rounded-full {{ $isToday ? 'bg-blue-500' : 'bg-zinc-400' }} animate-pulse shadow-sm"></span>
+                            </div>
                         @endif
                     </button>
                 @endif
@@ -284,14 +282,16 @@ new class extends Component {
         </div>
 
         <!-- Legend -->
-        <div class="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-700 flex flex-wrap items-center justify-center gap-4 text-xs md:text-sm text-zinc-500 dark:text-zinc-400">
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-blue-600"></span>
-                <span>Hoy</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-zinc-900 dark:bg-white badge-pulse"></span>
-                <span>Con actividades</span>
+        <div class="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-700">
+            <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-zinc-500 dark:text-zinc-400">
+                <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/20"></span>
+                    <span class="font-medium text-zinc-900 dark:text-white">Hoy</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full badge-pulse shadow-xs" style="background: linear-gradient(90deg, oklch(0.706 0.012 253.99) 50%, oklch(0.623 0.214 259.42) 50%)"></span>
+                    <span>Con actividades</span>
+                </div>
             </div>
         </div>
     </div>

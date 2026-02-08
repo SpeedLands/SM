@@ -91,7 +91,7 @@ new class extends Component {
                  return;
             }
             
-            Citation::create([
+            $citation = Citation::create([
                 'cycle_id' => $activeCycle->id,
                 'student_id' => $this->selectedStudentId,
                 'teacher_id' => auth()->id(),
@@ -99,6 +99,20 @@ new class extends Component {
                 'citation_date' => \Carbon\Carbon::parse($this->citationDate . ' ' . $this->citationTime),
                 'status' => 'PENDING',
             ]);
+
+            // Notify parents via FCM
+            $student = Student::find($this->selectedStudentId);
+            foreach ($student->parents as $parent) {
+                $parent->sendFcmNotification(
+                    'Nuevo Citatorio Escolar',
+                    "Se ha generado un citatorio para los padres de {$student->name}.",
+                    [],
+                    null,
+                    null,
+                    route('citations.index')
+                );
+            }
+
             $message = 'Citatorio generado correctamente.';
         }
 
@@ -311,7 +325,7 @@ new class extends Component {
                                 Confirmar de Enterado
                             </flux:button>
                         </div>
-@elseif($citation->parent_signature)
+                    @elseif($citation->parent_signature)
                         <div class="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 text-center">
                             <flux:text size="xs" color="green" class="font-bold">✓ USTED HA CONFIRMADO LA RECEPCIÓN DE ESTE CITATORIO</flux:text>
                         </div>

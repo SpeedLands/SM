@@ -120,6 +120,20 @@ new class extends Component {
             'status' => 'PENDING_SIGNATURE',
         ]);
 
+        // Notify parents via FCM
+        $student = Student::find($this->selectedStudentId);
+        $infraction = Infraction::find($this->infractionId);
+        foreach ($student->parents as $parent) {
+            $parent->sendFcmNotification(
+                'Nuevo Reporte Disciplinario',
+                "Se ha registrado un reporte para {$student->name}: {$infraction->description}",
+                [],
+                null,
+                null,
+                route('reports.index')
+            );
+        }
+
         // "Rule of 3" Check
         $this->checkCommunityServiceTrigger($this->selectedStudentId, $activeCycle->id);
 
