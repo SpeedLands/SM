@@ -9,6 +9,8 @@
 .env
 .env.backup
 .env.production
+.env.local
+.env.*.local
 .phpactor.json
 .phpunit.result.cache
 Homestead.json
@@ -20,3 +22,172 @@ yarn-error.log
 /.idea
 /.nova
 /.zed
+
+# ========================================
+# 🔐 CREDENCIALES Y ARCHIVOS SENSIBLES
+# ========================================
+
+# Firebase credentials (cualquier patrón)
+*firebase*.json
+firebase-credentials/
+.firebase/
+
+# Claves y certificados
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+*.der
+
+# Archivos de configuración con credenciales
+config/credentials.php
+config/secrets.php
+
+# ========================================
+# 💾 BASE DE DATOS Y DUMPS
+# ========================================
+
+# Dumps SQL
+*.sql
+*.sql.gz
+*.sql.zip
+*.dump
+*.sqlite
+*.sqlite3
+*.db
+
+# Archivos de base de datos específicos del proyecto
+database/*.sqlite
+database/*.db
+u932973837_laravel.sql
+
+# ========================================
+# 📦 ARCHIVOS TEMPORALES Y COMPILADOS
+# ========================================
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de respaldo
+*.bak
+*.backup
+*.old
+*.orig
+
+# Archivos comprimidos temporales
+temp.zip
+*.tar.gz
+*.rar
+
+# ========================================
+# 📝 LOGS Y DEBUGGING
+# ========================================
+
+# Logs de Laravel
+/storage/logs/*.log
+/storage/logs/**/*.log
+laravel.log
+*.log
+
+# Logs de sistema
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Debug dumps
+*.stackdump
+
+# ========================================
+# 🧪 TESTING Y COVERAGE
+# ========================================
+
+# Coverage reports
+/coverage
+/.phpunit.cache
+/phpunit.xml
+/.phpunit.result.cache
+/tests/_output/*
+/tests/_support/_generated
+
+# ========================================
+# 🛠️ HERRAMIENTAS DE DESARROLLO
+# ========================================
+
+# IDEs
+/.vscode/*
+!/.vscode/extensions.json
+!/.vscode/settings.json
+/.idea
+/.fleet
+/.nova
+/.zed
+*.sublime-project
+*.sublime-workspace
+
+# Composer
+/vendor/
+composer.phar
+composer.lock
+
+# Node
+/node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ========================================
+# 📊 DATOS EXTRAÍDOS Y PROCESADOS
+# ========================================
+
+# Archivos JSON de datos
+extracted_data.json
+/data/*.json
+/exports/*.json
+
+# ========================================
+# 🖼️ ASSETS GENERADOS
+# ========================================
+
+# Mix / Vite
+/public/hot
+/public/storage
+/public/build
+/public/mix-manifest.json
+
+# ========================================
+# 🔧 CONFIGURACIÓN LOCAL
+# ========================================
+
+# Configuración de desarrollo local
+.phpactor.json
+.php_cs.cache
+.php-cs-fixer.cache
+.phpstorm.meta.php
+_ide_helper.php
+_ide_helper_models.php
+
+# ========================================
+# 🚀 DEPLOYMENT
+# ========================================
+
+# Deployment scripts con credenciales
+deploy.sh
+deploy.php
+.deployer/
+
+# ========================================
+# 📱 MOBILE & PWA
+# ========================================
+
+# Service worker cache (si es generado)
+# /public/sw.js  # Comentado porque es parte del código fuente
