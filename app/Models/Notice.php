@@ -12,6 +12,7 @@ class Notice extends Model
     use HasFactory, HasUuids;
 
     public $timestamps = false;
+    public ?array $cached_stats = null;
     // Composite PKs are tricky in standard Eloquent save(), but manageable.
     // We define generic ID for now, but be aware.
     // Or we rely on ID being unique enough? Yes, ID is UUID.

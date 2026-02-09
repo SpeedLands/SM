@@ -34,4 +34,16 @@ class ClassGroup extends Model
     {
         return $this->hasMany(StudentCycleAssociation::class, 'class_group_id');
     }
+
+    public function students()
+    {
+        return $this->hasManyThrough(
+            Student::class,
+            StudentCycleAssociation::class,
+            'class_group_id', // Foreign key on student_cycle_association table...
+            'id',             // Foreign key on students table...
+            'id',             // Local key on class_groups table...
+            'student_id'      // Local key on student_cycle_association table...
+        );
+    }
 }

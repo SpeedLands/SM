@@ -72,6 +72,7 @@ new class extends Component {
 
         $this->showModal = false;
         $this->resetForm();
+        cache()->forget('infractions_all');
         $this->dispatch('notify', ['message' => $message]);
     }
 
@@ -84,6 +85,7 @@ new class extends Component {
         
         try {
             $infraction->delete();
+            cache()->forget('infractions_all');
             $this->dispatch('notify', ['message' => 'Tipo de reporte eliminado.']);
         } catch (\Exception $e) {
             $this->dispatch('notify', ['message' => 'No se pudo eliminar el registro.', 'variant' => 'danger']);

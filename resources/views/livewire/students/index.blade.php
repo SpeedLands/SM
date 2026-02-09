@@ -16,6 +16,7 @@ new class extends Component {
     public string $search = '';
     public string $gradeFilter = 'Todos';
     public string $groupFilter = 'Todos';
+    public bool $onlyActiveCycle = true;
 
     // Student Modal State
     public bool $showStudentModal = false;
@@ -53,6 +54,11 @@ new class extends Component {
     }
 
     public function updatingGroupFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingOnlyActiveCycle(): void
     {
         $this->resetPage();
     }
@@ -219,9 +225,14 @@ new class extends Component {
         $classGroups = $activeCycle ? ClassGroup::where('cycle_id', $activeCycle->id)->get() : collect();
         
         $query = Student::query()
+            ->select('students.*')
             ->when(auth()->user()->isViewParent(), function ($q) {
-                $q->whereHas('parents', function ($pq) {
-                    $pq->where('users.id', auth()->id());
+                $q->join('student_parents', 'students.id', '=', 'student_parents.student_id')
+                  ->where('student_parents.parent_id', auth()->id());
+            })
+            ->when($this->onlyActiveCycle && $activeCycle, function ($q) use ($activeCycle) {
+                $q->whereHas('currentCycleAssociation', function ($sq) use ($activeCycle) {
+                    $sq->where('cycle_id', $activeCycle->id);
                 });
             });
 
@@ -289,6 +300,10 @@ new class extends Component {
 
     <!-- Search and Filters -->
     <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <flux:heading size="lg" level="2">Filtros</flux:heading>
+            <flux:switch wire:model.live="onlyActiveCycle" label="Solo mostrar inscritos en ciclo actual" />
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <flux:field>
                 <flux:label>Buscar Alumno</flux:label>

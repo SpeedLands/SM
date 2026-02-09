@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Requests\StoreReportRequest;
 use App\Models\Report;
 use App\Models\Student;
 use App\Models\Infraction;
@@ -87,18 +88,8 @@ new class extends Component {
     public function save(): void
     {
         $this->authorize('teacher-or-admin');
-        $this->validate([
-            'selectedStudentId' => 'required|exists:students,id',
-            'infractionId' => 'required|exists:infractions,id',
-            'reportDate' => 'required|date',
-            'reportTime' => 'required',
-            'subject' => 'nullable|string|max:100',
-            'description' => 'required|string',
-        ], [
-            'selectedStudentId.required' => 'Debe seleccionar un alumno.',
-            'infractionId.required' => 'Debe seleccionar una infracción.',
-            'description.required' => 'La descripción es obligatoria.',
-        ]);
+        $request = new StoreReportRequest();
+        $this->validate($request->rules(), $request->messages(), $request->attributes());
 
         $activeCycle = Cycle::where('is_active', true)->first();
         
@@ -120,16 +111,17 @@ new class extends Component {
             'status' => 'PENDING_SIGNATURE',
         ]);
 
-        // Notify parents via FCM
-        $student = Student::find($this->selectedStudentId);
+        // Notify parents via FCM asíncronamente (Hallazgo #3 y #6)
+        $student = Student::with('parents')->find($this->selectedStudentId);
         $infraction = Infraction::find($this->infractionId);
-        foreach ($student->parents as $parent) {
-            $parent->sendFcmNotification(
+        $parentIds = $student->parents->pluck('id')->toArray();
+        
+        if (!empty($parentIds)) {
+            \App\Jobs\SendBulkFcmNotifications::dispatch(
+                $parentIds,
                 'Nuevo Reporte Disciplinario',
                 "Se ha registrado un reporte para {$student->name}: {$infraction->description}",
                 [],
-                null,
-                null,
                 route('reports.index')
             );
         }
@@ -195,25 +187,36 @@ new class extends Component {
         $this->dispatch('notify', ['message' => 'Reporte firmado correctamente.']);
     }
 
+    public function updatingStudentSearch(): void
+    {
+        $this->resetPage();
+    }
+
     public function with(): array
     {
         $activeCycle = Cycle::where('is_active', true)->first();
 
         $reports = Report::with(['student', 'teacher', 'infraction', 'parent'])
+            ->select('reports.*')
+            ->join('students', 'reports.student_id', '=', 'students.id')
             ->when(auth()->user()->isViewParent(), function ($q) {
-                $q->whereHas('student.parents', function ($pq) {
-                    $pq->where('users.id', auth()->id());
+                $q->join('student_parents', 'reports.student_id', '=', 'student_parents.student_id')
+                  ->where('student_parents.parent_id', auth()->id());
+            })
+            ->when($activeCycle, fn($q) => $q->where('reports.cycle_id', $activeCycle->id))
+            ->when($this->status, fn($q) => $q->where('reports.status', $this->status))
+            ->when($this->severity, function($q) {
+                $q->join('infractions', 'reports.infraction_id', '=', 'infractions.id')
+                  ->where('infractions.severity', $this->severity);
+            })
+            ->when($this->onlyPending, fn($q) => $q->where('reports.status', 'PENDING_SIGNATURE'))
+            ->when($this->search, function($q) {
+                $q->where(function($sq) {
+                    $sq->where('students.name', 'like', "%{$this->search}%")
+                      ->orWhere('reports.subject', 'like', "%{$this->search}%");
                 });
             })
-            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
-            ->when($this->status, fn($q) => $q->where('status', $this->status))
-            ->when($this->severity, fn($q) => $q->whereHas('infraction', fn($iq) => $iq->where('severity', $this->severity)))
-            ->when($this->onlyPending, fn($q) => $q->where('status', 'PENDING_SIGNATURE'))
-            ->when($this->search, function($q) {
-                $q->whereHas('student', fn($sq) => $sq->where('name', 'like', "%{$this->search}%"))
-                  ->orWhere('subject', 'like', "%{$this->search}%");
-            })
-            ->orderBy('date', 'desc')
+            ->orderBy('reports.date', 'desc')
             ->paginate(10);
 
         $studentResults = [];
@@ -223,9 +226,12 @@ new class extends Component {
                 ->get();
         }
 
+        // Cache infractions for 1 hour to avoid repeated DB calls on every render
+        $infractions = cache()->remember('infractions_all', 3600, fn() => Infraction::orderBy('description')->get());
+
         return [
             'reports' => $reports,
-            'infractions' => Infraction::all(),
+            'infractions' => $infractions,
             'studentResults' => $studentResults,
             'activeCycle' => $activeCycle,
         ];

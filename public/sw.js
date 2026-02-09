@@ -33,15 +33,32 @@ self.addEventListener('notificationclick', (event) => {
     console.log('[sw.js] Notification click Received.', event);
     event.notification.close();
 
-    const targetUrl = event.notification.data.url || '/';
+    // Prioritize URL from data payload, fallback to root
+    const targetUrl = new URL(event.notification.data.url || '/', self.location.origin).href;
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+            // Check if there is already a window open with the target URL
             for (const client of clientList) {
-                if (client.url === targetUrl && 'focus' in client) {
+                // Check if the URL matches (ignoring trailing slash for better matching)
+                const clientUrl = client.url.replace(/\/$/, "");
+                const targetUrlClean = targetUrl.replace(/\/$/, "");
+
+                if (clientUrl === targetUrlClean && 'focus' in client) {
                     return client.focus();
                 }
             }
+
+            // If no exact match, but there's any window open, navigate it
+            if (clientList.length > 0) {
+                const client = clientList[0];
+                if ('navigate' in client) {
+                    client.navigate(targetUrl);
+                    return client.focus();
+                }
+            }
+
+            // Otherwise, open a new window
             if (clients.openWindow) {
                 return clients.openWindow(targetUrl);
             }

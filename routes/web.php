@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('users', 'users.index')->name('users.index');
     Volt::route('reglamento', 'regulations.index')->name('regulations.index');
     Volt::route('alumnos', 'students.index')->name('students.index');
+    Volt::route('alumnos/promover', 'students.promote-students')->name('students.promote');
     Volt::route('reportes', 'reports.index')->name('reports.index');
     Volt::route('servicio-comunitario', 'community-services.index')->name('community-services.index');
     Volt::route('avisos', 'notices.index')->name('notices.index');

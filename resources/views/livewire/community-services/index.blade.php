@@ -4,6 +4,7 @@ use App\Models\CommunityService;
 use App\Models\Student;
 use App\Models\Cycle;
 use App\Models\Report;
+use App\Http\Requests\StoreCommunityServiceRequest;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
@@ -70,24 +71,8 @@ new class extends Component {
     public function save(): void
     {
         $this->authorize('teacher-or-admin');
-        $this->validate([
-            'selectedStudentId' => 'required|exists:students,id',
-            'activity' => 'required|string|max:255',
-            'scheduledDate' => [
-                'required',
-                'date',
-                'after_or_equal:today',
-                function ($attribute, $value, $fail) {
-                    if (Carbon::parse($value)->isSunday()) {
-                        $fail('No se permite programar servicio comunitario los domingos.');
-                    }
-                },
-            ],
-        ], [
-            'selectedStudentId.required' => 'Debe seleccionar un alumno.',
-            'activity.required' => 'La actividad es obligatoria.',
-            'scheduledDate.after_or_equal' => 'La fecha debe ser hoy o posterior.',
-        ]);
+        $request = new StoreCommunityServiceRequest();
+        $this->validate($request->rules(), $request->messages(), $request->attributes());
 
         $activeCycle = Cycle::where('is_active', true)->first();
         
@@ -106,15 +91,16 @@ new class extends Component {
             'status' => 'PENDING',
         ]);
 
-        // Notify parents via FCM
-        $student = Student::find($this->selectedStudentId);
-        foreach ($student->parents as $parent) {
-            $parent->sendFcmNotification(
+        // Notify parents via FCM asíncronamente (Hallazgo #3 y #6)
+        $student = Student::with('parents')->find($this->selectedStudentId);
+        $parentIds = $student->parents->pluck('id')->toArray();
+        
+        if (!empty($parentIds)) {
+            \App\Jobs\SendBulkFcmNotifications::dispatch(
+                $parentIds,
                 'Nuevo Servicio Comunitario Asignado',
                 "Se ha asignado una actividad de servicio comunitario para {$student->name}: {$this->activity}.",
                 [],
-                null,
-                null,
                 route('community-services.index')
             );
         }
@@ -167,35 +153,40 @@ new class extends Component {
         $activeCycle = Cycle::where('is_active', true)->first();
 
         $services = CommunityService::with(['student', 'assignedBy'])
+            ->select('community_services.*')
+            ->join('students', 'community_services.student_id', '=', 'students.id')
             ->when(auth()->user()->isViewParent(), function ($q) {
-                $q->whereHas('student.parents', function ($pq) {
-                    $pq->where('users.id', auth()->id());
+                $q->join('student_parents', 'students.id', '=', 'student_parents.student_id')
+                  ->where('student_parents.parent_id', auth()->id());
+            })
+            ->when($activeCycle, fn($q) => $q->where('community_services.cycle_id', $activeCycle->id))
+            ->when($this->statusFilter, fn($q) => $q->where('community_services.status', $this->statusFilter))
+            ->when($this->search, function($q) {
+                $q->where(function($sq) {
+                    $sq->where('students.name', 'like', "%{$this->search}%")
+                      ->orWhere('community_services.activity', 'like', "%{$this->search}%");
                 });
             })
-            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
-            ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
-            ->when($this->search, function($q) {
-                $q->whereHas('student', fn($sq) => $sq->where('name', 'like', "%{$this->search}%"))
-                  ->orWhere('activity', 'like', "%{$this->search}%");
-            })
-            ->orderBy('scheduled_date', 'asc')
+            ->orderBy('community_services.scheduled_date', 'asc')
             ->paginate(10);
 
         // Suggestions logic
         $suggestedStudents = [];
         if ($activeCycle && auth()->user()->isViewStaff()) {
-            $suggestedStudents = Student::whereHas('reports', function($q) use ($activeCycle) {
-                $q->where('cycle_id', $activeCycle->id);
-            })
-            ->get()
-            ->filter(function($student) use ($activeCycle) {
-                $reportsCount = Report::where('student_id', $student->id)->where('cycle_id', $activeCycle->id)->count();
-                if ($reportsCount < 3) return false;
-                
-                // Check if they already have enough services assigned
-                $servicesCount = CommunityService::where('student_id', $student->id)->where('cycle_id', $activeCycle->id)->count();
-                return $servicesCount < floor($reportsCount / 3);
-            });
+            $suggestedStudents = Student::whereHas('reports', function ($query) use ($activeCycle) {
+                    $query->where('cycle_id', $activeCycle->id);
+                })
+                ->withCount(['reports' => function ($query) use ($activeCycle) {
+                    $query->where('cycle_id', $activeCycle->id);
+                }])
+                ->having('reports_count', '>=', 3)
+                ->get()
+                ->filter(function ($student) use ($activeCycle) {
+                    $servicesCount = CommunityService::where('student_id', $student->id)
+                        ->where('cycle_id', $activeCycle->id)
+                        ->count();
+                    return $servicesCount < floor($student->reports_count / 3);
+                });
         }
 
         $studentResults = [];

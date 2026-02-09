@@ -3,6 +3,7 @@
 use App\Models\Citation;
 use App\Models\Student;
 use App\Models\Cycle;
+use App\Http\Requests\StoreCitationRequest;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
@@ -66,15 +67,8 @@ new class extends Component {
     public function saveCitation(): void
     {
         $this->authorize('teacher-or-admin');
-        $this->validate([
-            'selectedStudentId' => 'required|exists:students,id',
-            'reason' => 'required|string',
-            'citationDate' => 'required|date|after_or_equal:today',
-            'citationTime' => 'required',
-        ], [
-            'selectedStudentId.required' => 'Debe seleccionar un alumno.',
-            'reason.required' => 'El motivo es obligatorio.',
-        ]);
+        $request = new StoreCitationRequest();
+        $this->validate($request->rules(), $request->messages(), $request->attributes());
 
         if ($this->editingCitationId) {
             $citation = Citation::findOrFail($this->editingCitationId);
@@ -100,15 +94,16 @@ new class extends Component {
                 'status' => 'PENDING',
             ]);
 
-            // Notify parents via FCM
-            $student = Student::find($this->selectedStudentId);
-            foreach ($student->parents as $parent) {
-                $parent->sendFcmNotification(
+            // Notify parents via FCM asíncronamente (Hallazgo #3 y #6)
+            $student = Student::with('parents')->find($this->selectedStudentId);
+            $parentIds = $student->parents->pluck('id')->toArray();
+            
+            if (!empty($parentIds)) {
+                \App\Jobs\SendBulkFcmNotifications::dispatch(
+                    $parentIds,
                     'Nuevo Citatorio Escolar',
                     "Se ha generado un citatorio para los padres de {$student->name}.",
                     [],
-                    null,
-                    null,
                     route('citations.index')
                 );
             }
@@ -170,10 +165,14 @@ new class extends Component {
             ->orderBy('citation_date', 'asc');
 
         if ($isStaff) {
-            $citations = $query->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
+            $citations = $query->select('citations.*')
+                ->when($this->statusFilter, fn($q) => $q->where('citations.status', $this->statusFilter))
                 ->when($this->search, function($q) {
-                    $q->whereHas('student', fn($sq) => $sq->where('name', 'like', "%{$this->search}%"))
-                      ->orWhere('reason', 'like', "%{$this->search}%");
+                    $q->join('students', 'citations.student_id', '=', 'students.id')
+                      ->where(function($sq) {
+                        $sq->where('students.name', 'like', "%{$this->search}%")
+                          ->orWhere('citations.reason', 'like', "%{$this->search}%");
+                      });
                 })
                 ->paginate(10);
         } else {

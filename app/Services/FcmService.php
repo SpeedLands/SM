@@ -56,7 +56,6 @@ class FcmService
             $message['webpush']['notification']['image'] = $image;
         }
 
-        // FCM v1 requires 'data' to be a map of strings.
         if (! empty($data) || $url) {
             $message['data'] = array_map('strval', array_merge($data, ['url' => $url ?? '/']));
         }
@@ -64,10 +63,22 @@ class FcmService
         $response = Http::withToken($accessToken)->post($fcmUrl, ['message' => $message]);
 
         if ($response->failed()) {
-            Log::error('FCM Send Error: '.$response->body(), [
+            $error = $response->json('error');
+            $errorCode = $error['status'] ?? null;
+            $errorMessage = $error['message'] ?? $response->body();
+
+            Log::error('FCM Send Error: '.$errorMessage, [
                 'token' => $deviceToken,
-                'payload' => $message,
+                'status' => $errorCode,
             ]);
+
+            // Hallazgo #2: Invalidar token obsoleto
+            // UNREGISTERED: The token is no longer valid.
+            // INVALID_ARGUMENT: The token is malformed.
+            if ($errorCode === 'UNREGISTERED' || $errorCode === 'INVALID_ARGUMENT') {
+                Log::warning('FCM Token Invalidated: Clearing token for user.', ['token' => $deviceToken]);
+                \App\Models\User::where('fcm_token', $deviceToken)->update(['fcm_token' => null]);
+            }
 
             return false;
         }
@@ -79,46 +90,49 @@ class FcmService
 
     /**
      * Generate OAuth2 Access Token for Firebase API v1 using JWT.
+     * Hallazgo #1: Implementar Caché
      */
     protected function getAccessToken(): ?string
     {
-        $now = time();
-        $expiry = $now + 3600;
+        return cache()->remember('fcm_access_token', 3500, function () {
+            $now = time();
+            $expiry = $now + 3600;
 
-        $header = json_encode(['alg' => 'RS256', 'typ' => 'JWT']);
-        $payload = json_encode([
-            'iss' => $this->serviceAccount['client_email'],
-            'scope' => 'https://www.googleapis.com/auth/cloud-platform',
-            'aud' => 'https://oauth2.googleapis.com/token',
-            'exp' => $expiry,
-            'iat' => $now,
-        ]);
+            $header = json_encode(['alg' => 'RS256', 'typ' => 'JWT']);
+            $payload = json_encode([
+                'iss' => $this->serviceAccount['client_email'],
+                'scope' => 'https://www.googleapis.com/auth/cloud-platform',
+                'aud' => 'https://oauth2.googleapis.com/token',
+                'exp' => $expiry,
+                'iat' => $now,
+            ]);
 
-        $base64UrlHeader = $this->base64UrlEncode($header);
-        $base64UrlPayload = $this->base64UrlEncode($payload);
+            $base64UrlHeader = $this->base64UrlEncode($header);
+            $base64UrlPayload = $this->base64UrlEncode($payload);
 
-        $signature = '';
-        $privateKey = $this->serviceAccount['private_key'];
+            $signature = '';
+            $privateKey = $this->serviceAccount['private_key'];
 
-        if (! openssl_sign($base64UrlHeader.'.'.$base64UrlPayload, $signature, $privateKey, OPENSSL_ALGO_SHA256)) {
-            return null;
-        }
+            if (! openssl_sign($base64UrlHeader.'.'.$base64UrlPayload, $signature, $privateKey, OPENSSL_ALGO_SHA256)) {
+                return null;
+            }
 
-        $base64UrlSignature = $this->base64UrlEncode($signature);
-        $jwt = $base64UrlHeader.'.'.$base64UrlPayload.'.'.$base64UrlSignature;
+            $base64UrlSignature = $this->base64UrlEncode($signature);
+            $jwt = $base64UrlHeader.'.'.$base64UrlPayload.'.'.$base64UrlSignature;
 
-        $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
-            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-            'assertion' => $jwt,
-        ]);
+            $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion' => $jwt,
+            ]);
 
-        if ($response->failed()) {
-            Log::error('OAuth2 Token Generation Failed: '.$response->body());
+            if ($response->failed()) {
+                Log::error('OAuth2 Token Generation Failed: '.$response->body());
 
-            return null;
-        }
+                return null;
+            }
 
-        return $response->json('access_token');
+            return $response->json('access_token');
+        });
     }
 
     protected function base64UrlEncode(string $data): string

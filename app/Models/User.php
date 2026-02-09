@@ -177,36 +177,50 @@ class User extends Authenticatable
             return 0;
         }
 
-        $students = $this->students()
-            ->when($studentId, fn ($q) => $q->where('students.id', $studentId))
-            ->with(['currentCycleAssociation'])->get();
-
         $activeCycle = Cycle::where('is_active', true)->first();
-
         if (! $activeCycle) {
             return 0;
         }
 
+        $students = $this->students()
+            ->when($studentId, fn ($q) => $q->where('students.id', $studentId))
+            ->with(['currentCycleAssociation'])
+            ->get();
+
+        if ($students->isEmpty()) {
+            return 0;
+        }
+
+        $studentIds = $students->pluck('id')->toArray();
+        $studentGrades = $students->pluck('grade')->unique()->toArray();
+        $studentGroupIds = $students->pluck('currentCycleAssociation.class_group_id')->filter()->unique()->toArray();
+
         return Notice::where('cycle_id', $activeCycle->id)
             ->whereIn('target_audience', ['PARENTS', 'ALL'])
-            ->get()
-            ->filter(function ($notice) use ($students, $studentId) {
-                // If a specific studentId is requested, we only care about that student
-                $targetStudents = $studentId
-                    ? $students->filter(fn ($s) => (string) $s->id === (string) $studentId)
-                    : $students;
-
-                foreach ($targetStudents as $student) {
-                    if ($notice->isTargeting($student)) {
-                        // Check if signed for this student
-                        $signed = $notice->signatures()->where('student_id', (string) $student->id)->exists();
-                        if (! $signed) {
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
+            ->where(function ($query) use ($studentGrades, $studentGroupIds) {
+                $query->where('target_audience', 'ALL')
+                    ->orWhere(function ($q) use ($studentGrades, $studentGroupIds) {
+                        $q->where('target_audience', 'PARENTS')
+                            ->where(function ($sq) use ($studentGrades, $studentGroupIds) {
+                                $sq->where(function ($ssq) {
+                                    $ssq->whereNull('target_grades')
+                                        ->whereNull('target_class_groups');
+                                })
+                                ->orWhere(function ($ssq) use ($studentGrades) {
+                                    foreach ($studentGrades as $grade) {
+                                        $ssq->orWhereJsonContains('target_grades', $grade);
+                                    }
+                                })
+                                ->orWhere(function ($ssq) use ($studentGroupIds) {
+                                    foreach ($studentGroupIds as $groupId) {
+                                        $ssq->orWhereJsonContains('target_class_groups', $groupId);
+                                    }
+                                });
+                            });
+                    });
+            })
+            ->whereDoesntHave('signatures', function ($q) use ($studentIds) {
+                $q->whereIn('student_id', $studentIds);
             })
             ->count();
     }
