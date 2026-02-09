@@ -6,6 +6,7 @@ use App\Models\Student;
 use App\Models\Cycle;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Str;
 
 new class extends Component {
     use WithPagination;
@@ -91,7 +92,7 @@ new class extends Component {
                 return;
             }
 
-            Notice::create([
+            $notice = Notice::create([
                 'cycle_id' => $activeCycle->id,
                 'author_id' => auth()->id(),
                 'title' => $this->title,
@@ -105,6 +106,21 @@ new class extends Component {
                 'event_time' => $this->eventTime ?: null,
                 'date' => now(),
             ]);
+
+            // Notify parents via FCM asíncronamente (Hallazgo #3)
+            $students = $notice->getExpectedRecipientsQuery()->with('parents')->get();
+            $parentIds = $students->flatMap(fn($s) => $s->parents)->pluck('id')->unique()->toArray();
+            
+            if (!empty($parentIds)) {
+                \App\Jobs\SendBulkFcmNotifications::dispatch(
+                    $parentIds,
+                    'Nuevo Aviso Escolar: ' . $this->title,
+                    Str::limit($this->content, 100),
+                    [],
+                    route('notices.index')
+                );
+            }
+
             $message = 'Aviso publicado exitosamente.';
         }
 
@@ -196,33 +212,52 @@ new class extends Component {
                 ->orderBy('date', 'desc')
                 ->paginate(10);
                 
+            $notices->each(function($notice) {
+                $notice->cached_stats = $notice->getSignatureStats();
+            });
+                
             return [
                 'notices' => $notices,
                 'isStaff' => true,
-                'availableGroups' => $activeCycle ? \App\Models\ClassGroup::where('cycle_id', $activeCycle->id)->get() : collect(),
+                'availableGroups' => $activeCycle ? \App\Models\ClassGroup::where('cycle_id', $activeCycle->id)->withCount('students')->get() : collect(),
             ];
         } else {
             // Parent view (Normal parent or Staff in Parent mode)
             $students = $user->students()->with(['currentCycleAssociation'])->get();
+            $studentIds = $students->pluck('id')->toArray();
+            $studentGrades = $students->pluck('grade')->unique()->toArray();
+            $studentGroupIds = $students->pluck('currentCycleAssociation.class_group_id')->filter()->unique()->toArray();
             
-            $notices = Notice::with(['author', 'signatures' => fn($q) => $q->whereIn('student_id', $students->pluck('id'))])
+            $notices = Notice::with(['author', 'signatures' => fn($q) => $q->whereIn('student_id', $studentIds)])
                 ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
                 ->whereIn('target_audience', ['PARENTS', 'ALL'])
+                ->where(function($query) use ($studentGrades, $studentGroupIds) {
+                    $query->where('target_audience', 'ALL')
+                        ->orWhere(function($q) use ($studentGrades, $studentGroupIds) {
+                            $q->where('target_audience', 'PARENTS')
+                                ->where(function($sq) use ($studentGrades, $studentGroupIds) {
+                                    $sq->where(function($ssq) {
+                                        $ssq->whereNull('target_grades')
+                                            ->whereNull('target_class_groups');
+                                    })
+                                    ->orWhere(function($ssq) use ($studentGrades) {
+                                        foreach ($studentGrades as $grade) {
+                                            $ssq->orWhereJsonContains('target_grades', $grade);
+                                        }
+                                    })
+                                    ->orWhere(function($ssq) use ($studentGroupIds) {
+                                        foreach ($studentGroupIds as $groupId) {
+                                            $ssq->orWhereJsonContains('target_class_groups', $groupId);
+                                        }
+                                    });
+                                });
+                        });
+                })
+                ->when($this->onlyPending, function($q) use ($studentIds) {
+                    $q->whereDoesntHave('signatures', fn($sq) => $sq->whereIn('student_id', $studentIds));
+                })
                 ->orderBy('date', 'desc')
-                ->get()
-                ->filter(function($notice) use ($students) {
-                    foreach ($students as $student) {
-                        if ($notice->isTargeting($student)) {
-                            // If onlyPending is true, only include if not signed for this student
-                            if ($this->onlyPending) {
-                                $isSigned = $notice->signatures->where('student_id', $student->id)->isNotEmpty();
-                                if ($isSigned) continue;
-                            }
-                            return true;
-                        }
-                    }
-                    return false;
-                });
+                ->paginate(10);
 
             return [
                 'notices' => $notices,
@@ -282,7 +317,7 @@ new class extends Component {
                             </div>
                             
                             @php
-                                $stats = $notice->getSignatureStats();
+                                $stats = $notice->cached_stats ?? $notice->getSignatureStats();
                             @endphp
                             
                             <flux:button 
@@ -432,7 +467,6 @@ new class extends Component {
         <!-- Create Modal -->
         <flux:modal wire:model.self="showCreateModal" class="md:w-160">
             <form wire:submit="saveNotice" class="space-y-6">
-                <!-- ... existing form content ... -->
                 <header>
                     <flux:heading size="md">{{ $editingNoticeId ? 'Editar Aviso Escolar' : 'Nuevo Aviso Escolar' }}</flux:heading>
                     <flux:text>{{ $editingNoticeId ? 'Modifique los detalles del comunicado.' : 'Cree un comunicado para la comunidad escolar.' }}</flux:text>

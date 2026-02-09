@@ -54,6 +54,12 @@ new class extends Component {
             {{ $isViewParent ? 'Ficha de Alumnos' : 'Alumnos' }}
         </flux:navlist.item>
 
+        @if($isViewStaff)
+            @can('admin-only')
+                <flux:navlist.item icon="arrow-path-rounded-square" href="{{ route('students.promote') }}" :current="request()->routeIs('students.promote')">Promover Alumnos</flux:navlist.item>
+            @endcan
+        @endif
+
         <flux:navlist.item icon="document-text" href="{{ route('reports.index') }}" :current="request()->routeIs('reports.index')" :badge="$isViewParent && $reportsCount > 0 ? $reportsCount : null" badge:color="red">
             Reportes
         </flux:navlist.item>

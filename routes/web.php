@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('users', 'users.index')->name('users.index');
     Volt::route('reglamento', 'regulations.index')->name('regulations.index');
     Volt::route('alumnos', 'students.index')->name('students.index');
+    Volt::route('alumnos/promover', 'students.promote-students')->name('students.promote');
     Volt::route('reportes', 'reports.index')->name('reports.index');
     Volt::route('servicio-comunitario', 'community-services.index')->name('community-services.index');
     Volt::route('avisos', 'notices.index')->name('notices.index');
@@ -36,6 +37,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $new = $current === 'staff' ? 'parent' : 'staff';
 
         session(['active_view' => $new]);
+
+        // If switching TO parent view, and we are on a restricted route, redirect to dashboard
+        if ($new === 'parent') {
+            $restrictedRoutes = ['users.index', 'cycles.index', 'infractions.index'];
+            $currentRouteName = request()->header('Referer') ? app('router')->getRoutes()->match(app('request')->create(request()->header('Referer')))->getName() : null;
+
+            if (in_array($currentRouteName, $restrictedRoutes)) {
+                return redirect()->route('dashboard')->with('notify', [
+                    'message' => 'Cambiando a vista de Padre',
+                    'variant' => 'success',
+                ]);
+            }
+        }
 
         return back()->with('notify', [
             'message' => 'Cambiando a vista de '.($new === 'parent' ? 'Padre' : 'Personal'),
@@ -66,3 +80,4 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 });
+Route::post('/fcm-token', [\App\Http\Controllers\FcmController::class, 'storeToken'])->name('fcm-token')->middleware('auth');
