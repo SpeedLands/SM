@@ -86,7 +86,8 @@ new class extends Component {
         
         @if($isViewStaff)
             @can('admin-only')
-                <flux:navlist.item href="{{ route('users.index') }}" icon="users">Gestión de Usuarios</flux:navlist.item>
+                <flux:navlist.item href="{{ route('data-importer') }}" icon="document-arrow-up" :current="request()->routeIs('data-importer')">Importar Datos</flux:navlist.item>
+                <flux:navlist.item href="{{ route('users.index') }}" icon="users" :current="request()->routeIs('users.index')">Gestión de Usuarios</flux:navlist.item>
             @endcan
         @endif
 

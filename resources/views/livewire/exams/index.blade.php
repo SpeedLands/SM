@@ -101,13 +101,13 @@ new class extends Component {
             ->get();
         
         $parents = $students->flatMap(fn($s) => $s->parents)->unique('id');
-        foreach ($parents as $parent) {
-            $parent->sendFcmNotification(
+        
+        if ($parents->isNotEmpty()) {
+            \App\Jobs\SendBulkFcmNotifications::dispatch(
+                $parents->pluck('id')->toArray(),
                 'Nuevo Examen Programado',
                 "Se ha programado un examen de {$this->subject} para el {$exam->exam_date->format('d/m/Y')}.",
                 [],
-                null,
-                null,
                 route('exams.index')
             );
         }

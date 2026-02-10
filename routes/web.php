@@ -15,6 +15,7 @@ Volt::route('dashboard', 'dashboard.index')
 Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('cycles', 'cycles.index')->name('cycles.index');
     Volt::route('users', 'users.index')->name('users.index');
+    Route::get('importar-datos', \App\Livewire\DataImporter::class)->name('data-importer');
     Volt::route('reglamento', 'regulations.index')->name('regulations.index');
     Volt::route('alumnos', 'students.index')->name('students.index');
     Volt::route('alumnos/promover', 'students.promote-students')->name('students.promote');

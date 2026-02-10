@@ -26,6 +26,10 @@ new class extends Component {
     public string $tutorId = '';
     public ?ClassGroup $editingGroup = null;
 
+    // Deletion State
+    public ?Cycle $cycleToDelete = null;
+    public ?ClassGroup $groupToDelete = null;
+
     protected $rules = [
         'name' => 'required|string|max:50',
         'start_date' => 'required|date',
@@ -74,19 +78,31 @@ new class extends Component {
         $this->reset(['name', 'start_date', 'end_date', 'is_active']);
     }
 
-    public function delete(Cycle $cycle): void
+    public function confirmDelete(Cycle $cycle): void
     {
-        if ($cycle->is_active) {
+        $this->cycleToDelete = $cycle;
+        $this->dispatch('open-modal', name: 'confirm-delete-cycle');
+    }
+
+    public function delete(): void
+    {
+        if (!$this->cycleToDelete) return;
+
+        if ($this->cycleToDelete->is_active) {
             $this->dispatch('notify', ['message' => 'No se puede eliminar el ciclo activo.', 'variant' => 'danger']);
+            $this->dispatch('close-modal', name: 'confirm-delete-cycle');
             return;
         }
 
-        if ($cycle->groups()->exists() || $cycle->reports()->exists() || $cycle->notices()->exists() || $cycle->citations()->exists()) {
+        if ($this->cycleToDelete->groups()->exists() || $this->cycleToDelete->reports()->exists() || $this->cycleToDelete->notices()->exists() || $this->cycleToDelete->citations()->exists()) {
             $this->dispatch('notify', ['message' => 'No se puede eliminar un ciclo que tiene registros asociados (grupos, reportes, avisos, etc).', 'variant' => 'danger']);
+            $this->dispatch('close-modal', name: 'confirm-delete-cycle');
             return;
         }
 
-        $cycle->delete();
+        $this->cycleToDelete->delete();
+        $this->cycleToDelete = null;
+        $this->dispatch('close-modal', name: 'confirm-delete-cycle');
         $this->dispatch('cycle-saved');
     }
 
@@ -139,18 +155,31 @@ new class extends Component {
         $this->reset(['grade', 'section', 'tutorId']);
     }
 
-    public function deleteGroup(string $id): void
+    public function confirmDeleteGroup(string $id): void
     {
-        $group = ClassGroup::findOrFail($id);
+        $this->groupToDelete = ClassGroup::findOrFail($id);
+        $this->dispatch('open-modal', name: 'confirm-delete-group');
+    }
+
+    public function deleteGroup(): void
+    {
+        if (!$this->groupToDelete) return;
         
         // Check if group has students
-        if ($group->studentCycleAssociations()->exists()) {
+        if ($this->groupToDelete->studentCycleAssociations()->exists()) {
             $this->dispatch('notify', ['message' => 'No se puede eliminar un grupo que tiene alumnos inscritos.', 'variant' => 'danger']);
+            $this->dispatch('close-modal', name: 'confirm-delete-group');
             return;
         }
 
-        $group->delete();
-        $this->groupCycle->load('groups');
+        $cycleId = $this->groupToDelete->cycle_id;
+        $this->groupToDelete->delete();
+        $this->groupToDelete = null;
+        $this->dispatch('close-modal', name: 'confirm-delete-group');
+        
+        if ($this->groupCycle && $this->groupCycle->id === $cycleId) {
+            $this->groupCycle->load('groups');
+        }
     }
 
     public function with(): array
@@ -296,7 +325,7 @@ new class extends Component {
                                         <flux:button variant="ghost" size="sm" icon="users" wire:click="openGroupsModal('{{ $cycle->id }}')" />
                                         <flux:button variant="ghost" size="sm" icon="pencil" wire:click="edit({{ $cycle->id }})" />
                                         @if($cycle->groups_count === 0 && $cycle->reports_count === 0 && $cycle->notices_count === 0 && $cycle->citations_count === 0)
-                                            <flux:button variant="ghost" size="sm" icon="trash" wire:click="delete({{ $cycle->id }})" wire:confirm="¿Está seguro de eliminar este ciclo?" />
+                                            <flux:button variant="ghost" size="sm" icon="trash" wire:click="confirmDelete('{{ $cycle->id }}')" />
                                         @else
                                             <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por registros asociados" disabled />
                                         @endif
@@ -365,7 +394,7 @@ new class extends Component {
                             <div class="flex items-center gap-1">
                                 <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editGroup('{{ $group->id }}')" />
                                 @if($group->student_cycle_associations_count === 0)
-                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteGroup('{{ $group->id }}')" wire:confirm="¿Está seguro de eliminar este grupo?" />
+                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDeleteGroup('{{ $group->id }}')" />
                                 @else
                                     <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar porque tiene alumnos" disabled />
                                 @endif
@@ -382,6 +411,48 @@ new class extends Component {
             <div class="flex gap-2">
                 <flux:spacer />
                 <flux:button wire:click="$set('showGroupsModal', false)">Cerrar</flux:button>
+            </div>
+        </div>
+    </flux:modal>
+
+    <!-- Deletion Confirmation Modal: Cycle -->
+    <flux:modal name="confirm-delete-cycle" class="min-w-80">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Confirmar Eliminación de Ciclo</flux:heading>
+                <flux:subheading>
+                    ¿Estás seguro de eliminar el ciclo escolar: <span class="font-bold text-zinc-900 dark:text-white uppercase">{{ $cycleToDelete?->name }}</span>?
+                    Esta acción no se puede deshacer.
+                </flux:subheading>
+            </div>
+
+            <div class="flex gap-2">
+                <flux:spacer />
+                <flux:modal.close>
+                    <flux:button variant="ghost">Cancelar</flux:button>
+                </flux:modal.close>
+                <flux:button variant="danger" wire:click="delete">Eliminar Ciclo</flux:button>
+            </div>
+        </div>
+    </flux:modal>
+
+    <!-- Deletion Confirmation Modal: Group -->
+    <flux:modal name="confirm-delete-group" class="min-w-80">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Confirmar Eliminación de Grupo</flux:heading>
+                <flux:subheading>
+                    ¿Estás seguro de eliminar el grupo <span class="font-bold text-zinc-900 dark:text-white font-mono">{{ $groupToDelete?->grade }} {{ $groupToDelete?->section }}</span>?
+                    Esta acción solo es posible si el grupo no tiene alumnos registrados.
+                </flux:subheading>
+            </div>
+
+            <div class="flex gap-2">
+                <flux:spacer />
+                <flux:modal.close>
+                    <flux:button variant="ghost">Cancelar</flux:button>
+                </flux:modal.close>
+                <flux:button variant="danger" wire:click="deleteGroup">Eliminar Grupo</flux:button>
             </div>
         </div>
     </flux:modal>
