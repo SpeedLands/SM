@@ -19,6 +19,9 @@ new class extends Component {
     public string $description = '';
     public string $severity = 'NORMAL';
 
+    // Deletion Confirmation
+    public ?Infraction $infractionToDelete = null;
+
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -76,20 +79,32 @@ new class extends Component {
         $this->dispatch('notify', ['message' => $message]);
     }
 
-    public function delete(Infraction $infraction): void
+    public function confirmDelete(Infraction $infraction): void
     {
-        if ($infraction->reports()->exists()) {
+        $this->infractionToDelete = $infraction;
+        $this->dispatch('open-modal', name: 'confirm-delete-infraction');
+    }
+
+    public function delete(): void
+    {
+        if (!$this->infractionToDelete) return;
+
+        if ($this->infractionToDelete->reports()->exists()) {
             $this->dispatch('notify', ['message' => 'No se puede eliminar un tipo de reporte que ya ha sido utilizado.', 'variant' => 'danger']);
+            $this->dispatch('close-modal', name: 'confirm-delete-infraction');
             return;
         }
         
         try {
-            $infraction->delete();
+            $this->infractionToDelete->delete();
             cache()->forget('infractions_all');
             $this->dispatch('notify', ['message' => 'Tipo de reporte eliminado.']);
         } catch (\Exception $e) {
             $this->dispatch('notify', ['message' => 'No se pudo eliminar el registro.', 'variant' => 'danger']);
         }
+
+        $this->infractionToDelete = null;
+        $this->dispatch('close-modal', name: 'confirm-delete-infraction');
     }
 
     public function with(): array
@@ -147,7 +162,7 @@ new class extends Component {
                             <div class="flex justify-end gap-1">
                                 <flux:button variant="ghost" size="sm" icon="pencil" wire:click="openEditModal({{ $infraction->id }})" />
                                 @if($infraction->reports_count === 0)
-                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="delete({{ $infraction->id }})" wire:confirm="¿Está seguro de eliminar este tipo de reporte?" />
+                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete({{ $infraction->id }})" />
                                 @else
                                     <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar porque tiene reportes asociados" disabled />
                                 @endif
@@ -188,5 +203,25 @@ new class extends Component {
                 <flux:button variant="primary" type="submit">Guardar</flux:button>
             </div>
         </form>
+    </flux:modal>
+
+    <!-- Deletion Confirmation Modal -->
+    <flux:modal name="confirm-delete-infraction" class="min-w-80">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Confirmar Eliminación</flux:heading>
+                <flux:subheading>
+                    ¿Estás seguro de eliminar el tipo de reporte: <span class="font-bold text-zinc-900 dark:text-white uppercase">{{ $infractionToDelete?->description }}</span>?
+                </flux:subheading>
+            </div>
+
+            <div class="flex gap-2">
+                <flux:spacer />
+                <flux:modal.close>
+                    <flux:button variant="ghost">Cancelar</flux:button>
+                </flux:modal.close>
+                <flux:button variant="danger" wire:click="delete">Eliminar</flux:button>
+            </div>
+        </div>
     </flux:modal>
 </div>

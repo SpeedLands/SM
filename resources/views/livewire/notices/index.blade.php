@@ -187,14 +187,38 @@ new class extends Component {
     public function signNotice(string $noticeId, string $studentId, bool $isAuthorized = true): void
     {
         $this->authorize('parent-only');
-        
-        NoticeSignature::updateOrCreate(
-            ['notice_id' => $noticeId, 'student_id' => $studentId, 'parent_id' => auth()->id()],
-            ['signed_at' => now(), 'authorized' => $isAuthorized]
-        );
+        // Prevención de firmas duplicadas: comprobar si ya existe una firma para este aviso y alumno
+        $existing = NoticeSignature::where('notice_id', $noticeId)
+            ->where('student_id', $studentId)
+            ->first();
 
-        $this->dispatch('navigation-refresh');
-        $this->dispatch('notify', ['message' => 'Firma registrada correctamente.']);
+        if ($existing && $existing->signed_at) {
+            // Si ya fue firmada por otro padre, mostrar toast informativo y no duplicar
+            $this->dispatch('notify', ['message' => 'Este aviso ya ha sido firmado.', 'variant' => 'info']);
+            $this->dispatch('navigation-refresh');
+            return;
+        }
+
+        try {
+            // Intentar crear o actualizar la firma. Una restricción única en BD evita duplicados en concurrencia.
+            NoticeSignature::updateOrCreate(
+                ['notice_id' => $noticeId, 'student_id' => $studentId, 'parent_id' => auth()->id()],
+                ['signed_at' => now(), 'authorized' => $isAuthorized]
+            );
+
+            $this->dispatch('navigation-refresh');
+            $this->dispatch('notify', ['message' => 'Firma registrada correctamente.']);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Si la excepción es por clave duplicada, informar al usuario que ya fue firmado
+            $sqlState = $e->getCode();
+            if (in_array($sqlState, ['23000', '23505'])) { // MySQL/MariaDB and Postgres unique violation codes
+                $this->dispatch('notify', ['message' => 'Este aviso ya ha sido firmado.', 'variant' => 'info']);
+                $this->dispatch('navigation-refresh');
+                return;
+            }
+
+            throw $e; // Re-lanzar otras excepciones
+        }
     }
 
     public function with(): array

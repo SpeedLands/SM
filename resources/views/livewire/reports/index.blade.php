@@ -275,78 +275,150 @@ new class extends Component {
         @endif
     </div>
 
-    <!-- Reports Table -->
-    <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">
-        <table class="w-full text-left text-sm">
-            <thead>
-                <tr class="border-b border-zinc-200 dark:border-zinc-700">
-                    <th class="py-3 px-2 font-semibold">Fecha</th>
-                    <th class="py-3 px-2 font-semibold">Alumno</th>
-                    <th class="py-3 px-2 font-semibold">Infracción / Asunto</th>
-                    {{-- <th class="py-3 px-2 font-semibold text-center">Gravedad</th> --}}
-                    <th class="py-3 px-2 font-semibold text-center">Estado</th>
-                    <th class="py-3 px-2 text-right font-semibold">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
-                @forelse ($reports as $report)
-                    <tr wire:key="{{ $report->id }}">
-                        <td class="py-4 px-2">
-                            <div class="font-medium">{{ $report->date->format('d/m/Y') }}</div>
-                            <div class="text-xs text-zinc-500">{{ $report->date->format('H:i') }}</div>
-                        </td>
-                        <td class="py-4 px-2">
-                            <div class="font-bold">{{ $report->student->name }}</div>
-                        </td>
-                        <td class="py-4 px-2">
-                            <div class="font-medium text-blue-600 dark:text-blue-400">{{ $report->infraction->description }}</div>
-                            @if($report->subject)
-                                <div class="text-xs font-semibold uppercase mt-1">Asunto: {{ $report->subject }}</div>
-                            @endif
-                            <div class="text-xs text-zinc-500 whitespace-normal line-clamp-1 italic">{{ $report->description }}</div>
-                        </td>
-                        {{-- <td class="py-4 px-2 text-center">
-                            @if($report->infraction->severity === 'GRAVE')
-                                <flux:badge color="red" size="sm" inset="left">Grave</flux:badge>
-                            @else
-                                <flux:badge color="neutral" size="sm" inset="left">Normal</flux:badge>
-                            @endif
-                        </td> --}}
-                        <td class="py-4 px-2 text-center">
-                            @if($report->status === 'SIGNED')
-                                <div class="flex flex-col items-center">
-                                    <flux:badge color="green" size="sm" inset="left" icon="check-badge">Firmado</flux:badge>
-                                    @if($report->signed_at)
-                                        <span class="text-[10px] text-zinc-500 mt-1">{{ $report->signed_at->format('d/m/Y H:i') }}</span>
+    @if(auth()->user()->isViewStaff())
+        <!-- Reports Table (Staff View) -->
+        <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b border-zinc-200 dark:border-zinc-700">
+                        <th class="py-3 px-2 font-semibold">Fecha</th>
+                        <th class="py-3 px-2 font-semibold">Alumno</th>
+                        <th class="py-3 px-2 font-semibold">Infracción / Asunto</th>
+                        <th class="py-3 px-2 font-semibold text-center">Estado</th>
+                        <th class="py-3 px-2 text-right font-semibold">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                    @forelse ($reports as $report)
+                        <tr wire:key="{{ $report->id }}">
+                            <td class="py-4 px-2">
+                                <div class="font-medium">{{ $report->date->format('d/m/Y') }}</div>
+                                <div class="text-xs text-zinc-500">{{ $report->date->format('H:i') }}</div>
+                            </td>
+                            <td class="py-4 px-2">
+                                <div class="font-bold">{{ $report->student->name }}</div>
+                            </td>
+                            <td class="py-4 px-2">
+                                <div class="font-medium text-blue-600 dark:text-blue-400">{{ $report->infraction->description }}</div>
+                                @if($report->subject)
+                                    <div class="text-xs font-semibold uppercase mt-1">Asunto: {{ $report->subject }}</div>
+                                @endif
+                                <div class="text-xs text-zinc-500 whitespace-normal line-clamp-1 italic">{{ $report->description }}</div>
+                            </td>
+                            <td class="py-4 px-2 text-center">
+                                @if($report->status === 'SIGNED')
+                                    <div class="flex flex-col items-center">
+                                        <flux:badge color="green" size="sm" inset="left" icon="check-badge">Firmado</flux:badge>
+                                        @if($report->signed_at)
+                                            <span class="text-[10px] text-zinc-500 mt-1">{{ $report->signed_at->format('d/m/Y H:i') }}</span>
+                                        @endif
+                                    </div>
+                                @else
+                                    <flux:badge color="amber" size="sm" inset="left" icon="clock">Pendiente</flux:badge>
+                                @endif
+                            </td>
+                            <td class="py-4 px-2 text-right">
+                                <div class="flex justify-end gap-1">
+                                    @if(auth()->user()->isAdmin())
+                                        <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteReport('{{ $report->id }}')" />
                                     @endif
                                 </div>
-                            @else
-                                <flux:badge color="amber" size="sm" inset="left" icon="clock">Pendiente</flux:badge>
-                            @endif
-                        </td>
-                        <td class="py-4 px-2 text-right">
-                            <div class="flex justify-end gap-1">
-                                @if(auth()->user()->isViewParent() && $report->status !== 'SIGNED')
-                                    <flux:button variant="primary" size="sm" icon="finger-print" wire:click="signReport('{{ $report->id }}')">Firmar</flux:button>
-                                @endif
-
-                                @if(auth()->user()->isAdmin() && auth()->user()->isViewStaff())
-                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteReport('{{ $report->id }}')" />
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="py-12 text-center text-zinc-500 italic">No se encontraron reportes.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-        <div class="mt-4">
-            {{ $reports->links() }}
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-12 text-center text-zinc-500 italic">No se encontraron reportes.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+            <div class="mt-4">
+                {{ $reports->links() }}
+            </div>
         </div>
-    </div>
+    @else
+        <!-- Parent View: Feed style (Modern Cards) -->
+        <div class="space-y-6 max-w-3xl mx-auto">
+            @forelse ($reports as $report)
+                <div wire:key="rep-{{ $report->id }}" class="p-6 rounded-2xl border {{ $report->status === 'SIGNED' ? 'border-zinc-200 bg-zinc-50/50' : 'border-amber-200 bg-white shadow-lg' }} dark:border-zinc-700 dark:bg-zinc-900 relative transition-all hover:shadow-xl group">
+                    @if($report->status !== 'SIGNED' && $report->infraction->severity === 'GRAVE')
+                        <div class="absolute -top-3 -right-3">
+                            <flux:badge color="red" size="sm" class="animate-pulse shadow-md">Falta Grave</flux:badge>
+                        </div>
+                    @endif
+
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-linear-to-br from-zinc-500 to-zinc-700 flex items-center justify-center text-white font-black text-xl shadow-inner uppercase">
+                                {{ substr($report->student->name, 0, 1) }}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <flux:text size="xs" class="uppercase tracking-widest font-black text-zinc-400">Reporte de:</flux:text>
+                                    <span class="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold">{{ $report->student->name }}</span>
+                                </div>
+                                <flux:heading level="3" size="lg" class="mt-0.5">{{ $report->infraction->description }}</flux:heading>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                             <flux:text size="xs" class="text-zinc-500 block">{{ $report->date->format('d M, Y') }}</flux:text>
+                             <flux:text size="xs" class="text-zinc-400">{{ $report->date->format('H:i') }} hrs</flux:text>
+                        </div>
+                    </div>
+
+                    @if($report->subject)
+                        <div class="mb-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 uppercase">
+                                Asunto: {{ $report->subject }}
+                            </span>
+                        </div>
+                    @endif
+
+                    <div class="prose prose-zinc dark:prose-invert max-w-none text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 italic leading-relaxed">
+                        "{{ $report->description }}"
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800">
+                        @if($report->status !== 'SIGNED')
+                            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div class="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                                    <flux:icon icon="information-circle" variant="micro" />
+                                    <flux:text size="sm" class="font-medium text-inherit">Requiere su firma de enterado</flux:text>
+                                </div>
+                                <flux:button variant="primary" icon="finger-print" class="w-full sm:w-auto px-10 shadow-lg shadow-amber-500/30" wire:click="signReport('{{ $report->id }}')">
+                                    Firmar Reporte
+                                </flux:button>
+                            </div>
+                        @else
+                            <div class="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/10 rounded-xl border border-green-100 dark:border-green-800/30">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white shadow-md">
+                                        <flux:icon icon="check" variant="micro" />
+                                    </div>
+                                    <div>
+                                        <flux:text size="sm" class="font-bold text-green-800 dark:text-green-200 uppercase tracking-tight">Reporte Firmado / Enterado</flux:text>
+                                        <flux:text size="xs" class="text-green-700/60 dark:text-green-400/60 font-medium">Registrado el {{ $report->signed_at->format('d/m/Y H:i') }}</flux:text>
+                                    </div>
+                                </div>
+                                <flux:icon icon="shield-check" class="text-green-200 dark:text-green-800" size="xl" />
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="py-20 text-center">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-300 dark:text-zinc-600 mb-4">
+                        <flux:icon icon="check-circle" size="xl" />
+                    </div>
+                    <flux:heading size="md" class="text-zinc-400">Sin reportes registrados</flux:heading>
+                    <flux:text class="text-zinc-500">No se han encontrado incidencias disciplinarias para sus hijos en este ciclo.</flux:text>
+                </div>
+            @endforelse
+            <div class="mt-4">
+                {{ $reports->links() }}
+            </div>
+        </div>
+    @endif
 
     @can('teacher-or-admin')
         <!-- Create/Edit Modal -->

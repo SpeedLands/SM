@@ -42,6 +42,10 @@ new class extends Component {
     public string $fatherName = '';
     public string $motherWorkplace = '';
     public string $fatherWorkplace = '';
+    
+    // Deletion State
+    public string $idToDelete = '';
+    public string $nameToDelete = '';
 
     public function updatingSearch(): void
     {
@@ -204,18 +208,33 @@ new class extends Component {
         $this->dispatch('student-saved');
     }
 
-    public function deleteStudent(string $id): void
+    public function confirmDelete(string $id, string $name): void
     {
         if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
-        $student = Student::findOrFail($id);
+        $this->idToDelete = $id;
+        $this->nameToDelete = $name;
+        $this->dispatch('open-modal', name: 'confirm-delete-student');
+    }
+
+    public function deleteStudent(): void
+    {
+        if (!auth()->user()->isViewStaff()) abort(403);
+        $this->authorize('teacher-or-admin');
+        if (!$this->idToDelete) return;
+
+        $student = Student::findOrFail($this->idToDelete);
         
         if ($student->reports()->exists() || $student->communityServices()->exists()) {
             $this->dispatch('notify', ['type' => 'error', 'message' => 'No se puede eliminar un alumno que tiene reportes o servicios registrados.']);
+            $this->dispatch('close-modal', name: 'confirm-delete-student');
             return;
         }
 
         $student->delete();
+        $this->idToDelete = '';
+        $this->nameToDelete = '';
+        $this->dispatch('close-modal', name: 'confirm-delete-student');
         $this->dispatch('student-saved'); // Trigger refresh
     }
 
@@ -381,7 +400,7 @@ new class extends Component {
                                     @if(auth()->user()->isViewStaff())
                                         <flux:button x-on:click.stop variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
                                         @if($student->reports_count === 0 && $student->community_services_count === 0)
-                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteStudent('{{ $student->id }}')" wire:confirm="¿Está seguro de eliminar este registro?" />
+                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $student->id }}', '{{ $student->name }}')" />
                                         @else
                                             <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por registros asociados" disabled />
                                         @endif
@@ -570,6 +589,27 @@ new class extends Component {
             </div>
         </flux:modal>
     @endcan
+
+    <!-- Deletion Confirmation Modal -->
+    <flux:modal name="confirm-delete-student" class="min-w-80">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Confirmar Eliminación</flux:heading>
+                <flux:subheading>
+                    ¿Estás seguro de eliminar al alumno <span class="font-bold text-zinc-900 dark:text-white uppercase">{{ $nameToDelete }}</span>?
+                    Esta acción es irreversible.
+                </flux:subheading>
+            </div>
+
+            <div class="flex gap-2">
+                <flux:spacer />
+                <flux:modal.close>
+                    <flux:button variant="ghost">Cancelar</flux:button>
+                </flux:modal.close>
+                <flux:button variant="danger" wire:click="deleteStudent">Eliminar Alumno</flux:button>
+            </div>
+        </div>
+    </flux:modal>
 </div>
 
 <script>
