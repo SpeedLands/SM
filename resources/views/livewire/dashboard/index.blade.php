@@ -29,10 +29,12 @@ new class extends Component {
     protected function getAdminStats(?Cycle $activeCycle): array
     {
         $stats = [
-            'totalStudents' => Student::count(),
+            'totalStudents' => $activeCycle 
+                ? Student::whereHas('cycleAssociations', fn($q) => $q->where('cycle_id', $activeCycle->id))->count() 
+                : 0,
             'totalReports' => $activeCycle ? Report::where('cycle_id', $activeCycle->id)->count() : 0,
             'activeCitations' => $activeCycle ? Citation::where('cycle_id', $activeCycle->id)->where('status', 'PENDING')->count() : 0,
-            'activeNotices' => $activeCycle ? Notice::where('cycle_id', $activeCycle->id)->count() : Notice::count(),
+            'activeNotices' => $activeCycle ? Notice::where('cycle_id', $activeCycle->id)->count() : 0,
         ];
 
         $recentReports = Report::with('student')
@@ -120,7 +122,7 @@ new class extends Component {
                     <flux:icon icon="user-group" variant="solid" />
                 </div>
                 <div>
-                    <div class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total Alumnos</div>
+                    <div class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Alumnos (Ciclo)</div>
                     <div class="text-2xl font-bold">{{ $totalStudents }}</div>
                 </div>
             </div>

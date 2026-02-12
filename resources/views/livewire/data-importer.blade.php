@@ -165,7 +165,7 @@
                     <div class="space-y-6">
                         <div>
                             <flux:heading size="lg">Confirmar Importación</flux:heading>
-                            <flux:subheading>¿Estás seguro de que deseas importar estos datos al sistema? Esta acción no se puede deshacer fácilmente.</flux:subheading>
+                            <flux:subheading class="whitespace-normal wrap-break-word">¿Estás seguro de que deseas importar estos datos al sistema? Esta acción no se puede deshacer fácilmente.</flux:subheading>
                         </div>
 
                         <div class="flex gap-2">
@@ -189,57 +189,164 @@
         <!-- Step 4: Results -->
         @if ($step === 4)
         <div class="space-y-6 text-center bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm">
-                <div class="flex justify-center">
-                    <flux:icon.check-circle class="w-16 h-16 text-green-500" />
+                <div class="space-y-4">
+                    <flux:heading size="xl">¡Importación Completada!</flux:heading>
+                    <flux:subheading>Resultados de la hoja: <span class="font-bold text-zinc-900 dark:text-zinc-100">{{ $stats['details']['sheet_name'] ?? 'N/A' }}</span></flux:subheading>
                 </div>
-                <flux:heading size="xl">¡Importación Completada!</flux:heading>
                 
-                <div class="grid grid-cols-3 gap-4 max-w-lg mx-auto">
-                    <div class="bg-green-50 dark:bg-green-950 p-4 rounded-lg">
-                        <div class="text-2xl font-bold text-green-700 dark:text-green-400">{{ $stats['created'] ?? 0 }}</div>
-                        <div class="text-xs text-green-600 dark:text-green-500 uppercase">Creados</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                    <!-- Students Stats -->
+                    @if(isset($stats['summary']['students']) && $stats['summary']['students']['total'] > 0)
+                        <div class="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                            <div class="text-xs font-bold text-zinc-500 uppercase mb-2">Alumnos</div>
+                            <div class="flex justify-around items-end">
+                                <div>
+                                    <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $stats['summary']['students']['created'] }}</div>
+                                    <div class="text-[10px] text-zinc-500">Nuevos</div>
+                                </div>
+                                <div>
+                                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $stats['summary']['students']['updated'] }}</div>
+                                    <div class="text-[10px] text-zinc-500">Act.</div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Parents Stats -->
+                    <div class="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                        <div class="text-xs font-bold text-zinc-500 uppercase mb-2">Padres</div>
+                        <div class="flex justify-around items-end">
+                            <div>
+                                <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $stats['summary']['parents']['created'] ?? ($stats['created'] ?? 0) }}</div>
+                                <div class="text-[10px] text-zinc-500">Nuevos</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $stats['summary']['parents']['updated'] ?? ($stats['updated'] ?? 0) }}</div>
+                                <div class="text-[10px] text-zinc-500">Act.</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
-                        <div class="text-2xl font-bold text-blue-700 dark:text-blue-400">{{ $stats['updated'] ?? 0 }}</div>
-                        <div class="text-xs text-blue-600 dark:text-blue-500 uppercase">Actualizados</div>
+
+                    <!-- Links Stats -->
+                    <div class="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                        <div class="text-xs font-bold text-zinc-500 uppercase mb-2">Vínculos</div>
+                        <div class="flex justify-around items-end">
+                            <div>
+                                <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $stats['summary']['links']['successful'] ?? 0 }}</div>
+                                <div class="text-[10px] text-zinc-500">Éxito</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-red-600 dark:text-red-400">{{ $stats['summary']['links']['failed'] ?? 0 }}</div>
+                                <div class="text-[10px] text-zinc-500">Error</div>
+                            </div>
+                        </div>
                     </div>
-                    @if(($stats['errors'] ?? 0) > 0)
-                    <div class="bg-red-50 dark:bg-red-950 p-4 rounded-lg">
-                        <div class="text-2xl font-bold text-red-700 dark:text-red-400">{{ $stats['errors'] ?? 0 }}</div>
-                        <div class="text-xs text-red-600 dark:text-red-500 uppercase">Errores</div>
-                    </div>
+                </div>
+
+                <!-- Notifications Accordion -->
+                <div class="mt-8 text-left space-y-4 max-w-3xl mx-auto">
+                    @php
+                        $hasNotifications = !empty($stats['notifications']['success']) || 
+                                           !empty($stats['notifications']['warnings']) || 
+                                           !empty($stats['notifications']['errors']);
+                    @endphp
+
+                    @if($hasNotifications)
+                        <div class="space-y-6">
+                            <!-- Errores Críticos -->
+                            @if(!empty($stats['notifications']['errors']))
+                                <div class="space-y-3">
+                                    <flux:heading size="sm" class="text-red-600 flex items-center gap-2">
+                                        <flux:icon.x-circle class="w-4 h-4" /> Errores Críticos
+                                    </flux:heading>
+                                    @foreach($stats['notifications']['errors'] as $error)
+                                        <div class="p-3 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-lg text-sm">
+                                            <div class="font-bold text-red-700 dark:text-red-400">{{ $error['message'] }}</div>
+                                            @if(isset($error['row'])) <div class="text-xs text-red-600 dark:text-red-500 mt-1">Fila: {{ $error['row'] }} | Valor: {{ $error['value'] ?? 'N/A' }}</div> @endif
+                                            <div class="text-xs text-red-600 dark:text-red-500 mt-1 italic">Acción: {{ $error['action'] ?? 'Fila omitida' }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            <!-- Advertencias -->
+                            @if(!empty($stats['notifications']['warnings']))
+                                <div class="space-y-3">
+                                    <flux:heading size="sm" class="text-amber-600 flex items-center gap-2">
+                                        <flux:icon.exclamation-triangle class="w-4 h-4" /> Advertencias y Pendientes
+                                    </flux:heading>
+                                    <div class="max-h-64 overflow-y-auto space-y-2 pr-2">
+                                        @foreach($stats['notifications']['warnings'] as $warning)
+                                            <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 rounded-lg text-sm">
+                                                <div class="font-bold text-amber-700 dark:text-amber-400">{{ $warning['message'] }}</div>
+                                                <div class="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-[11px] text-amber-600 dark:text-amber-500">
+                                                    @if(isset($warning['row'])) <span>Fila: {{ $warning['row'] }}</span> @endif
+                                                    @if(isset($warning['student_searched'])) <span>Buscado: "{{ $warning['student_searched'] }}"</span> @endif
+                                                    @if(isset($warning['suggestion'])) <span class="italic">Sugerencia: {{ $warning['suggestion'] }}</span> @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Éxitos / Casos Especiales -->
+                            @if(!empty($stats['notifications']['success']))
+                                <div class="space-y-3">
+                                    <flux:heading size="sm" class="text-green-600 flex items-center gap-2">
+                                        <flux:icon.check-circle class="w-4 h-4" /> Casos Identificados Automáticamente
+                                    </flux:heading>
+                                    <div class="max-h-64 overflow-y-auto space-y-2 pr-2">
+                                        @foreach($stats['notifications']['success'] as $success)
+                                            <div class="p-3 bg-green-50 dark:bg-green-950/30 border border-green-100 dark:border-green-900/50 rounded-lg text-sm">
+                                                @if($success['type'] === 'multiple_children')
+                                                    <div class="font-bold text-green-700 dark:text-green-400 flex items-center gap-2">
+                                                        <flux:icon.users class="w-4 h-4" /> Multi-hijos: {{ $success['parent_name'] }}
+                                                    </div>
+                                                    <div class="text-[11px] text-green-600 dark:text-green-500 mt-1">
+                                                        Hijos: {{ implode(', ', $success['children']) }} (Filas: {{ implode(', ', $success['rows_processed']) }})
+                                                    </div>
+                                                @elseif($success['type'] === 'fuzzy_match')
+                                                    <div class="font-bold text-green-700 dark:text-green-400 flex items-center gap-2">
+                                                        <flux:icon.sparkles class="w-4 h-4" /> Ajuste automático ({{ $success['similarity'] }}%)
+                                                    </div>
+                                                    <div class="text-[11px] text-green-600 dark:text-green-500 mt-1">
+                                                        Se buscó "{{ $success['student_searched'] }}" y se vinculó con "{{ $success['student_found'] }}"
+                                                    </div>
+                                                @else
+                                                    <div class="font-bold text-green-700 dark:text-green-400">{{ $success['message'] }}</div>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
                     @else
-                     <div class="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg">
-                        <div class="text-2xl font-bold text-gray-700 dark:text-zinc-400">0</div>
-                        <div class="text-xs text-gray-600 dark:text-zinc-500 uppercase">Errores</div>
-                    </div>
+                        <div class="text-center py-8 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800">
+                            <flux:text variant="subtle">Importación limpia. No se detectaron anomalías.</flux:text>
+                        </div>
                     @endif
                 </div>
 
+                {{-- Action items from old structure (backwards compatibility for Teachers) --}}
                 @if(!empty($stats['action_items']))
                     <div class="mt-8 text-left space-y-4 max-w-2xl mx-auto">
                         <flux:heading size="lg" class="flex items-center gap-2">
                             <flux:icon.exclamation-triangle class="text-zinc-500" />
-                            Acciones Requeridas ({{ count($stats['action_items']) }})
+                            Acciones de Seguimiento
                         </flux:heading>
                         
-                        <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                        <div class="space-y-2">
                             @foreach($stats['action_items'] as $item)
-                                <div class="bg-zinc-50 dark:bg-zinc-800/50 border-l-4 border-zinc-400 dark:border-zinc-600 p-4 rounded-r-lg flex justify-between items-start">
-                                    <div>
+                                <div class="bg-zinc-50 dark:bg-zinc-800/50 border-l-4 border-zinc-400 dark:border-zinc-600 p-3 rounded-r-lg flex justify-between items-start">
+                                    <div class="text-sm">
                                         <div class="font-bold text-zinc-900 dark:text-zinc-100">{{ $item['title'] }}</div>
-                                        <div class="text-sm text-zinc-800 dark:text-zinc-400">{{ $item['message'] }}</div>
+                                        <div class="text-zinc-800 dark:text-zinc-400">{{ $item['message'] }}</div>
                                     </div>
-                                    @if($item['type'] === 'INCOMPLETE_STUDENT')
-                                        <flux:button variant="outline" size="sm" href="{{ route('students.index', ['search' => $item['title']]) }}" target="_blank" class="ml-4 shrink-0">Ver Alumno</flux:button>
-                                    @endif
                                 </div>
                             @endforeach
                         </div>
-                        
-                        <flux:text variant="subtle" class="italic">
-                            Nota: Los padres que no se vincularon automáticamente pueden ser asignados manualmente desde el catálogo de alumnos.
-                        </flux:text>
                     </div>
                 @endif
 

@@ -288,9 +288,9 @@ new class extends Component {
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center gap-3">
                             <flux:icon icon="calendar-days" class="text-blue-500" size="xl" />
-                            <div>
+                            <div class="whitespace-normal pr-4">
                                 <flux:heading level="3" size="md">Citatorio Escolar</flux:heading>
-                                <flux:text size="sm" class="text-zinc-500">Para padre/tutor de: <strong>{{ $citation->student->name }}</strong></flux:text>
+                                <flux:text size="sm" class="text-zinc-500">Para padre/tutor de: <strong class="wrap-break-word">{{ $citation->student->name }}</strong></flux:text>
                             </div>
                         </div>
                         @if($citation->parent_signature)
@@ -301,7 +301,7 @@ new class extends Component {
                     <div class="space-y-4">
                         <div class="p-4 bg-zinc-50 dark:bg-zinc-800 rounded-xl border border-zinc-100 dark:border-zinc-800">
                             <flux:text size="xs" class="uppercase font-bold text-zinc-500 mb-1">Motivo de la Cita</flux:text>
-                            <flux:text class="text-zinc-700 dark:text-zinc-300 font-medium">{{ $citation->reason }}</flux:text>
+                            <flux:text class="text-zinc-700 dark:text-zinc-300 font-medium whitespace-normal wrap-break-word">{{ $citation->reason }}</flux:text>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">

@@ -575,7 +575,7 @@ new class extends Component {
                 <header>
                     <flux:heading size="lg">Detalles de Firmas</flux:heading>
                     @if($viewingSignaturesNoticeId)
-                        <flux:text size="sm" class="mt-1">Progreso para: <span class="font-bold">{{ App\Models\Notice::find($viewingSignaturesNoticeId)?->title }}</span></flux:text>
+                        <flux:text size="sm" class="mt-1 whitespace-normal wrap-break-word">Progreso para: <span class="font-bold">{{ App\Models\Notice::find($viewingSignaturesNoticeId)?->title }}</span></flux:text>
                     @endif
                 </header>
 
@@ -623,7 +623,7 @@ new class extends Component {
                             <div class="max-h-80 overflow-y-auto space-y-2 pr-2 animate-in fade-in duration-200">
                                 @forelse($signedList as $item)
                                     <div class="flex items-center justify-between p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
-                                        <div>
+                                        <div class="whitespace-normal wrap-break-word">
                                             <flux:text font="medium">{{ $item['student_name'] }}</flux:text>
                                             <flux:text size="xs" class="text-zinc-500">Firmado por: {{ $item['parent_name'] }}</flux:text>
                                         </div>

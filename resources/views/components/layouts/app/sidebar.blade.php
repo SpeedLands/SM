@@ -176,6 +176,23 @@
                         }
                     }));
                 });
+
+                // Initialize Flatpickr for all date inputs
+                window.addEventListener('load', () => {
+                    flatpickr('input[type="date"]', {
+                        locale: 'es',
+                        dateFormat: 'Y-m-d',
+                        disableMobile: true,
+                        // Theme handling (dark mode)
+                        onOpen: function(selectedDates, dateStr, instance) {
+                            if (document.documentElement.classList.contains('dark')) {
+                                instance.calendarContainer.classList.add('dark');
+                            } else {
+                                instance.calendarContainer.classList.remove('dark');
+                            }
+                        }
+                    });
+                });
             });
         </script>
 

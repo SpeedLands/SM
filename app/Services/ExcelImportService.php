@@ -21,6 +21,10 @@ class ExcelImportService
      */
     public function getSheetsInfo(UploadedFile $file): array
     {
+        if (! class_exists('Maatwebsite\Excel\Facades\Excel')) {
+            throw new \Exception('La librería de Excel no está instalada o requiere que habilites la extensión "gd" en tu PHP.');
+        }
+
         // Load the spreadsheet to get actual sheet names
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
         $sheetNames = $spreadsheet->getSheetNames();
@@ -84,6 +88,13 @@ class ExcelImportService
      */
     public function import(UploadedFile $file, string $type, int $sheetIndex, ?int $parentSheetIndex = null): array
     {
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
+        $sheetNames = $spreadsheet->getSheetNames();
+        $sheetName = $sheetNames[$sheetIndex] ?? '';
+
+        // Extract grade and section from sheet name (e.g., "3A" -> "3º", "A")
+        $context = $this->extractGradeAndSection($sheetName);
+
         $sheets = Excel::toArray(new class implements \Maatwebsite\Excel\Concerns\ToArray
         {
             public function array(array $array)
@@ -100,16 +111,16 @@ class ExcelImportService
         // Remove header
         $header = $rows->shift();
 
-        return DB::transaction(function () use ($rows, $type, $sheets, $parentSheetIndex) {
+        return DB::transaction(function () use ($rows, $type, $sheets, $parentSheetIndex, $context) {
             $stats = match ($type) {
                 'TEACHERS' => $this->importTeachers($rows),
-                'PARENTS' => $this->importParents($rows),
-                'STUDENTS' => $this->importStudents($rows, $parentSheetIndex !== null ? collect($sheets[$parentSheetIndex]) : null),
+                'PARENTS' => $this->importParents($rows, $context['grade'], $context['section']),
+                'STUDENTS' => $this->importStudents($rows, $parentSheetIndex !== null ? collect($sheets[$parentSheetIndex]) : null, $context['grade'], $context['section']),
                 default => throw new \Exception("Invalid import type: {$type}"),
             };
 
             // Post-import: Check for students missing parents in the active cycle
-            if ($type === 'STUDENTS' || $type === 'PARENTS') {
+            if (($type === 'STUDENTS' || $type === 'PARENTS') && isset($stats['touched_student_ids'])) {
                 $stats['action_items'] = array_merge(
                     $stats['action_items'] ?? [],
                     $this->getIncompleteStudentActionItems()
@@ -118,6 +129,25 @@ class ExcelImportService
 
             return $stats;
         });
+    }
+
+    /**
+     * Parse grade and section from sheet name (e.g. "3A", "3A MATUTINO", "TERCERO A")
+     */
+    private function extractGradeAndSection(string $sheetName): array
+    {
+        $grade = '1º'; // Default
+        $section = 'A'; // Default (Valid group)
+
+        if (preg_match('/(\d+)([A-Z])/i', $sheetName, $matches)) {
+            $grade = $matches[1].'º';
+            $section = strtoupper($matches[2]);
+        }
+
+        return [
+            'grade' => $grade,
+            'section' => $section,
+        ];
     }
 
     private function getIncompleteStudentActionItems(): array
@@ -171,12 +201,18 @@ class ExcelImportService
                 // Excel Structure: Nombre | Correo | Contraseña | Rol
                 // Index: 0, 1, 2, 3
 
+                $email = trim((string) ($row[1] ?? ''));
+
+                // Silent skip for headers or empty rows
+                if (empty($email) || in_array(strtolower($email), ['correo', 'email', 'e-mail'])) {
+                    continue;
+                }
+
                 $name = $row[0] ?? null;
-                $email = $row[1] ?? null;
                 $password = $row[2] ?? null;
                 $roleLabel = $row[3] ?? '';
 
-                if (! $email || ! $name) {
+                if (! $name || strtolower(trim($name)) === 'nombre') {
                     continue;
                 }
 
@@ -189,13 +225,17 @@ class ExcelImportService
                 $user = User::where('email', $email)->first();
 
                 if ($user) {
-                    $user->update([
+                    $updateData = [
                         'name' => $name,
                         'role' => $role,
-                        // Update password only if provided and different?
-                        // For safety, let's update it if provided in the "import" logic usually implies synchronization
-                        'password' => $password ? Hash::make($password) : $user->password,
-                    ]);
+                    ];
+
+                    // Optimization: Only re-hash if provided and different
+                    if ($password && ! Hash::check((string) $password, $user->password)) {
+                        $updateData['password'] = Hash::make((string) $password);
+                    }
+
+                    $user->update($updateData);
                     $stats['updated']++;
                 } else {
                     User::create([
@@ -216,123 +256,332 @@ class ExcelImportService
         return $stats;
     }
 
-    protected function importParents(Collection $rows): array
+    public function importParents(Collection $rows, string $currentGrade, string $currentSection): array
     {
-        $stats = ['created' => 0, 'updated' => 0, 'errors' => 0, 'action_items' => []];
+        $report = [
+            'summary' => [
+                'students' => ['created' => 0, 'updated' => 0, 'total' => 0], // Placeholder if needed
+                'parents' => ['created' => 0, 'updated' => 0, 'total' => 0, 'with_multiple_children' => 0],
+                'links' => ['successful' => 0, 'failed' => 0],
+            ],
+            'notifications' => [
+                'success' => [],
+                'warnings' => [],
+                'errors' => [],
+            ],
+            'details' => [
+                'parents_by_child_count' => [],
+                'sheet_name' => "{$currentGrade}{$currentSection}",
+                'grade' => $currentGrade,
+                'section' => $currentSection,
+            ],
+        ];
 
-        // Remove header if it was passed raw, but import() handles that.
-        // Excel Structure: Nombre | Correo | Teléfono | Contraseña | Rol | Ocupación
-        // Index: 0, 1, 2, 3, 4, 5
+        // Step 1: Group by email
+        $parentsByEmail = [];
+        foreach ($rows as $index => $row) {
+            $email = trim((string) ($row[1] ?? ''));
 
-        foreach ($rows as $row) {
-            try {
-                $name = $row[0] ?? null;
-                $email = $row[1] ?? null;
-                $phone = $row[2] ?? null;
-                $password = $row[3] ?? null;
-                // $role = $row[4]; // Should be Parent
-                $occupation = $row[5] ?? null;
-
-                if (! $email || ! $name) {
-                    continue;
-                }
-
-                $user = User::updateOrCreate(
-                    ['email' => $email],
-                    [
-                        'name' => $name,
-                        'phone' => $phone,
-                        'password' => $password ? Hash::make($password) : Hash::make(Str::random(10)), // Will define password only on creation if not exists, distinct logic than update usually? method above was specific.
-                        'role' => 'PARENT',
-                        'occupation' => $occupation,
-                        'status' => 'ACTIVE',
-                    ]
-                );
-
-                if ($user->wasRecentlyCreated) {
-                    $stats['created']++;
-                } else {
-                    $stats['updated']++;
-                }
-
-                // Try linking if name contains "Padre/Madre de"
-                if (! $this->linkParentByDescription($user)) {
-                    $stats['action_items'][] = [
-                        'type' => 'UNLINKED_PARENT',
-                        'title' => "Padre sin vínculo: {$user->name}",
-                        'message' => 'No se pudo identificar automáticamente al alumno para este padre.',
-                        'user_id' => $user->id,
-                    ];
-                }
-
-            } catch (\Exception $e) {
-                $stats['errors']++;
+            // Silent skip for headers or empty rows
+            if (empty($email) || in_array(strtolower($email), ['correo', 'email', 'e-mail', 'mail'])) {
+                continue;
             }
+
+            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $report['notifications']['errors'][] = [
+                    'type' => 'invalid_email',
+                    'message' => 'Email inválido',
+                    'row' => $index + 2,
+                    'value' => $email,
+                    'action' => 'Fila omitida',
+                ];
+
+                continue;
+            }
+
+            if (! isset($parentsByEmail[$email])) {
+                $parentsByEmail[$email] = [];
+            }
+
+            $parentsByEmail[$email][] = [
+                'row_index' => $index,
+                'name' => $row[0] ?? null,
+                'email' => $email,
+                'phone' => $row[2] ?? null,
+                'password' => $row[3] ?? null,
+                'occupation' => $row[5] ?? null,
+            ];
         }
 
-        return $stats;
+        // Step 2: Process each email group
+        foreach ($parentsByEmail as $email => $parentRows) {
+            $childrenCount = count($parentRows);
+
+            // Check for different passwords in the same group
+            $passwords = array_unique(array_filter(array_column($parentRows, 'password')));
+            if (count($passwords) > 1) {
+                $report['notifications']['warnings'][] = [
+                    'type' => 'password_mismatch',
+                    'message' => 'Contraseñas diferentes encontradas para el mismo correo',
+                    'parent_email' => $email,
+                    'passwords_found' => count($passwords),
+                    'rows' => array_map(fn ($r) => $r['row_index'] + 2, $parentRows),
+                    'action' => 'Usando la primera contraseña encontrada',
+                ];
+            }
+
+            $firstRow = $parentRows[0];
+            $phone = $firstRow['phone'];
+            $password = $firstRow['password'];
+            $occupation = $firstRow['occupation'];
+
+            $childrenNames = [];
+            $relationship = null;
+            $studentsToLink = [];
+            $fuzzyMatches = [];
+            $notFoundChildren = [];
+
+            foreach ($parentRows as $parentRow) {
+                $mapping = $this->extractRelationAndName($parentRow['name']);
+
+                if ($mapping['student_name']) {
+                    $relationship = $relationship ?? $mapping['relationship'];
+
+                    // Search for the student in the group context
+                    $matchResult = $this->findStudentInGroupWithDetails(
+                        $mapping['student_name'],
+                        $currentGrade,
+                        $currentSection
+                    );
+
+                    if ($matchResult['student']) {
+                        $studentsToLink[] = $matchResult['student'];
+                        $childrenNames[] = $matchResult['student']->name; // Use DB name for consistency
+
+                        if ($matchResult['method'] === 'fuzzy') {
+                            $fuzzyMatches[] = [
+                                'searched' => $mapping['student_name'],
+                                'found' => $matchResult['student']->name,
+                                'similarity' => $matchResult['similarity'],
+                            ];
+                        }
+                    } else {
+                        $notFoundChildren[] = [
+                            'name' => $mapping['student_name'],
+                            'row' => $parentRow['row_index'] + 2,
+                        ];
+                    }
+                }
+            }
+
+            // Report missing students
+            foreach ($notFoundChildren as $notFound) {
+                $report['notifications']['warnings'][] = [
+                    'type' => 'student_not_found',
+                    'message' => "No se encontró al alumno solicitado: \"{$notFound['name']}\"",
+                    'parent_email' => $email,
+                    'student_searched' => $notFound['name'],
+                    'group' => "{$currentGrade}{$currentSection}",
+                    'row' => $notFound['row'],
+                    'suggestion' => 'Verificar que el nombre esté escrito exactamente como en la lista de alumnos.',
+                ];
+                $report['summary']['links']['failed']++;
+            }
+
+            // Report fuzzy matches
+            foreach ($fuzzyMatches as $fuzzy) {
+                $report['notifications']['success'][] = [
+                    'type' => 'fuzzy_match',
+                    'message' => "Vínculo sugerido por similitud ({$fuzzy['similarity']}%)",
+                    'student_searched' => $fuzzy['searched'],
+                    'student_found' => $fuzzy['found'],
+                    'similarity' => $fuzzy['similarity'],
+                    'action' => 'Vinculado automáticamente',
+                ];
+            }
+
+            // Skip parent if no students could be linked at all
+            if (empty($studentsToLink)) {
+                continue;
+            }
+
+            // Step 3: BUILD CONCATENATED NAME
+            $relationship = $relationship ?? 'TUTOR';
+            $childrenNames = array_unique($childrenNames);
+
+            // Fetch existing user to calculate cumulative name if they exist
+            $user = User::where('email', $email)->with('students')->first();
+            $allChildrenNames = $childrenNames;
+
+            if ($user && $user->students->isNotEmpty()) {
+                $existingNames = $user->students->pluck('name')->toArray();
+                $allChildrenNames = array_unique(array_merge($existingNames, $childrenNames));
+            }
+
+            $childrenList = implode(', ', $allChildrenNames);
+            $concatenatedName = ucfirst(strtolower($relationship)).' de '.$childrenList;
+
+            // Step 4: Create/Update Parent User
+            if (! $user) {
+                $user = User::create([
+                    'email' => $email,
+                    'name' => $concatenatedName,
+                    'phone' => $phone,
+                    'occupation' => $occupation,
+                    'role' => 'PARENT',
+                    'status' => 'ACTIVE',
+                    'password' => Hash::make($password ?: Str::random(10)),
+                ]);
+                $report['summary']['parents']['created']++;
+            } else {
+                // PROTECTION: Do not update name or password if user is ADMIN or TEACHER
+                if (in_array($user->role, ['ADMIN', 'TEACHER'])) {
+                    $report['notifications']['success'][] = [
+                        'type' => 'staff_parent',
+                        'message' => 'Personal administrativo/docente con hijos vinculados',
+                        'user_name' => $user->name,
+                        'user_role' => $user->role,
+                        'parent_email' => $email,
+                        'action' => 'Nombre y contraseña protegidos (se mantienen datos de personal)',
+                    ];
+                } else {
+                    $user->update([
+                        'name' => $concatenatedName,
+                        'phone' => $phone,
+                        'occupation' => $occupation,
+                    ]);
+
+                    // Optimization: Only re-hash if provided and different
+                    if ($password && ! Hash::check((string) $password, $user->password)) {
+                        $user->password = Hash::make((string) $password);
+                        $user->save();
+                    }
+                }
+
+                $report['summary']['parents']['updated']++;
+            }
+
+            $report['summary']['parents']['total']++;
+
+            // Step 5: SYNC ALL CHILDREN
+            foreach ($studentsToLink as $student) {
+                $student->parents()->syncWithoutDetaching([
+                    $user->id => ['relationship' => $relationship],
+                ]);
+                $report['summary']['links']['successful']++;
+            }
+
+            // Multiple children notification
+            if ($childrenCount > 1) {
+                $report['summary']['parents']['with_multiple_children']++;
+                $report['notifications']['success'][] = [
+                    'type' => 'multiple_children',
+                    'message' => 'Padre con múltiples hijos identificado',
+                    'parent_email' => $email,
+                    'parent_name' => $concatenatedName,
+                    'children_count' => $childrenCount,
+                    'children' => $childrenNames,
+                    'rows_processed' => array_map(fn ($r) => $r['row_index'] + 2, $parentRows),
+                ];
+            }
+
+            // Distribution
+            $report['details']['parents_by_child_count'][$childrenCount] = ($report['details']['parents_by_child_count'][$childrenCount] ?? 0) + 1;
+        }
+
+        return $report;
     }
 
-    protected function importStudents(Collection $rows, ?Collection $parentRows = null): array
+    /**
+     * Specialized student finder that attempts exact, partial, and fuzzy matching.
+     */
+    private function findStudentInGroupWithDetails(string $studentName, string $grade, string $section): array
     {
-        $stats = ['created' => 0, 'updated' => 0, 'errors' => 0, 'action_items' => []];
-        $activeCycle = Cycle::where('is_active', true)->firstOrFail();
+        // 1. Exact match
+        $student = Student::where('name', $studentName)
+            ->where('grade', $grade)
+            ->where('group_name', $section)
+            ->first();
 
-        // If parent rows provided, index them by Student Name found in "Padre de [STUDENT NAME]"
-        $parentsByStudentName = [];
-        if ($parentRows) {
-            $parentHeader = $parentRows->shift();
-            foreach ($parentRows as $pRow) {
-                // Identify student name and relationship from parent name "Padre de ..."
-                $pName = $pRow[0] ?? '';
-                $mapping = $this->extractRelationAndName($pName);
-                if ($mapping['student_name']) {
-                    $parentsByStudentName[strtoupper(trim($mapping['student_name']))][] = [
-                        'row' => $pRow,
-                        'relationship' => $mapping['relationship'],
-                    ];
-                }
+        if ($student) {
+            return ['student' => $student, 'method' => 'exact', 'similarity' => 100];
+        }
+
+        // 2. Partial match (LIKE)
+        $student = Student::where('name', 'LIKE', "%{$studentName}%")
+            ->where('grade', $grade)
+            ->where('group_name', $section)
+            ->first();
+
+        if ($student) {
+            return ['student' => $student, 'method' => 'like', 'similarity' => 95];
+        }
+
+        // 3. Fuzzy matching (85% similarity threshold)
+        $candidates = Student::where('grade', $grade)
+            ->where('group_name', $section)
+            ->get();
+
+        $bestMatch = null;
+        $bestSimilarity = 0;
+
+        foreach ($candidates as $candidate) {
+            similar_text(strtoupper($studentName), strtoupper($candidate->name), $similarity);
+            if ($similarity > $bestSimilarity && $similarity >= 85) {
+                $bestMatch = $candidate;
+                $bestSimilarity = $similarity;
             }
         }
 
-        foreach ($rows as $row) {
+        if ($bestMatch) {
+            return ['student' => $bestMatch, 'method' => 'fuzzy', 'similarity' => round($bestSimilarity)];
+        }
+
+        return ['student' => null, 'method' => 'none', 'similarity' => 0];
+    }
+
+    public function importStudents(Collection $rows, ?Collection $parentRows = null, string $currentGrade = '1º', string $currentSection = 'A'): array
+    {
+        $activeCycle = Cycle::where('is_active', true)->firstOrFail();
+        $report = [
+            'summary' => [
+                'students' => ['created' => 0, 'updated' => 0, 'total' => 0],
+                'parents' => ['created' => 0, 'updated' => 0, 'total' => 0],
+                'links' => ['successful' => 0, 'failed' => 0],
+            ],
+            'notifications' => [
+                'success' => [],
+                'warnings' => [],
+                'errors' => [],
+            ],
+            'touched_student_ids' => [],
+        ];
+
+        // Find or Create ClassGroup once
+        $group = ClassGroup::firstOrCreate([
+            'cycle_id' => $activeCycle->id,
+            'grade' => $currentGrade,
+            'section' => $currentSection,
+        ]);
+
+        foreach ($rows as $index => $row) {
             try {
                 // Excel Structure: Nombre | Turno | Grado / Grupo | Dirección | Teléfono | Otro Contacto
-                // Index: 0, 1, 2, 3, 4, 5
-
-                $name = $row[0] ?? null;
+                $name = trim((string) ($row[0] ?? ''));
                 $turn = $row[1] ?? 'MATUTINO';
-                $groupStr = $row[2] ?? ''; // "3A", "3B"
 
-                if (! $name) {
+                // Silent skip for headers or empty rows
+                if (empty($name) || in_array(strtolower($name), ['nombre', 'estudiante', 'alumno'])) {
                     continue;
-                }
-
-                // Parse Grade/Group
-                $grade = null;
-                $section = null;
-                if (preg_match('/(\d+)([A-Z]+)/i', $groupStr, $matches)) {
-                    $grade = $matches[1].'º'; // Append ordinal indicator to match DB convention (e.g., 3º)
-                    $section = strtoupper($matches[2]);
-                }
-
-                // Find or Create ClassGroup
-                $group = null;
-                if ($grade && $section) {
-                    $group = ClassGroup::firstOrCreate([
-                        'cycle_id' => $activeCycle->id,
-                        'grade' => $grade,
-                        'section' => $section,
-                    ]);
                 }
 
                 // Create/Update Student
                 $student = Student::updateOrCreate(
-                    ['name' => $name], // Matching by name is risky but standard for this level of import
+                    ['name' => $name],
                     [
-                        'birth_date' => '2010-01-01', // Default birth date as it's not in Excel but required
-                        'grade' => $grade,
-                        'group_name' => $section, // Redundant but in model
+                        'birth_date' => '2010-01-01', // Default
+                        'grade' => $currentGrade,
+                        'group_name' => $currentSection,
                         'turn' => trim($turn),
                     ]
                 );
@@ -348,84 +597,55 @@ class ExcelImportService
                 );
 
                 // Association
-                if ($group) {
-                    StudentCycleAssociation::updateOrCreate(
-                        [
-                            'student_id' => $student->id,
-                            'cycle_id' => $activeCycle->id,
-                        ],
-                        [
-                            'class_group_id' => $group->id,
-                            'status' => 'ACTIVE',
-                        ]
-                    );
-                }
+                StudentCycleAssociation::updateOrCreate(
+                    [
+                        'student_id' => $student->id,
+                        'cycle_id' => $activeCycle->id,
+                    ],
+                    [
+                        'class_group_id' => $group->id,
+                        'status' => 'ACTIVE',
+                    ]
+                );
 
                 if ($student->wasRecentlyCreated) {
-                    $stats['created']++;
+                    $report['summary']['students']['created']++;
                 } else {
-                    $stats['updated']++;
+                    $report['summary']['students']['updated']++;
                 }
-
-                // Link Parents if available
-                if (isset($parentsByStudentName[strtoupper(trim($name))])) {
-                    foreach ($parentsByStudentName[strtoupper(trim($name))] as $pInfo) {
-                        $pData = $pInfo['row'];
-                        $relationship = $pInfo['relationship'];
-
-                        // Create Parent User 'Inline'
-                        $pEmail = $pData[1] ?? null;
-                        if ($pEmail) {
-                            $parentUser = User::firstOrCreate(
-                                ['email' => $pEmail],
-                                [
-                                    'name' => $pData[0],
-                                    'phone' => $pData[2] ?? null,
-                                    'password' => Hash::make($pData[3] ?? Str::random(10)),
-                                    'role' => 'PARENT',
-                                    'occupation' => $pData[5] ?? null,
-                                    'status' => 'ACTIVE',
-                                ]
-                            );
-
-                            // Link
-                            $student->parents()->syncWithoutDetaching([
-                                $parentUser->id => ['relationship' => $relationship],
-                            ]);
-                        }
-                    }
-                }
+                $report['summary']['students']['total']++;
+                $report['touched_student_ids'][] = $student->id;
 
             } catch (\Exception $e) {
-                dump($e->getMessage());
-                $stats['errors']++;
+                $report['notifications']['errors'][] = [
+                    'type' => 'import_error',
+                    'message' => 'Error importando alumno en fila '.($index + 2).': '.$e->getMessage(),
+                    'row' => $index + 2,
+                    'action' => 'Fila omitida',
+                ];
             }
         }
 
-        return $stats;
-    }
+        // If parent rows provided (e.g. from another sheet or below), process them
+        if ($parentRows && $parentRows->count() > 0) {
+            $parentReport = $this->importParents($parentRows, $currentGrade, $currentSection);
 
-    private function linkParentByDescription(User $parent): bool
-    {
-        $mapping = $this->extractRelationAndName($parent->name);
-        if ($mapping['student_name']) {
-            $student = Student::where('name', 'LIKE', "%{$mapping['student_name']}%")->first();
-            if ($student) {
-                $student->parents()->syncWithoutDetaching([
-                    $parent->id => ['relationship' => $mapping['relationship']],
-                ]);
-
-                return true;
-            }
+            // Merge results
+            $report['summary']['parents'] = $parentReport['summary']['parents'];
+            $report['summary']['links'] = $parentReport['summary']['links'];
+            $report['notifications']['success'] = array_merge($report['notifications']['success'], $parentReport['notifications']['success']);
+            $report['notifications']['warnings'] = array_merge($report['notifications']['warnings'], $parentReport['notifications']['warnings']);
+            $report['notifications']['errors'] = array_merge($report['notifications']['errors'], $parentReport['notifications']['errors']);
+            $report['details'] = $parentReport['details'];
         }
 
-        return false;
+        return $report;
     }
 
     private function extractRelationAndName($parentName): array
     {
         // "Padre de X", "Madre de X", "Tutor de X"
-        if (preg_match('/(Padre|Madre|Tutor)\s+de\s+(.+)/i', $parentName, $matches)) {
+        if (preg_match('/^(Padre|Madre|Tutor)\s+de\s+(.+)$/i', $parentName, $matches)) {
             return [
                 'relationship' => strtoupper($matches[1]), // PADRE, MADRE, TUTOR
                 'student_name' => trim($matches[2]),

@@ -259,10 +259,7 @@ new class extends Component {
             <form wire:submit="save" class="space-y-4">
                 <flux:input wire:model="name" :label="__('Nombre del Ciclo')" placeholder="Ej: 2024-2025" />
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <flux:input type="date" wire:model="start_date" :label="__('Inicio')" class="w-full" />
-                    <flux:input type="date" wire:model="end_date" :label="__('Fin')" class="w-full" />
-                </div>
+
 
                 <div class="flex items-center justify-between py-2">
                     <div>
@@ -360,7 +357,7 @@ new class extends Component {
                 </flux:select>
                 <flux:select label="Sección" wire:model="section" class="w-full">
                     <option value="">Sección...</option>
-                    @foreach(range('A', 'F') as $letter)
+                    @foreach(['A', 'B', 'C', 'D', 'G', 'H', 'I'] as $letter)
                         <option value="{{ $letter }}">{{ $letter }}</option>
                     @endforeach
                 </flux:select>
@@ -378,16 +375,17 @@ new class extends Component {
                 </div>
             </form>
 
-            <div class="space-y-2">
+            <div class="space-y-3">
                 <flux:heading size="sm">Grupos Registrados</flux:heading>
-                <div class="divide-y divide-zinc-100 dark:divide-zinc-800 border rounded-lg overflow-hidden border-zinc-200 dark:border-zinc-700">
+                <div class="max-h-96 overflow-y-auto pr-2 divide-y divide-zinc-100 dark:divide-zinc-800 border rounded-lg border-zinc-200 dark:border-zinc-700">
                     @forelse($currentGroups as $group)
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white dark:bg-zinc-900 gap-3" wire:key="group-{{ $group->id }}">
                             <div class="flex items-center gap-4 min-w-0">
                                 <div class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold rounded text-lg shrink-0">{{ $group->grade }} {{ $group->section }}</div>
                                 <div class="min-w-0">
-                                    <div class="text-sm font-medium uppercase truncate" title="Tutor: {{ $group->tutor?->name ?? 'No asignado' }}">
-                                        Tutor: {{ $group->tutor?->name ?? 'No asignado' }}
+                                    <div class="text-[10px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider mb-0.5">Asesor</div>
+                                    <div class="text-sm font-medium text-zinc-900 dark:text-white leading-tight wrap-break-word" title="Asesor: {{ $group->tutor?->name ?? 'No asignado' }}">
+                                        {{ $group->tutor?->name ?? 'No asignado' }}
                                     </div>
                                 </div>
                             </div>

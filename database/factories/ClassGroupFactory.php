@@ -18,7 +18,7 @@ class ClassGroupFactory extends Factory
     {
         return [
             'grade' => $this->faker->randomElement(['1º', '2º', '3º']),
-            'section' => $this->faker->randomElement(['A', 'B', 'C', 'D']),
+            'section' => $this->faker->randomElement(['A', 'B', 'C', 'D', 'G', 'H', 'I']),
             'cycle_id' => \App\Models\Cycle::factory(),
         ];
     }
