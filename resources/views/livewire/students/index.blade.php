@@ -343,7 +343,7 @@ new class extends Component {
                 <flux:label>Grupo</flux:label>
                 <flux:select wire:model.live="groupFilter">
                     <option value="Todos">Todos los grupos</option>
-                    @foreach(['A', 'B', 'C', 'D', 'E', 'F'] as $section)
+                    @foreach(['A', 'B', 'C', 'D', 'G', 'H', 'I'] as $section)
                         <option value="{{ $section }}">Sección {{ $section }}</option>
                     @endforeach
                 </flux:select>
@@ -558,7 +558,7 @@ new class extends Component {
                                             <div class="flex items-center justify-between py-2">
                                                 <div class="flex items-center gap-3">
                                                     <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-xs font-bold text-purple-600">{{ $parent->initials() }}</div>
-                                                    <div>
+                                                    <div class="whitespace-normal">
                                                         <div class="text-sm font-bold uppercase">{{ $parent->name }}</div>
                                                         <div class="text-xs text-zinc-500">{{ $parent->pivot->relationship }} · {{ $parent->phone ?? 'Sin teléfono' }}</div>
                                                     </div>
@@ -595,8 +595,8 @@ new class extends Component {
         <div class="space-y-6">
             <div>
                 <flux:heading size="lg">Confirmar Eliminación</flux:heading>
-                <flux:subheading>
-                    ¿Estás seguro de eliminar al alumno <span class="font-bold text-zinc-900 dark:text-white uppercase">{{ $nameToDelete }}</span>?
+                <flux:subheading class="whitespace-normal wrap-break-word">
+                    ¿Estás seguro de eliminar al alumno <span class="font-bold text-zinc-900 dark:text-white uppercase wrap-break-word">{{ $nameToDelete }}</span>?
                     Esta acción es irreversible.
                 </flux:subheading>
             </div>

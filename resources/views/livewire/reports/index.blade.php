@@ -299,11 +299,11 @@ new class extends Component {
                                 <div class="font-bold">{{ $report->student->name }}</div>
                             </td>
                             <td class="py-4 px-2">
-                                <div class="font-medium text-blue-600 dark:text-blue-400">{{ $report->infraction->description }}</div>
+                                <div class="font-medium text-blue-600 dark:text-blue-400 whitespace-normal">{{ $report->infraction->description }}</div>
                                 @if($report->subject)
-                                    <div class="text-xs font-semibold uppercase mt-1">Asunto: {{ $report->subject }}</div>
+                                    <div class="text-xs font-semibold uppercase mt-1 whitespace-normal">Asunto: {{ $report->subject }}</div>
                                 @endif
-                                <div class="text-xs text-zinc-500 whitespace-normal line-clamp-1 italic">{{ $report->description }}</div>
+                                <div class="text-xs text-zinc-500 whitespace-normal line-clamp-2 italic">{{ $report->description }}</div>
                             </td>
                             <td class="py-4 px-2 text-center">
                                 @if($report->status === 'SIGNED')
@@ -352,12 +352,12 @@ new class extends Component {
                             <div class="w-12 h-12 rounded-xl bg-linear-to-br from-zinc-500 to-zinc-700 flex items-center justify-center text-white font-black text-xl shadow-inner uppercase">
                                 {{ substr($report->student->name, 0, 1) }}
                             </div>
-                            <div>
+                            <div class="whitespace-normal">
                                 <div class="flex items-center gap-2">
-                                    <flux:text size="xs" class="uppercase tracking-widest font-black text-zinc-400">Reporte de:</flux:text>
-                                    <span class="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold">{{ $report->student->name }}</span>
+                                    <flux:text size="xs" class="uppercase tracking-widest font-black text-zinc-400 shrink-0">Reporte de:</flux:text>
+                                    <span class="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold wrap-break-word">{{ $report->student->name }}</span>
                                 </div>
-                                <flux:heading level="3" size="lg" class="mt-0.5">{{ $report->infraction->description }}</flux:heading>
+                                <flux:heading level="3" size="lg" class="mt-0.5 whitespace-normal">{{ $report->infraction->description }}</flux:heading>
                             </div>
                         </div>
                         <div class="text-right">
