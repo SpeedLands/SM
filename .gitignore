@@ -191,3 +191,5 @@ deploy.php
 
 # Service worker cache (si es generado)
 # /public/sw.js  # Comentado porque es parte del código fuente
+
+DOC_MEMORIA_DE_ESTADIAS_OLD_SYSTEM.md
