@@ -65,4 +65,14 @@ class Student extends Model
     {
         return $this->hasMany(CommunityService::class);
     }
+
+    public function citations(): HasMany
+    {
+        return $this->hasMany(Citation::class);
+    }
+
+    public function noticeSignatures(): HasMany
+    {
+        return $this->hasMany(NoticeSignature::class);
+    }
 }

@@ -17,7 +17,9 @@ new class extends Component {
 
     // Create Modal
     public bool $showCreateModal = false;
+    public bool $showDeleteModal = false;
     public ?string $editingNoticeId = null;
+    public ?string $deletingNoticeId = null;
     public string $title = '';
     public string $content = '';
     public string $type = 'GENERAL';
@@ -149,11 +151,22 @@ new class extends Component {
         $this->showCreateModal = true;
     }
 
-    public function deleteNotice(string $id): void
+    public function confirmDelete(string $id): void
     {
         $this->authorize('teacher-or-admin');
-        Notice::findOrFail($id)->delete();
-        $this->dispatch('notify', ['message' => 'Aviso eliminado correctamente.']);
+        $this->deletingNoticeId = $id;
+        $this->showDeleteModal = true;
+    }
+
+    public function deleteNotice(): void
+    {
+        $this->authorize('teacher-or-admin');
+        if ($this->deletingNoticeId) {
+            Notice::findOrFail($this->deletingNoticeId)->delete();
+            $this->showDeleteModal = false;
+            $this->deletingNoticeId = null;
+            $this->dispatch('notify', ['message' => 'Aviso eliminado correctamente.']);
+        }
     }
 
     public function viewSignatures(string $id): void
@@ -337,7 +350,7 @@ new class extends Component {
                         <div class="flex flex-col items-end gap-2">
                             <div class="flex gap-1 mb-1">
                                 <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editNotice('{{ $notice->id }}')" />
-                                <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="deleteNotice('{{ $notice->id }}')" />
+                                <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="confirmDelete('{{ $notice->id }}')" />
                             </div>
                             
                             @php
@@ -662,6 +675,22 @@ new class extends Component {
 
                 <div class="flex justify-end">
                     <flux:button wire:click="$set('showSignaturesModal', false)">Cerrar</flux:button>
+                </div>
+            </div>
+        </flux:modal>
+
+        <!-- Delete Confirmation Modal -->
+        <flux:modal name="delete-notice" wire:model="showDeleteModal" class="md:w-96">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">¿Eliminar aviso?</flux:heading>
+                    <flux:text class="mt-2 text-zinc-500">Esta acción no se puede deshacer. Todos los padres dejarán de ver este comunicado inmediatamente.</flux:text>
+                </div>
+
+                <div class="flex gap-2">
+                    <flux:spacer />
+                    <flux:button wire:click="$set('showDeleteModal', false)">Cancelar</flux:button>
+                    <flux:button variant="danger" wire:click="deleteNotice">Eliminar</flux:button>
                 </div>
             </div>
         </flux:modal>

@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\User;
+use App\Models\Citation;
 use App\Models\Cycle;
-use App\Models\Student;
 use App\Models\Notice;
 use App\Models\NoticeSignature;
-use App\Models\Citation;
+use App\Models\Student;
+use App\Models\User;
 use Livewire\Volt\Volt;
 
 test('admins can create notices', function () {
@@ -28,7 +28,7 @@ test('parents can sign notices with authorization', function () {
     $parent = User::factory()->create(['role' => 'PARENT']);
     $student = Student::factory()->create();
     $cycle = Cycle::factory()->create(['is_active' => true]);
-    
+
     // Link parent to student
     $parent->students()->attach($student->id, ['relationship' => 'PADRE']);
 
@@ -63,7 +63,7 @@ test('teachers can manage citations', function () {
         ->test('citations.index')
         ->call('selectStudent', $student->id)
         ->set('reason', 'Academic review')
-        ->set('citationDate', now()->addDay()->format('Y-m-d'))
+        ->set('citationDate', \Carbon\Carbon::parse('2026-02-16')->format('Y-m-d'))
         ->set('citationTime', '09:00')
         ->call('saveCitation')
         ->assertHasNoErrors();
@@ -77,4 +77,24 @@ test('teachers can manage citations', function () {
         ->call('updateStatus', $citation->id, 'ATTENDED');
 
     expect($citation->refresh()->status)->toBe('ATTENDED');
+});
+
+test('citations cannot be scheduled on weekends', function () {
+    $teacher = User::factory()->create(['role' => 'TEACHER']);
+    $student = Student::factory()->create();
+    Cycle::where('is_active', true)->first() ?: Cycle::factory()->create(['is_active' => true]);
+
+    // Find next Saturday
+    $saturday = now()->next(\Carbon\Carbon::SATURDAY)->format('Y-m-d');
+
+    Volt::actingAs($teacher)
+        ->test('citations.index')
+        ->call('selectStudent', $student->id)
+        ->set('reason', 'Weekend review')
+        ->set('citationDate', $saturday)
+        ->set('citationTime', '09:00')
+        ->call('saveCitation')
+        ->assertHasErrors(['citationDate']);
+
+    expect(Citation::count())->toBe(0);
 });

@@ -177,22 +177,39 @@
                     }));
                 });
 
-                // Initialize Flatpickr for all date inputs
-                window.addEventListener('load', () => {
-                    flatpickr('input[type="date"]', {
-                        locale: 'es',
-                        dateFormat: 'Y-m-d',
-                        disableMobile: true,
-                        // Theme handling (dark mode)
-                        onOpen: function(selectedDates, dateStr, instance) {
-                            if (document.documentElement.classList.contains('dark')) {
-                                instance.calendarContainer.classList.add('dark');
-                            } else {
-                                instance.calendarContainer.classList.remove('dark');
-                            }
+                function initDateInputs() {
+                    // Force native date picker on click/focus for the entire field
+                    document.querySelectorAll('input[type="date"], input[type="time"]').forEach(function(input) {
+                        if (!input.hasAttribute('data-has-picker-listener')) {
+                            // Trigger on click anywhere in the input
+                            input.addEventListener('click', function(e) {
+                                if ('showPicker' in HTMLInputElement.prototype) {
+                                    try {
+                                        this.showPicker();
+                                    } catch (err) {
+                                        // Some browsers might restrict showPicker calls
+                                    }
+                                }
+                            });
+                            
+                            // Also trigger on focus (for keyboard navigation)
+                            input.addEventListener('focus', function(e) {
+                                if ('showPicker' in HTMLInputElement.prototype) {
+                                    try {
+                                        this.showPicker();
+                                    } catch (err) {}
+                                }
+                            });
+
+                            input.setAttribute('data-has-picker-listener', 'true');
+                            // Style suggestion: make it look like it's clickable
+                            input.style.cursor = 'pointer';
                         }
                     });
-                });
+                }
+
+                window.addEventListener('load', initDateInputs);
+                document.addEventListener('livewire:navigated', initDateInputs);
             });
         </script>
 
@@ -241,5 +258,48 @@
                 </div>
             </template>
         </div>
+
+        <!-- Swipe Gesture for Sidebar (Mobile) -->
+        <script>
+            (function() {
+                let touchStartX = 0;
+                let touchEndX = 0;
+                let touchStartY = 0;
+                let touchEndY = 0;
+                const swipeThreshold = 50; // Minimum distance for swipe
+                const edgeThreshold = 30; // Distance from edge to trigger swipe
+                
+                function handleSwipe() {
+                    const diffX = touchEndX - touchStartX;
+                    const diffY = touchEndY - touchStartY;
+                    
+                    // Only trigger if horizontal swipe is dominant
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        // Right swipe from left edge
+                        if (diffX > swipeThreshold && touchStartX < edgeThreshold) {
+                            // Open sidebar
+                            const sidebar = document.querySelector('[data-flux-sidebar]');
+                            if (sidebar && window.innerWidth < 1024) { // Only on mobile/tablet
+                                const toggleButton = document.querySelector('[data-flux-sidebar-toggle]');
+                                if (toggleButton) {
+                                    toggleButton.click();
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                document.addEventListener('touchstart', function(e) {
+                    touchStartX = e.changedTouches[0].screenX;
+                    touchStartY = e.changedTouches[0].screenY;
+                }, { passive: true });
+                
+                document.addEventListener('touchend', function(e) {
+                    touchEndX = e.changedTouches[0].screenX;
+                    touchEndY = e.changedTouches[0].screenY;
+                    handleSwipe();
+                }, { passive: true });
+            })();
+        </script>
     </body>
 </html>

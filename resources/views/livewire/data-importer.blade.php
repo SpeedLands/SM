@@ -3,14 +3,23 @@
 
     <div class="space-y-8">
         <!-- Step Indicator -->
-        <div class="flex items-center space-x-4 text-sm">
-            <div class="{{ $step >= 1 ? 'font-bold text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-zinc-500' }}">1. Cargar Archivo</div>
-            <flux:icon.chevron-right class="w-4 h-4 text-gray-400 dark:text-zinc-500" />
-            <div class="{{ $step >= 2 ? 'font-bold text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-zinc-500' }}">2. Configuración</div>
-            <flux:icon.chevron-right class="w-4 h-4 text-gray-400 dark:text-zinc-500" />
-            <div class="{{ $step >= 3 ? 'font-bold text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-zinc-500' }}">3. Previsualizar</div>
-            <flux:icon.chevron-right class="w-4 h-4 text-gray-400 dark:text-zinc-500" />
-            <div class="{{ $step >= 4 ? 'font-bold text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-zinc-500' }}">4. Resultados</div>
+        <div class="flex flex-wrap items-center gap-y-4 sm:gap-4 text-sm">
+            <!-- Row 1: Steps 1-2 -->
+            <div class="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                <div class="flex-1 sm:flex-none {{ $step >= 1 ? 'font-bold text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-zinc-500' }}">1. Cargar Archivo</div>
+                <flux:icon.chevron-right class="w-4 h-4 text-gray-400 dark:text-zinc-500 shrink-0" />
+                <div class="flex-1 sm:flex-none {{ $step >= 2 ? 'font-bold text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-zinc-500' }}">2. Configuración</div>
+            </div>
+            
+            <!-- Separator chevron (hidden on mobile) -->
+            <flux:icon.chevron-right class="w-4 h-4 text-gray-400 dark:text-zinc-500 hidden sm:block" />
+            
+            <!-- Row 2: Steps 3-4 -->
+            <div class="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                <div class="flex-1 sm:flex-none {{ $step >= 3 ? 'font-bold text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-zinc-500' }}">3. Previsualizar</div>
+                <flux:icon.chevron-right class="w-4 h-4 text-gray-400 dark:text-zinc-500 shrink-0" />
+                <div class="flex-1 sm:flex-none {{ $step >= 4 ? 'font-bold text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-zinc-500' }}">4. Resultados</div>
+            </div>
         </div>
 
         <!-- Step 1: Upload -->

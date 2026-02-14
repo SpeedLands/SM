@@ -155,13 +155,7 @@ new class extends Component {
         ]);
     }
 
-    public function resetPassword(User $user): void
-    {
-        $user->update([
-            'status' => 'FORCE_PASSWORD_CHANGE'
-        ]);
-        $this->dispatch('password-reset-triggered');
-    }
+
 
     public function with(): array
     {
@@ -318,11 +312,7 @@ new class extends Component {
                                 <div class="flex justify-end gap-1">
                                     <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editUser('{{ $user->id }}')" />
                                     
-                                    @if($user->status === 'FORCE_PASSWORD_CHANGE')
-                                        <flux:button variant="ghost" size="sm" icon="key" class="text-blue-500" disabled />
-                                    @else
-                                        <flux:button variant="ghost" size="sm" icon="key" wire:click="resetPassword('{{ $user->id }}')" />
-                                    @endif
+
 
                                     @if($user->id !== auth()->id())
                                         @if($user->status === 'BLOCKED')

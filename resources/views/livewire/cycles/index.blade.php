@@ -29,6 +29,8 @@ new class extends Component {
     // Deletion State
     public ?Cycle $cycleToDelete = null;
     public ?ClassGroup $groupToDelete = null;
+    public bool $showDeleteGroupModal = false;
+    public bool $showDeleteCycleModal = false;
 
     protected $rules = [
         'name' => 'required|string|max:50',
@@ -81,7 +83,7 @@ new class extends Component {
     public function confirmDelete(Cycle $cycle): void
     {
         $this->cycleToDelete = $cycle;
-        $this->dispatch('open-modal', name: 'confirm-delete-cycle');
+        $this->showDeleteCycleModal = true;
     }
 
     public function delete(): void
@@ -90,19 +92,19 @@ new class extends Component {
 
         if ($this->cycleToDelete->is_active) {
             $this->dispatch('notify', ['message' => 'No se puede eliminar el ciclo activo.', 'variant' => 'danger']);
-            $this->dispatch('close-modal', name: 'confirm-delete-cycle');
+            $this->showDeleteCycleModal = false;
             return;
         }
 
         if ($this->cycleToDelete->groups()->exists() || $this->cycleToDelete->reports()->exists() || $this->cycleToDelete->notices()->exists() || $this->cycleToDelete->citations()->exists()) {
             $this->dispatch('notify', ['message' => 'No se puede eliminar un ciclo que tiene registros asociados (grupos, reportes, avisos, etc).', 'variant' => 'danger']);
-            $this->dispatch('close-modal', name: 'confirm-delete-cycle');
+            $this->showDeleteCycleModal = false;
             return;
         }
 
         $this->cycleToDelete->delete();
         $this->cycleToDelete = null;
-        $this->dispatch('close-modal', name: 'confirm-delete-cycle');
+        $this->showDeleteCycleModal = false;
         $this->dispatch('cycle-saved');
     }
 
@@ -158,7 +160,7 @@ new class extends Component {
     public function confirmDeleteGroup(string $id): void
     {
         $this->groupToDelete = ClassGroup::findOrFail($id);
-        $this->dispatch('open-modal', name: 'confirm-delete-group');
+        $this->showDeleteGroupModal = true;
     }
 
     public function deleteGroup(): void
@@ -168,14 +170,14 @@ new class extends Component {
         // Check if group has students
         if ($this->groupToDelete->studentCycleAssociations()->exists()) {
             $this->dispatch('notify', ['message' => 'No se puede eliminar un grupo que tiene alumnos inscritos.', 'variant' => 'danger']);
-            $this->dispatch('close-modal', name: 'confirm-delete-group');
+            $this->showDeleteGroupModal = false;
             return;
         }
 
         $cycleId = $this->groupToDelete->cycle_id;
         $this->groupToDelete->delete();
         $this->groupToDelete = null;
-        $this->dispatch('close-modal', name: 'confirm-delete-group');
+        $this->showDeleteGroupModal = false;
         
         if ($this->groupCycle && $this->groupCycle->id === $cycleId) {
             $this->groupCycle->load('groups');
@@ -259,7 +261,9 @@ new class extends Component {
             <form wire:submit="save" class="space-y-4">
                 <flux:input wire:model="name" :label="__('Nombre del Ciclo')" placeholder="Ej: 2024-2025" />
 
+                <flux:input wire:model="start_date" type="date" :label="__('Fecha de Inicio')" />
 
+                <flux:input wire:model="end_date" type="date" :label="__('Fecha de Fin')" />
 
                 <div class="flex items-center justify-between py-2">
                     <div>
@@ -414,7 +418,7 @@ new class extends Component {
     </flux:modal>
 
     <!-- Deletion Confirmation Modal: Cycle -->
-    <flux:modal name="confirm-delete-cycle" class="min-w-80">
+    <flux:modal wire:model="showDeleteCycleModal" class="min-w-80">
         <div class="space-y-6">
             <div>
                 <flux:heading size="lg">Confirmar Eliminación de Ciclo</flux:heading>
@@ -426,16 +430,14 @@ new class extends Component {
 
             <div class="flex gap-2">
                 <flux:spacer />
-                <flux:modal.close>
-                    <flux:button variant="ghost">Cancelar</flux:button>
-                </flux:modal.close>
+                <flux:button variant="ghost" wire:click="$set('showDeleteCycleModal', false)">Cancelar</flux:button>
                 <flux:button variant="danger" wire:click="delete">Eliminar Ciclo</flux:button>
             </div>
         </div>
     </flux:modal>
 
     <!-- Deletion Confirmation Modal: Group -->
-    <flux:modal name="confirm-delete-group" class="min-w-80">
+    <flux:modal wire:model="showDeleteGroupModal" class="min-w-80">
         <div class="space-y-6">
             <div>
                 <flux:heading size="lg">Confirmar Eliminación de Grupo</flux:heading>
@@ -447,9 +449,7 @@ new class extends Component {
 
             <div class="flex gap-2">
                 <flux:spacer />
-                <flux:modal.close>
-                    <flux:button variant="ghost">Cancelar</flux:button>
-                </flux:modal.close>
+                <flux:button variant="ghost" wire:click="$set('showDeleteGroupModal', false)">Cancelar</flux:button>
                 <flux:button variant="danger" wire:click="deleteGroup">Eliminar Grupo</flux:button>
             </div>
         </div>

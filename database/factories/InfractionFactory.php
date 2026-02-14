@@ -17,7 +17,9 @@ class InfractionFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'description' => $this->faker->sentence(3),
+            'severity' => 'NORMAL',
+            'created_at' => now(),
         ];
     }
 }

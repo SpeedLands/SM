@@ -6,6 +6,8 @@ use App\Models\Cycle;
 use App\Models\User;
 use App\Models\StudentCycleAssociation;
 use App\Models\StudentPii;
+use App\Models\Citation;
+use App\Models\NoticeSignature;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Str;
@@ -46,6 +48,7 @@ new class extends Component {
     // Deletion State
     public string $idToDelete = '';
     public string $nameToDelete = '';
+    public bool $showDeleteModal = false;
 
     public function updatingSearch(): void
     {
@@ -208,34 +211,48 @@ new class extends Component {
         $this->dispatch('student-saved');
     }
 
-    public function confirmDelete(string $id, string $name): void
+    public function confirmDelete(string $id): void
     {
         if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
+        $student = Student::findOrFail($id);
         $this->idToDelete = $id;
-        $this->nameToDelete = $name;
-        $this->dispatch('open-modal', name: 'confirm-delete-student');
+        $this->nameToDelete = $student->name;
+        $this->showDeleteModal = true;
     }
 
     public function deleteStudent(): void
     {
         if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
-        if (!$this->idToDelete) return;
-
-        $student = Student::findOrFail($this->idToDelete);
-        
-        if ($student->reports()->exists() || $student->communityServices()->exists()) {
-            $this->dispatch('notify', ['type' => 'error', 'message' => 'No se puede eliminar un alumno que tiene reportes o servicios registrados.']);
-            $this->dispatch('close-modal', name: 'confirm-delete-student');
+        if (!$this->idToDelete) {
+            \Illuminate\Support\Facades\Log::warning('Intento de borrar alumno sin ID seleccionado.');
             return;
         }
 
-        $student->delete();
-        $this->idToDelete = '';
-        $this->nameToDelete = '';
-        $this->dispatch('close-modal', name: 'confirm-delete-student');
-        $this->dispatch('student-saved'); // Trigger refresh
+        $student = Student::withCount(['reports', 'communityServices', 'citations', 'noticeSignatures'])->findOrFail($this->idToDelete);
+        
+        if ($student->reports_count > 0 || $student->community_services_count > 0 || $student->citations_count > 0 || $student->notice_signatures_count > 0) {
+            $this->dispatch('notify', [
+                'variant' => 'danger', 
+                'message' => 'No se puede eliminar un alumno que tiene historial (reportes, servicios, citatorios o avisos firmados).'
+            ]);
+            $this->showDeleteModal = false;
+            return;
+        }
+
+        try {
+            $student->delete();
+            \Illuminate\Support\Facades\Log::info("Alumno eliminado: {$this->nameToDelete} ({$this->idToDelete}) por usuario: " . auth()->id());
+            
+            $this->idToDelete = '';
+            $this->nameToDelete = '';
+            $this->showDeleteModal = false;
+            $this->dispatch('student-saved');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error al eliminar alumno: " . $e->getMessage());
+            $this->dispatch('notify', ['variant' => 'danger', 'message' => 'Error al eliminar el alumno en la base de datos.']);
+        }
     }
 
     public function with(): array
@@ -283,7 +300,7 @@ new class extends Component {
         $currentStudent = $this->studentId ? Student::with('parents')->find($this->studentId) : null;
 
         return [
-            'students' => $query->withCount(['reports', 'communityServices'])->latest('name')->paginate(10),
+            'students' => $query->withCount(['reports', 'communityServices', 'citations', 'noticeSignatures'])->latest('name')->paginate(10),
             'classGroups' => $classGroups,
             'activeCycle' => $activeCycle,
             'parentSearchResults' => $parentSearchResults,
@@ -399,10 +416,10 @@ new class extends Component {
                                 <div class="flex justify-end gap-1">
                                     @if(auth()->user()->isViewStaff())
                                         <flux:button x-on:click.stop variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
-                                        @if($student->reports_count === 0 && $student->community_services_count === 0)
-                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $student->id }}', '{{ $student->name }}')" />
+                                        @if($student->reports_count === 0 && $student->community_services_count === 0 && $student->citations_count === 0 && $student->notice_signatures_count === 0)
+                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $student->id }}')" />
                                         @else
-                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por registros asociados" disabled />
+                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por historial asociado" disabled />
                                         @endif
                                     @endif
 
@@ -591,7 +608,7 @@ new class extends Component {
     @endcan
 
     <!-- Deletion Confirmation Modal -->
-    <flux:modal name="confirm-delete-student" class="min-w-80">
+    <flux:modal wire:model="showDeleteModal" class="min-w-80">
         <div class="space-y-6">
             <div>
                 <flux:heading size="lg">Confirmar Eliminación</flux:heading>
@@ -603,9 +620,7 @@ new class extends Component {
 
             <div class="flex gap-2">
                 <flux:spacer />
-                <flux:modal.close>
-                    <flux:button variant="ghost">Cancelar</flux:button>
-                </flux:modal.close>
+                <flux:button variant="ghost" wire:click="$set('showDeleteModal', false)">Cancelar</flux:button>
                 <flux:button variant="danger" wire:click="deleteStudent">Eliminar Alumno</flux:button>
             </div>
         </div>
@@ -673,17 +688,17 @@ function studentPopover(){
         hide(){ this.show = false; this.studentId = null; this.studentName = null; },
         goToReport(){
             if(!this.studentId) return;
-            const url = '{{ route('reports.index') }}' + '?open_create=1&student_id=' + encodeURIComponent(this.studentId) + '&student_name=' + encodeURIComponent(this.studentName);
+            const url = "{{ route('reports.index') }}" + "?open_create=1&student_id=" + encodeURIComponent(this.studentId) + "&student_name=" + encodeURIComponent(this.studentName);
             window.location.href = url;
         },
         goToService(){
             if(!this.studentId) return;
-            const url = '{{ route('community-services.index') }}' + '?open_create=1&student_id=' + encodeURIComponent(this.studentId) + '&student_name=' + encodeURIComponent(this.studentName);
+            const url = "{{ route('community-services.index') }}" + "?open_create=1&student_id=" + encodeURIComponent(this.studentId) + "&student_name=" + encodeURIComponent(this.studentName);
             window.location.href = url;
         },
         goToCitation(){
             if(!this.studentId) return;
-            const url = '{{ route('citations.index') }}' + '?open_create=1&student_id=' + encodeURIComponent(this.studentId) + '&student_name=' + encodeURIComponent(this.studentName);
+            const url = "{{ route('citations.index') }}" + "?open_create=1&student_id=" + encodeURIComponent(this.studentId) + "&student_name=" + encodeURIComponent(this.studentName);
             window.location.href = url;
         }
     }
