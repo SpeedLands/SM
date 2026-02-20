@@ -24,7 +24,16 @@ class StoreCitationRequest extends FormRequest
         return [
             'selectedStudentId' => 'required|exists:students,id',
             'reason' => 'required|string',
-            'citationDate' => 'required|date|after_or_equal:today',
+            'citationDate' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+                function ($attribute, $value, $fail) {
+                    if ($value && \Carbon\Carbon::parse($value)->isWeekend()) {
+                        $fail('No se pueden agendar citatorios en sábados o domingos.');
+                    }
+                },
+            ],
             'citationTime' => 'required',
         ];
     }

@@ -15,7 +15,9 @@ new class extends Component {
 
     // Create Modal
     public bool $showCreateModal = false;
+    public bool $showDeleteModal = false;
     public ?string $editingCitationId = null;
+    public ?string $deletingCitationId = null;
     public string $studentSearch = '';
     public ?string $selectedStudentId = null;
     public string $reason = '';
@@ -132,11 +134,22 @@ new class extends Component {
         $this->showCreateModal = true;
     }
 
-    public function deleteCitation(string $id): void
+    public function confirmDelete(string $id): void
     {
         $this->authorize('teacher-or-admin');
-        Citation::findOrFail($id)->delete();
-        $this->dispatch('notify', ['message' => 'Citatorio eliminado correctamente.']);
+        $this->deletingCitationId = $id;
+        $this->showDeleteModal = true;
+    }
+
+    public function deleteCitation(): void
+    {
+        $this->authorize('teacher-or-admin');
+        if ($this->deletingCitationId) {
+            Citation::findOrFail($this->deletingCitationId)->delete();
+            $this->showDeleteModal = false;
+            $this->deletingCitationId = null;
+            $this->dispatch('notify', ['message' => 'Citatorio eliminado correctamente.']);
+        }
     }
 
     public function updateStatus(string $id, string $status): void
@@ -263,7 +276,7 @@ new class extends Component {
                                         <flux:button variant="ghost" size="sm" icon="check-circle" class="text-green-600" title="Marcar asistencia" wire:click="updateStatus('{{ $citation->id }}', 'ATTENDED')" />
                                         <flux:button variant="ghost" size="sm" icon="x-circle" class="text-red-600" title="Marcar inasistencia" wire:click="updateStatus('{{ $citation->id }}', 'NO_SHOW')" />
                                         <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editCitation('{{ $citation->id }}')" />
-                                        <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="deleteCitation('{{ $citation->id }}')" />
+                                        <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="confirmDelete('{{ $citation->id }}')" />
                                     @endif
 
                                 </div>
@@ -370,8 +383,15 @@ new class extends Component {
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <flux:input type="date" wire:model="citationDate" label="Fecha de la Cita" />
-                        <flux:input type="time" wire:model="citationTime" label="Hora" />
+                        <flux:field>
+                            <flux:label>Fecha de la Cita</flux:label>
+                            <flux:input type="date" wire:model="citationDate" />
+                        </flux:field>
+
+                        <flux:field>
+                            <flux:label>Hora</flux:label>
+                            <flux:input type="time" wire:model="citationTime" />
+                        </flux:field>
                     </div>
 
                     <flux:textarea wire:model="reason" label="Motivo de la Cita" rows="4" placeholder="Ej: Revisión de desempeño académico, Comportamiento en clase..." />
@@ -383,6 +403,22 @@ new class extends Component {
                     <flux:button variant="primary" type="submit">{{ $editingCitationId ? 'Actualizar Citatorio' : 'Generar Citatorio' }}</flux:button>
                 </div>
             </form>
+        </flux:modal>
+
+        <!-- Delete Confirmation Modal -->
+        <flux:modal name="delete-citation" wire:model="showDeleteModal" class="md:w-96">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">¿Eliminar citatorio?</flux:heading>
+                    <flux:text class="mt-2 text-zinc-500">Esta acción no se puede deshacer. Los padres del alumno ya no podrán ver este citatorio.</flux:text>
+                </div>
+
+                <div class="flex gap-2">
+                    <flux:spacer />
+                    <flux:button wire:click="$set('showDeleteModal', false)">Cancelar</flux:button>
+                    <flux:button variant="danger" wire:click="deleteCitation">Eliminar</flux:button>
+                </div>
+            </div>
         </flux:modal>
     @endif
 </div>

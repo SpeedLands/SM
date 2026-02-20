@@ -20,6 +20,7 @@ new class extends Component {
     public string $severity = 'NORMAL';
 
     // Deletion Confirmation
+    public bool $showDeleteModal = false;
     public ?Infraction $infractionToDelete = null;
 
     public function updatingSearch(): void
@@ -29,7 +30,7 @@ new class extends Component {
 
     public function mount(): void
     {
-        abort_unless(auth()->user()->isAdmin() && auth()->user()->isViewStaff(), 403);
+        abort_unless(auth()->user()?->isAdmin() && auth()->user()?->isViewStaff(), 403);
     }
 
     public function openCreateModal(): void
@@ -82,21 +83,31 @@ new class extends Component {
     public function confirmDelete(Infraction $infraction): void
     {
         $this->infractionToDelete = $infraction;
-        $this->dispatch('open-modal', name: 'confirm-delete-infraction');
+        $this->showDeleteModal = true;
     }
 
     public function delete(): void
     {
         if (!$this->infractionToDelete) return;
 
-        if ($this->infractionToDelete->reports()->exists()) {
+        // Ensure we have the latest database state
+        $infraction = Infraction::find($this->infractionToDelete->id);
+
+        if (!$infraction) {
+            $this->infractionToDelete = null;
+            $this->showDeleteModal = false;
+            return;
+        }
+
+        if (App\Models\Report::where('infraction_id', $infraction->id)->exists()) {
             $this->dispatch('notify', ['message' => 'No se puede eliminar un tipo de reporte que ya ha sido utilizado.', 'variant' => 'danger']);
-            $this->dispatch('close-modal', name: 'confirm-delete-infraction');
+            $this->infractionToDelete = null;
+            $this->showDeleteModal = false;
             return;
         }
         
         try {
-            $this->infractionToDelete->delete();
+            $infraction->delete();
             cache()->forget('infractions_all');
             $this->dispatch('notify', ['message' => 'Tipo de reporte eliminado.']);
         } catch (\Exception $e) {
@@ -104,7 +115,7 @@ new class extends Component {
         }
 
         $this->infractionToDelete = null;
-        $this->dispatch('close-modal', name: 'confirm-delete-infraction');
+        $this->showDeleteModal = false;
     }
 
     public function with(): array
@@ -206,7 +217,7 @@ new class extends Component {
     </flux:modal>
 
     <!-- Deletion Confirmation Modal -->
-    <flux:modal name="confirm-delete-infraction" class="min-w-80">
+    <flux:modal wire:model.self="showDeleteModal" class="min-w-80">
         <div class="space-y-6">
             <div>
                 <flux:heading size="lg">Confirmar Eliminación</flux:heading>
@@ -217,9 +228,7 @@ new class extends Component {
 
             <div class="flex gap-2">
                 <flux:spacer />
-                <flux:modal.close>
-                    <flux:button variant="ghost">Cancelar</flux:button>
-                </flux:modal.close>
+                <flux:button variant="ghost" wire:click="$set('showDeleteModal', false)">Cancelar</flux:button>
                 <flux:button variant="danger" wire:click="delete">Eliminar</flux:button>
             </div>
         </div>

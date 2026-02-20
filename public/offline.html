@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sin Conexión - Sistema de Gestión Escolar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #27272a;
+            }
+
+            .container {
+                background: #18181b;
+                border-color: #3f3f46;
+            }
+
+            h1 {
+                color: #fafafa;
+            }
+
+            p {
+                color: #a1a1aa;
+            }
+
+            .tips {
+                border-top-color: #3f3f46;
+            }
+
+            .tips h2 {
+                color: #e4e4e7;
+            }
+
+            .tips li {
+                color: #a1a1aa;
+            }
+
+            .tips li::before {
+                color: #818cf8;
+            }
+        }
+
+        .container {
+            background: white;
+            border: 1px solid #e4e4e7;
+            border-radius: 20px;
+            padding: 60px 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 0.9;
+            }
+        }
+
+        .icon svg {
+            width: 60px;
+            height: 60px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #18181b;
+            margin-bottom: 15px;
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+
+        p {
+            font-size: 16px;
+            color: #52525b;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            transition: color 0.3s;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #fecaca;
+            color: #991b1b;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .status {
+                background: rgba(220, 38, 38, 0.2);
+                color: #fca5a5;
+            }
+
+            .status-dot {
+                background: #fca5a5;
+            }
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #991b1b;
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .retry-button {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .retry-button:active {
+            transform: translateY(0);
+        }
+
+        .tips {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e4e4e7;
+            transition: border-color 0.3s;
+        }
+
+        .tips h2 {
+            font-size: 16px;
+            color: #27272a;
+            margin-bottom: 15px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .tips ul {
+            list-style: none;
+            text-align: left;
+        }
+
+        .tips li {
+            padding: 8px 0;
+            color: #52525b;
+            font-size: 14px;
+            display: flex;
+            align-items: start;
+            gap: 10px;
+            transition: color 0.3s;
+        }
+
+        .tips li::before {
+            content: "•";
+            color: #6366f1;
+            font-weight: bold;
+            font-size: 20px;
+            line-height: 1;
+            transition: color 0.3s;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 40px 30px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .icon {
+                width: 100px;
+                height: 100px;
+            }
+
+            .icon svg {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9z" />
+                <path d="M5 13l2 2c3.11-3.11 8.89-3.11 12 0l2-2c-4.18-4.18-10.82-4.18-15 0z" />
+                <path d="M9 17l3 3 3-3c-1.66-1.66-4.34-1.66-6 0z" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+            </svg>
+        </div>
+
+        <h1>Sin Conexión a Internet</h1>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            <span>Desconectado</span>
+        </div>
+
+        <p>No se puede conectar al servidor. Por favor, verifica tu conexión a internet e intenta nuevamente.</p>
+
+        <button class="retry-button" onclick="window.location.reload()">
+            Reintentar Conexión
+        </button>
+
+        <div class="tips">
+            <h2>Sugerencias:</h2>
+            <ul>
+                <li>Verifica que tu dispositivo esté conectado a internet</li>
+                <li>Comprueba que el WiFi o datos móviles estén activados</li>
+                <li>Intenta recargar la página en unos momentos</li>
+                <li>Si el problema persiste, contacta al administrador del sistema</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Auto-retry when connection is restored
+        window.addEventListener('online', () => {
+            window.location.reload();
+        });
+
+        // Update status when connection changes
+        function updateStatus() {
+            const status = document.querySelector('.status');
+            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (navigator.onLine) {
+                status.innerHTML = '<span class="status-dot" style="background: ' + (isDark ? '#86efac' : '#16a34a') + ';"></span><span>Conectado</span>';
+                status.style.background = isDark ? 'rgba(34, 197, 94, 0.2)' : '#dcfce7';
+                status.style.color = isDark ? '#86efac' : '#166534';
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        }
+
+        window.addEventListener('online', updateStatus);
+        window.addEventListener('offline', updateStatus);
+    </script>
+</body>
+
+</html>

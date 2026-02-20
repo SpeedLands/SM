@@ -22,7 +22,9 @@ new class extends Component {
     
     // Modal state
     public bool $showReportModal = false;
+    public bool $showDeleteModal = false;
     public ?Report $editingReport = null;
+    public ?string $reportIdToDelete = null;
     
     // Form fields
     public string $studentSearch = '';
@@ -151,17 +153,33 @@ new class extends Component {
         }
     }
 
-    public function deleteReport(string $id): void
+    public function confirmDelete(string $id): void
     {
         $this->authorize('admin-only');
-        $report = Report::findOrFail($id);
+        $this->reportIdToDelete = $id;
+        $this->showDeleteModal = true;
+    }
+
+    public function deleteReport(): void
+    {
+        $this->authorize('admin-only');
+        
+        if (!$this->reportIdToDelete) {
+            return;
+        }
+
+        $report = Report::findOrFail($this->reportIdToDelete);
 
         if ($report->status === 'SIGNED') {
             $this->dispatch('notify', ['message' => 'No se puede eliminar un reporte que ya ha sido firmado.', 'variant' => 'danger']);
+            $this->showDeleteModal = false;
+            $this->reportIdToDelete = null;
             return;
         }
 
         $report->delete();
+        $this->showDeleteModal = false;
+        $this->reportIdToDelete = null;
         $this->dispatch('notify', ['message' => 'Reporte eliminado correctamente.']);
     }
 
@@ -320,7 +338,7 @@ new class extends Component {
                             <td class="py-4 px-2 text-right">
                                 <div class="flex justify-end gap-1">
                                     @if(auth()->user()->isAdmin())
-                                        <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="deleteReport('{{ $report->id }}')" />
+                                        <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $report->id }}')" />
                                     @endif
                                 </div>
                             </td>
@@ -474,6 +492,28 @@ new class extends Component {
                     <flux:button variant="primary" type="submit">Guardar Reporte</flux:button>
                 </div>
             </form>
+        </flux:modal>
+    @endcan
+
+    @can('admin-only')
+        <!-- Delete Confirmation Modal -->
+        <flux:modal wire:model.self="showDeleteModal" class="min-w-88">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">¿Eliminar reporte?</flux:heading>
+                    <flux:text class="mt-2">
+                        Esta acción no se puede deshacer. El registro del reporte será eliminado permanentemente.
+                    </flux:text>
+                </div>
+
+                <div class="flex gap-2">
+                    <flux:spacer />
+                    <flux:modal.close>
+                        <flux:button variant="ghost">Cancelar</flux:button>
+                    </flux:modal.close>
+                    <flux:button variant="danger" wire:click="deleteReport">Eliminar Reporte</flux:button>
+                </div>
+            </div>
         </flux:modal>
     @endcan
 

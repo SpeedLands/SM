@@ -582,7 +582,7 @@ class ExcelImportService
                         'birth_date' => '2010-01-01', // Default
                         'grade' => $currentGrade,
                         'group_name' => $currentSection,
-                        'turn' => trim($turn),
+                        'turn' => strtoupper(trim($turn)),
                     ]
                 );
 

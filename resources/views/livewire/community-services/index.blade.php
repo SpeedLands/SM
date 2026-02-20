@@ -24,6 +24,10 @@ new class extends Component {
     public string $activity = '';
     public string $description = '';
     public string $scheduledDate = '';
+    
+    // Deletion
+    public bool $showDeleteModal = false;
+    public ?string $idToDelete = null;
 
     public function updatingSearch(): void
     {
@@ -146,6 +150,26 @@ new class extends Component {
         $service->update($data);
         
         $this->dispatch('notify', ['message' => 'Estado del servicio actualizado.']);
+    }
+
+    public function confirmDelete(string $id): void
+    {
+        $this->authorize('teacher-or-admin');
+        $this->idToDelete = $id;
+        $this->showDeleteModal = true;
+    }
+
+    public function delete(): void
+    {
+        $this->authorize('teacher-or-admin');
+        if (!$this->idToDelete) return;
+
+        $service = CommunityService::findOrFail($this->idToDelete);
+        $service->delete();
+
+        $this->idToDelete = null;
+        $this->showDeleteModal = false;
+        $this->dispatch('notify', ['message' => 'Servicio comunitario eliminado.']);
     }
 
     public function with(): array
@@ -290,6 +314,7 @@ new class extends Component {
                                         <flux:button variant="ghost" size="sm" icon="check-circle" class="text-green-600" title="Marcar como cumplido" wire:click="updateStatus('{{ $service->id }}', 'COMPLETED')" />
                                         <flux:button variant="ghost" size="sm" icon="x-circle" class="text-red-600" title="Marcar como no asistió" wire:click="updateStatus('{{ $service->id }}', 'MISSED')" />
                                     @endif
+                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" title="Eliminar servicio" wire:click="confirmDelete('{{ $service->id }}')" />
                                 </div>
                             </td>
                         </tr>
@@ -436,5 +461,23 @@ new class extends Component {
                 <flux:button variant="primary" type="submit">Asignar Servicio</flux:button>
             </div>
         </form>
+    </flux:modal>
+
+    <!-- Deletion Confirmation Modal -->
+    <flux:modal wire:model.self="showDeleteModal" class="min-w-80">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Confirmar Eliminación</flux:heading>
+                <flux:subheading>
+                    ¿Estás seguro de eliminar este registro de servicio comunitario? Esta acción no se puede deshacer.
+                </flux:subheading>
+            </div>
+
+            <div class="flex gap-2">
+                <flux:spacer />
+                <flux:button variant="ghost" wire:click="$set('showDeleteModal', false)">Cancelar</flux:button>
+                <flux:button variant="danger" wire:click="delete">Eliminar</flux:button>
+            </div>
+        </div>
     </flux:modal>
 </div>

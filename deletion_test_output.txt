@@ -1,0 +1,10 @@
+
+   PASS  Tests\Feature\DeletionFunctionalityTest
+  Ô£ô admin can deleÔÇª 38.01s  
+  Ô£ô admin cannot deÔÇª 1.49s  
+  Ô£ô admin can deletÔÇª 1.38s  
+  Ô£ô admin can deletÔÇª 1.01s  
+
+  Tests:    4 passed (14 assertions)
+  Duration: 42.71s
+

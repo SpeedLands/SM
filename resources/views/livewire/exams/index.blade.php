@@ -16,6 +16,9 @@ new class extends Component {
 
     // Create Modal
     public bool $showCreateModal = false;
+    public bool $showDeleteModal = false;
+    public ?string $editingExamId = null;
+    public ?string $deletingExamId = null;
     public string $grade = '1';
     public string $groupName = 'A';
     public string $period = '1';
@@ -117,11 +120,22 @@ new class extends Component {
         $this->dispatch('notify', ['message' => 'Examen programado correctamente.']);
     }
 
-    public function deleteExam(string $id): void
+    public function confirmDelete(string $id): void
     {
         if (!auth()->user()->isViewStaff()) abort(403);
-        ExamSchedule::findOrFail($id)->delete();
-        $this->dispatch('notify', ['message' => 'Examen eliminado.']);
+        $this->deletingExamId = $id;
+        $this->showDeleteModal = true;
+    }
+
+    public function deleteExam(): void
+    {
+        if (!auth()->user()->isViewStaff()) abort(403);
+        if ($this->deletingExamId) {
+            ExamSchedule::findOrFail($this->deletingExamId)->delete();
+            $this->showDeleteModal = false;
+            $this->deletingExamId = null;
+            $this->dispatch('notify', ['message' => 'Examen eliminado correctamente.']);
+        }
     }
 
     public function with(): array
@@ -221,7 +235,7 @@ new class extends Component {
                                 <flux:badge size="xs" color="purple" variant="outline">{{ $exam->period }}º Trimestre</flux:badge>
                                 @if($isStaff)
                                     <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="deleteExam('{{ $exam->id }}')" />
+                                        <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="confirmDelete('{{ $exam->id }}')" />
                                     </div>
                                 @endif
                             </div>
@@ -240,6 +254,22 @@ new class extends Component {
                 </div>
             @endforeach
         </div>
+
+        <!-- Delete Confirmation Modal -->
+        <flux:modal name="delete-exam" wire:model="showDeleteModal" class="md:w-96">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">¿Eliminar examen?</flux:heading>
+                    <flux:text class="mt-2 text-zinc-500">Esta acción no se puede deshacer. Los alumnos y padres dejarán de ver esta fecha de evaluación.</flux:text>
+                </div>
+
+                <div class="flex gap-2">
+                    <flux:spacer />
+                    <flux:button wire:click="$set('showDeleteModal', false)">Cancelar</flux:button>
+                    <flux:button variant="danger" wire:click="deleteExam">Eliminar</flux:button>
+                </div>
+            </div>
+        </flux:modal>
     @endif
 
     <!-- Create Modal -->
