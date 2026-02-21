@@ -193,3 +193,11 @@ deploy.php
 # /public/sw.js  # Comentado porque es parte del código fuente
 
 DOC_MEMORIA_DE_ESTADIAS_OLD_SYSTEM.md
+MEMORIA_ESTADIAS.md
+DOC.md
+*.txt
+
+/DATOS_CORREGIDOS
+/DATOS_CORREGIDOS/*
+/DATOS/*
+/DATOS/

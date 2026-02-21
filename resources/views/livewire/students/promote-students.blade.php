@@ -42,7 +42,7 @@ new class extends Component {
             ->orderBy('grade')
             ->orderBy('section')
             ->get()
-            ->map(fn($g) => ['id' => $g->id, 'name' => "{$g->grade}º {$g->section}"])
+            ->map(fn($g) => ['id' => $g->id, 'name' => "{$g->grade} {$g->section}"])
             ->toArray();
             
         $this->reset(['sourceGroupId', 'students', 'selectedStudents', 'selectAll']);
@@ -54,7 +54,7 @@ new class extends Component {
             ->orderBy('grade')
             ->orderBy('section')
             ->get()
-            ->map(fn($g) => ['id' => $g->id, 'name' => "{$g->grade}º {$g->section}"])
+            ->map(fn($g) => ['id' => $g->id, 'name' => "{$g->grade} {$g->section}"])
             ->toArray();
             
         $this->reset(['destinationGroupId']);

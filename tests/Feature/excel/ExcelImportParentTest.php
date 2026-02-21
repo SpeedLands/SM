@@ -137,7 +137,7 @@ it('silently skips header rows containing field names', function () {
     $student = Student::factory()->create([
         'name' => 'HIJO',
         'grade' => '3º',
-        'group_name' => 'A'
+        'group_name' => 'A',
     ]);
 
     $report = $this->service->importParents($rows, '3º', 'A');
@@ -152,11 +152,11 @@ it('accumulates children names across different imports (cross-group)', function
     $rows1 = collect([
         ['Padre de HIJO A', 'papa@test.com', '123', 'pass', 'PARENT', 'N/A'],
     ]);
-    
+
     $studentA = Student::factory()->create(['name' => 'HIJO A', 'grade' => '3º', 'group_name' => 'A']);
-    
+
     $this->service->importParents($rows1, '3º', 'A');
-    
+
     $user = User::where('email', 'papa@test.com')->first();
     expect($user->name)->toBe('Padre de HIJO A');
 
@@ -164,9 +164,9 @@ it('accumulates children names across different imports (cross-group)', function
     $rows2 = collect([
         ['Padre de HIJO B', 'papa@test.com', '123', 'pass', 'PARENT', 'N/A'],
     ]);
-    
+
     $studentB = Student::factory()->create(['name' => 'HIJO B', 'grade' => '1º', 'group_name' => 'B']);
-    
+
     $this->service->importParents($rows2, '1º', 'B');
 
     $user->refresh();
@@ -181,7 +181,7 @@ it('protects staff profiles (Admin/Teacher) during parent import', function () {
         'name' => 'PROFESOR JUAN',
         'email' => 'juan@colegio.com',
         'role' => 'TEACHER',
-        'password' => Hash::make('docente123')
+        'password' => Hash::make('docente123'),
     ]);
 
     $student = Student::factory()->create(['name' => 'HIJO DEL PROFE', 'grade' => '3º', 'group_name' => 'A']);
@@ -209,5 +209,58 @@ it('protects staff profiles (Admin/Teacher) during parent import', function () {
 
     // Notification should be present
     expect($report['notifications']['success'])->toHaveCount(1)
-        ->and($report['notifications']['success'][0]['type'])->toBe('staff_parent');
+        ->and($report['notifications']['success'][0]['type'])->toBe('staff_parent')
+        ->and($report['notifications']['success'][0]['user_name'])->toBe('PROFESOR JUAN')
+        ->and($report['notifications']['success'][0]['children'])->toContain('HIJO DEL PROFE');
+});
+
+it('summarizes parent name when there are more than 3 children', function () {
+    // 1. Setup 5 Students
+    $students = [];
+    for ($i = 1; $i <= 5; $i++) {
+        $students[] = Student::factory()->create([
+            'name' => "HIJO {$i}",
+            'grade' => '3º',
+            'group_name' => 'A',
+        ]);
+    }
+
+    // 2. Mock Excel Rows (5 rows for the same parent)
+    $rows = collect([]);
+    foreach ($students as $student) {
+        $rows->push(["Padre de {$student->name}", 'multihijos@example.com', '123', 'pass', 'PARENT', 'N/A']);
+    }
+
+    // 3. Execute
+    $this->service->importParents($rows, '3º', 'A');
+
+    // 4. Assertions
+    $user = User::where('email', 'multihijos@example.com')->first();
+
+    // Format: Padre de 5 alumnos (HIJO 1, HIJO 2, HIJO 3 y 2 más)
+    expect($user->name)->toContain('Padre de 5 alumnos')
+        ->and($user->name)->toContain('HIJO 1, HIJO 2, HIJO 3')
+        ->and($user->name)->toContain('y 2 más');
+});
+
+it('ensures parent name never exceeds 255 characters', function () {
+    // 1. Setup Student with VERY long name
+    $longName = str_repeat('A', 300);
+    $student = Student::factory()->create([
+        'name' => $longName,
+        'grade' => '3º',
+        'group_name' => 'A',
+    ]);
+
+    // 2. Mock Excel Row
+    $rows = collect([
+        ["Padre de {$longName}", 'longname@example.com', '123', 'pass', 'PARENT', 'N/A'],
+    ]);
+
+    // 3. Execute
+    $this->service->importParents($rows, '3º', 'A');
+
+    // 4. Assertions
+    $user = User::where('email', 'longname@example.com')->first();
+    expect(strlen($user->name))->toBeLessThanOrEqual(255);
 });

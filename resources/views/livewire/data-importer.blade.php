@@ -264,27 +264,37 @@
                         <div class="space-y-6">
                             <!-- Errores Críticos -->
                             @if(!empty($stats['notifications']['errors']))
-                                <div class="space-y-3">
-                                    <flux:heading size="sm" class="text-red-600 flex items-center gap-2">
-                                        <flux:icon.x-circle class="w-4 h-4" /> Errores Críticos
-                                    </flux:heading>
-                                    @foreach($stats['notifications']['errors'] as $error)
-                                        <div class="p-3 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-lg text-sm">
-                                            <div class="font-bold text-red-700 dark:text-red-400">{{ $error['message'] }}</div>
-                                            @if(isset($error['row'])) <div class="text-xs text-red-600 dark:text-red-500 mt-1">Fila: {{ $error['row'] }} | Valor: {{ $error['value'] ?? 'N/A' }}</div> @endif
-                                            <div class="text-xs text-red-600 dark:text-red-500 mt-1 italic">Acción: {{ $error['action'] ?? 'Fila omitida' }}</div>
+                                <div x-data="{ open: true }" class="space-y-3">
+                                    <flux:heading size="sm" class="text-red-600 flex items-center justify-between cursor-pointer" x-on:click="open = !open">
+                                        <div class="flex items-center gap-2">
+                                            <flux:icon.x-circle class="w-4 h-4" /> Errores Críticos
                                         </div>
-                                    @endforeach
+                                        <flux:icon.chevron-down class="w-3 h-3 transition-transform" x-bind:class="open || '-rotate-90'" />
+                                    </flux:heading>
+                                    
+                                    <div x-show="open" x-collapse class="space-y-2">
+                                        @foreach($stats['notifications']['errors'] as $error)
+                                            <div class="p-3 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-lg text-sm">
+                                                <div class="font-bold text-red-700 dark:text-red-400">{{ $error['message'] }}</div>
+                                                @if(isset($error['row'])) <div class="text-xs text-red-600 dark:text-red-500 mt-1">Fila: {{ $error['row'] }} | Valor: {{ $error['value'] ?? 'N/A' }}</div> @endif
+                                                <div class="text-xs text-red-600 dark:text-red-500 mt-1 italic">Acción: {{ $error['action'] ?? 'Fila omitida' }}</div>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             @endif
 
                             <!-- Advertencias -->
                             @if(!empty($stats['notifications']['warnings']))
-                                <div class="space-y-3">
-                                    <flux:heading size="sm" class="text-amber-600 flex items-center gap-2">
-                                        <flux:icon.exclamation-triangle class="w-4 h-4" /> Advertencias y Pendientes
+                                <div x-data="{ open: true }" class="space-y-3">
+                                    <flux:heading size="sm" class="text-amber-600 flex items-center justify-between cursor-pointer" x-on:click="open = !open">
+                                        <div class="flex items-center gap-2">
+                                            <flux:icon.exclamation-triangle class="w-4 h-4" /> Advertencias y Pendientes
+                                        </div>
+                                        <flux:icon.chevron-down class="w-3 h-3 transition-transform" x-bind:class="open || '-rotate-90'" />
                                     </flux:heading>
-                                    <div class="max-h-64 overflow-y-auto space-y-2 pr-2">
+
+                                    <div x-show="open" x-collapse class="max-h-64 overflow-y-auto space-y-2 pr-2">
                                         @foreach($stats['notifications']['warnings'] as $warning)
                                             <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 rounded-lg text-sm">
                                                 <div class="font-bold text-amber-700 dark:text-amber-400">{{ $warning['message'] }}</div>
@@ -301,11 +311,15 @@
 
                             <!-- Éxitos / Casos Especiales -->
                             @if(!empty($stats['notifications']['success']))
-                                <div class="space-y-3">
-                                    <flux:heading size="sm" class="text-green-600 flex items-center gap-2">
-                                        <flux:icon.check-circle class="w-4 h-4" /> Casos Identificados Automáticamente
+                                <div x-data="{ open: true }" class="space-y-3">
+                                    <flux:heading size="sm" class="text-green-600 flex items-center justify-between cursor-pointer" x-on:click="open = !open">
+                                        <div class="flex items-center gap-2">
+                                            <flux:icon.check-circle class="w-4 h-4" /> Casos Identificados Automáticamente
+                                        </div>
+                                        <flux:icon.chevron-down class="w-3 h-3 transition-transform" x-bind:class="open || '-rotate-90'" />
                                     </flux:heading>
-                                    <div class="max-h-64 overflow-y-auto space-y-2 pr-2">
+
+                                    <div x-show="open" x-collapse class="max-h-96 overflow-y-auto space-y-2 pr-2">
                                         @foreach($stats['notifications']['success'] as $success)
                                             <div class="p-3 bg-green-50 dark:bg-green-950/30 border border-green-100 dark:border-green-900/50 rounded-lg text-sm">
                                                 @if($success['type'] === 'multiple_children')
@@ -321,6 +335,14 @@
                                                     </div>
                                                     <div class="text-[11px] text-green-600 dark:text-green-500 mt-1">
                                                         Se buscó "{{ $success['student_searched'] }}" y se vinculó con "{{ $success['student_found'] }}"
+                                                    </div>
+                                                @elseif($success['type'] === 'staff_parent')
+                                                    <div class="font-bold text-green-700 dark:text-green-400 flex items-center gap-2">
+                                                        <flux:icon.identification class="w-4 h-4" /> Personal/Admin identificado
+                                                    </div>
+                                                    <div class="text-[11px] text-green-600 dark:text-green-500 mt-1">
+                                                        <strong>{{ $success['user_name'] }}</strong> ({{ $success['user_email'] }}) tiene el rol <strong>{{ $success['user_role'] }}</strong>.
+                                                        Sus hijos vinculados en esta sesión: {{ implode(', ', $success['children'] ?? []) }}.
                                                     </div>
                                                 @else
                                                     <div class="font-bold text-green-700 dark:text-green-400">{{ $success['message'] }}</div>
@@ -340,21 +362,30 @@
 
                 {{-- Action items from old structure (backwards compatibility for Teachers) --}}
                 @if(!empty($stats['action_items']))
-                    <div class="mt-8 text-left space-y-4 max-w-2xl mx-auto">
-                        <flux:heading size="lg" class="flex items-center gap-2">
-                            <flux:icon.exclamation-triangle class="text-zinc-500" />
-                            Acciones de Seguimiento
+                    <div x-data="{ open: false }" class="mt-8 text-left space-y-4 max-w-2xl mx-auto border dark:border-zinc-800 rounded-xl overflow-hidden">
+                        <flux:heading 
+                            size="lg" 
+                            class="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                            x-on:click="open = !open"
+                        >
+                            <div class="flex items-center gap-2">
+                                <flux:icon.exclamation-triangle class="text-zinc-500" />
+                                Acciones de Seguimiento ({{ count($stats['action_items']) }})
+                            </div>
+                            <flux:icon.chevron-down class="w-4 h-4 transition-transform duration-200" x-bind:class="open && 'rotate-180'" />
                         </flux:heading>
                         
-                        <div class="space-y-2">
-                            @foreach($stats['action_items'] as $item)
-                                <div class="bg-zinc-50 dark:bg-zinc-800/50 border-l-4 border-zinc-400 dark:border-zinc-600 p-3 rounded-r-lg flex justify-between items-start">
-                                    <div class="text-sm">
-                                        <div class="font-bold text-zinc-900 dark:text-zinc-100">{{ $item['title'] }}</div>
-                                        <div class="text-zinc-800 dark:text-zinc-400">{{ $item['message'] }}</div>
+                        <div x-show="open" x-collapse>
+                            <div class="p-4 space-y-2 border-t dark:border-zinc-800 max-h-96 overflow-y-auto">
+                                @foreach($stats['action_items'] as $item)
+                                    <div class="bg-zinc-50 dark:bg-zinc-800/50 border-l-4 border-zinc-400 dark:border-zinc-600 p-3 rounded-r-lg flex justify-between items-start">
+                                        <div class="text-sm">
+                                            <div class="font-bold text-zinc-900 dark:text-zinc-100">{{ $item['title'] }}</div>
+                                            <div class="text-zinc-800 dark:text-zinc-400">{{ $item['message'] }}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 @endif

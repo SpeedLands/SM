@@ -13,9 +13,16 @@ Volt::route('dashboard', 'dashboard.index')
     ->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Volt::route('cycles', 'cycles.index')->name('cycles.index');
-    Volt::route('users', 'users.index')->name('users.index');
-    Route::get('importar-datos', \App\Livewire\DataImporter::class)->name('data-importer');
+    Route::middleware('can:admin-only')->group(function () {
+        Volt::route('cycles', 'cycles.index')->name('cycles.index');
+        Volt::route('users', 'users.index')->name('users.index');
+        Route::get('importar-datos', \App\Livewire\DataImporter::class)->name('data-importer');
+        Volt::route('exportar-datos', 'data-exporter')->name('data-exporter');
+
+        Route::get('exportar/maestros', [\App\Http\Controllers\ExportController::class, 'teachers'])->name('export.teachers');
+        Route::get('exportar/padres', [\App\Http\Controllers\ExportController::class, 'parents'])->name('export.parents');
+        Route::get('exportar/alumnos', [\App\Http\Controllers\ExportController::class, 'students'])->name('export.students');
+    });
     Volt::route('reglamento', 'regulations.index')->name('regulations.index');
     Volt::route('alumnos', 'students.index')->name('students.index');
     Volt::route('alumnos/promover', 'students.promote-students')->name('students.promote');

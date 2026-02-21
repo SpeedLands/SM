@@ -90,6 +90,12 @@ new class extends Component {
     public function save(): void
     {
         $this->authorize('teacher-or-admin');
+
+        if (now()->isWeekend()) {
+            $this->dispatch('notify', ['message' => 'No se pueden registrar reportes los fines de semana.', 'variant' => 'warning']);
+            return;
+        }
+
         $request = new StoreReportRequest();
         $this->validate($request->rules(), $request->messages(), $request->attributes());
 

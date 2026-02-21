@@ -15,14 +15,14 @@ class CheckUserStatus
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && auth()->user()->status === 'INACTIVE') {
+        if (auth()->check() && auth()->user()->status === 'BLOCKED') {
             auth()->logout();
 
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
             return redirect()->route('login')->withErrors([
-                'email' => 'Su cuenta ha sido desactivada. Por favor, contacte al administrador.',
+                'email' => 'Su cuenta ha sido bloqueada. Por favor, contacte al administrador.',
             ]);
         }
 
