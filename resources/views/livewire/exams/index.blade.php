@@ -201,7 +201,7 @@ new class extends Component {
         <flux:select wire:model.live="gradeFilter" placeholder="Grado (Todos)">
             <option value="">Todos los grados</option>
             @foreach($availableGroups->pluck('grade')->unique() as $grade)
-                <option value="{{ $grade }}">{{ $grade }}º Grado</option>
+                <option value="{{ $grade }}">{{ $grade }} Grado</option>
             @endforeach
         </flux:select>
 
@@ -292,7 +292,7 @@ new class extends Component {
                 <div class="grid grid-cols-2 gap-4">
                     <flux:select wire:model="grade" label="Grado">
                         @foreach($availableGroups->pluck('grade')->unique() as $g)
-                            <option value="{{ $g }}">{{ $g }}º Grado</option>
+                            <option value="{{ $g }}">{{ $g }} Grado</option>
                         @endforeach
                     </flux:select>
                     <flux:select wire:model="groupName" label="Grupo">

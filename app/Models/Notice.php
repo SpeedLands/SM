@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Notice extends Model
 {
@@ -12,11 +14,8 @@ class Notice extends Model
     use HasFactory, HasUuids;
 
     public $timestamps = false;
+
     public ?array $cached_stats = null;
-    // Composite PKs are tricky in standard Eloquent save(), but manageable.
-    // We define generic ID for now, but be aware.
-    // Or we rely on ID being unique enough? Yes, ID is UUID.
-    // Partitioning key is cycle_id.
 
     protected $fillable = [
         'cycle_id',
@@ -41,17 +40,17 @@ class Notice extends Model
         'target_class_groups' => 'array',
     ];
 
-    public function author()
+    public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
     }
 
-    public function signatures()
+    public function signatures(): HasMany
     {
         return $this->hasMany(NoticeSignature::class);
     }
 
-    public function cycle()
+    public function cycle(): BelongsTo
     {
         return $this->belongsTo(Cycle::class);
     }
@@ -66,14 +65,14 @@ class Notice extends Model
                 $query->where('cycle_id', $this->cycle_id);
             })
             ->when($this->target_audience === 'PARENTS', function ($query) {
-                $query->when(!empty($this->target_grades), function ($q) {
+                $query->when(! empty($this->target_grades), function ($q) {
                     $q->whereIn('grade', $this->target_grades);
                 })
-                ->when(!empty($this->target_class_groups), function ($q) {
-                    $q->whereHas('currentCycleAssociation', function ($sq) {
-                        $sq->whereIn('class_group_id', $this->target_class_groups);
+                    ->when(! empty($this->target_class_groups), function ($q) {
+                        $q->whereHas('currentCycleAssociation', function ($sq) {
+                            $sq->whereIn('class_group_id', $this->target_class_groups);
+                        });
                     });
-                });
             });
     }
 
@@ -109,7 +108,9 @@ class Notice extends Model
     public function isTargeting(Student $student): bool
     {
         // Must be in the cycle of the notice
-        if (!$student->currentCycleAssociation || $student->currentCycleAssociation->cycle_id !== $this->cycle_id) {
+        $association = $student->cycleAssociations->firstWhere('cycle_id', $this->cycle_id);
+
+        if (! $association) {
             return false;
         }
 
@@ -124,16 +125,15 @@ class Notice extends Model
         }
 
         // Check Grade targeting
-        if (!empty($this->target_grades)) {
+        if (! empty($this->target_grades)) {
             if (in_array($student->grade, $this->target_grades)) {
                 return true;
             }
         }
 
         // Check Class Group targeting
-        if (!empty($this->target_class_groups)) {
-            $assoc = $student->currentCycleAssociation;
-            if ($assoc && in_array($assoc->class_group_id, $this->target_class_groups)) {
+        if (! empty($this->target_class_groups)) {
+            if (in_array($association->class_group_id, $this->target_class_groups)) {
                 return true;
             }
         }

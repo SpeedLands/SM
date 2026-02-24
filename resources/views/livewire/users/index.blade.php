@@ -28,6 +28,12 @@ new class extends Component {
     public string $userOccupation = '';
     public string $userPassword = '';
     public bool $showPassword = false;
+    
+    // Blocking Confirmation
+    public bool $showBlockModal = false;
+    public string $userToBlockId = '';
+    public string $userToBlockName = '';
+    public string $newBlockStatus = '';
 
     protected $rules = [
         'userName' => 'required|string|max:255',
@@ -145,14 +151,38 @@ new class extends Component {
         $this->dispatch('user-saved');
     }
 
-    public function toggleBlock(User $user): void
+    public function confirmToggleBlock(User $user): void
     {
         if ($user->id === auth()->id()) {
             return;
         }
 
+        $this->userToBlockId = $user->id;
+        $this->userToBlockName = $user->name;
+        $this->newBlockStatus = $user->status === 'BLOCKED' ? 'ACTIVE' : 'BLOCKED';
+        $this->showBlockModal = true;
+    }
+
+    public function toggleBlock(): void
+    {
+        $user = User::findOrFail($this->userToBlockId);
+        
+        if ($user->id === auth()->id()) {
+            return;
+        }
+
         $user->update([
-            'status' => $user->status === 'BLOCKED' ? 'ACTIVE' : 'BLOCKED'
+            'status' => $this->newBlockStatus
+        ]);
+
+        $this->showBlockModal = false;
+        $this->userToBlockId = '';
+        $this->userToBlockName = '';
+        $this->newBlockStatus = '';
+        
+        $this->dispatch('notify', [
+            'message' => $user->status === 'BLOCKED' ? 'Usuario bloqueado.' : 'Usuario desbloqueado.',
+            'variant' => 'success'
         ]);
     }
 
@@ -194,7 +224,7 @@ new class extends Component {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <flux:heading size="xl" level="1">Gestión de Usuarios y Roles</flux:heading>
-            <flux:text class="text-zinc-500 dark:text-zinc-400">Administre el acceso, asigne roles y gestione credenciales de seguridad. Los nuevos usuarios requerirán cambio de contraseña al primer inicio.</flux:text>
+            <flux:text class="text-zinc-500 dark:text-zinc-400">Administre el acceso, asigne roles y gestione credenciales de seguridad.</flux:text>
         </div>
         <flux:button variant="primary" icon="plus" wire:click="openCreateModal">Añadir Nuevo Usuario</flux:button>
     </div>
@@ -317,9 +347,9 @@ new class extends Component {
 
                                     @if($user->id !== auth()->id())
                                         @if($user->status === 'BLOCKED')
-                                            <flux:button variant="ghost" size="sm" icon="lock-open" class="text-green-500" wire:click="toggleBlock('{{ $user->id }}')" />
+                                            <flux:button variant="ghost" size="sm" icon="lock-open" class="text-green-500" wire:click="confirmToggleBlock('{{ $user->id }}')" />
                                         @else
-                                            <flux:button variant="ghost" size="sm" icon="lock-closed" class="text-red-500/50 hover:text-red-500" wire:click="toggleBlock('{{ $user->id }}')" />
+                                            <flux:button variant="ghost" size="sm" icon="lock-closed" class="text-red-500/50 hover:text-red-500" wire:click="confirmToggleBlock('{{ $user->id }}')" />
                                         @endif
                                     @endif
                                 </div>
@@ -431,6 +461,30 @@ new class extends Component {
                     <flux:button type="submit" variant="primary">{{ $userId ? 'Actualizar' : 'Guardar' }}</flux:button>
                 </div>
             </form>
+        </div>
+    </flux:modal>
+
+    <!-- Block Confirmation Modal -->
+    <flux:modal wire:model="showBlockModal" class="min-w-80">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{ $newBlockStatus === 'BLOCKED' ? '¿Bloquear usuario?' : '¿Desbloquear usuario?' }}</flux:heading>
+                <flux:subheading class="mt-2">
+                    @if($newBlockStatus === 'BLOCKED')
+                        Estás a punto de bloquear a <span class="font-bold">{{ $userToBlockName }}</span>. Este usuario perderá acceso inmediato a la plataforma.
+                    @else
+                        Estás a punto de restaurar el acceso para <span class="font-bold">{{ $userToBlockName }}</span>.
+                    @endif
+                </flux:subheading>
+            </div>
+
+            <div class="flex gap-2">
+                <flux:spacer />
+                <flux:button variant="ghost" wire:click="$set('showBlockModal', false)">Cancelar</flux:button>
+                <flux:button variant="{{ $newBlockStatus === 'BLOCKED' ? 'danger' : 'primary' }}" wire:click="toggleBlock">
+                    {{ $newBlockStatus === 'BLOCKED' ? 'Bloquear Acceso' : 'Desbloquear Acceso' }}
+                </flux:button>
+            </div>
         </div>
     </flux:modal>
 </div>

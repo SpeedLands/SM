@@ -18,6 +18,7 @@ new class extends Component {
     public string $search = '';
     public string $status = '';
     public string $severity = '';
+    public bool $onlyActiveCycle = true;
     public bool $onlyPending = false;
     
     // Modal state
@@ -51,6 +52,11 @@ new class extends Component {
     }
 
     public function updatingOnlyPending(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingOnlyActiveCycle(): void
     {
         $this->resetPage();
     }
@@ -90,6 +96,12 @@ new class extends Component {
     public function save(): void
     {
         $this->authorize('teacher-or-admin');
+
+        if (now()->isWeekend()) {
+            $this->dispatch('notify', ['message' => 'No se pueden registrar reportes los fines de semana.', 'variant' => 'warning']);
+            return;
+        }
+
         $request = new StoreReportRequest();
         $this->validate($request->rules(), $request->messages(), $request->attributes());
 
@@ -221,7 +233,7 @@ new class extends Component {
                 $q->join('student_parents', 'reports.student_id', '=', 'student_parents.student_id')
                   ->where('student_parents.parent_id', auth()->id());
             })
-            ->when($activeCycle, fn($q) => $q->where('reports.cycle_id', $activeCycle->id))
+            ->when($this->onlyActiveCycle && $activeCycle, fn($q) => $q->where('reports.cycle_id', $activeCycle->id))
             ->when($this->status, fn($q) => $q->where('reports.status', $this->status))
             ->when($this->severity, function($q) {
                 $q->join('infractions', 'reports.infraction_id', '=', 'infractions.id')
@@ -289,6 +301,10 @@ new class extends Component {
         @if(auth()->user()->isViewParent())
             <div class="flex items-center gap-2 px-2">
                 <flux:checkbox wire:model.live="onlyPending" label="Solo pendientes" />
+            </div>
+        @else
+            <div class="flex items-center gap-2 px-2">
+                <flux:switch wire:model.live="onlyActiveCycle" label="Solo ciclo activo" />
             </div>
         @endif
     </div>

@@ -41,6 +41,19 @@
 
             <flux:spacer />
 
+            <!-- Push Notification Prompt -->
+            <div x-data="{ showPushPrompt: false }" 
+                 x-init="if ('Notification' in window && navigator.serviceWorker && Notification.permission === 'default') { showPushPrompt = true; }">
+                 
+                <template x-if="showPushPrompt">
+                    <div class="px-3 pb-4">
+                        <flux:button variant="ghost" icon="bell-alert" class="w-full justify-start text-xs font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20 active:scale-95 transition-transform" @click="requestPushPermission(); showPushPrompt = false;">
+                            Activar Notificaciones
+                        </flux:button>
+                    </div>
+                </template>
+            </div>
+
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">
                 <flux:profile
@@ -137,14 +150,19 @@
                 if ("Notification" in window) {
                     if (Notification.permission === "granted") {
                         updateFcmToken();
-                    } else if (Notification.permission !== "denied") {
+                    }
+                }
+
+                // Expose function for the manual button
+                window.requestPushPermission = function() {
+                    if ("Notification" in window) {
                         Notification.requestPermission().then(permission => {
                             if (permission === "granted") {
                                 updateFcmToken();
                             }
                         });
                     }
-                }
+                };
 
                 // Handle Foreground Messages
                 messaging.onMessage((payload) => {
@@ -163,6 +181,17 @@
                             url: url
                         }
                     }));
+
+                    // Show local system notification if in foreground
+                    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+                        navigator.serviceWorker.ready.then((registration) => {
+                            registration.showNotification(title, {
+                                body: body,
+                                icon: icon,
+                                data: { url: url }
+                            });
+                        });
+                    }
                 });
 
                 // Global listener for 'notify' event from Livewire

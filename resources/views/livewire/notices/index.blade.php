@@ -13,6 +13,7 @@ new class extends Component {
 
     public string $search = '';
     public string $typeFilter = '';
+    public bool $onlyActiveCycle = true;
     public bool $onlyPending = false;
 
     // Create Modal
@@ -49,6 +50,11 @@ new class extends Component {
     }
 
     public function updatingOnlyPending(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingOnlyActiveCycle(): void
     {
         $this->resetPage();
     }
@@ -243,7 +249,7 @@ new class extends Component {
         if ($isStaffView) {
             $notices = Notice::with(['author'])
                 ->withCount('signatures')
-                ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
+                ->when($this->onlyActiveCycle && $activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
                 ->when($this->search, fn($q) => $q->where('title', 'like', "%{$this->search}%"))
                 ->when($this->typeFilter, fn($q) => $q->where('type', $this->typeFilter))
                 ->orderBy('date', 'desc')
@@ -260,13 +266,15 @@ new class extends Component {
             ];
         } else {
             // Parent view (Normal parent or Staff in Parent mode)
-            $students = $user->students()->with(['currentCycleAssociation'])->get();
+            $students = $user->students()->with(['cycleAssociations'])->get();
             $studentIds = $students->pluck('id')->toArray();
             $studentGrades = $students->pluck('grade')->unique()->toArray();
-            $studentGroupIds = $students->pluck('currentCycleAssociation.class_group_id')->filter()->unique()->toArray();
+            $studentGroupIds = $students->map(function($student) use ($activeCycle) {
+                return $activeCycle ? $student->cycleAssociations->firstWhere('cycle_id', $activeCycle->id)?->class_group_id : null;
+            })->filter()->unique()->toArray();
             
             $notices = Notice::with(['author', 'signatures' => fn($q) => $q->whereIn('student_id', $studentIds)])
-                ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
+                ->when($this->onlyActiveCycle && $activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
                 ->whereIn('target_audience', ['PARENTS', 'ALL'])
                 ->where(function($query) use ($studentGrades, $studentGroupIds) {
                     $query->where('target_audience', 'ALL')
@@ -320,13 +328,15 @@ new class extends Component {
     @if($isStaff)
         <!-- Admin/Teacher View: Dashboard with stats -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <flux:input wire:model.live.debounce.300ms="search" placeholder="Buscar avisos..." icon="magnifying-glass" />
             <flux:select wire:model.live="typeFilter" placeholder="Filtrar por tipo...">
                 <option value="">Todos los tipos</option>
                 <option value="GENERAL">General</option>
                 <option value="URGENT">Urgente</option>
                 <option value="EVENT">Evento</option>
             </flux:select>
+            <div class="flex items-center gap-2 px-2">
+                <flux:switch wire:model.live="onlyActiveCycle" label="Solo ciclo activo" />
+            </div>
         </div>
 
         <div class="space-y-4">

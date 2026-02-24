@@ -108,6 +108,9 @@ class ExcelImportService
         }
 
         $rows = collect($sheets[$sheetIndex]);
+        // Increase execution time limit to 5 minutes for bulk imports
+        set_time_limit(300);
+
         // Remove header
         $header = $rows->shift();
 
@@ -201,7 +204,7 @@ class ExcelImportService
                 // Excel Structure: Nombre | Correo | Contraseña | Rol
                 // Index: 0, 1, 2, 3
 
-                $email = trim((string) ($row[1] ?? ''));
+                $email = $this->sanitizeEmail($row[1] ?? '');
 
                 // Silent skip for headers or empty rows
                 if (empty($email) || in_array(strtolower($email), ['correo', 'email', 'e-mail'])) {
@@ -230,18 +233,21 @@ class ExcelImportService
                         'role' => $role,
                     ];
 
-                    // Optimization: Only re-hash if provided and different
-                    if ($password && ! Hash::check((string) $password, $user->password)) {
+                    // Optimization: Direct update without redundant check to save time
+                    if ($password) {
                         $updateData['password'] = Hash::make((string) $password);
+                        $updateData['plain_password'] = (string) $password;
                     }
 
                     $user->update($updateData);
                     $stats['updated']++;
                 } else {
+                    $plainPassword = $password ?: Str::random(10);
                     User::create([
                         'name' => $name,
                         'email' => $email,
-                        'password' => Hash::make($password ?: Str::random(10)),
+                        'password' => Hash::make($plainPassword),
+                        'plain_password' => $plainPassword,
                         'role' => $role,
                         'status' => 'ACTIVE',
                     ]);
@@ -280,7 +286,7 @@ class ExcelImportService
         // Step 1: Group by email
         $parentsByEmail = [];
         foreach ($rows as $index => $row) {
-            $email = trim((string) ($row[1] ?? ''));
+            $email = $this->sanitizeEmail($row[1] ?? '');
 
             // Silent skip for headers or empty rows
             if (empty($email) || in_array(strtolower($email), ['correo', 'email', 'e-mail', 'mail'])) {
@@ -418,11 +424,23 @@ class ExcelImportService
                 $allChildrenNames = array_unique(array_merge($existingNames, $childrenNames));
             }
 
-            $childrenList = implode(', ', $allChildrenNames);
-            $concatenatedName = ucfirst(strtolower($relationship)).' de '.$childrenList;
+            // Optimization: If there are many children, summarize to avoid SQL truncation error
+            $childrenCountTotal = count($allChildrenNames);
+            if ($childrenCountTotal > 3) {
+                $firstThree = array_slice($allChildrenNames, 0, 3);
+                $childrenList = implode(', ', $firstThree).' y '.($childrenCountTotal - 3).' más';
+                $concatenatedName = ucfirst(strtolower($relationship))." de {$childrenCountTotal} alumnos ({$childrenList})";
+            } else {
+                $childrenList = implode(', ', $allChildrenNames);
+                $concatenatedName = ucfirst(strtolower($relationship)).' de '.$childrenList;
+            }
+
+            // Final safety: Truncate to 250 characters just in case
+            $concatenatedName = Str::limit($concatenatedName, 250);
 
             // Step 4: Create/Update Parent User
             if (! $user) {
+                $plainPassword = $password ?: Str::random(10);
                 $user = User::create([
                     'email' => $email,
                     'name' => $concatenatedName,
@@ -430,7 +448,8 @@ class ExcelImportService
                     'occupation' => $occupation,
                     'role' => 'PARENT',
                     'status' => 'ACTIVE',
-                    'password' => Hash::make($password ?: Str::random(10)),
+                    'password' => Hash::make($plainPassword),
+                    'plain_password' => $plainPassword,
                 ]);
                 $report['summary']['parents']['created']++;
             } else {
@@ -438,11 +457,12 @@ class ExcelImportService
                 if (in_array($user->role, ['ADMIN', 'TEACHER'])) {
                     $report['notifications']['success'][] = [
                         'type' => 'staff_parent',
-                        'message' => 'Personal administrativo/docente con hijos vinculados',
+                        'message' => "Personal ({$user->role}) identificado como padre: {$user->name}",
                         'user_name' => $user->name,
+                        'user_email' => $user->email,
                         'user_role' => $user->role,
-                        'parent_email' => $email,
-                        'action' => 'Nombre y contraseña protegidos (se mantienen datos de personal)',
+                        'children' => $childrenNames,
+                        'action' => 'Perfil protegido. Alumnos vinculados correctamente.',
                     ];
                 } else {
                     $user->update([
@@ -451,9 +471,10 @@ class ExcelImportService
                         'occupation' => $occupation,
                     ]);
 
-                    // Optimization: Only re-hash if provided and different
-                    if ($password && ! Hash::check((string) $password, $user->password)) {
+                    // Optimization: Direct update without redundant check to save time
+                    if ($password) {
                         $user->password = Hash::make((string) $password);
+                        $user->plain_password = (string) $password;
                         $user->save();
                     }
                 }
@@ -542,6 +563,9 @@ class ExcelImportService
 
     public function importStudents(Collection $rows, ?Collection $parentRows = null, string $currentGrade = '1º', string $currentSection = 'A'): array
     {
+        // Guard: detect if user accidentally swapped sheets (parents sheet selected as students)
+        $this->assertNotParentsSheet($rows);
+
         $activeCycle = Cycle::where('is_active', true)->firstOrFail();
         $report = [
             'summary' => [
@@ -575,14 +599,16 @@ class ExcelImportService
                     continue;
                 }
 
-                // Create/Update Student
+                // Create/Update Student - Identified by Name + Grade + Section to prevent overwriting homonyms in different groups
                 $student = Student::updateOrCreate(
-                    ['name' => $name],
                     [
-                        'birth_date' => '2010-01-01', // Default
+                        'name' => $name,
                         'grade' => $currentGrade,
                         'group_name' => $currentSection,
-                        'turn' => strtoupper(trim($turn)),
+                    ],
+                    [
+                        'birth_date' => '2010-01-01', // Default
+                        'turn' => $this->normalizeTurn($turn),
                     ]
                 );
 
@@ -642,12 +668,25 @@ class ExcelImportService
         return $report;
     }
 
-    private function extractRelationAndName($parentName): array
+    protected function extractRelationAndName($parentName): array
     {
-        // "Padre de X", "Madre de X", "Tutor de X"
-        if (preg_match('/^(Padre|Madre|Tutor)\s+de\s+(.+)$/i', $parentName, $matches)) {
+        // Normalize accents in the prefix before matching
+        $normalized = $this->stripAccents((string) $parentName);
+
+        // Accepts variations: Padre/Papa/Papi/Mama/Madre/Tutor/Tutora/Abuelo/Abuela/Tio/Tia
+        if (preg_match('/^(Padre|Papa|Papi|Mama|Madre|Tutor|Tutora|Abuelo|Abuela|Tio|Tia|Tutor Legal)\s+de\s+(.+)$/i', $normalized, $matches)) {
+            // Map common aliases to standard relationship
+            $alias = strtoupper($matches[1]);
+            $relationship = match ($alias) {
+                'PAPA', 'PAPI' => 'PADRE',
+                'MAMA' => 'MADRE',
+                'TIO' => 'TUTOR',
+                'TIA' => 'TUTORA',
+                default => $alias,
+            };
+
             return [
-                'relationship' => strtoupper($matches[1]), // PADRE, MADRE, TUTOR
+                'relationship' => $relationship,
                 'student_name' => trim($matches[2]),
             ];
         }
@@ -656,5 +695,91 @@ class ExcelImportService
             'relationship' => 'TUTOR',
             'student_name' => null,
         ];
+    }
+
+    /**
+     * Normalize a turn value to MATUTINO or VESPERTINO, tolerating typos and accents.
+     */
+    private function normalizeTurn(mixed $turn): string
+    {
+        $clean = strtoupper(trim($this->stripAccents((string) ($turn ?? ''))));
+
+        // Explicit mapping for known variants
+        $matutino = ['MATUTINO', 'MATUTIN', 'MATUINO', 'MAÑANA', 'MANANA', 'MAT', 'M', 'MORNING'];
+        $vespertino = ['VESPERTINO', 'VESPERTIN', 'VESPERTNO', 'TARDE', 'VESPER', 'VES', 'V', 'AFTERNOON'];
+
+        if (in_array($clean, $matutino, true)) {
+            return 'MATUTINO';
+        }
+
+        if (in_array($clean, $vespertino, true)) {
+            return 'VESPERTINO';
+        }
+
+        // Fuzzy: if it starts with M -> MATUTINO, if starts with V/T -> VESPERTINO
+        if (str_starts_with($clean, 'M')) {
+            return 'MATUTINO';
+        }
+
+        if (str_starts_with($clean, 'V') || str_starts_with($clean, 'T')) {
+            return 'VESPERTINO';
+        }
+
+        // Default fallback
+        return 'MATUTINO';
+    }
+
+    /**
+     * Throw an exception if the rows look like a parents sheet (names follow "Padre de X" pattern).
+     * This protects against the user accidentally swapping the student and parent sheets.
+     */
+    private function assertNotParentsSheet(Collection $rows): void
+    {
+        $sample = $rows->take(10);
+        $parentLikeCount = 0;
+
+        foreach ($sample as $row) {
+            $name = trim((string) ($row[0] ?? ''));
+            if (preg_match('/^(Padre|Madre|Tutor|Papa|Mama|Abuelo|Abuela)\s+de\s+/i', $name)) {
+                $parentLikeCount++;
+            }
+        }
+
+        // If more than half the sampled rows look like parent rows, reject
+        $total = $sample->count();
+        if ($total > 0 && ($parentLikeCount / $total) >= 0.5) {
+            throw new \Exception(
+                "La hoja seleccionada parece contener datos de PADRES (detectados {$parentLikeCount} de {$total} registros con formato \"Padre de...\"). "
+                .'Por favor selecciona la hoja correcta de ALUMNOS.'
+            );
+        }
+    }
+
+    /**
+     * Remove accent characters from a string for fuzzy comparisons.
+     */
+    private function stripAccents(string $text): string
+    {
+        $search = ['á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú', 'ñ', 'Ñ', 'ü', 'Ü'];
+        $replace = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U', 'n', 'N', 'u', 'U'];
+
+        return str_replace($search, $replace, $text);
+    }
+
+    /**
+     * Sanitize email address by removing accents and converting special characters.
+     */
+    protected function sanitizeEmail($email): string
+    {
+        if (! $email) {
+            return '';
+        }
+
+        $email = trim((string) $email);
+
+        $search = ['ñ', 'Ñ', 'á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú'];
+        $replace = ['n', 'n', 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+
+        return str_replace($search, $replace, $email);
     }
 }

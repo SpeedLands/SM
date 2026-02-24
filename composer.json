@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/livewire-starter-kit",
+    "name": "school/management-system",
     "type": "project",
-    "description": "The official Laravel starter kit for Livewire.",
+    "description": "Sistema de gestión escolar - Control de reportes, citatorios, avisos y servicio comunitario.",
     "keywords": [
         "laravel",
         "framework"

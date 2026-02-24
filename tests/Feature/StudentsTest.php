@@ -20,6 +20,13 @@ test('admins can see students list', function () {
         'group_name' => $group->section,
     ]);
 
+    \App\Models\StudentCycleAssociation::create([
+        'student_id' => $student->id,
+        'cycle_id' => $cycle->id,
+        'class_group_id' => $group->id,
+        'status' => 'ACTIVE',
+    ]);
+
     $this->actingAs($admin)
         ->get(route('students.index'))
         ->assertOk()
@@ -33,6 +40,9 @@ test('can search students by name or curp', function () {
 
     $student1 = Student::factory()->create(['name' => 'JUAN PEREZ', 'grade' => $group->grade, 'group_name' => $group->section]);
     $student2 = Student::factory()->create(['name' => 'MARIA LOPEZ', 'grade' => $group->grade, 'group_name' => $group->section]);
+
+    \App\Models\StudentCycleAssociation::create(['student_id' => $student1->id, 'cycle_id' => $cycle->id, 'class_group_id' => $group->id, 'status' => 'ACTIVE']);
+    \App\Models\StudentCycleAssociation::create(['student_id' => $student2->id, 'cycle_id' => $cycle->id, 'class_group_id' => $group->id, 'status' => 'ACTIVE']);
 
     Volt::actingAs($admin)
         ->test('students.index')

@@ -14,9 +14,15 @@ new class extends Component {
         $user = auth()->user();
         $activeCycle = Cycle::where('is_active', true)->first();
         
-        if ($user->isAdmin() || $user->isTeacher()) {
+        if ($user->isViewParent() && ! $user->isViewStaff()) {
+            return $this->getParentStats($activeCycle);
+        }
+
+        if ($user->isViewStaff()) {
             return $this->getAdminStats($activeCycle);
-        } elseif ($user->isParent()) {
+        }
+
+        if ($user->isParent()) {
             return $this->getParentStats($activeCycle);
         }
 

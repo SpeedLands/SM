@@ -28,9 +28,12 @@ class Student extends Model
         'birth_order',
     ];
 
-    protected $casts = [
-        'birth_date' => 'date',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'birth_date' => 'date',
+        ];
+    }
 
     public function parents(): BelongsToMany
     {

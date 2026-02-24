@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Report extends Model
 {
@@ -26,32 +27,35 @@ class Report extends Model
         'signed_by_parent_id',
     ];
 
-    protected $casts = [
-        'date' => 'datetime',
-        'signed_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'date' => 'datetime',
+            'signed_at' => 'datetime',
+        ];
+    }
 
-    public function student()
+    public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class);
     }
 
-    public function teacher()
+    public function teacher(): BelongsTo
     {
         return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    public function infraction()
+    public function infraction(): BelongsTo
     {
         return $this->belongsTo(Infraction::class);
     }
 
-    public function parent()
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(User::class, 'signed_by_parent_id');
     }
 
-    public function cycle()
+    public function cycle(): BelongsTo
     {
         return $this->belongsTo(Cycle::class);
     }

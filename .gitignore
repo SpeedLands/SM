@@ -119,6 +119,9 @@ pnpm-debug.log*
 /tests/_output/*
 /tests/_support/_generated
 
+# Log generado por los tests
+/tests/laravel.log
+
 # ========================================
 # 🛠️ HERRAMIENTAS DE DESARROLLO
 # ========================================
@@ -153,6 +156,53 @@ pnpm-lock.yaml
 extracted_data.json
 /data/*.json
 /exports/*.json
+
+# ========================================
+# 🗑️ SCRIPTS TEMPORALES DE DIAGNÓSTICO
+# ========================================
+
+# Scripts PHP temporales creados durante el proceso de importación de datos
+analyze_passwords.php
+audit_2i.php
+audit_2i_granular.php
+audit_data.php
+audit_passwords_final.php
+audit_precision.php
+check_1a_structure.php
+check_1b_structure.php
+check_2i_structure.php
+check_binary.php
+check_maestros_structure.php
+check_padres_headers.php
+compare_7_8.php
+compare_orig_corr.php
+debug_parent_rows.php
+deep_search_orig.php
+deletion_test_output.txt
+dump_2i.php
+dump_3i.php
+dump_padres_2i.php
+dump_padres_start.php
+find_conflicts_global.php
+find_duplicate_students.php
+find_global_orig.php
+find_in_maestros.php
+find_in_original.php
+find_parent_conflicts.php
+find_parents_by_student.php
+find_target_global.php
+fix_2i_surgical.php
+fix_excel_data.php
+inspect_2i.php
+inspect_2i_full.php
+inspect_orig_critical.php
+list_sheets.php
+search_alvarado.php
+sync_db_data.php
+test_encoding.php
+test_findcols_2i.php
+test_smart_scan.php
+unify_passwords.php
 
 # ========================================
 # 🖼️ ASSETS GENERADOS
@@ -193,3 +243,11 @@ deploy.php
 # /public/sw.js  # Comentado porque es parte del código fuente
 
 DOC_MEMORIA_DE_ESTADIAS_OLD_SYSTEM.md
+MEMORIA_ESTADIAS.md
+DOC.md
+*.txt
+
+/DATOS_CORREGIDOS
+/DATOS_CORREGIDOS/*
+/DATOS/*
+/DATOS/
