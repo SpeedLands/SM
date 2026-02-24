@@ -32,6 +32,13 @@ test('parents can sign notices with authorization', function () {
     // Link parent to student
     $parent->students()->attach($student->id, ['relationship' => 'PADRE']);
 
+    // Associate student with cycle
+    \App\Models\StudentCycleAssociation::create([
+        'student_id' => $student->id,
+        'cycle_id' => $cycle->id,
+        'class_group_id' => \App\Models\ClassGroup::factory()->create(['cycle_id' => $cycle->id])->id,
+    ]);
+
     $notice = Notice::create([
         'cycle_id' => $cycle->id,
         'author_id' => User::factory()->create(['role' => 'ADMIN'])->id,
@@ -55,6 +62,8 @@ test('parents can sign notices with authorization', function () {
 });
 
 test('teachers can manage citations', function () {
+    \Carbon\Carbon::setTestNow(\Carbon\Carbon::create(2026, 2, 13, 10, 0, 0)); // A Friday before 2026-02-16.
+
     $teacher = User::factory()->create(['role' => 'TEACHER']);
     $student = Student::factory()->create();
     $cycle = Cycle::factory()->create(['is_active' => true]);
@@ -77,6 +86,7 @@ test('teachers can manage citations', function () {
         ->call('updateStatus', $citation->id, 'ATTENDED');
 
     expect($citation->refresh()->status)->toBe('ATTENDED');
+    \Carbon\Carbon::setTestNow(); // Reset
 });
 
 test('citations cannot be scheduled on weekends', function () {

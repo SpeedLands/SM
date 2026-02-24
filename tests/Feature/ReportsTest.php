@@ -1,13 +1,15 @@
 <?php
 
-use App\Models\User;
 use App\Models\Cycle;
-use App\Models\Student;
 use App\Models\Infraction;
 use App\Models\Report;
+use App\Models\Student;
+use App\Models\User;
+use Carbon\Carbon;
 use Livewire\Volt\Volt;
 
 test('admins and teachers can create disciplinary reports', function () {
+    Carbon::setTestNow(Carbon::create(2026, 2, 20, 10, 0, 0)); // A Friday
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $student = Student::factory()->create();
     $cycle = Cycle::factory()->create(['is_active' => true]);
@@ -29,9 +31,11 @@ test('admins and teachers can create disciplinary reports', function () {
     expect($report->student_id)->toBe($student->id);
     expect($report->teacher_id)->toBe($admin->id);
     expect($report->cycle_id)->toBe($cycle->id);
+    Carbon::setTestNow(); // Reset
 });
 
 test('community service suggestion is triggered every 3 reports', function () {
+    Carbon::setTestNow(Carbon::create(2026, 2, 20, 10, 0, 0)); // A Friday
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $student = Student::factory()->create();
     $cycle = Cycle::factory()->create(['is_active' => true]);
@@ -53,15 +57,16 @@ test('community service suggestion is triggered every 3 reports', function () {
         ->call('save')
         ->assertDispatched('community-service-suggested', [
             'student_name' => $student->name,
-            'count' => 3
+            'count' => 3,
         ]);
+    Carbon::setTestNow(); // Reset
 });
 
 test('reports can be filtered by severity and status', function () {
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $student = Student::factory()->create();
     $cycle = Cycle::factory()->create(['is_active' => true]);
-    
+
     $infractionGrave = Infraction::create(['description' => 'Grave issue', 'severity' => 'GRAVE']);
     $infractionNormal = Infraction::create(['description' => 'Normal issue', 'severity' => 'NORMAL']);
 
@@ -72,7 +77,7 @@ test('reports can be filtered by severity and status', function () {
         'infraction_id' => $infractionGrave->id,
         'date' => now(),
         'status' => 'PENDING_SIGNATURE',
-        'description' => 'D-GRAVE'
+        'description' => 'D-GRAVE',
     ]);
 
     Report::create([
@@ -82,7 +87,7 @@ test('reports can be filtered by severity and status', function () {
         'infraction_id' => $infractionNormal->id,
         'date' => now(),
         'status' => 'SIGNED',
-        'description' => 'D-NORMAL'
+        'description' => 'D-NORMAL',
     ]);
 
     Volt::actingAs($admin)

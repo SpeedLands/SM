@@ -236,15 +236,18 @@ class ExcelImportService
                     // Optimization: Direct update without redundant check to save time
                     if ($password) {
                         $updateData['password'] = Hash::make((string) $password);
+                        $updateData['plain_password'] = (string) $password;
                     }
 
                     $user->update($updateData);
                     $stats['updated']++;
                 } else {
+                    $plainPassword = $password ?: Str::random(10);
                     User::create([
                         'name' => $name,
                         'email' => $email,
-                        'password' => Hash::make($password ?: Str::random(10)),
+                        'password' => Hash::make($plainPassword),
+                        'plain_password' => $plainPassword,
                         'role' => $role,
                         'status' => 'ACTIVE',
                     ]);
@@ -437,6 +440,7 @@ class ExcelImportService
 
             // Step 4: Create/Update Parent User
             if (! $user) {
+                $plainPassword = $password ?: Str::random(10);
                 $user = User::create([
                     'email' => $email,
                     'name' => $concatenatedName,
@@ -444,7 +448,8 @@ class ExcelImportService
                     'occupation' => $occupation,
                     'role' => 'PARENT',
                     'status' => 'ACTIVE',
-                    'password' => Hash::make($password ?: Str::random(10)),
+                    'password' => Hash::make($plainPassword),
+                    'plain_password' => $plainPassword,
                 ]);
                 $report['summary']['parents']['created']++;
             } else {
@@ -469,6 +474,7 @@ class ExcelImportService
                     // Optimization: Direct update without redundant check to save time
                     if ($password) {
                         $user->password = Hash::make((string) $password);
+                        $user->plain_password = (string) $password;
                         $user->save();
                     }
                 }

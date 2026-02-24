@@ -12,6 +12,7 @@ new class extends Component {
 
     public string $search = '';
     public string $statusFilter = '';
+    public bool $onlyActiveCycle = true;
 
     // Create Modal
     public bool $showCreateModal = false;
@@ -30,6 +31,11 @@ new class extends Component {
     }
 
     public function updatingStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingOnlyActiveCycle(): void
     {
         $this->resetPage();
     }
@@ -174,7 +180,7 @@ new class extends Component {
         $isStaff = $user->isViewStaff();
 
         $query = Citation::with(['student', 'teacher'])
-            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
+            ->when($this->onlyActiveCycle && $activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
             ->orderBy('citation_date', 'asc');
 
         if ($isStaff) {
@@ -225,6 +231,9 @@ new class extends Component {
                 <option value="ATTENDED">Asistió</option>
                 <option value="NO_SHOW">No asistió</option>
             </flux:select>
+            <div class="flex items-center gap-2 px-2">
+                <flux:switch wire:model.live="onlyActiveCycle" label="Solo ciclo activo" />
+            </div>
         </div>
 
         <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">

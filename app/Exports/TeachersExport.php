@@ -5,11 +5,13 @@ namespace App\Exports;
 use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Cell\StringValueBinder;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class TeachersExport implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles
+class TeachersExport extends StringValueBinder implements FromCollection, ShouldAutoSize, WithCustomValueBinder, WithHeadings, WithStyles
 {
     public function __construct(
         private readonly bool $generatePasswords = false,
@@ -23,12 +25,13 @@ class TeachersExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
             ->orderBy('name')
             ->get()
             ->map(function (User $user) {
-                $passwordColumn = '';
+                $passwordColumn = $user->plain_password ?? '';
 
                 if ($this->generatePasswords) {
                     $newPassword = \Illuminate\Support\Str::password(8, letters: true, numbers: true, symbols: false, spaces: false);
                     $user->update([
-                        'password' => \Illuminate\Support\Facades\Hash::make($newPassword)
+                        'password' => \Illuminate\Support\Facades\Hash::make($newPassword),
+                        'plain_password' => $newPassword,
                     ]);
                     $passwordColumn = $newPassword;
                 }

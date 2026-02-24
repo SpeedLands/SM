@@ -30,7 +30,8 @@ test('admins can manage class groups for a cycle', function () {
     Volt::actingAs($admin)
         ->test('cycles.index')
         ->call('openGroupsModal', $cycle->id)
-        ->call('deleteGroup', $group->id)
+        ->call('confirmDeleteGroup', $group->id)
+        ->call('deleteGroup')
         ->assertHasNoErrors()
         ->assertDontSee('1º A');
 

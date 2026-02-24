@@ -14,6 +14,7 @@ new class extends Component {
 
     public string $search = '';
     public string $statusFilter = '';
+    public bool $onlyActiveCycle = true;
     
     // Modal state
     public bool $showServiceModal = false;
@@ -28,6 +29,11 @@ new class extends Component {
     // Deletion
     public bool $showDeleteModal = false;
     public ?string $idToDelete = null;
+
+    public function updatingOnlyActiveCycle(): void
+    {
+        $this->resetPage();
+    }
 
     public function updatingSearch(): void
     {
@@ -183,7 +189,7 @@ new class extends Component {
                 $q->join('student_parents', 'students.id', '=', 'student_parents.student_id')
                   ->where('student_parents.parent_id', auth()->id());
             })
-            ->when($activeCycle, fn($q) => $q->where('community_services.cycle_id', $activeCycle->id))
+            ->when($this->onlyActiveCycle && $activeCycle, fn($q) => $q->where('community_services.cycle_id', $activeCycle->id))
             ->when($this->statusFilter, fn($q) => $q->where('community_services.status', $this->statusFilter))
             ->when($this->search, function($q) {
                 $q->where(function($sq) {
@@ -263,12 +269,15 @@ new class extends Component {
     <!-- Filters -->
     <div class="flex flex-col md:flex-row gap-4">
         <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Buscar alumno o actividad..." class="flex-1" />
-        <flux:select wire:model.live="statusFilter" class="w-full md:w-64">
+        <flux:select wire:model.live="statusFilter" class="w-full md:w-64" placeholder="Todos los estados">
             <option value="">Todos los estados</option>
             <option value="PENDING">Pendientes</option>
             <option value="COMPLETED">Completados</option>
             <option value="MISSED">No asistió</option>
         </flux:select>
+        <div class="flex items-center gap-2 px-2">
+            <flux:switch wire:model.live="onlyActiveCycle" label="Solo ciclo activo" />
+        </div>
     </div>
 
     @if(auth()->user()->isViewStaff())

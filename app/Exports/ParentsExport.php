@@ -8,12 +8,14 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Cell\StringValueBinder;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ParentsExport implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
+class ParentsExport extends StringValueBinder implements FromCollection, ShouldAutoSize, WithCustomValueBinder, WithHeadings, WithStyles, WithTitle
 {
     public function __construct(
         private readonly ?string $groupId = null,
@@ -35,7 +37,7 @@ class ParentsExport implements FromCollection, ShouldAutoSize, WithHeadings, Wit
                     $q->where('cycle_id', $this->cycleId);
                 }
             });
-            
+
             // Eager load only the students for this group
             $query->with(['students' => function ($q) {
                 $q->whereHas('cycleAssociations', function ($q2) {
@@ -47,7 +49,7 @@ class ParentsExport implements FromCollection, ShouldAutoSize, WithHeadings, Wit
             }]);
         } elseif ($this->cycleId) {
             $query->whereHas('students.cycleAssociations', fn ($q) => $q->where('cycle_id', $this->cycleId));
-            
+
             $query->with(['students' => function ($q) {
                 $q->whereHas('cycleAssociations', fn ($q2) => $q2->where('cycle_id', $this->cycleId));
             }]);
@@ -58,13 +60,14 @@ class ParentsExport implements FromCollection, ShouldAutoSize, WithHeadings, Wit
         $query->orderBy('name')
             ->get()
             ->each(function (User $parent) use ($rows) {
-                $passwordColumn = '';
+                $passwordColumn = $parent->plain_password ?? '';
 
                 // Generate new passwords if requested
                 if ($this->generatePasswords) {
                     $newPassword = Str::password(8, letters: true, numbers: true, symbols: false, spaces: false);
                     $parent->update([
-                        'password' => Hash::make($newPassword)
+                        'password' => Hash::make($newPassword),
+                        'plain_password' => $newPassword,
                     ]);
                     $passwordColumn = $newPassword;
                 }
@@ -119,6 +122,7 @@ class ParentsExport implements FromCollection, ShouldAutoSize, WithHeadings, Wit
     {
         if ($this->groupId) {
             $group = ClassGroup::find($this->groupId);
+
             return $group ? "{$group->grade}{$group->section}" : 'Padres';
         }
 

@@ -76,7 +76,7 @@ new #[Layout('components.layouts.app')] class extends Component {
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Teachers & Admins -->
-            <flux:card class="flex flex-col">
+            <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm flex flex-col">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
                         <flux:icon name="identification" />
@@ -106,10 +106,10 @@ new #[Layout('components.layouts.app')] class extends Component {
                         Descargar Maestros
                     </flux:button>
                 </div>
-            </flux:card>
+            </div>
 
             <!-- Parents -->
-            <flux:card class="flex flex-col">
+            <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm flex flex-col">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
                     <div class="flex items-center gap-3 flex-1">
                         <div class="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg">
@@ -154,10 +154,10 @@ new #[Layout('components.layouts.app')] class extends Component {
                         Descargar Padres
                     </flux:button>
                 </div>
-            </flux:card>
+            </div>
 
             <!-- Students -->
-            <flux:card class="md:col-span-2">
+            <div class="md:col-span-2 p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
                     <div class="flex items-center gap-3 flex-1">
                         <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg">
@@ -201,7 +201,7 @@ new #[Layout('components.layouts.app')] class extends Component {
                         Descargar Alumnos
                     </flux:button>
                 </div>
-            </flux:card>
+            </div>
         </div>
 
         <div class="mt-8 p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-700">

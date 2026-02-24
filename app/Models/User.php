@@ -43,6 +43,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'plain_password',
         'role',
         'status',
         'two_factor_secret',
@@ -63,6 +64,7 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'plain_password',
         'two_factor_secret',
         'two_factor_recovery_codes',
         'remember_token',
@@ -78,6 +80,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'plain_password' => 'encrypted',
             'two_factor_confirmed_at' => 'datetime',
             'last_login_at' => 'datetime',
         ];
@@ -206,16 +209,16 @@ class User extends Authenticatable
                                     $ssq->whereNull('target_grades')
                                         ->whereNull('target_class_groups');
                                 })
-                                ->orWhere(function ($ssq) use ($studentGrades) {
-                                    foreach ($studentGrades as $grade) {
-                                        $ssq->orWhereJsonContains('target_grades', $grade);
-                                    }
-                                })
-                                ->orWhere(function ($ssq) use ($studentGroupIds) {
-                                    foreach ($studentGroupIds as $groupId) {
-                                        $ssq->orWhereJsonContains('target_class_groups', $groupId);
-                                    }
-                                });
+                                    ->orWhere(function ($ssq) use ($studentGrades) {
+                                        foreach ($studentGrades as $grade) {
+                                            $ssq->orWhereJsonContains('notices.target_grades', (string) $grade);
+                                        }
+                                    })
+                                    ->orWhere(function ($ssq) use ($studentGroupIds) {
+                                        foreach ($studentGroupIds as $groupId) {
+                                            $ssq->orWhereJsonContains('notices.target_class_groups', (string) $groupId);
+                                        }
+                                    });
                             });
                     });
             })

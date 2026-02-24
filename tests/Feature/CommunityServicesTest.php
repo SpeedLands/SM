@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\User;
-use App\Models\Cycle;
-use App\Models\Student;
 use App\Models\CommunityService;
-use App\Models\Report;
+use App\Models\Cycle;
 use App\Models\Infraction;
+use App\Models\Report;
+use App\Models\Student;
+use App\Models\User;
 use Livewire\Volt\Volt;
 
 test('admins can assign community service', function () {
@@ -19,7 +19,7 @@ test('admins can assign community service', function () {
         ->assertSee($student->name)
         ->call('selectStudent', $student->id)
         ->set('activity', 'Limpieza de patio')
-        ->set('scheduledDate', now()->addDay()->format('Y-m-d'))
+        ->set('scheduledDate', now()->next(\Carbon\Carbon::MONDAY)->format('Y-m-d'))
         ->call('save')
         ->assertHasNoErrors()
         ->assertSee('Limpieza de patio');
@@ -39,8 +39,8 @@ test('status transitions work correctly', function () {
         'student_id' => $student->id,
         'assigned_by_id' => $admin->id,
         'activity' => 'Test activity',
-        'scheduled_date' => now()->addDay(),
-        'status' => 'PENDING'
+        'scheduled_date' => now()->next(\Carbon\Carbon::MONDAY),
+        'status' => 'PENDING',
     ]);
 
     Volt::actingAs($admin)
@@ -80,8 +80,8 @@ test('it suggests students with 3 reports', function () {
         'student_id' => $student->id,
         'assigned_by_id' => $admin->id,
         'activity' => 'Reparación',
-        'scheduled_date' => now()->addDay(),
-        'status' => 'PENDING'
+        'scheduled_date' => now()->next(\Carbon\Carbon::MONDAY),
+        'status' => 'PENDING',
     ]);
 
     Volt::actingAs($admin)
