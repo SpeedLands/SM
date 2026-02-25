@@ -7,18 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Fix push_subscriptions table — drop old webpush package schema
+     * and recreate with the correct columns.
      */
     public function up(): void
     {
-        // If an old push_subscriptions table exists (e.g. from webpush package with
-        // subscribable_type/subscribable_id columns), drop it and start fresh.
-        if (Schema::hasTable('push_subscriptions')) {
-            if (Schema::hasColumn('push_subscriptions', 'subscribable_type')) {
-                Schema::dropIfExists('push_subscriptions');
-            }
+        // If old webpush package table exists, drop it completely
+        if (Schema::hasTable('push_subscriptions') && Schema::hasColumn('push_subscriptions', 'subscribable_type')) {
+            Schema::dropIfExists('push_subscriptions');
         }
 
+        // Recreate only if it doesn't exist (covers both fresh install and post-drop)
         if (! Schema::hasTable('push_subscriptions')) {
             Schema::create('push_subscriptions', function (Blueprint $table) {
                 $table->id();
@@ -36,7 +35,7 @@ return new class extends Migration
             });
         }
 
-        // Migrate existing fcm_token data from users table (if the column still exists)
+        // Migrate existing fcm_token data from users table (if column still exists)
         if (Schema::hasColumn('users', 'fcm_token')) {
             $users = \Illuminate\Support\Facades\DB::table('users')
                 ->whereNotNull('fcm_token')
@@ -54,7 +53,6 @@ return new class extends Migration
                 );
             }
 
-            // Remove old fcm_token column from users
             Schema::table('users', function (Blueprint $table) {
                 if (Schema::hasIndex('users', 'idx_users_fcm_token')) {
                     $table->dropIndex('idx_users_fcm_token');
@@ -69,23 +67,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('fcm_token')->nullable()->after('password');
-            $table->index('fcm_token', 'idx_users_fcm_token');
-        });
-
-        // Restore fcm_tokens back to users table
-        $subscriptions = \Illuminate\Support\Facades\DB::table('push_subscriptions')
-            ->where('type', 'fcm')
-            ->whereNotNull('fcm_token')
-            ->get(['user_id', 'fcm_token']);
-
-        foreach ($subscriptions as $sub) {
-            \Illuminate\Support\Facades\DB::table('users')
-                ->where('id', $sub->user_id)
-                ->update(['fcm_token' => $sub->fcm_token]);
-        }
-
-        Schema::dropIfExists('push_subscriptions');
+        // Nothing to reverse — previous migration handles rollback
     }
 };

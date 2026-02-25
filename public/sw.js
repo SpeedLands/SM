@@ -1,55 +1,74 @@
 /**
  * Hybrid Service Worker: Firebase (Android/Chrome) + Standard Web Push (iOS/Safari/Firefox)
- * Firebase handles background messages on Chromium browsers.
- * The standard 'push' event listener handles Web Push for iOS Safari and others.
+ * 
+ * KEY DESIGN:
+ * - On Chrome/Android: Firebase SDK handles background FCM messages automatically.
+ *   Our 'push' listener MUST skip FCM payloads to avoid double notifications.
+ * - On iOS/Safari/Firefox: Standard Web Push via VAPID. Our 'push' listener handles everything.
  */
 
-// Only load Firebase SDK on non-Safari browsers (Chrome, Edge, etc.)
-const isSafari = !self.firebase && !self.importScripts.toString().includes('native');
+// ==================== Message listener (MUST be at top level) ====================
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'CLEAR_CACHE') {
+        console.log('[SW] Clearing all caches...');
+        event.waitUntil(
+            caches.keys().then(keys => Promise.all(
+                keys.map(key => caches.delete(key))
+            )).then(() => {
+                console.log('[SW] Caches cleared.');
+            })
+        );
+    }
+});
+
+// ==================== Firebase initialization (Chrome/Android only) ====================
+// IMPORTANT: Do NOT load Firebase on Safari/iOS — it would set firebaseInitialized=true
+// and then the push listener would skip showing notifications (thinking Firebase handles them).
+// Safari/iOS must use the standard Web Push path.
 let firebaseInitialized = false;
 
-try {
-    importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
-    importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+// Detect Safari/iOS in Service Worker context
+const isIOSOrSafari = /Safari/.test(self.navigator?.userAgent || '') && !/Chrome/.test(self.navigator?.userAgent || '');
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDrMr4T9g9eUub_LDYcs27vp5aE6tolB8I",
-        authDomain: "educom-24ee8.firebaseapp.com",
-        projectId: "educom-24ee8",
-        storageBucket: "educom-24ee8.firebasestorage.app",
-        messagingSenderId: "977130140369",
-        appId: "1:977130140369:web:75a5296cab81caa5c28bf0",
-        measurementId: "G-JD1JYBKQ4Y"
-    };
+if (!isIOSOrSafari) {
+    try {
+        importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+        importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
-    firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging();
-    firebaseInitialized = true;
-    console.log('[SW] Firebase initialized for background messaging');
-} catch (e) {
-    console.log('[SW] Firebase not available — using standard Web Push only', e.message);
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrMr4T9g9eUub_LDYcs27vp5aE6tolB8I",
+            authDomain: "educom-24ee8.firebaseapp.com",
+            projectId: "educom-24ee8",
+            storageBucket: "educom-24ee8.firebasestorage.app",
+            messagingSenderId: "977130140369",
+            appId: "1:977130140369:web:75a5296cab81caa5c28bf0",
+            measurementId: "G-JD1JYBKQ4Y"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+        firebaseInitialized = true;
+        console.log('[SW] Firebase initialized for background messaging');
+    } catch (e) {
+        console.log('[SW] Firebase not available — using standard Web Push only', e.message);
+    }
+} else {
+    console.log('[SW] Safari/iOS detected — using standard Web Push only (no Firebase)');
 }
 
-/**
- * Standard Web Push event listener (handles iOS Safari, Firefox, and fallback for all browsers).
- * Firebase's background handler may intercept this on Chromium — this ensures iOS works.
- */
+// ==================== Push event (Web Push for iOS/Safari/Firefox) ====================
 self.addEventListener('push', (event) => {
-    // If Firebase handled this event, skip (avoid duplicate notifications on Chrome)
-    if (firebaseInitialized && event.data) {
-        try {
-            const raw = event.data.json();
-            // Firebase wraps its payloads with 'notification' at top level from FCM
-            // Standard Web Push payloads from our WebPushService have 'title' at top level
-            if (raw.notification && !raw.title) {
-                // This is an FCM-formatted payload — Firebase will handle it
-                return;
-            }
-        } catch (e) {
-            // Not JSON, proceed with standard handling
-        }
+    // On Chrome with Firebase: FCM sends push events that Firebase's
+    // onBackgroundMessage handler already displays. We MUST skip these
+    // to avoid showing a duplicate notification.
+    if (firebaseInitialized) {
+        // When Firebase is active, it handles ALL push events on Chrome.
+        // We don't need to show anything — Firebase does it automatically.
+        console.log('[SW] Firebase active — skipping push event (Firebase handles it)');
+        return;
     }
 
+    // Non-Firebase browsers (iOS Safari, Firefox, etc.) — we handle the notification
     let data = { title: 'Notificación', body: '', icon: '/apple-touch-icon.png', url: '/' };
     
     if (event.data) {
@@ -76,20 +95,15 @@ self.addEventListener('push', (event) => {
     );
 });
 
-
-
+// ==================== Notification click ====================
 self.addEventListener('notificationclick', (event) => {
-    console.log('[sw.js] Notification click Received.', event);
     event.notification.close();
 
-    // Prioritize URL from data payload, fallback to root
-    const targetUrl = new URL(event.notification.data.url || '/', self.location.origin).href;
+    const targetUrl = new URL(event.notification.data?.url || '/', self.location.origin).href;
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-            // Check if there is already a window open with the target URL
             for (const client of clientList) {
-                // Check if the URL matches (ignoring trailing slash for better matching)
                 const clientUrl = client.url.replace(/\/$/, "");
                 const targetUrlClean = targetUrl.replace(/\/$/, "");
 
@@ -98,7 +112,6 @@ self.addEventListener('notificationclick', (event) => {
                 }
             }
 
-            // If no exact match, but there's any window open, navigate it
             if (clientList.length > 0) {
                 const client = clientList[0];
                 if ('navigate' in client) {
@@ -107,7 +120,6 @@ self.addEventListener('notificationclick', (event) => {
                 }
             }
 
-            // Otherwise, open a new window
             if (clients.openWindow) {
                 return clients.openWindow(targetUrl);
             }
@@ -115,7 +127,8 @@ self.addEventListener('notificationclick', (event) => {
     );
 });
 
-const CACHE_NAME = 'sm-app-shell-v5';
+// ==================== Caching ====================
+const CACHE_NAME = 'sm-app-shell-v6';
 const PRECACHE_URLS = [
     '/',
     '/favicon.ico',
@@ -169,27 +182,13 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    self.addEventListener('message', event => {
-        if (event.data && event.data.type === 'CLEAR_CACHE') {
-            console.log('[SW] Clearing all caches...');
-            event.waitUntil(
-                caches.keys().then(keys => Promise.all(
-                    keys.map(key => caches.delete(key))
-                )).then(() => {
-                    console.log('[SW] Caches cleared.');
-                })
-            );
-        }
-    });
-
     event.respondWith(
         caches.match(request).then(cached => {
             if (cached) return cached;
             return fetch(request).then(resp => {
-                const isHtml = resp.headers.get('content-type')?.includes('text/html');
                 const isStatic = request.destination === 'style' || request.destination === 'script' || request.destination === 'image';
 
-                if (isStatic || (isHtml && request.method === 'GET')) {
+                if (isStatic) {
                     const copy = resp.clone();
                     caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
                 }

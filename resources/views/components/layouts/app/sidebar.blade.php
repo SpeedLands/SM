@@ -74,9 +74,29 @@
 
         @fluxScripts
         
-        <!-- Firebase SDK (only used on Chromium browsers for FCM) -->
-        <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+        <!-- Firebase SDK (only loaded on Chromium browsers — not needed on Safari/iOS) -->
+        <script>
+            // Only load Firebase on non-Safari/non-iOS browsers
+            (function() {
+                const ua = navigator.userAgent;
+                const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+                const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                if (!isSafari && !isIOS) {
+                    const s1 = document.createElement('script');
+                    s1.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js';
+                    s1.onload = function() {
+                        const s2 = document.createElement('script');
+                        s2.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js';
+                        s2.onload = function() {
+                            // Signal that Firebase scripts are loaded
+                            window.dispatchEvent(new Event('firebase-loaded'));
+                        };
+                        document.head.appendChild(s2);
+                    };
+                    document.head.appendChild(s1);
+                }
+            })();
+        </script>
 
         <script>
             /**
@@ -113,43 +133,49 @@
             let firebaseReady = false;
             let messaging = null;
 
-            try {
-                if (typeof firebase !== 'undefined' && !isWebPushOnly()) {
-                    const firebaseConfig = {
-                        apiKey: "AIzaSyDrMr4T9g9eUub_LDYcs27vp5aE6tolB8I",
-                        authDomain: "educom-24ee8.firebaseapp.com",
-                        projectId: "educom-24ee8",
-                        storageBucket: "educom-24ee8.firebasestorage.app",
-                        messagingSenderId: "977130140369",
-                        appId: "1:977130140369:web:75a5296cab81caa5c28bf0",
-                        measurementId: "G-JD1JYBKQ4Y"
-                    };
-                    firebase.initializeApp(firebaseConfig);
-                    messaging = firebase.messaging();
-                    firebaseReady = true;
-                    console.log('[Push] Firebase initialized (FCM mode)');
+            function tryInitFirebase() {
+                if (firebaseReady) return;
+                try {
+                    if (typeof firebase !== 'undefined' && typeof firebase.messaging === 'function' && !isWebPushOnly()) {
+                        const firebaseConfig = {
+                            apiKey: "AIzaSyDrMr4T9g9eUub_LDYcs27vp5aE6tolB8I",
+                            authDomain: "educom-24ee8.firebaseapp.com",
+                            projectId: "educom-24ee8",
+                            storageBucket: "educom-24ee8.firebasestorage.app",
+                            messagingSenderId: "977130140369",
+                            appId: "1:977130140369:web:75a5296cab81caa5c28bf0",
+                            measurementId: "G-JD1JYBKQ4Y"
+                        };
+                        firebase.initializeApp(firebaseConfig);
+                        messaging = firebase.messaging();
+                        firebaseReady = true;
+                        console.log('[Push] Firebase initialized (FCM mode)');
+
+                        // If notification permission is already granted, auto-subscribe
+                        if ("Notification" in window && Notification.permission === "granted") {
+                            updateFcmToken();
+                        }
+
+                        // Set up foreground message handler
+                        setupFcmForegroundHandler();
+                    }
+                } catch (e) {
+                    console.log('[Push] Firebase init error:', e.message);
                 }
-            } catch (e) {
-                console.log('[Push] Firebase not available:', e.message);
             }
+
+            // Initialize Firebase when the scripts finish loading (async)
+            window.addEventListener('firebase-loaded', tryInitFirebase);
+            // Also try immediately in case scripts were cached and loaded synchronously
+            tryInitFirebase();
 
             function updateFcmToken() {
                 if (!('serviceWorker' in navigator) || !firebaseReady) return;
 
                 navigator.serviceWorker.ready.then((registration) => {
-                    registration.pushManager.getSubscription().then(subscription => {
-                        if (subscription) {
-                            subscription.unsubscribe().then(() => {
-                                console.log('[Push] Unsubscribed from old push service');
-                                retrieveNewToken(registration);
-                            }).catch((err) => {
-                                console.warn('[Push] Unsubscribe failed, attempting new token anyway', err);
-                                retrieveNewToken(registration);
-                            });
-                        } else {
-                            retrieveNewToken(registration);
-                        }
-                    }).catch(() => retrieveNewToken(registration));
+                    // Directly get FCM token — no need to unsubscribe PushManager first.
+                    // Firebase manages its own subscription internally.
+                    retrieveNewToken(registration);
                 });
             }
 
@@ -224,6 +250,32 @@
                 }
             }
 
+            // ==================== FCM Foreground Handler ====================
+            function setupFcmForegroundHandler() {
+                if (!firebaseReady || !messaging) return;
+                messaging.onMessage((payload) => {
+                    console.log('[Push] Foreground message received:', payload);
+                    const title = payload.notification?.title || 'Notificación';
+                    const body = payload.notification?.body || '';
+                    const icon = payload.notification?.icon || "/apple-touch-icon.png";
+                    const url = payload.data ? payload.data.url : null;
+
+                    // Only show the in-app toast — do NOT call showNotification() here.
+                    // When the app is in the foreground, FCM delivers the message to
+                    // onMessage() instead of the service worker, so there is no system
+                    // notification. The toast IS the foreground notification.
+                    window.dispatchEvent(new CustomEvent('flux-toast', {
+                        detail: {
+                            title: title,
+                            body: body,
+                            icon: icon,
+                            variant: 'success',
+                            url: url
+                        }
+                    }));
+                });
+            }
+
             // ==================== Unified Entry Points ====================
             function initPushNotifications() {
                 if (isWebPushOnly()) {
@@ -267,37 +319,8 @@
                     }
                 };
 
-                // Handle Foreground Messages (FCM only — Web Push uses SW 'push' event)
-                if (firebaseReady && messaging) {
-                    messaging.onMessage((payload) => {
-                        console.log('[Push] Foreground message received:', payload);
-                        const title = payload.notification.title;
-                        const body = payload.notification.body;
-                        const icon = payload.notification.icon || "/apple-touch-icon.png";
-                        const url = payload.data ? payload.data.url : null;
-
-                        window.dispatchEvent(new CustomEvent('flux-toast', {
-                            detail: {
-                                title: title,
-                                body: body,
-                                icon: icon,
-                                variant: 'success',
-                                url: url
-                            }
-                        }));
-
-                        // Show local system notification
-                        if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-                            navigator.serviceWorker.ready.then((registration) => {
-                                registration.showNotification(title, {
-                                    body: body,
-                                    icon: icon,
-                                    data: { url: url }
-                                });
-                            });
-                        }
-                    });
-                }
+                // Set up foreground handler if Firebase is already loaded
+                setupFcmForegroundHandler();
 
                 // Global listener for 'notify' event from Livewire
                 window.addEventListener('notify', (event) => {
