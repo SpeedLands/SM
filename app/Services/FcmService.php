@@ -72,12 +72,11 @@ class FcmService
                 'status' => $errorCode,
             ]);
 
-            // Hallazgo #2: Invalidar token obsoleto
             // UNREGISTERED: The token is no longer valid.
             // INVALID_ARGUMENT: The token is malformed.
             if ($errorCode === 'UNREGISTERED' || $errorCode === 'INVALID_ARGUMENT') {
-                Log::warning('FCM Token Invalidated: Clearing token for user.', ['token' => $deviceToken]);
-                \App\Models\User::where('fcm_token', $deviceToken)->update(['fcm_token' => null]);
+                Log::warning('FCM Token Invalidated: Clearing subscription.', ['token' => $deviceToken]);
+                \App\Models\PushSubscription::where('fcm_token', $deviceToken)->delete();
             }
 
             return false;

@@ -1,18 +1,80 @@
-importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+/**
+ * Hybrid Service Worker: Firebase (Android/Chrome) + Standard Web Push (iOS/Safari/Firefox)
+ * Firebase handles background messages on Chromium browsers.
+ * The standard 'push' event listener handles Web Push for iOS Safari and others.
+ */
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDrMr4T9g9eUub_LDYcs27vp5aE6tolB8I",
-    authDomain: "educom-24ee8.firebaseapp.com",
-    projectId: "educom-24ee8",
-    storageBucket: "educom-24ee8.firebasestorage.app",
-    messagingSenderId: "977130140369",
-    appId: "1:977130140369:web:75a5296cab81caa5c28bf0",
-    measurementId: "G-JD1JYBKQ4Y"
-};
+// Only load Firebase SDK on non-Safari browsers (Chrome, Edge, etc.)
+const isSafari = !self.firebase && !self.importScripts.toString().includes('native');
+let firebaseInitialized = false;
 
-firebase.initializeApp(firebaseConfig);
-const messaging = firebase.messaging();
+try {
+    importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+    importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDrMr4T9g9eUub_LDYcs27vp5aE6tolB8I",
+        authDomain: "educom-24ee8.firebaseapp.com",
+        projectId: "educom-24ee8",
+        storageBucket: "educom-24ee8.firebasestorage.app",
+        messagingSenderId: "977130140369",
+        appId: "1:977130140369:web:75a5296cab81caa5c28bf0",
+        measurementId: "G-JD1JYBKQ4Y"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+    firebaseInitialized = true;
+    console.log('[SW] Firebase initialized for background messaging');
+} catch (e) {
+    console.log('[SW] Firebase not available — using standard Web Push only', e.message);
+}
+
+/**
+ * Standard Web Push event listener (handles iOS Safari, Firefox, and fallback for all browsers).
+ * Firebase's background handler may intercept this on Chromium — this ensures iOS works.
+ */
+self.addEventListener('push', (event) => {
+    // If Firebase handled this event, skip (avoid duplicate notifications on Chrome)
+    if (firebaseInitialized && event.data) {
+        try {
+            const raw = event.data.json();
+            // Firebase wraps its payloads with 'notification' at top level from FCM
+            // Standard Web Push payloads from our WebPushService have 'title' at top level
+            if (raw.notification && !raw.title) {
+                // This is an FCM-formatted payload — Firebase will handle it
+                return;
+            }
+        } catch (e) {
+            // Not JSON, proceed with standard handling
+        }
+    }
+
+    let data = { title: 'Notificación', body: '', icon: '/apple-touch-icon.png', url: '/' };
+    
+    if (event.data) {
+        try {
+            const payload = event.data.json();
+            data = {
+                title: payload.title || data.title,
+                body: payload.body || data.body,
+                icon: payload.icon || data.icon,
+                url: payload.url || data.url,
+            };
+        } catch (e) {
+            data.body = event.data.text() || '';
+        }
+    }
+
+    event.waitUntil(
+        self.registration.showNotification(data.title, {
+            body: data.body,
+            icon: data.icon,
+            badge: '/apple-touch-icon.png',
+            data: { url: data.url },
+        })
+    );
+});
 
 
 
@@ -53,7 +115,7 @@ self.addEventListener('notificationclick', (event) => {
     );
 });
 
-const CACHE_NAME = 'sm-app-shell-v4';
+const CACHE_NAME = 'sm-app-shell-v5';
 const PRECACHE_URLS = [
     '/',
     '/favicon.ico',

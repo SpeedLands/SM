@@ -54,7 +54,6 @@ class User extends Authenticatable
         'last_login_at',
         'phone',
         'occupation',
-        'fcm_token',
     ];
 
     /**
@@ -169,6 +168,21 @@ class User extends Authenticatable
     public function reports(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Report::class, 'teacher_id');
+    }
+
+    public function pushSubscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PushSubscription::class);
+    }
+
+    public function fcmSubscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PushSubscription::class)->where('type', 'fcm');
+    }
+
+    public function webPushSubscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PushSubscription::class)->where('type', 'webpush');
     }
 
     /**
@@ -312,22 +326,66 @@ class User extends Authenticatable
     }
 
     /**
-     * Send a FCM notification to this user.
+     * Send push notifications to all of this user's subscriptions (FCM + Web Push).
+     */
+    public function sendPushNotification(string $title, string $body, array $data = [], ?string $icon = null, ?string $image = null, ?string $url = null): bool
+    {
+        $sent = false;
+
+        // Send via FCM to all FCM subscriptions
+        $fcmSubs = $this->fcmSubscriptions()->get();
+        if ($fcmSubs->isNotEmpty()) {
+            $fcmService = app(\App\Services\FcmService::class);
+            foreach ($fcmSubs as $sub) {
+                try {
+                    $result = $fcmService->sendNotification(
+                        $sub->fcm_token,
+                        $title,
+                        $body,
+                        $data,
+                        $icon,
+                        $image,
+                        $url
+                    );
+                    if ($result) {
+                        $sent = true;
+                    }
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('FCM send failed for subscription', [
+                        'subscription_id' => $sub->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        }
+
+        // Send via Web Push to all Web Push subscriptions
+        $webPushSubs = $this->webPushSubscriptions()->get();
+        if ($webPushSubs->isNotEmpty()) {
+            $webPushService = app(\App\Services\WebPushService::class);
+            foreach ($webPushSubs as $sub) {
+                try {
+                    $result = $webPushService->sendNotification($sub, $title, $body, $data, $icon, $url);
+                    if ($result) {
+                        $sent = true;
+                    }
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Web Push send failed for subscription', [
+                        'subscription_id' => $sub->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        }
+
+        return $sent;
+    }
+
+    /**
+     * Legacy alias for backward compatibility.
      */
     public function sendFcmNotification(string $title, string $body, array $data = [], ?string $icon = null, ?string $image = null, ?string $url = null): bool
     {
-        if (! $this->fcm_token) {
-            return false;
-        }
-
-        return app(\App\Services\FcmService::class)->sendNotification(
-            $this->fcm_token,
-            $title,
-            $body,
-            $data,
-            $icon,
-            $image,
-            $url
-        );
+        return $this->sendPushNotification($title, $body, $data, $icon, $image, $url);
     }
 }

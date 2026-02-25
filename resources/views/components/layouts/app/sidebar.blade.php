@@ -74,36 +74,76 @@
 
         @fluxScripts
         
-        <!-- Firebase SDK -->
+        <!-- Firebase SDK (only used on Chromium browsers for FCM) -->
         <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
         <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 
         <script>
-            const firebaseConfig = {
-                apiKey: "AIzaSyDrMr4T9g9eUub_LDYcs27vp5aE6tolB8I",
-                authDomain: "educom-24ee8.firebaseapp.com",
-                projectId: "educom-24ee8",
-                storageBucket: "educom-24ee8.firebasestorage.app",
-                messagingSenderId: "977130140369",
-                appId: "1:977130140369:web:75a5296cab81caa5c28bf0",
-                measurementId: "G-JD1JYBKQ4Y"
-            };
+            /**
+             * Hybrid Push Notification System
+             * - Chrome/Android: Firebase Cloud Messaging (FCM)
+             * - Safari/iOS PWA: Standard Web Push with VAPID
+             */
+            const VAPID_PUBLIC_KEY = "{{ config('webpush.vapid.public_key') }}";
+            const PUSH_SUBSCRIBE_URL = "{{ route('push.subscribe') }}";
+            const FCM_TOKEN_URL = "{{ route('fcm-token') }}";
+            const CSRF_TOKEN = "{{ csrf_token() }}";
 
-            firebase.initializeApp(firebaseConfig);
-            const messaging = firebase.messaging();
+            // Detect if this is Safari or iOS (no Firebase messaging support)
+            function isWebPushOnly() {
+                const ua = navigator.userAgent;
+                const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+                const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                return isSafari || isIOS;
+            }
+
+            // Convert VAPID key from base64url to Uint8Array
+            function urlBase64ToUint8Array(base64String) {
+                const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+                const rawData = window.atob(base64);
+                const outputArray = new Uint8Array(rawData.length);
+                for (let i = 0; i < rawData.length; ++i) {
+                    outputArray[i] = rawData.charCodeAt(i);
+                }
+                return outputArray;
+            }
+
+            // ==================== FCM Flow (Chrome/Android) ====================
+            let firebaseReady = false;
+            let messaging = null;
+
+            try {
+                if (typeof firebase !== 'undefined' && !isWebPushOnly()) {
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyDrMr4T9g9eUub_LDYcs27vp5aE6tolB8I",
+                        authDomain: "educom-24ee8.firebaseapp.com",
+                        projectId: "educom-24ee8",
+                        storageBucket: "educom-24ee8.firebasestorage.app",
+                        messagingSenderId: "977130140369",
+                        appId: "1:977130140369:web:75a5296cab81caa5c28bf0",
+                        measurementId: "G-JD1JYBKQ4Y"
+                    };
+                    firebase.initializeApp(firebaseConfig);
+                    messaging = firebase.messaging();
+                    firebaseReady = true;
+                    console.log('[Push] Firebase initialized (FCM mode)');
+                }
+            } catch (e) {
+                console.log('[Push] Firebase not available:', e.message);
+            }
 
             function updateFcmToken() {
-                if (!('serviceWorker' in navigator)) return;
+                if (!('serviceWorker' in navigator) || !firebaseReady) return;
 
                 navigator.serviceWorker.ready.then((registration) => {
-                    // Try to unsubscribe first to clear any stale state that might cause AbortError
                     registration.pushManager.getSubscription().then(subscription => {
                         if (subscription) {
                             subscription.unsubscribe().then(() => {
-                                console.log('Unsubscribed from old push service');
+                                console.log('[Push] Unsubscribed from old push service');
                                 retrieveNewToken(registration);
                             }).catch((err) => {
-                                console.warn('Unsubscribe failed, attempting new token anyway', err);
+                                console.warn('[Push] Unsubscribe failed, attempting new token anyway', err);
                                 retrieveNewToken(registration);
                             });
                         } else {
@@ -115,25 +155,88 @@
 
             function retrieveNewToken(registration) {
                 messaging.getToken({ 
-                    vapidKey: "{{ env('VAPID_PUBLIC_KEY') }}",
+                    vapidKey: VAPID_PUBLIC_KEY,
                     serviceWorkerRegistration: registration
                 }).then((currentToken) => {
                     if (currentToken) {
-                        fetch("{{ route('fcm-token') }}", {
+                        fetch(FCM_TOKEN_URL, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                                "X-CSRF-TOKEN": CSRF_TOKEN
                             },
                             body: JSON.stringify({ token: currentToken })
                         })
                         .then(response => response.json())
-                        .then(data => console.log('FCM Token Updated:', data))
-                        .catch(err => console.error('Error updating FCM token:', err));
+                        .then(data => console.log('[Push] FCM Token Updated:', data))
+                        .catch(err => console.error('[Push] Error updating FCM token:', err));
                     }
                 }).catch((err) => {
-                    console.error('An error occurred while retrieving token. ', err);
+                    console.error('[Push] Error retrieving FCM token:', err);
                 });
+            }
+
+            // ==================== Web Push Flow (Safari/iOS) ====================
+            async function subscribeWebPush() {
+                if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                    console.warn('[Push] Web Push not supported');
+                    return;
+                }
+
+                try {
+                    const registration = await navigator.serviceWorker.ready;
+                    
+                    // Check for existing subscription
+                    let subscription = await registration.pushManager.getSubscription();
+                    
+                    if (!subscription) {
+                        subscription = await registration.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+                        });
+                        console.log('[Push] New Web Push subscription created');
+                    } else {
+                        console.log('[Push] Existing Web Push subscription found');
+                    }
+
+                    // Send subscription to server
+                    const subJson = subscription.toJSON();
+                    const response = await fetch(PUSH_SUBSCRIBE_URL, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": CSRF_TOKEN
+                        },
+                        body: JSON.stringify({
+                            type: 'webpush',
+                            endpoint: subJson.endpoint,
+                            keys: {
+                                p256dh: subJson.keys.p256dh,
+                                auth: subJson.keys.auth,
+                            }
+                        })
+                    });
+
+                    const data = await response.json();
+                    console.log('[Push] Web Push subscription stored:', data);
+                } catch (err) {
+                    console.error('[Push] Web Push subscription error:', err);
+                }
+            }
+
+            // ==================== Unified Entry Points ====================
+            function initPushNotifications() {
+                if (isWebPushOnly()) {
+                    console.log('[Push] Using Web Push (Safari/iOS)');
+                    subscribeWebPush();
+                } else if (firebaseReady) {
+                    console.log('[Push] Using FCM (Chrome/Android)');
+                    updateFcmToken();
+                } else {
+                    // Fallback to Web Push for any browser where Firebase failed
+                    console.log('[Push] Firebase not ready, falling back to Web Push');
+                    subscribeWebPush();
+                }
             }
 
             document.addEventListener('livewire:initialized', () => {
@@ -146,10 +249,10 @@
                     });
                 });
 
-                // Request FCM Permission and Token
+                // Auto-subscribe if permission is already granted
                 if ("Notification" in window) {
                     if (Notification.permission === "granted") {
-                        updateFcmToken();
+                        initPushNotifications();
                     }
                 }
 
@@ -158,41 +261,43 @@
                     if ("Notification" in window) {
                         Notification.requestPermission().then(permission => {
                             if (permission === "granted") {
-                                updateFcmToken();
+                                initPushNotifications();
                             }
                         });
                     }
                 };
 
-                // Handle Foreground Messages
-                messaging.onMessage((payload) => {
-                    console.log('Message received. ', payload);
-                    const title = payload.notification.title;
-                    const body = payload.notification.body;
-                    const icon = payload.notification.icon || "/apple-touch-icon.png";
-                    const url = payload.data ? payload.data.url : null;
+                // Handle Foreground Messages (FCM only — Web Push uses SW 'push' event)
+                if (firebaseReady && messaging) {
+                    messaging.onMessage((payload) => {
+                        console.log('[Push] Foreground message received:', payload);
+                        const title = payload.notification.title;
+                        const body = payload.notification.body;
+                        const icon = payload.notification.icon || "/apple-touch-icon.png";
+                        const url = payload.data ? payload.data.url : null;
 
-                    window.dispatchEvent(new CustomEvent('flux-toast', {
-                        detail: {
-                            title: title,
-                            body: body,
-                            icon: icon,
-                            variant: 'success',
-                            url: url
-                        }
-                    }));
-
-                    // Show local system notification if in foreground
-                    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-                        navigator.serviceWorker.ready.then((registration) => {
-                            registration.showNotification(title, {
+                        window.dispatchEvent(new CustomEvent('flux-toast', {
+                            detail: {
+                                title: title,
                                 body: body,
                                 icon: icon,
-                                data: { url: url }
+                                variant: 'success',
+                                url: url
+                            }
+                        }));
+
+                        // Show local system notification
+                        if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+                            navigator.serviceWorker.ready.then((registration) => {
+                                registration.showNotification(title, {
+                                    body: body,
+                                    icon: icon,
+                                    data: { url: url }
+                                });
                             });
-                        });
-                    }
-                });
+                        }
+                    });
+                }
 
                 // Global listener for 'notify' event from Livewire
                 window.addEventListener('notify', (event) => {

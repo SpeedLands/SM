@@ -76,6 +76,7 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+    Volt::route('settings/notifications', 'settings.notifications')->name('notifications.edit');
 
     Volt::route('settings/two-factor', 'settings.two-factor')
         ->middleware(
@@ -88,4 +89,6 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 });
-Route::post('/fcm-token', [\App\Http\Controllers\FcmController::class, 'storeToken'])->name('fcm-token')->middleware('auth');
+Route::post('/fcm-token', [\App\Http\Controllers\PushSubscriptionController::class, 'storeLegacyToken'])->name('fcm-token')->middleware('auth');
+Route::post('/push/subscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'store'])->name('push.subscribe')->middleware('auth');
+Route::post('/push/unsubscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'destroy'])->name('push.unsubscribe')->middleware('auth');

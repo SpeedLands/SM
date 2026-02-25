@@ -2,8 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Models\PushSubscription;
 use App\Models\User;
 use App\Services\FcmService;
+use App\Services\WebPushService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -39,17 +41,19 @@ class SendBulkFcmNotifications implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(FcmService $fcmService): void
+    public function handle(FcmService $fcmService, WebPushService $webPushService): void
     {
-        Log::info('Starting Bulk FCM Sending', ['count' => count($this->userIds)]);
+        Log::info('Starting Bulk Push Sending', ['count' => count($this->userIds)]);
 
-        User::whereIn('id', $this->userIds)
+        // Send FCM notifications
+        PushSubscription::whereIn('user_id', $this->userIds)
+            ->where('type', 'fcm')
             ->whereNotNull('fcm_token')
-            ->chunkById(100, function ($users) use ($fcmService) {
-                foreach ($users as $user) {
+            ->chunkById(100, function ($subscriptions) use ($fcmService) {
+                foreach ($subscriptions as $subscription) {
                     try {
                         $fcmService->sendNotification(
-                            $user->fcm_token,
+                            $subscription->fcm_token,
                             $this->title,
                             $this->body,
                             $this->data,
@@ -57,18 +61,41 @@ class SendBulkFcmNotifications implements ShouldQueue
                             null,
                             $this->url
                         );
-                        
-                        // Small delay to prevent hitting rate limits too fast
-                        usleep(50000); // 50ms
+
+                        usleep(50000); // 50ms delay
                     } catch (\Exception $e) {
-                        Log::error('Individual FCM Sending Failed', [
-                            'user_id' => $user->id,
-                            'error' => $e->getMessage()
+                        Log::error('FCM Sending Failed', [
+                            'subscription_id' => $subscription->id,
+                            'user_id' => $subscription->user_id,
+                            'error' => $e->getMessage(),
                         ]);
                     }
                 }
             });
 
-        Log::info('Bulk FCM Sending Completed');
+        // Send Web Push notifications (iOS Safari, Firefox, etc.)
+        $webPushBatch = [];
+        PushSubscription::whereIn('user_id', $this->userIds)
+            ->where('type', 'webpush')
+            ->whereNotNull('p256dh_key')
+            ->whereNotNull('auth_key')
+            ->chunk(100, function ($subscriptions) use ($webPushService, &$webPushBatch) {
+                foreach ($subscriptions as $subscription) {
+                    $webPushBatch[] = [
+                        'subscription' => $subscription,
+                        'title' => $this->title,
+                        'body' => $this->body,
+                        'url' => $this->url,
+                        'data' => $this->data,
+                    ];
+                }
+            });
+
+        if (! empty($webPushBatch)) {
+            $results = $webPushService->sendBatch($webPushBatch);
+            Log::info('Web Push Batch Results', $results);
+        }
+
+        Log::info('Bulk Push Sending Completed');
     }
 }
