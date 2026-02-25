@@ -42,8 +42,14 @@ class FcmService
                 'body' => $body,
             ],
             'webpush' => [
+                'headers' => [
+                    'Urgency' => 'high',
+                ],
                 'notification' => [
+                    'title' => $title,
+                    'body' => $body,
                     'icon' => $icon ?? '/apple-touch-icon.png',
+                    'click_action' => $url ?? '/',
                 ],
                 'fcm_options' => [
                     'link' => $url ?? '/',
