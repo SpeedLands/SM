@@ -34,6 +34,7 @@ class Cycle extends Model
     {
         return $this->hasMany(ExamSchedule::class);
     }
+
     public function reports()
     {
         return $this->hasMany(Report::class);

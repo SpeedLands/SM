@@ -1,27 +1,27 @@
 <?php
 
-use App\Models\Notice;
-use App\Models\Student;
-use App\Models\NoticeSignature;
-use App\Models\Cycle;
 use App\Models\ClassGroup;
-use App\Models\User;
+use App\Models\Cycle;
+use App\Models\Notice;
+use App\Models\NoticeSignature;
+use App\Models\Student;
 use App\Models\StudentCycleAssociation;
+use App\Models\User;
 
 test('notice signature statistics are calculated correctly', function () {
     $cycle = Cycle::factory()->create(['is_active' => true]);
-    
+
     // Create students in different grades/groups
     $classGroupA = ClassGroup::factory()->create(['cycle_id' => $cycle->id, 'grade' => 1, 'section' => 'A']);
     $classGroupB = ClassGroup::factory()->create(['cycle_id' => $cycle->id, 'grade' => 2, 'section' => 'B']);
-    
+
     $studentsA = Student::factory()->count(10)->create(['grade' => 1]);
-    foreach($studentsA as $s) {
+    foreach ($studentsA as $s) {
         StudentCycleAssociation::create([
             'student_id' => $s->id,
             'cycle_id' => $cycle->id,
             'class_group_id' => $classGroupA->id,
-            'status' => 'ACTIVE'
+            'status' => 'ACTIVE',
         ]);
         // Associate parent
         $parent = User::factory()->create(['role' => 'PARENT']);
@@ -29,12 +29,12 @@ test('notice signature statistics are calculated correctly', function () {
     }
 
     $studentsB = Student::factory()->count(5)->create(['grade' => 2]);
-    foreach($studentsB as $s) {
+    foreach ($studentsB as $s) {
         StudentCycleAssociation::create([
             'student_id' => $s->id,
             'cycle_id' => $cycle->id,
             'class_group_id' => $classGroupB->id,
-            'status' => 'ACTIVE'
+            'status' => 'ACTIVE',
         ]);
         $parent = User::factory()->create(['role' => 'PARENT']);
         $s->parents()->attach($parent);
@@ -52,9 +52,9 @@ test('notice signature statistics are calculated correctly', function () {
     ]);
 
     expect($noticeAll->getExpectedRecipientsCount())->toBe(15);
-    
+
     // Sign for 3 students from A
-    foreach($studentsA->take(3) as $student) {
+    foreach ($studentsA->take(3) as $student) {
         NoticeSignature::create([
             'notice_id' => $noticeAll->id,
             'student_id' => $student->id,
@@ -82,9 +82,9 @@ test('notice signature statistics are calculated correctly', function () {
     ]);
 
     expect($noticeGrade1->getExpectedRecipientsCount())->toBe(10);
-    
-     // Sign for 10 students from A
-    foreach($studentsA as $student) {
+
+    // Sign for 10 students from A
+    foreach ($studentsA as $student) {
         NoticeSignature::create([
             'notice_id' => $noticeGrade1->id,
             'student_id' => $student->id,

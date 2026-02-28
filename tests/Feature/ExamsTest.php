@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\User;
-use App\Models\Cycle;
 use App\Models\ClassGroup;
+use App\Models\Cycle;
 use App\Models\ExamSchedule;
 use App\Models\Student;
+use App\Models\User;
 use Livewire\Volt\Volt;
 
 test('admins can schedule exams', function () {
@@ -13,7 +13,7 @@ test('admins can schedule exams', function () {
     $group = ClassGroup::factory()->create([
         'cycle_id' => $cycle->id,
         'grade' => '1',
-        'section' => 'A'
+        'section' => 'A',
     ]);
 
     Volt::actingAs($admin)
@@ -33,7 +33,7 @@ test('parents can view exams for their children', function () {
     $parent = User::factory()->create(['role' => 'PARENT']);
     $student = Student::factory()->create(['grade' => '2', 'group_name' => 'B']);
     $cycle = Cycle::factory()->create(['is_active' => true]);
-    
+
     // Link parent to student
     $parent->students()->attach($student->id, ['relationship' => 'PADRE']);
 
@@ -57,7 +57,7 @@ test('parents can view exams for their children', function () {
 test('filtering works correctly', function () {
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $cycle = Cycle::factory()->create(['is_active' => true]);
-    
+
     ExamSchedule::create([
         'cycle_id' => $cycle->id,
         'grade' => '1',
