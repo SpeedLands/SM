@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\StudentCycleAssociation;
 use App\Models\StudentPii;
 use App\Models\Citation;
+use App\Models\Report;
+use App\Models\CommunityService;
 use App\Models\NoticeSignature;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
@@ -49,6 +51,11 @@ new class extends Component {
     public string $idToDelete = '';
     public string $nameToDelete = '';
     public bool $showDeleteModal = false;
+
+    // History Modal State
+    public bool $showHistoryModal = false;
+    public string $historyStudentName = '';
+    public array $historyItems = [];
 
     public function updatingSearch(): void
     {
@@ -106,6 +113,72 @@ new class extends Component {
 
         Student::findOrFail($this->studentId)->parents()->detach($parentId);
         $this->dispatch('parent-removed');
+    }
+
+    public function viewHistory(string $id): void
+    {
+        $student = Student::findOrFail($id);
+        $this->historyStudentName = $student->name;
+
+        $activeCycle = Cycle::where('is_active', true)->first();
+        $items = collect();
+
+        // Reports
+        $reports = Report::with('teacher', 'infraction')
+            ->where('student_id', $id)
+            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
+            ->get();
+
+        foreach ($reports as $r) {
+            $items->push([
+                'type' => 'report',
+                'date' => $r->date ? $r->date->format('Y-m-d') : null,
+                'date_display' => $r->date ? $r->date->isoFormat('D [de] MMMM, YYYY') : 'Sin fecha',
+                'title' => $r->subject,
+                'description' => $r->description,
+                'extra' => $r->teacher?->name ?? '',
+                'status' => $r->status,
+            ]);
+        }
+
+        // Community Services
+        $services = CommunityService::with('assignedBy')
+            ->where('student_id', $id)
+            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
+            ->get();
+
+        foreach ($services as $s) {
+            $items->push([
+                'type' => 'service',
+                'date' => $s->scheduled_date ? $s->scheduled_date->format('Y-m-d') : null,
+                'date_display' => $s->scheduled_date ? $s->scheduled_date->isoFormat('D [de] MMMM, YYYY') : 'Sin fecha',
+                'title' => $s->activity,
+                'description' => $s->description,
+                'extra' => $s->assignedBy?->name ?? '',
+                'status' => $s->status,
+            ]);
+        }
+
+        // Citations
+        $citations = Citation::with('teacher')
+            ->where('student_id', $id)
+            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
+            ->get();
+
+        foreach ($citations as $c) {
+            $items->push([
+                'type' => 'citation',
+                'date' => $c->citation_date ? $c->citation_date->format('Y-m-d') : null,
+                'date_display' => $c->citation_date ? $c->citation_date->isoFormat('D [de] MMMM, YYYY') : 'Sin fecha',
+                'title' => $c->reason,
+                'description' => '',
+                'extra' => $c->teacher?->name ?? '',
+                'status' => $c->status,
+            ]);
+        }
+
+        $this->historyItems = $items->sortByDesc('date')->values()->toArray();
+        $this->showHistoryModal = true;
     }
 
     public function editStudent(string $id): void
@@ -414,6 +487,7 @@ new class extends Component {
                             </td>
                             <td class="py-4 px-2 text-right">
                                 <div class="flex justify-end gap-1">
+                                    <flux:button x-on:click.stop variant="ghost" size="sm" icon="eye" wire:click="viewHistory('{{ $student->id }}')" title="Ver historial" />
                                     @if(auth()->user()->isViewStaff())
                                         <flux:button x-on:click.stop variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
                                         @if($student->reports_count === 0 && $student->community_services_count === 0 && $student->citations_count === 0 && $student->notice_signatures_count === 0)
@@ -606,6 +680,147 @@ new class extends Component {
             </div>
         </flux:modal>
     @endcan
+
+    <!-- Student History Modal -->
+    <flux:modal wire:model="showHistoryModal" class="w-full max-w-3xl">
+        <div class="space-y-6">
+            <header>
+                <flux:heading size="lg">Historial del Alumno</flux:heading>
+                <flux:text class="uppercase font-bold">{{ $historyStudentName }}</flux:text>
+            </header>
+
+            <!-- Legend -->
+            <div class="flex flex-wrap gap-3">
+                <div class="flex items-center gap-1.5">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <span class="text-xs text-zinc-600 dark:text-zinc-400">Reportes</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="text-xs text-zinc-600 dark:text-zinc-400">Servicios Comunitarios</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                    <span class="text-xs text-zinc-600 dark:text-zinc-400">Citatorios</span>
+                </div>
+            </div>
+
+            @if(count($historyItems) === 0)
+                <div class="py-12 text-center border border-dashed rounded-2xl border-zinc-300 dark:border-zinc-700">
+                    <flux:icon icon="check-circle" class="mx-auto text-emerald-400 mb-3" size="xl" />
+                    <flux:heading size="md" class="text-zinc-400">Sin historial</flux:heading>
+                    <flux:text size="sm" class="text-zinc-500">Este alumno no tiene reportes, servicios comunitarios ni citatorios registrados en el ciclo activo.</flux:text>
+                </div>
+            @else
+                <div class="max-h-[60vh] overflow-y-auto pr-1 space-y-6">
+                    @php
+                        $grouped = collect($historyItems)->groupBy('date');
+                    @endphp
+
+                    @foreach($grouped as $date => $dateItems)
+                        <div class="space-y-3">
+                            <!-- Date Header -->
+                            <div class="flex items-center gap-2 px-1 sticky top-0 bg-white dark:bg-zinc-800 py-1 z-10">
+                                <flux:badge color="zinc" size="sm" inset="left">
+                                    {{ $date ? \Carbon\Carbon::parse($date)->isoFormat('dddd') : 'N/A' }}
+                                </flux:badge>
+                                <flux:text size="sm" class="font-bold">
+                                    {{ $dateItems->first()['date_display'] }}
+                                </flux:text>
+                            </div>
+
+                            @foreach($dateItems as $item)
+                                @if($item['type'] === 'report')
+                                    {{-- Report Card - Red --}}
+                                    <div class="p-4 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <flux:icon icon="document-text" class="text-red-600" />
+                                            <flux:badge size="xs" color="red" variant="outline">Reporte</flux:badge>
+                                        </div>
+                                        <div class="font-bold text-red-900 dark:text-red-100">{{ $item['title'] }}</div>
+                                        @if($item['description'])
+                                            <div class="text-xs text-red-600 dark:text-red-400 mt-1 line-clamp-2 italic">{{ $item['description'] }}</div>
+                                        @endif
+                                        @if($item['extra'])
+                                            <div class="text-xs text-red-500 dark:text-red-400 mt-2">
+                                                Reportado por: {{ $item['extra'] }}
+                                            </div>
+                                        @endif
+                                        <div class="mt-2">
+                                            @if($item['status'] === 'PENDING_SIGNATURE')
+                                                <flux:badge size="sm" color="amber">Pendiente firma</flux:badge>
+                                            @elseif($item['status'] === 'SIGNED')
+                                                <flux:badge size="sm" color="green">Firmado</flux:badge>
+                                            @elseif($item['status'] === 'PENDING')
+                                                <flux:badge size="sm" color="amber">Pendiente firma</flux:badge>
+                                            @else
+                                                <flux:badge size="sm" color="zinc">{{ $item['status'] }}</flux:badge>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                @elseif($item['type'] === 'service')
+                                    {{-- Service Card - Green --}}
+                                    <div class="p-4 rounded-xl border border-green-200 dark:border-green-900/50 bg-green-50 dark:bg-green-900/20">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <flux:icon icon="briefcase" class="text-green-600" />
+                                            <flux:badge size="xs" color="green" variant="outline">Servicio Comunitario</flux:badge>
+                                        </div>
+                                        <div class="font-bold text-green-900 dark:text-green-100">{{ $item['title'] }}</div>
+                                        @if($item['description'])
+                                            <div class="text-xs text-green-600 dark:text-green-400 mt-2 italic">{{ $item['description'] }}</div>
+                                        @endif
+                                        @if($item['extra'])
+                                            <div class="text-xs text-green-500 dark:text-green-400 mt-2">
+                                                Asignado por: {{ $item['extra'] }}
+                                            </div>
+                                        @endif
+                                        <div class="mt-2">
+                                            @if($item['status'] === 'PENDING')
+                                                <flux:badge size="sm" color="amber">Pendiente</flux:badge>
+                                            @elseif($item['status'] === 'COMPLETED')
+                                                <flux:badge size="sm" color="green">Completado</flux:badge>
+                                            @else
+                                                <flux:badge size="sm" color="red">Incumplido</flux:badge>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                @elseif($item['type'] === 'citation')
+                                    {{-- Citation Card - Amber --}}
+                                    <div class="p-4 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/20">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <flux:icon icon="calendar-days" class="text-amber-600" />
+                                            <flux:badge size="xs" color="amber" variant="outline">Citatorio</flux:badge>
+                                        </div>
+                                        <div class="font-bold text-amber-900 dark:text-amber-100">{{ $item['title'] }}</div>
+                                        @if($item['extra'])
+                                            <div class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                                                Solicitado por: {{ $item['extra'] }}
+                                            </div>
+                                        @endif
+                                        <div class="mt-2">
+                                            @if($item['status'] === 'PENDING')
+                                                <flux:badge size="sm" color="amber">Agendado</flux:badge>
+                                            @elseif($item['status'] === 'ATTENDED')
+                                                <flux:badge size="sm" color="green">Asistió</flux:badge>
+                                            @else
+                                                <flux:badge size="sm" color="red">No asistió</flux:badge>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            <div class="flex justify-end pt-2">
+                <flux:button wire:click="$set('showHistoryModal', false)">Cerrar</flux:button>
+            </div>
+        </div>
+    </flux:modal>
 
     <!-- Deletion Confirmation Modal -->
     <flux:modal wire:model="showDeleteModal" class="min-w-80">

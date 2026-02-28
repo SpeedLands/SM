@@ -113,10 +113,11 @@ test('total count combines all pending items', function () {
 });
 
 test('parent can filter pending counts by student', function () {
-    $student2 = Student::factory()->create(['grade' => '2º']);
+    $this->student->update(['grade' => '1']);
+    $student2 = Student::factory()->create(['grade' => '2']);
     $this->parent->students()->attach($student2->id, ['relationship' => 'PADRE']);
 
-    // Notice for student 1 MUST target student 1
+    // Notice for student 1 (grade 1)
     Notice::create([
         'cycle_id' => $this->cycle->id,
         'author_id' => User::factory()->create(['role' => 'ADMIN'])->id,
@@ -124,11 +125,11 @@ test('parent can filter pending counts by student', function () {
         'content' => 'Content',
         'type' => 'GENERAL',
         'target_audience' => 'PARENTS',
-        'target_grades' => [$this->student->grade],
+        'target_grades' => ['1'],
         'date' => now(),
     ]);
 
-    // Report for student 2 MUST be for student 2
+    // Report for student 2
     $infraction = Infraction::create(['description' => 'Test', 'severity' => 'NORMAL']);
     Report::create([
         'cycle_id' => $this->cycle->id,
