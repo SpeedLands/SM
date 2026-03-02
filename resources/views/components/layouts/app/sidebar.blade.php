@@ -41,18 +41,6 @@
 
             <flux:spacer />
 
-            <!-- Push Notification Prompt -->
-            <div x-data="{ showPushPrompt: false }" 
-                 x-init="if ('Notification' in window && navigator.serviceWorker && Notification.permission === 'default') { showPushPrompt = true; }">
-                 
-                <template x-if="showPushPrompt">
-                    <div class="px-3 pb-4">
-                        <flux:button variant="ghost" icon="bell-alert" class="w-full justify-start text-xs font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20 active:scale-95 transition-transform" @click="requestPushPermission(); showPushPrompt = false;">
-                            Activar Notificaciones
-                        </flux:button>
-                    </div>
-                </template>
-            </div>
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">

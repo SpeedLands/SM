@@ -29,6 +29,7 @@ new class extends Component {
     // Deletion
     public bool $showDeleteModal = false;
     public ?string $idToDelete = null;
+    public ?string $editingServiceId = null;
 
     public function updatingOnlyActiveCycle(): void
     {
@@ -78,6 +79,21 @@ new class extends Component {
         $this->studentSearch = Student::find($id)->name;
     }
 
+    public function editService(string $id): void
+    {
+        $this->authorize('teacher-or-admin');
+        
+        $service = CommunityService::findOrFail($id);
+        $this->editingServiceId = $service->id;
+        $this->selectedStudentId = $service->student_id;
+        $this->studentSearch = $service->student->name;
+        $this->activity = $service->activity;
+        $this->description = $service->description ?? '';
+        $this->scheduledDate = Carbon::parse($service->scheduled_date)->format('Y-m-d');
+        
+        $this->showServiceModal = true;
+    }
+
     public function save(): void
     {
         $this->authorize('teacher-or-admin');
@@ -91,33 +107,43 @@ new class extends Component {
             return;
         }
 
-        $service = CommunityService::create([
+        $data = [
             'cycle_id' => $activeCycle->id,
             'student_id' => $this->selectedStudentId,
-            'assigned_by_id' => auth()->id(),
             'activity' => $this->activity,
             'description' => $this->description,
             'scheduled_date' => $this->scheduledDate,
-            'status' => 'PENDING',
-        ]);
+        ];
 
-        // Notify parents via FCM asíncronamente (Hallazgo #3 y #6)
-        $student = Student::with('parents')->find($this->selectedStudentId);
-        $parentIds = $student->parents->pluck('id')->toArray();
-        
-        if (!empty($parentIds)) {
-            \App\Jobs\SendBulkFcmNotifications::dispatch(
-                $parentIds,
-                'Nuevo Servicio Comunitario Asignado',
-                "Se ha asignado una actividad de servicio comunitario para {$student->name}: {$this->activity}.",
-                [],
-                route('community-services.index')
-            );
+        if ($this->editingServiceId) {
+            $service = CommunityService::findOrFail($this->editingServiceId);
+            $service->update($data);
+            $message = 'Servicio comunitario actualizado.';
+        } else {
+            $data['assigned_by_id'] = auth()->id();
+            $data['status'] = 'PENDING';
+            $service = CommunityService::create($data);
+            $message = 'Servicio comunitario asignado.';
+
+            // Notify parents via FCM asíncronamente (Hallazgo #3 y #6)
+            $student = Student::with('parents')->find($this->selectedStudentId);
+            $parentIds = $student->parents->pluck('id')->toArray();
+            
+            if (!empty($parentIds)) {
+                \App\Jobs\SendBulkFcmNotifications::dispatch(
+                    $parentIds,
+                    'Nuevo Servicio Comunitario Asignado',
+                    "Se ha asignado una actividad de servicio comunitario para {$student->name}: {$this->activity}.",
+                    [],
+                    route('community-services.index')
+                );
+            }
         }
 
         $this->showServiceModal = false;
         $this->resetForm();
-        $this->dispatch('notify', ['message' => 'Servicio comunitario asignado.']);
+        $this->editingServiceId = null;
+        $this->dispatch('notify', ['message' => $message]);
     }
 
     public function signService(string $id): void
@@ -318,13 +344,14 @@ new class extends Component {
                                 @endif
                             </td>
                             <td class="py-4 px-2 text-right">
-                                <div class="flex justify-end gap-1">
-                                    @if($service->status === 'PENDING')
-                                        <flux:button variant="ghost" size="sm" icon="check-circle" class="text-green-600" title="Marcar como cumplido" wire:click="updateStatus('{{ $service->id }}', 'COMPLETED')" />
-                                        <flux:button variant="ghost" size="sm" icon="x-circle" class="text-red-600" title="Marcar como no asistió" wire:click="updateStatus('{{ $service->id }}', 'MISSED')" />
-                                    @endif
-                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" title="Eliminar servicio" wire:click="confirmDelete('{{ $service->id }}')" />
-                                </div>
+                                    <div class="flex justify-end gap-1">
+                                        @if($service->status === 'PENDING')
+                                            <flux:button variant="ghost" size="sm" icon="check-circle" class="text-green-600" title="Marcar como cumplido" wire:click="updateStatus('{{ $service->id }}', 'COMPLETED')" />
+                                            <flux:button variant="ghost" size="sm" icon="x-circle" class="text-red-600" title="Marcar como no asistió" wire:click="updateStatus('{{ $service->id }}', 'MISSED')" />
+                                            <flux:button variant="ghost" size="sm" icon="pencil" title="Editar servicio" wire:click="editService('{{ $service->id }}')" />
+                                        @endif
+                                        <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" title="Eliminar servicio" wire:click="confirmDelete('{{ $service->id }}')" />
+                                    </div>
                             </td>
                         </tr>
                     @empty
@@ -433,8 +460,8 @@ new class extends Component {
     <flux:modal wire:model.self="showServiceModal" class="md:w-160">
         <form wire:submit="save" class="space-y-6">
             <header>
-                <flux:heading size="lg">Asignar Servicio Comunitario</flux:heading>
-                <flux:text>Defina la actividad y fecha para el cumplimiento del servicio.</flux:text>
+                <flux:heading size="lg">{{ $editingServiceId ? 'Editar Servicio Comunitario' : 'Asignar Servicio Comunitario' }}</flux:heading>
+                <flux:text>{{ $editingServiceId ? 'Actualice la actividad y fecha para el cumplimiento del servicio.' : 'Defina la actividad y fecha para el cumplimiento del servicio.' }}</flux:text>
             </header>
 
             <div class="space-y-4">
@@ -467,7 +494,7 @@ new class extends Component {
             <div class="flex gap-2">
                 <flux:spacer />
                 <flux:button wire:click="$set('showServiceModal', false)">Cancelar</flux:button>
-                <flux:button variant="primary" type="submit">Asignar Servicio</flux:button>
+                <flux:button variant="primary" type="submit">{{ $editingServiceId ? 'Actualizar Servicio' : 'Asignar Servicio' }}</flux:button>
             </div>
         </form>
     </flux:modal>

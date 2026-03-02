@@ -6,6 +6,7 @@ use App\Models\Cycle;
 use App\Models\Student;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
+use Carbon\Carbon;
 
 new class extends Component {
     use WithPagination;
@@ -56,6 +57,21 @@ new class extends Component {
         }
     }
 
+    public function editExam(string $id): void
+    {
+        if (!auth()->user()->isViewStaff()) abort(403);
+        
+        $exam = ExamSchedule::findOrFail($id);
+        $this->editingExamId = $id;
+        $this->subject = $exam->subject;
+        $this->grade = $exam->grade;
+        $this->groupName = $exam->group_name;
+        $this->period = $exam->period;
+        $this->examDate = Carbon::parse($exam->exam_date)->format('Y-m-d');
+        
+        $this->showCreateModal = true;
+    }
+
     public function saveExam(): void
     {
         if (!auth()->user()->isViewStaff()) abort(403);
@@ -81,7 +97,7 @@ new class extends Component {
             return;
         }
 
-        $exam = ExamSchedule::create([
+        $data = [
             'cycle_id' => $activeCycle->id,
             'grade' => $this->grade,
             'group_name' => $this->groupName,
@@ -89,35 +105,43 @@ new class extends Component {
             'subject' => $this->subject,
             'exam_date' => $this->examDate,
             'day_of_week' => $this->daysOfWeek[$dayNum],
-        ]);
+        ];
 
-        // Notify parents of this grade and group
-        $activeCycle = Cycle::where('is_active', true)->first();
-        $students = Student::where('grade', $this->grade)
-            ->whereHas('currentCycleAssociation', function($q) use ($activeCycle) {
-                $q->where('cycle_id', $activeCycle->id)
-                  ->whereHas('group', function($sq) {
-                      $sq->where('section', $this->groupName);
-                  });
-            })
-            ->with('parents')
-            ->get();
-        
-        $parents = $students->flatMap(fn($s) => $s->parents)->unique('id');
-        
-        if ($parents->isNotEmpty()) {
-            \App\Jobs\SendBulkFcmNotifications::dispatch(
-                $parents->pluck('id')->toArray(),
-                'Nuevo Examen Programado',
-                "Se ha programado un examen de {$this->subject} para el {$exam->exam_date->format('d/m/Y')}.",
-                [],
-                route('exams.index')
-            );
+        if ($this->editingExamId) {
+            $exam = ExamSchedule::findOrFail($this->editingExamId);
+            $exam->update($data);
+            $message = 'Examen actualizado correctamente.';
+        } else {
+            $exam = ExamSchedule::create($data);
+            $message = 'Examen programado correctamente.';
+
+            // Notify parents of this grade and group
+            $students = Student::where('grade', $this->grade)
+                ->whereHas('currentCycleAssociation', function($q) use ($activeCycle) {
+                    $q->where('cycle_id', $activeCycle->id)
+                      ->whereHas('group', function($sq) {
+                          $sq->where('section', $this->groupName);
+                      });
+                })
+                ->with('parents')
+                ->get();
+            
+            $parents = $students->flatMap(fn($s) => $s->parents)->unique('id');
+            
+            if ($parents->isNotEmpty()) {
+                \App\Jobs\SendBulkFcmNotifications::dispatch(
+                    $parents->pluck('id')->toArray(),
+                    'Nuevo Examen Programado',
+                    "Se ha programado un examen de {$this->subject} para el {$exam->exam_date->format('d/m/Y')}.",
+                    [],
+                    route('exams.index')
+                );
+            }
         }
 
         $this->showCreateModal = false;
-        $this->reset(['subject']);
-        $this->dispatch('notify', ['message' => 'Examen programado correctamente.']);
+        $this->reset(['subject', 'editingExamId']);
+        $this->dispatch('notify', ['message' => $message]);
     }
 
     public function confirmDelete(string $id): void
@@ -185,7 +209,7 @@ new class extends Component {
             <flux:text class="text-zinc-500">Programación de evaluaciones por trimestre.</flux:text>
         </div>
         @if($isStaff)
-            <flux:button variant="primary" icon="plus" wire:click="$set('showCreateModal', true)">Programar Examen</flux:button>
+            <flux:button variant="primary" icon="plus" wire:click="reset(['subject', 'editingExamId']); $set('showCreateModal', true)">Programar Examen</flux:button>
         @endif
     </div>
 
@@ -234,7 +258,8 @@ new class extends Component {
                             <div class="flex justify-between items-start mb-2">
                                 <flux:badge size="xs" color="purple" variant="outline">{{ $exam->period }}º Trimestre</flux:badge>
                                 @if($isStaff)
-                                    <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editExam('{{ $exam->id }}')" />
                                         <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="confirmDelete('{{ $exam->id }}')" />
                                     </div>
                                 @endif
@@ -245,7 +270,7 @@ new class extends Component {
                             <div class="mt-3 flex items-center justify-between">
                                 <div class="flex items-center gap-1.5">
                                     <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                                    <flux:text size="sm" class="font-medium">{{ $exam->grade }}º"{{ $exam->group_name }}"</flux:text>
+                                    <flux:text size="sm" class="font-medium">{{ $exam->grade }}"{{ $exam->group_name }}"</flux:text>
                                 </div>
                                 <flux:text size="xs" class="text-zinc-500">{{ $exam->exam_date->format('H:i') == '00:00' ? '' : $exam->exam_date->format('H:i').' hrs' }}</flux:text>
                             </div>
@@ -276,8 +301,8 @@ new class extends Component {
     <flux:modal wire:model.self="showCreateModal" class="md:w-160">
         <form wire:submit="saveExam" class="space-y-6">
             <header>
-                <flux:heading size="md">Programar Examen</flux:heading>
-                <flux:text>Ingrese los detalles de la evaluación académica.</flux:text>
+                <flux:heading size="md">{{ $editingExamId ? 'Editar Examen' : 'Programar Examen' }}</flux:heading>
+                <flux:text>{{ $editingExamId ? 'Actualice los detalles de la evaluación.' : 'Ingrese los detalles de la evaluación académica.' }}</flux:text>
             </header>
 
             <div class="space-y-4">

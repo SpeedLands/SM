@@ -215,6 +215,14 @@ new class extends Component {
                 'edit' => '',
                 'delete' => ''
             ],
+            'tutorial-c-notifications' => [
+                'desc' => 'Activa las notificaciones push para recibir alertas al instante sobre reportes, citatorios y avisos.',
+                'req' => 'Un navegador moderno (Chrome, Safari, Edge) con soporte para Service Workers.',
+                'steps' => '<li>Ve a tu perfil (abajo a la izquierda).</li><li>Selecciona "Configuración" en el menú desplegable.</li><li>Haz clic en la pestaña "Notificaciones".</li><li>Presiona el botón "Activar" y concede los permisos en tu navegador.</li>',
+                'tip' => 'Si activas las notificaciones pero no las recibes, revisa que tu sistema operativo (Windows/Android/iOS) no esté en modo "No molestar".',
+                'edit' => '',
+                'delete' => ''
+            ],
         ][$name] ?? [
             'desc' => "Esta guía te ayudará a dominar la sección de <strong>{$title}</strong>.",
             'req' => 'Acceso al módulo con permisos de ' . $category . '.',
