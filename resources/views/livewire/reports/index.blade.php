@@ -93,17 +93,57 @@ new class extends Component {
         $this->studentSearch = Student::find($id)->name;
     }
 
+    public function editReport(string $id): void
+    {
+        $this->authorize('teacher-or-admin');
+        
+        $report = Report::findOrFail($id);
+        $this->editingReport = $report;
+        $this->selectedStudentId = $report->student_id;
+        $this->studentSearch = $report->student->name;
+        $this->infractionId = $report->infraction_id;
+        $this->subject = $report->subject ?? '';
+        $this->description = $report->description;
+        $this->reportDate = Carbon::parse($report->date)->format('Y-m-d');
+        $this->reportTime = Carbon::parse($report->date)->format('H:i');
+        
+        $this->showReportModal = true;
+    }
+
     public function save(): void
     {
         $this->authorize('teacher-or-admin');
 
-        if (now()->isWeekend()) {
-            $this->dispatch('notify', ['message' => 'No se pueden registrar reportes los fines de semana.', 'variant' => 'warning']);
-            return;
-        }
-
-        $request = new StoreReportRequest();
-        $this->validate($request->rules(), $request->messages(), $request->attributes());
+        $this->validate([
+            'selectedStudentId' => 'required|exists:students,id',
+            'infractionId' => 'required|exists:infractions,id',
+            'subject' => 'nullable|string|max:255',
+            'description' => 'required|string|max:1000',
+            'reportDate' => [
+                'required',
+                'date',
+                'before_or_equal:tomorrow',
+                function ($attribute, $value, $fail) {
+                    if ($value && \Carbon\Carbon::parse($value)->isWeekend()) {
+                        $fail('No se pueden registrar reportes para fines de semana.');
+                    }
+                },
+            ],
+            'reportTime' => 'required',
+        ], [
+            'selectedStudentId.required' => 'Debe seleccionar un alumno.',
+            'infractionId.required' => 'Debe seleccionar un tipo de infracción.',
+            'subject.required' => 'El asunto es obligatorio.',
+            'description.required' => 'La descripción es obligatoria.',
+            'reportDate.before_or_equal' => 'La fecha del reporte debe ser una fecha anterior o igual a mañana.',
+        ], [
+            'selectedStudentId' => 'alumno',
+            'infractionId' => 'tipo de infracción',
+            'subject' => 'asunto',
+            'description' => 'descripción',
+            'reportDate' => 'fecha del reporte',
+            'reportTime' => 'hora del reporte',
+        ]);
 
         $activeCycle = Cycle::where('is_active', true)->first();
         
@@ -114,38 +154,46 @@ new class extends Component {
 
         $reportDateTime = Carbon::parse($this->reportDate . ' ' . $this->reportTime);
 
-        $report = Report::create([
+        $data = [
             'cycle_id' => $activeCycle->id,
             'student_id' => $this->selectedStudentId,
-            'teacher_id' => auth()->id(),
             'infraction_id' => $this->infractionId,
             'subject' => $this->subject,
             'description' => $this->description,
             'date' => $reportDateTime,
-            'status' => 'PENDING_SIGNATURE',
-        ]);
+        ];
 
-        // Notify parents via FCM asíncronamente (Hallazgo #3 y #6)
-        $student = Student::with('parents')->find($this->selectedStudentId);
-        $infraction = Infraction::find($this->infractionId);
-        $parentIds = $student->parents->pluck('id')->toArray();
-        
-        if (!empty($parentIds)) {
-            \App\Jobs\SendBulkFcmNotifications::dispatch(
-                $parentIds,
-                'Nuevo Reporte Disciplinario',
-                "Se ha registrado un reporte para {$student->name}: {$infraction->description}",
-                [],
-                route('reports.index')
-            );
+        if ($this->editingReport) {
+            $this->editingReport->update($data);
+            $message = 'Reporte actualizado exitosamente.';
+        } else {
+            $data['teacher_id'] = auth()->id();
+            $data['status'] = 'PENDING_SIGNATURE';
+            $report = Report::create($data);
+            $message = 'Reporte registrado exitosamente.';
+
+            // Notify parents via FCM asíncronamente (Hallazgo #3 y #6)
+            $student = Student::with('parents')->find($this->selectedStudentId);
+            $infraction = Infraction::find($this->infractionId);
+            $parentIds = $student->parents->pluck('id')->toArray();
+            
+            if (!empty($parentIds)) {
+                \App\Jobs\SendBulkFcmNotifications::dispatch(
+                    $parentIds,
+                    'Nuevo Reporte Disciplinario',
+                    "Se ha registrado un reporte para {$student->name}: {$infraction->description}",
+                    [],
+                    route('reports.index')
+                );
+            }
+
+            // "Rule of 3" Check
+            $this->checkCommunityServiceTrigger($this->selectedStudentId, $activeCycle->id);
         }
-
-        // "Rule of 3" Check
-        $this->checkCommunityServiceTrigger($this->selectedStudentId, $activeCycle->id);
 
         $this->showReportModal = false;
         $this->resetForm();
-        $this->dispatch('notify', ['message' => 'Reporte registrado exitosamente.']);
+        $this->dispatch('notify', ['message' => $message]);
     }
 
     protected function checkCommunityServiceTrigger(string $studentId, int $cycleId): void
@@ -167,14 +215,14 @@ new class extends Component {
 
     public function confirmDelete(string $id): void
     {
-        $this->authorize('admin-only');
+        $this->authorize('teacher-or-admin');
         $this->reportIdToDelete = $id;
         $this->showDeleteModal = true;
     }
 
     public function deleteReport(): void
     {
-        $this->authorize('admin-only');
+        $this->authorize('teacher-or-admin');
         
         if (!$this->reportIdToDelete) {
             return;
@@ -353,9 +401,8 @@ new class extends Component {
                             </td>
                             <td class="py-4 px-2 text-right">
                                 <div class="flex justify-end gap-1">
-                                    @if(auth()->user()->isAdmin())
-                                        <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $report->id }}')" />
-                                    @endif
+                                    <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editReport('{{ $report->id }}')" />
+                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $report->id }}')" />
                                 </div>
                             </td>
                         </tr>
@@ -459,8 +506,8 @@ new class extends Component {
         <flux:modal wire:model.self="showReportModal" class="md:w-160">
             <form wire:submit="save" class="space-y-6">
                 <header>
-                    <flux:heading size="lg">Registrar Reporte Disciplinario</flux:heading>
-                    <flux:text>Complete los detalles de la incidencia académica o conductual.</flux:text>
+                    <flux:heading size="lg">{{ $editingReport ? 'Editar Reporte' : 'Registrar Reporte Disciplinario' }}</flux:heading>
+                    <flux:text>{{ $editingReport ? 'Actualice los detalles de la incidencia.' : 'Complete los detalles de la incidencia académica o conductual.' }}</flux:text>
                 </header>
 
                 <div class="space-y-4">
@@ -511,7 +558,7 @@ new class extends Component {
         </flux:modal>
     @endcan
 
-    @can('admin-only')
+    @can('teacher-or-admin')
         <!-- Delete Confirmation Modal -->
         <flux:modal wire:model.self="showDeleteModal" class="min-w-88">
             <div class="space-y-6">

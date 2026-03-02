@@ -38,3 +38,13 @@ test('correct password must be provided to update password', function () {
 
     $response->assertHasErrors(['current_password']);
 });
+
+test('non-admin users cannot access password update page', function () {
+    $user = User::factory()->create([
+        'role' => 'PARENT',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('user-password.edit'));
+
+    $response->assertStatus(403);
+});

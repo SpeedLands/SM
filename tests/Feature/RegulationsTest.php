@@ -6,7 +6,7 @@ use Livewire\Volt\Volt;
 
 beforeEach(function () {
     // Create/ensure the regulation exists
-    Regulation::firstOrCreate(
+    Regulation::updateOrCreate(
         ['id' => 1],
         [
             'title' => 'Test Regulation',

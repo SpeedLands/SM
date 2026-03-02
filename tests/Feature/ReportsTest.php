@@ -100,3 +100,71 @@ test('reports can be filtered by severity and status', function () {
         ->assertSee('D-NORMAL')
         ->assertDontSee('D-GRAVE');
 });
+
+test('can register a report on a Sunday for a previous Monday', function () {
+    // Today is Sunday, March 1st, 2026
+    Carbon::setTestNow(Carbon::create(2026, 3, 1, 12, 0, 0));
+
+    $admin = User::factory()->create(['role' => 'ADMIN']);
+    $student = Student::factory()->create();
+    $cycle = Cycle::factory()->create(['is_active' => true]);
+    $infraction = Infraction::create(['description' => 'Falta', 'severity' => 'NORMAL']);
+
+    Volt::actingAs($admin)
+        ->test('reports.index')
+        ->call('selectStudent', $student->id)
+        ->set('infractionId', $infraction->id)
+        ->set('reportDate', '2026-02-23') // A Monday
+        ->set('reportTime', '09:00')
+        ->set('description', 'Reported on Sunday for Monday')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(Report::where('description', 'Reported on Sunday for Monday')->exists())->toBeTrue();
+    Carbon::setTestNow();
+});
+
+test('cannot register a report for a Saturday even if today is a weekday', function () {
+    // Today is Monday, March 2nd, 2026
+    Carbon::setTestNow(Carbon::create(2026, 3, 2, 12, 0, 0));
+
+    $admin = User::factory()->create(['role' => 'ADMIN']);
+    $student = Student::factory()->create();
+    Cycle::factory()->create(['is_active' => true]);
+    $infraction = Infraction::create(['description' => 'Falta', 'severity' => 'NORMAL']);
+
+    Volt::actingAs($admin)
+        ->test('reports.index')
+        ->call('selectStudent', $student->id)
+        ->set('infractionId', $infraction->id)
+        ->set('reportDate', '2026-02-28') // A Saturday
+        ->set('reportTime', '09:00')
+        ->set('description', 'Report for Saturday')
+        ->call('save')
+        ->assertHasErrors(['reportDate']);
+
+    Carbon::setTestNow();
+});
+
+test('can register a report for tomorrow if tomorrow is a weekday', function () {
+    // Today is Monday, March 2nd, 2026
+    Carbon::setTestNow(Carbon::create(2026, 3, 2, 12, 0, 0));
+
+    $admin = User::factory()->create(['role' => 'ADMIN']);
+    $student = Student::factory()->create();
+    Cycle::factory()->create(['is_active' => true]);
+    $infraction = Infraction::create(['description' => 'Falta', 'severity' => 'NORMAL']);
+
+    Volt::actingAs($admin)
+        ->test('reports.index')
+        ->call('selectStudent', $student->id)
+        ->set('infractionId', $infraction->id)
+        ->set('reportDate', '2026-03-03') // Tuesday (Tomorrow)
+        ->set('reportTime', '09:00')
+        ->set('description', 'Report for tomorrow')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(Report::where('description', 'Report for tomorrow')->exists())->toBeTrue();
+    Carbon::setTestNow();
+});

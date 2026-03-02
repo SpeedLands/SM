@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use App\Models\Student;
+use App\Models\User;
 use Livewire\Volt\Volt;
 
 test('it works', function () {
@@ -44,7 +44,7 @@ test('parent can only see their own students', function () {
     $parent = User::factory()->parent()->create();
     $child = Student::factory()->create();
     $parent->students()->attach($child->id, ['relationship' => 'PADRE']);
-    
+
     $otherStudent = Student::factory()->create();
 
     Volt::actingAs($parent)
@@ -55,7 +55,7 @@ test('parent can only see their own students', function () {
 
 test('teacher can create reports', function () {
     $teacher = User::factory()->teacher()->create();
-    
+
     $this->actingAs($teacher)
         ->get(route('reports.index'))
         ->assertSee('Nuevo Reporte');
@@ -63,7 +63,7 @@ test('teacher can create reports', function () {
 
 test('parent cannot see create report button', function () {
     $parent = User::factory()->parent()->create();
-    
+
     $this->actingAs($parent)
         ->get(route('reports.index'))
         ->assertDontSee('Nuevo Reporte');
@@ -71,7 +71,7 @@ test('parent cannot see create report button', function () {
 
 test('parent cannot see register student button', function () {
     $parent = User::factory()->parent()->create();
-    
+
     $this->actingAs($parent)
         ->get(route('students.index'))
         ->assertDontSee('Inscribir Alumno');
@@ -79,7 +79,7 @@ test('parent cannot see register student button', function () {
 
 test('parent cannot open student registration modal', function () {
     $parent = User::factory()->parent()->create();
-    
+
     Volt::actingAs($parent)
         ->test('students.index')
         ->call('openCreateModal')

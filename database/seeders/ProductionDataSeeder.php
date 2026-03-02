@@ -2,15 +2,15 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\Student;
-use App\Models\Regulation;
-use App\Models\Infraction;
-use App\Models\Cycle;
 use App\Models\ClassGroup;
+use App\Models\Cycle;
+use App\Models\Infraction;
+use App\Models\Regulation;
+use App\Models\Student;
 use App\Models\StudentParent;
 use App\Models\StudentPii;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class ProductionDataSeeder extends Seeder
@@ -18,8 +18,9 @@ class ProductionDataSeeder extends Seeder
     public function run(): void
     {
         $path = database_path('seeders/data/extracted_data.json');
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             $this->command->error("Data file not found at: {$path}");
+
             return;
         }
 
@@ -49,7 +50,7 @@ class ProductionDataSeeder extends Seeder
         DB::table('exam_schedules')->truncate();
         DB::table('community_services')->truncate();
         DB::table('student_cycle_association')->truncate();
-        
+
         Infraction::truncate();
         Regulation::truncate();
         StudentParent::truncate();
@@ -60,14 +61,30 @@ class ProductionDataSeeder extends Seeder
         Cycle::truncate();
 
         // Re-insert data
-        foreach ($data['cycles'] as $item) Cycle::create($item);
-        foreach ($data['class_groups'] as $item) ClassGroup::create($item);
-        foreach ($data['users'] as $item) User::create($item);
-        foreach ($data['regulations'] as $item) Regulation::create($item);
-        foreach ($data['infractions'] as $item) Infraction::create($item);
-        foreach ($data['students'] as $item) Student::create($item);
-        foreach ($data['student_piis'] as $item) StudentPii::create($item);
-        foreach ($data['student_parents'] as $item) StudentParent::create($item);
+        foreach ($data['cycles'] as $item) {
+            Cycle::create($item);
+        }
+        foreach ($data['class_groups'] as $item) {
+            ClassGroup::create($item);
+        }
+        foreach ($data['users'] as $item) {
+            User::create($item);
+        }
+        foreach ($data['regulations'] as $item) {
+            Regulation::create($item);
+        }
+        foreach ($data['infractions'] as $item) {
+            Infraction::create($item);
+        }
+        foreach ($data['students'] as $item) {
+            Student::create($item);
+        }
+        foreach ($data['student_piis'] as $item) {
+            StudentPii::create($item);
+        }
+        foreach ($data['student_parents'] as $item) {
+            StudentParent::create($item);
+        }
 
         // Re-enable foreign key checks
         if (config('database.default') === 'sqlite') {
@@ -75,7 +92,7 @@ class ProductionDataSeeder extends Seeder
         } else {
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         }
-        
+
         $this->command->info('Production data seeded successfully!');
     }
 }

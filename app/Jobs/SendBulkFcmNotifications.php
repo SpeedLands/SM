@@ -62,11 +62,11 @@ class SendBulkFcmNotifications implements ShouldQueue
                             $this->url
                         );
 
-                        usleep(50000); // 50ms delay
+                        // Small delay to prevent hitting rate limits too fast
+                        usleep(50000); // 50ms
                     } catch (\Exception $e) {
-                        Log::error('FCM Sending Failed', [
-                            'subscription_id' => $subscription->id,
-                            'user_id' => $subscription->user_id,
+                        Log::error('Individual FCM Sending Failed', [
+                            'user_id' => $user->id,
                             'error' => $e->getMessage(),
                         ]);
                     }

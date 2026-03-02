@@ -26,7 +26,16 @@ class StoreReportRequest extends FormRequest
             'infractionId' => 'required|exists:infractions,id',
             'subject' => 'nullable|string|max:255',
             'description' => 'required|string|max:1000',
-            'reportDate' => 'required|date|before_or_equal:today',
+            'reportDate' => [
+                'required',
+                'date',
+                'before_or_equal:tomorrow',
+                function ($attribute, $value, $fail) {
+                    if ($value && \Carbon\Carbon::parse($value)->isWeekend()) {
+                        $fail('No se pueden registrar reportes para fines de semana.');
+                    }
+                },
+            ],
             'reportTime' => 'required',
         ];
     }
@@ -60,6 +69,7 @@ class StoreReportRequest extends FormRequest
             'infractionId.required' => 'Debe seleccionar un tipo de infracción.',
             'subject.required' => 'El asunto es obligatorio.',
             'description.required' => 'La descripción es obligatoria.',
+            'reportDate.before_or_equal' => 'La fecha del reporte debe ser una fecha anterior o igual a hoy.',
         ];
     }
 }
