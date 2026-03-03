@@ -13,7 +13,7 @@ class FcmService
 
     public function __construct()
     {
-        $path = base_path('educom-24ee8-firebase-adminsdk-fbsvc-9fe7a29913.json');
+        $path = config('services.firebase.credentials');
         if (! file_exists($path)) {
             throw new \Exception('Firebase service account file not found.');
         }

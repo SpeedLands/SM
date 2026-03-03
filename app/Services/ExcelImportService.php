@@ -435,8 +435,8 @@ class ExcelImportService
                 $concatenatedName = ucfirst(strtolower($relationship)).' de '.$childrenList;
             }
 
-            // Final safety: Truncate to 250 characters just in case
-            $concatenatedName = Str::limit($concatenatedName, 250);
+            // Final safety: Truncate to 255 characters (standard Laravel string limit)
+            $concatenatedName = Str::limit($concatenatedName, 255, '');
 
             // Step 4: Create/Update Parent User
             if (! $user) {

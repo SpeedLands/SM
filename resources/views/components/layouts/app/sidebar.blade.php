@@ -292,7 +292,13 @@
                 // Auto-subscribe if permission is already granted
                 if ("Notification" in window) {
                     if (Notification.permission === "granted") {
-                        initPushNotifications();
+                        updateFcmToken();
+                    } else if (Notification.permission === "default") {
+                        Notification.requestPermission().then(permission => {
+                            if (permission === "granted") {
+                                updateFcmToken();
+                            }
+                        });
                     }
                 }
 

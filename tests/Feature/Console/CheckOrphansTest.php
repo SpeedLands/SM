@@ -57,4 +57,3 @@ test('non-parent users are not included in parents without students check', func
         ->expectsOutputToContain('Todos los padres/tutores tienen al menos un alumno asociado.')
         ->assertSuccessful();
 });
-

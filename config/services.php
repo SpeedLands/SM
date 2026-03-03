@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'firebase' => [
+        'credentials' => env('FIREBASE_CREDENTIALS_PATH')
+            ? (str_starts_with(env('FIREBASE_CREDENTIALS_PATH'), '/') || str_contains(env('FIREBASE_CREDENTIALS_PATH'), ':')
+                ? env('FIREBASE_CREDENTIALS_PATH')
+                : base_path(env('FIREBASE_CREDENTIALS_PATH')))
+            : base_path('serviceAccountKey.json'),
+    ],
+
 ];
