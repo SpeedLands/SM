@@ -55,6 +55,8 @@ new class extends Component {
     // History Modal State
     public bool $showHistoryModal = false;
     public string $historyStudentName = '';
+    public string $historyStudentId = '';
+    public bool $historyOnlyActiveCycle = true;
     public array $historyItems = [];
 
     public function updatingSearch(): void
@@ -119,14 +121,30 @@ new class extends Component {
     {
         $student = Student::findOrFail($id);
         $this->historyStudentName = $student->name;
+        $this->historyStudentId = $id;
+        $this->historyOnlyActiveCycle = true;
+        $this->loadHistoryItems();
+        $this->showHistoryModal = true;
+    }
+
+    public function updatedHistoryOnlyActiveCycle(): void
+    {
+        $this->loadHistoryItems();
+    }
+
+    protected function loadHistoryItems(): void
+    {
+        $id = $this->historyStudentId;
+        if (!$id) return;
 
         $activeCycle = Cycle::where('is_active', true)->first();
+        $filterCycle = $this->historyOnlyActiveCycle;
         $items = collect();
 
         // Reports
         $reports = Report::with('teacher', 'infraction')
             ->where('student_id', $id)
-            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
+            ->when($filterCycle && $activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
             ->get();
 
         foreach ($reports as $r) {
@@ -144,7 +162,7 @@ new class extends Component {
         // Community Services
         $services = CommunityService::with('assignedBy')
             ->where('student_id', $id)
-            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
+            ->when($filterCycle && $activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
             ->get();
 
         foreach ($services as $s) {
@@ -162,7 +180,7 @@ new class extends Component {
         // Citations
         $citations = Citation::with('teacher')
             ->where('student_id', $id)
-            ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
+            ->when($filterCycle && $activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
             ->get();
 
         foreach ($citations as $c) {
@@ -178,7 +196,6 @@ new class extends Component {
         }
 
         $this->historyItems = $items->sortByDesc('date')->values()->toArray();
-        $this->showHistoryModal = true;
     }
 
     public function editStudent(string $id): void
@@ -689,20 +706,22 @@ new class extends Component {
                 <flux:text class="uppercase font-bold">{{ $historyStudentName }}</flux:text>
             </header>
 
-            <!-- Legend -->
-            <div class="flex flex-wrap gap-3">
-                <div class="flex items-center gap-1.5">
-                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                    <span class="text-xs text-zinc-600 dark:text-zinc-400">Reportes</span>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex flex-wrap gap-3">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <span class="text-xs text-zinc-600 dark:text-zinc-400">Reportes</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span class="text-xs text-zinc-600 dark:text-zinc-400">Servicios Comunitarios</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                        <span class="text-xs text-zinc-600 dark:text-zinc-400">Citatorios</span>
+                    </div>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span class="text-xs text-zinc-600 dark:text-zinc-400">Servicios Comunitarios</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <div class="w-3 h-3 rounded-full bg-amber-500"></div>
-                    <span class="text-xs text-zinc-600 dark:text-zinc-400">Citatorios</span>
-                </div>
+                <flux:switch wire:model.live="historyOnlyActiveCycle" label="Solo ciclo activo" />
             </div>
 
             @if(count($historyItems) === 0)
