@@ -29,6 +29,7 @@ yarn-error.log
 
 # Firebase credentials (cualquier patrón)
 *firebase*.json
+serviceAccountKey.json
 firebase-credentials/
 .firebase/
 

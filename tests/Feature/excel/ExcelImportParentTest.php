@@ -244,23 +244,27 @@ it('summarizes parent name when there are more than 3 children', function () {
 });
 
 it('ensures parent name never exceeds 255 characters', function () {
-    // 1. Setup Student with VERY long name
-    $longName = str_repeat('A', 300);
-    $student = Student::factory()->create([
-        'name' => $longName,
-        'grade' => '3º',
-        'group_name' => 'A',
-    ]);
+    // 1. Setup 3 Students with names at the database limit (100)
+    $students = [];
+    for ($i = 0; $i < 3; $i++) {
+        $students[] = Student::factory()->create([
+            'name' => str_repeat(chr(ord('A') + $i), 100),
+            'grade' => '3º',
+            'group_name' => 'A',
+        ]);
+    }
 
-    // 2. Mock Excel Row
-    $rows = collect([
-        ["Padre de {$longName}", 'longname@example.com', '123', 'pass', 'PARENT', 'N/A'],
-    ]);
+    // 2. Mock Excel Rows with correct format to exceed 255 chars in total
+    $rows = collect([]);
+    foreach ($students as $student) {
+        $rows->push(["Padre de {$student->name}", 'longname@example.com', '123', 'pass', 'PARENT', 'N/A']);
+    }
 
     // 3. Execute
     $this->service->importParents($rows, '3º', 'A');
 
     // 4. Assertions
     $user = User::where('email', 'longname@example.com')->first();
-    expect(strlen($user->name))->toBeLessThanOrEqual(255);
+    expect($user)->not->toBeNull()
+        ->and(strlen($user->name))->toBeLessThanOrEqual(255);
 });

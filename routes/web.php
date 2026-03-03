@@ -70,7 +70,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings', function () {
         return auth()->user()->isAdmin()
             ? redirect()->route('profile.edit')
-            : redirect()->route('appearance.edit');
+            : redirect()->route('notifications.edit');
     })->name('settings');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');

@@ -13,6 +13,7 @@ class Regulation extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'id',
         'title',
         'content',
         'last_updated',

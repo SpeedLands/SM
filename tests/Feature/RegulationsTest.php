@@ -2,7 +2,10 @@
 
 use App\Models\Regulation;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Volt\Volt;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // Create/ensure the regulation exists

@@ -138,6 +138,12 @@
                 if ("Notification" in window) {
                     if (Notification.permission === "granted") {
                         updateFcmToken();
+                    } else if (Notification.permission === "default") {
+                        Notification.requestPermission().then(permission => {
+                            if (permission === "granted") {
+                                updateFcmToken();
+                            }
+                        });
                     }
                 }
 
