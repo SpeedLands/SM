@@ -5,6 +5,7 @@ use App\Models\Report;
 use App\Models\Citation;
 use App\Models\Notice;
 use App\Models\Cycle;
+use App\Models\Attendance;
 use App\Models\CommunityService;
 use Livewire\Volt\Component;
 
@@ -56,9 +57,46 @@ new class extends Component {
             ->limit(5)
             ->get();
 
+        // Reports by classroom (grade + group)
+        $reportsByClassroom = $activeCycle
+            ? Report::where('cycle_id', $activeCycle->id)
+                ->join('students', 'reports.student_id', '=', 'students.id')
+                ->selectRaw("students.grade, students.group_name, COUNT(*) as total")
+                ->groupBy('students.grade', 'students.group_name')
+                ->orderByDesc('total')
+                ->get()
+                ->map(fn($r) => [
+                    'grade' => $r->grade,
+                    'group' => $r->group_name,
+                    'total' => $r->total,
+                ])
+                ->values()
+                ->toArray()
+            : [];
+
+        // Absences by classroom (grade + group) within active cycle dates
+        $attendanceByClassroom = $activeCycle
+            ? Attendance::join('students', 'attendances.student_id', '=', 'students.id')
+                ->whereBetween('attendances.date', [$activeCycle->start_date, $activeCycle->end_date])
+                ->where('attendances.status', 'FALTA')
+                ->selectRaw("students.grade, students.group_name, COUNT(*) as total")
+                ->groupBy('students.grade', 'students.group_name')
+                ->orderByDesc('total')
+                ->get()
+                ->map(fn($r) => [
+                    'grade' => $r->grade,
+                    'group' => $r->group_name,
+                    'total' => $r->total,
+                ])
+                ->values()
+                ->toArray()
+            : [];
+
         return array_merge($stats, [
             'recentReports' => $recentReports,
             'upcomingCitations' => $upcomingCitations,
+            'reportsByClassroom' => $reportsByClassroom,
+            'attendanceByClassroom' => $attendanceByClassroom,
             'activeCycle' => $activeCycle,
             'isAdmin' => true,
         ]);
@@ -214,6 +252,126 @@ new class extends Component {
                         <div class="text-center py-8 text-zinc-500 italic text-sm">No hay citatorios pendientes.</div>
                     @endforelse
                 </div>
+            </div>
+        </div>
+
+        <!-- Reports by Classroom -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm" x-data="{ showAll: false }">
+                <div class="flex items-center justify-between mb-6">
+                    <flux:heading size="lg">Reportes por Salón</flux:heading>
+                    <flux:badge size="sm" color="zinc">Ciclo Activo</flux:badge>
+                </div>
+
+                @if(count($reportsByClassroom) === 0)
+                    <div class="text-center py-8 text-zinc-500 italic text-sm">No hay reportes registrados en el ciclo activo.</div>
+                @else
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-zinc-200 dark:border-zinc-700 text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                                <th class="py-2 px-2 font-semibold">#</th>
+                                <th class="py-2 px-2 font-semibold">Grado</th>
+                                <th class="py-2 px-2 font-semibold">Grupo</th>
+                                <th class="py-2 px-2 text-right font-semibold">Reportes</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                            @foreach($reportsByClassroom as $index => $classroom)
+                                <tr
+                                    x-show="showAll || {{ $index }} < 5"
+                                    x-transition:enter="transition ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 -translate-y-1"
+                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                    class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                                >
+                                    <td class="py-3 px-2 text-zinc-400 font-mono text-xs">{{ $index + 1 }}</td>
+                                    <td class="py-3 px-2">
+                                        <flux:badge size="sm" color="blue">{{ $classroom['grade'] }}</flux:badge>
+                                    </td>
+                                    <td class="py-3 px-2">
+                                        <flux:badge size="sm" color="neutral">{{ $classroom['group'] }}</flux:badge>
+                                    </td>
+                                    <td class="py-3 px-2 text-right">
+                                        <span class="inline-flex items-center gap-1.5 font-bold {{ $index === 0 ? 'text-red-600 dark:text-red-400' : 'text-zinc-900 dark:text-white' }}">
+                                            @if($index === 0)
+                                                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                                            @endif
+                                            {{ $classroom['total'] }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    @if(count($reportsByClassroom) > 5)
+                        <div class="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 text-center">
+                            <flux:button variant="ghost" size="sm" x-on:click="showAll = !showAll">
+                                <span x-show="!showAll">Mostrar todos ({{ count($reportsByClassroom) }})</span>
+                                <span x-show="showAll" x-cloak>Mostrar solo Top 5</span>
+                            </flux:button>
+                        </div>
+                    @endif
+                @endif
+            </div>
+
+            <!-- Absences by Classroom -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm" x-data="{ showAllAtt: false }">
+                <div class="flex items-center justify-between mb-6">
+                    <flux:heading size="lg">Inasistencias por Salón</flux:heading>
+                    <flux:badge size="sm" color="zinc">Ciclo Activo</flux:badge>
+                </div>
+
+                @if(count($attendanceByClassroom) === 0)
+                    <div class="text-center py-8 text-zinc-500 italic text-sm">No hay inasistencias registradas en el ciclo activo.</div>
+                @else
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-zinc-200 dark:border-zinc-700 text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                                <th class="py-2 px-2 font-semibold">#</th>
+                                <th class="py-2 px-2 font-semibold">Grado</th>
+                                <th class="py-2 px-2 font-semibold">Grupo</th>
+                                <th class="py-2 px-2 text-right font-semibold">Faltas</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                            @foreach($attendanceByClassroom as $index => $classroom)
+                                <tr
+                                    x-show="showAllAtt || {{ $index }} < 5"
+                                    x-transition:enter="transition ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 -translate-y-1"
+                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                    class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                                >
+                                    <td class="py-3 px-2 text-zinc-400 font-mono text-xs">{{ $index + 1 }}</td>
+                                    <td class="py-3 px-2">
+                                        <flux:badge size="sm" color="blue">{{ $classroom['grade'] }}</flux:badge>
+                                    </td>
+                                    <td class="py-3 px-2">
+                                        <flux:badge size="sm" color="neutral">{{ $classroom['group'] }}</flux:badge>
+                                    </td>
+                                    <td class="py-3 px-2 text-right">
+                                        <span class="inline-flex items-center gap-1.5 font-bold {{ $index === 0 ? 'text-red-600 dark:text-red-400' : 'text-zinc-900 dark:text-white' }}">
+                                            @if($index === 0)
+                                                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                                            @endif
+                                            {{ $classroom['total'] }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    @if(count($attendanceByClassroom) > 5)
+                        <div class="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 text-center">
+                            <flux:button variant="ghost" size="sm" x-on:click="showAllAtt = !showAllAtt">
+                                <span x-show="!showAllAtt">Mostrar todos ({{ count($attendanceByClassroom) }})</span>
+                                <span x-show="showAllAtt" x-cloak>Mostrar solo Top 5</span>
+                            </flux:button>
+                        </div>
+                    @endif
+                @endif
             </div>
         </div>
     @endif
