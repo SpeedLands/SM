@@ -80,6 +80,7 @@ new class extends Component {
 
         @if($isViewStaff)
             @can('teacher-or-admin')
+                 <flux:navlist.item icon="clock" href="{{ route('attendance.index') }}" :current="request()->routeIs('attendance.*')">Asistencia</flux:navlist.item>
                 <flux:navlist.item icon="calendar" href="{{ route('calendar.index') }}" :current="request()->routeIs('calendar.index')">Calendario General</flux:navlist.item>
             @endcan
         @endif

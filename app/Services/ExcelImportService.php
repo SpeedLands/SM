@@ -79,6 +79,7 @@ class ExcelImportService
                 ['index' => 3, 'label' => 'Dirección', 'field' => 'address', 'required' => false],
                 ['index' => 4, 'label' => 'Teléfono', 'field' => 'phone', 'required' => false],
                 ['index' => 5, 'label' => 'Otro Contacto', 'field' => 'other_contact', 'required' => false],
+                ['index' => 6, 'label' => 'CURP', 'field' => 'curp', 'required' => false],
             ],
         };
     }
@@ -590,9 +591,10 @@ class ExcelImportService
 
         foreach ($rows as $index => $row) {
             try {
-                // Excel Structure: Nombre | Turno | Grado / Grupo | Dirección | Teléfono | Otro Contacto
+                // Excel Structure: Nombre | Turno | Grado / Grupo | Dirección | Teléfono | Otro Contacto | CURP
                 $name = trim((string) ($row[0] ?? ''));
                 $turn = $row[1] ?? 'MATUTINO';
+                $curp = isset($row[6]) ? trim((string) $row[6]) : null;
 
                 // Silent skip for headers or empty rows
                 if (empty($name) || in_array(strtolower($name), ['nombre', 'estudiante', 'alumno'])) {
@@ -607,6 +609,7 @@ class ExcelImportService
                         'group_name' => $currentSection,
                     ],
                     [
+                        'curp' => $curp ? strtoupper($curp) : null,
                         'birth_date' => '2010-01-01', // Default
                         'turn' => $this->normalizeTurn($turn),
                     ]

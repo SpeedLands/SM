@@ -28,6 +28,7 @@ new class extends Component {
     
     // Core Student Fields
     public string $name = '';
+    public string $curp = '';
     public string $birthDate = '';
     public string $turn = 'MATUTINO';
     public int $siblingsCount = 0;
@@ -83,7 +84,7 @@ new class extends Component {
     {
         if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
-        $this->reset(['studentId', 'name', 'birthDate', 'turn', 'siblingsCount', 'birthOrder', 'classGroupId', 'address', 'allergies', 'medicalConditions', 'emergencyContact', 'otherContact', 'motherName', 'fatherName', 'motherWorkplace', 'fatherWorkplace']);
+        $this->reset(['studentId', 'name', 'curp', 'birthDate', 'turn', 'siblingsCount', 'birthOrder', 'classGroupId', 'address', 'allergies', 'medicalConditions', 'emergencyContact', 'otherContact', 'motherName', 'fatherName', 'motherWorkplace', 'fatherWorkplace']);
         $this->showStudentModal = true;
     }
 
@@ -206,6 +207,7 @@ new class extends Component {
         
         $this->studentId = $student->id;
         $this->name = $student->name;
+        $this->curp = $student->curp ?? '';
         $this->birthDate = $student->birth_date->format('Y-m-d');
         $this->turn = $student->turn;
         $this->siblingsCount = $student->siblings_count;
@@ -236,6 +238,7 @@ new class extends Component {
         $this->authorize('teacher-or-admin');
         $this->validate([
             'name' => 'required|string|max:100',
+            'curp' => 'nullable|string|size:18',
             'turn' => 'required|in:MATUTINO,VESPERTINO',
             'classGroupId' => 'required|exists:class_groups,id',
         ]);
@@ -252,6 +255,7 @@ new class extends Component {
             $student = Student::findOrFail($this->studentId);
             $student->update([
                 'name' => strtoupper($this->name),
+                'curp' => $this->curp ? strtoupper($this->curp) : null,
                 'birth_date' => $this->birthDate ?: now()->subYears(12)->format('Y-m-d'),
                 'grade' => $group->grade,
                 'group_name' => $group->section,
@@ -261,6 +265,7 @@ new class extends Component {
             $student = Student::create([
                 'id' => (string) Str::uuid(),
                 'name' => strtoupper($this->name),
+                'curp' => $this->curp ? strtoupper($this->curp) : null,
                 'birth_date' => $this->birthDate ?: now()->subYears(12)->format('Y-m-d'),
                 'grade' => $group->grade,
                 'group_name' => $group->section,
@@ -399,7 +404,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="space-y-6 text-zinc-900 dark:text-white pb-10">
+<div x-data="studentPopover()" x-init="init()" class="space-y-6 text-zinc-900 dark:text-white pb-10">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <flux:heading size="xl" level="1">Gestión de Alumnos</flux:heading>
@@ -424,8 +429,17 @@ new class extends Component {
         </flux:callout>
     @endif
 
+    {{-- Filtros Rápidos (Pills for mobile style) --}}
+    <div class="flex flex-wrap gap-2 sm:hidden pb-2 overflow-x-auto no-scrollbar">
+        @if($search) <flux:badge variant="solid" color="zinc" class="shrink-0">"{{ $search }}"</flux:badge> @endif
+        @if($gradeFilter !== 'Todos') <flux:badge variant="solid" color="zinc" class="shrink-0">{{ $gradeFilter }}</flux:badge> @endif
+        @if($groupFilter !== 'Todos') <flux:badge variant="solid" color="zinc" class="shrink-0">Sección {{ $groupFilter }}</flux:badge> @endif
+        @if($onlyActiveCycle) <flux:badge variant="solid" color="zinc" class="shrink-0">Ciclo Activo</flux:badge> @endif
+        <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="$refs.filterPanel.classList.toggle('hidden')" />
+    </div>
+
     <!-- Search and Filters -->
-    <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm space-y-6">
+    <div x-ref="filterPanel" class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm space-y-6 transition-all">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <flux:heading size="lg" level="2">Filtros</flux:heading>
             <flux:switch wire:model.live="onlyActiveCycle" label="Solo mostrar inscritos en ciclo actual" />
@@ -458,10 +472,68 @@ new class extends Component {
         </div>
     </div>
 
-    <!-- Students Table -->
-    <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-hidden">
+    <!-- Mobile Cards (Staff View) -->
+    <div class="space-y-4 sm:hidden pb-10">
+        @forelse($students as $student)
+            <div wire:key="std-mob-{{ $student->id }}" class="p-4 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm relative">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0">
+                            <flux:icon icon="user" class="text-indigo-600 dark:text-indigo-400" variant="solid" />
+                        </div>
+                        <div class="flex flex-col">
+                            <flux:text size="sm" class="font-bold uppercase">{{ $student->name }}</flux:text>
+                            <flux:text size="xs" class="text-zinc-500 font-mono">{{ $student->curp }}</flux:text>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <div class="flex gap-1 mb-1">
+                            <flux:badge size="xs" color="blue">{{ $student->grade }}</flux:badge>
+                            <flux:badge size="xs" color="neutral">{{ $student->group_name }}</flux:badge>
+                        </div>
+                        <flux:badge size="xs" variant="outline" color="{{ $student->turn === 'MATUTINO' ? 'sky' : 'orange' }}">
+                            {{ $student->turn }}
+                        </flux:badge>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-1 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                    <flux:button variant="ghost" size="xs" icon="eye" wire:click="viewHistory('{{ $student->id }}')" title="Ver historial" />
+                    @if(auth()->user()->isViewStaff())
+                        {{-- Mobile quick actions --}}
+                        <flux:dropdown>
+                            <flux:button variant="ghost" size="xs" icon="plus-circle" title="Crear reporte, servicio o citatorio" />
+                            <flux:menu>
+                                <flux:menu.item icon="document-text" x-on:click="studentId = '{{ $student->id }}'; studentName = '{{ $student->name }}'; goToReport()">Generar Reporte</flux:menu.item>
+                                <flux:menu.item icon="briefcase" x-on:click="studentId = '{{ $student->id }}'; studentName = '{{ $student->name }}'; goToService()">Servicio Comunitario</flux:menu.item>
+                                <flux:menu.item icon="calendar-days" x-on:click="studentId = '{{ $student->id }}'; studentName = '{{ $student->name }}'; goToCitation()">Citatorio</flux:menu.item>
+                                <flux:menu.separator />
+                                <flux:menu.item icon="clock" wire:click="viewHistory('{{ $student->id }}')">Ver Historial</flux:menu.item>
+                                <flux:menu.item icon="pencil" wire:click="editStudent('{{ $student->id }}')">Editar Datos</flux:menu.item>
+                            </flux:menu>
+                        </flux:dropdown>
+
+                        @if($student->reports_count === 0 && $student->community_services_count === 0 && $student->citations_count === 0 && $student->notice_signatures_count === 0)
+                            <flux:button variant="ghost" size="xs" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $student->id }}')" />
+                        @else
+                            <flux:button variant="ghost" size="xs" icon="trash" class="text-zinc-300 dark:text-zinc-600" disabled />
+                        @endif
+                    @endif
+                </div>
+            </div>
+        @empty
+            <div class="py-12 text-center text-zinc-500 italic bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-dashed border-zinc-300">
+                No se encontraron alumnos coincidentes
+            </div>
+        @endforelse
+        <div class="mt-4">
+            {{ $students->links() }}
+        </div>
+    </div>
+
+    <!-- Students Table (Desktop View) -->
+    <div class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
-            <div x-data="studentPopover()" x-init="init()" x-cloak class="relative">
                 <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-zinc-200 dark:border-zinc-700 text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -473,7 +545,7 @@ new class extends Component {
                 </thead>
                 <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                     @forelse ($students as $student)
-                        <tr wire:key="{{ $student->id }}" 
+                        <tr wire:key="std-desk-{{ $student->id }}" 
                         @if(auth()->user()->isViewStaff())
                             x-on:click="select($event)" data-id="{{ $student->id }}" data-name="{{ $student->name }}" class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
                         @else
@@ -487,6 +559,9 @@ new class extends Component {
                                     </div>
                                     <div>
                                         <div class="font-bold text-zinc-900 dark:text-white uppercase">{{ $student->name }}</div>
+                                        @if($student->curp)
+                                            <div class="text-[10px] font-mono text-zinc-400 uppercase tracking-tighter">{{ $student->curp }}</div>
+                                        @endif
                                         <div class="text-xs text-zinc-500">Inscrito en {{ $activeCycle?->name ?? 'N/A' }}</div>
                                     </div>
                                 </div>
@@ -506,9 +581,9 @@ new class extends Component {
                                 <div class="flex justify-end gap-1">
                                     <flux:button x-on:click.stop variant="ghost" size="sm" icon="eye" wire:click="viewHistory('{{ $student->id }}')" title="Ver historial" />
                                     @if(auth()->user()->isViewStaff())
-                                        <flux:button x-on:click.stop variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" />
+                                        <flux:button x-on:click.stop variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" title="Editar alumno" />
                                         @if($student->reports_count === 0 && $student->community_services_count === 0 && $student->citations_count === 0 && $student->notice_signatures_count === 0)
-                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $student->id }}')" />
+                                            <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $student->id }}')" title="Eliminar alumno" />
                                         @else
                                             <flux:button x-on:click.stop variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por historial asociado" disabled />
                                         @endif
@@ -525,18 +600,7 @@ new class extends Component {
                 </tbody>
             </table>
 
-                <!-- Popover (fixed) -->
-                <div x-show="show" class="z-50" x-bind:style="popoverStyle()" @click.away="hide()">
-                    <div :class="popoverClass" class="bg-white dark:bg-zinc-900 rounded shadow-lg p-2 border border-zinc-200 dark:border-zinc-700" x-ref="popover">
-                        <button class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToReport()">Reporte</button>
-                        <button class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToService()">Servicio Comunitario</button>
-                        <button class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToCitation()">Citatorio</button>
-                    </div>
-                </div>
-
             </div>
-        </div>
-
         <div class="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-sm text-zinc-500">
             <div>{{ $students->links() }}</div>
         </div>
@@ -563,6 +627,13 @@ new class extends Component {
                                 placeholder="Ej. JUAN PEREZ LOPEZ" 
                                 class="uppercase md:col-span-1"
                                 x-on:input="name = $event.target.value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z ]/g, '')"
+                            />
+                            <flux:input 
+                                label="CURP" 
+                                wire:model="curp" 
+                                placeholder="ABCD010101XXXXX000" 
+                                class="uppercase"
+                                x-on:input="curp = $event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 18)"
                             />
                             <flux:select label="Turno" wire:model="turn">
                                 <option value="MATUTINO">Matutino</option>
@@ -859,6 +930,15 @@ new class extends Component {
             </div>
         </div>
     </flux:modal>
+
+    <!-- Shared Popover (floating for Desktop) -->
+    <div x-show="show" x-cloak class="z-50" x-bind:style="popoverStyle()" @click.away="hide()">
+        <div :class="popoverClass" class="bg-white dark:bg-zinc-900 rounded shadow-lg p-2 border border-zinc-200 dark:border-zinc-700" x-ref="popover">
+            <button type="button" class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToReport()">Reporte</button>
+            <button type="button" class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToService()">Servicio Comunitario</button>
+            <button type="button" class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToCitation()">Citatorio</button>
+        </div>
+    </div>
 </div>
 
 <script>

@@ -9,11 +9,14 @@ use Livewire\Attributes\Layout;
 new #[Layout('components.layouts.app')] class extends Component {
     public ?string $cycleId = null;
     public ?string $groupId = null;
-    
     public ?string $parentCycleId = null;
     public ?string $parentGroupId = null;
     public bool $generatePasswords = false;
     public bool $generateTeacherPasswords = false;
+    public ?string $attendanceCycleId = null;
+    public ?string $attendanceGroupId = null;
+    public int $attendanceMonth;
+    public int $attendanceYear;
 
     public function mount(): void
     {
@@ -21,7 +24,29 @@ new #[Layout('components.layouts.app')] class extends Component {
         if ($activeCycle) {
             $this->cycleId = $activeCycle->id;
             $this->parentCycleId = $activeCycle->id;
+            $this->attendanceCycleId = $activeCycle->id;
         }
+
+        $this->attendanceMonth = (int) now()->format('m');
+        $this->attendanceYear = (int) now()->format('Y');
+    }
+
+    #[Computed]
+    public function attendanceGroups()
+    {
+        if (! $this->attendanceCycleId) {
+            return collect();
+        }
+
+        return ClassGroup::where('cycle_id', $this->attendanceCycleId)
+            ->orderBy('grade')
+            ->orderBy('section')
+            ->get();
+    }
+
+    public function updatedAttendanceCycleId(): void
+    {
+        $this->attendanceGroupId = null;
     }
 
     #[Computed]
@@ -157,49 +182,105 @@ new #[Layout('components.layouts.app')] class extends Component {
             </div>
 
             <!-- Students -->
-            <div class="md:col-span-2 p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm">
-                <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
-                    <div class="flex items-center gap-3 flex-1">
-                        <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg">
-                            <flux:icon name="academic-cap" />
-                        </div>
-                        <div>
-                            <flux:heading size="lg">Alumnos</flux:heading>
-                            <flux:text size="sm">Exporta alumnos por ciclo y grupo especializado.</flux:text>
-                        </div>
+            <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm flex flex-col">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                        <flux:icon name="academic-cap" />
                     </div>
+                    <div>
+                        <flux:heading size="lg">Alumnos</flux:heading>
+                        <flux:text size="sm">Exporta alumnos por ciclo y grupo.</flux:text>
+                    </div>
+                </div>
 
-                    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                        <flux:select wire:model.live="cycleId" placeholder="Ciclo Escolar" class="w-full sm:w-48">
+                <div class="flex flex-col gap-3 mb-6">
+                    <div class="flex flex-row gap-2 w-full">
+                        <flux:select wire:model.live="cycleId" placeholder="Ciclo Escolar" class="w-1/2">
                             @foreach ($this->cycles as $cycle)
                                 <option value="{{ $cycle->id }}">{{ $cycle->name }}</option>
                             @endforeach
                         </flux:select>
-
-                        <flux:select wire:model.live="groupId" placeholder="Todos los grupos" class="w-full sm:w-48">
+                        <flux:select wire:model.live="groupId" placeholder="Todos los grupos" class="w-1/2">
                             <option value="">Todos los grupos</option>
                             @foreach ($this->groups as $group)
                                 <option value="{{ $group->id }}">{{ $group->grade }} {{ $group->section }}</option>
                             @endforeach
                         </flux:select>
                     </div>
-                </div>
-
-                <div class="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <flux:text size="sm" class="flex items-center gap-2">
                             <flux:icon name="information-circle" variant="micro" />
-                            Los datos sensibles (PII) se exportarán desencriptados para su lectura.
+                            Los datos sensibles (PII) se exportarán desencriptados.
                     </flux:text>
+                </div>
 
+                <div class="mt-auto pt-4 border-t border-zinc-100 dark:border-zinc-800">
                     <flux:button
                         as="a"
                         :href="route('export.students', ['cycle_id' => $cycleId, 'group_id' => $groupId])"
                         variant="primary"
                         icon="document-arrow-down"
-                        class="w-full sm:w-auto"
+                        class="w-full"
                     >
                         Descargar Alumnos
                     </flux:button>
+                </div>
+            </div>
+
+            <!-- Attendance -->
+            <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm flex flex-col">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-lg">
+                        <flux:icon name="clipboard-document-check" />
+                    </div>
+                    <div>
+                        <flux:heading size="lg">Asistencias</flux:heading>
+                        <flux:text size="sm">Exporta el registro mensual por grupo.</flux:text>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3 mb-6">
+                    <div class="flex flex-row gap-2 w-full">
+                        <flux:select wire:model.live="attendanceCycleId" placeholder="Ciclo Escolar" class="w-1/2">
+                            @foreach ($this->cycles as $cycle)
+                                <option value="{{ $cycle->id }}">{{ $cycle->name }}</option>
+                            @endforeach
+                        </flux:select>
+                        <flux:select wire:model.live="attendanceGroupId" placeholder="Seleccione grupo" class="w-1/2">
+                            @foreach ($this->attendanceGroups as $group)
+                                <option value="{{ $group->id }}">{{ $group->grade }} {{ $group->section }}</option>
+                            @endforeach
+                        </flux:select>
+                    </div>
+                    <div class="flex flex-row gap-2 w-full">
+                        <flux:select wire:model.live="attendanceMonth" class="w-1/2">
+                            @foreach (range(1, 12) as $m)
+                                <option value="{{ $m }}">{{ ucfirst(\Carbon\Carbon::create(null, $m)->translatedFormat('F')) }}</option>
+                            @endforeach
+                        </flux:select>
+                        <flux:select wire:model.live="attendanceYear" class="w-1/2">
+                            @foreach (range(now()->year - 2, now()->year + 1) as $y)
+                                <option value="{{ $y }}">{{ $y }}</option>
+                            @endforeach
+                        </flux:select>
+                    </div>
+                </div>
+
+                <div class="mt-auto pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                    @if($attendanceGroupId)
+                        <flux:button
+                            as="a"
+                            :href="route('export.attendance', ['group_id' => $attendanceGroupId, 'month' => $attendanceMonth, 'year' => $attendanceYear])"
+                            variant="primary"
+                            icon="document-arrow-down"
+                            class="w-full"
+                        >
+                            Descargar Asistencias
+                        </flux:button>
+                    @else
+                        <flux:button variant="primary" disabled icon="document-arrow-down" class="w-full">
+                            Seleccione un grupo
+                        </flux:button>
+                    @endif
                 </div>
             </div>
         </div>

@@ -341,15 +341,14 @@ new class extends Component {
                             </td>
                             <td class="py-4 px-2 text-right">
                                 <div class="flex justify-end gap-1">
-                                    <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editUser('{{ $user->id }}')" />
+                                    <flux:button variant="ghost" size="sm" icon="pencil" title="Editar usuario" wire:click="editUser('{{ $user->id }}')" />
                                     
-
 
                                     @if($user->id !== auth()->id())
                                         @if($user->status === 'BLOCKED')
-                                            <flux:button variant="ghost" size="sm" icon="lock-open" class="text-green-500" wire:click="confirmToggleBlock('{{ $user->id }}')" />
+                                            <flux:button variant="ghost" size="sm" icon="lock-open" class="text-green-500" title="Desbloquear acceso" wire:click="confirmToggleBlock('{{ $user->id }}')" />
                                         @else
-                                            <flux:button variant="ghost" size="sm" icon="lock-closed" class="text-red-500/50 hover:text-red-500" wire:click="confirmToggleBlock('{{ $user->id }}')" />
+                                            <flux:button variant="ghost" size="sm" icon="lock-closed" class="text-red-500/50 hover:text-red-500" title="Bloquear acceso" wire:click="confirmToggleBlock('{{ $user->id }}')" />
                                         @endif
                                     @endif
                                 </div>

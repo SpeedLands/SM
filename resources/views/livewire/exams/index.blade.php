@@ -37,14 +37,14 @@ new class extends Component {
     public function mount(): void
     {
         $this->examDate = now()->addDays(7)->format('Y-m-d');
-        
+
         $activeCycle = Cycle::where('is_active', true)->first();
         if ($activeCycle) {
             $firstGroup = ClassGroup::where('cycle_id', $activeCycle->id)->first();
             if ($firstGroup) {
                 $this->grade = $firstGroup->grade;
                 $this->groupName = $firstGroup->section;
-                
+
                 // For parents, we might want to default the filters to their child's group
                 if (auth()->user()->isParent()) {
                     $student = auth()->user()->students()->first();
@@ -55,6 +55,17 @@ new class extends Component {
                 }
             }
         }
+    }
+
+    public function openCreateModal(): void
+    {
+        if (!auth()->user()->isViewStaff()) {
+            abort(403);
+        }
+
+        $this->subject = '';
+        $this->editingExamId = null;
+        $this->showCreateModal = true;
     }
 
     public function editExam(string $id): void
@@ -209,32 +220,51 @@ new class extends Component {
             <flux:text class="text-zinc-500">Programación de evaluaciones por trimestre.</flux:text>
         </div>
         @if($isStaff)
-            <flux:button variant="primary" icon="plus" wire:click="reset(['subject', 'editingExamId']); $set('showCreateModal', true)">Programar Examen</flux:button>
+            <flux:button variant="primary" icon="plus" wire:click="openCreateModal">Programar Examen</flux:button>
         @endif
     </div>
 
-    <!-- Filters -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <flux:select wire:model.live="periodFilter" placeholder="Todos los trimestres">
-            <option value="">Todos los trimestres</option>
-            <option value="1">1º Trimestre</option>
-            <option value="2">2º Trimestre</option>
-            <option value="3">3º Trimestre</option>
-        </flux:select>
- 
-        <flux:select wire:model.live="gradeFilter" placeholder="Grado (Todos)">
-            <option value="">Todos los grados</option>
-            @foreach($availableGroups->pluck('grade')->unique() as $grade)
-                <option value="{{ $grade }}">{{ $grade }} Grado</option>
-            @endforeach
-        </flux:select>
+    {{-- Filtros Rápidos (Pills for mobile style) --}}
+    <div class="flex flex-wrap gap-2 sm:hidden pb-2 overflow-x-auto no-scrollbar">
+        @if($periodFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">{{ $periodFilter }}º Trimestre</flux:badge> @endif
+        @if($gradeFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">{{ $gradeFilter }}º Grado</flux:badge> @endif
+        @if($groupFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">Grupo {{ $groupFilter }}</flux:badge> @endif
+        <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="$refs.filterPanel.classList.toggle('hidden')" />
+    </div>
 
-        <flux:select wire:model.live="groupFilter" placeholder="Grupo (Todos)">
-            <option value="">Todos los grupos</option>
-            @foreach($availableGroups->pluck('section')->unique() as $section)
-                <option value="{{ $section }}">Grupo "{{ $section }}"</option>
-            @endforeach
-        </flux:select>
+    <!-- Filters -->
+    <div x-ref="filterPanel" class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm transition-all mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <flux:field>
+                <flux:label>Trimestre</flux:label>
+                <flux:select wire:model.live="periodFilter">
+                    <option value="">Todos los trimestres</option>
+                    <option value="1">1º Trimestre</option>
+                    <option value="2">2º Trimestre</option>
+                    <option value="3">3º Trimestre</option>
+                </flux:select>
+            </flux:field>
+     
+            <flux:field>
+                <flux:label>Grado</flux:label>
+                <flux:select wire:model.live="gradeFilter">
+                    <option value="">Todos los grados</option>
+                    @foreach($availableGroups->pluck('grade')->unique() as $grade)
+                        <option value="{{ $grade }}">{{ $grade }} Grado</option>
+                    @endforeach
+                </flux:select>
+            </flux:field>
+    
+            <flux:field>
+                <flux:label>Grupo / Sección</flux:label>
+                <flux:select wire:model.live="groupFilter">
+                    <option value="">Todos los grupos</option>
+                    @foreach($availableGroups->pluck('section')->unique() as $section)
+                        <option value="{{ $section }}">Grupo "{{ $section }}"</option>
+                    @endforeach
+                </flux:select>
+            </flux:field>
+        </div>
     </div>
 
     @if($exams->isEmpty())
@@ -258,9 +288,9 @@ new class extends Component {
                             <div class="flex justify-between items-start mb-2">
                                 <flux:badge size="xs" color="purple" variant="outline">{{ $exam->period }}º Trimestre</flux:badge>
                                 @if($isStaff)
-                                    <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editExam('{{ $exam->id }}')" />
-                                        <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="confirmDelete('{{ $exam->id }}')" />
+                                    <div class="flex gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                        <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editExam('{{ $exam->id }}')" title="Editar examen" />
+                                        <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="confirmDelete('{{ $exam->id }}')" title="Eliminar examen" />
                                     </div>
                                 @endif
                             </div>

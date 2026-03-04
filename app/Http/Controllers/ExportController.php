@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AttendanceExport;
 use App\Exports\ParentsExport;
 use App\Exports\StudentsExport;
 use App\Exports\TeachersExport;
@@ -43,5 +44,24 @@ class ExportController extends Controller
         $filename = 'alumnos_'.now()->format('Y-m-d').'.xlsx';
 
         return Excel::download(new StudentsExport($groupId, $cycleId), $filename);
+    }
+
+    public function attendance(Request $request)
+    {
+        Gate::authorize('admin-only');
+
+        $request->validate([
+            'group_id' => ['required', 'string', 'exists:class_groups,id'],
+            'month' => ['required', 'integer', 'min:1', 'max:12'],
+            'year' => ['required', 'integer', 'min:2020'],
+        ]);
+
+        $groupId = $request->query('group_id');
+        $month = $request->integer('month');
+        $year = $request->integer('year');
+
+        $filename = 'asistencia_'.now()->format('Y-m-d').'.xlsx';
+
+        return Excel::download(new AttendanceExport($groupId, $month, $year), $filename);
     }
 }

@@ -323,10 +323,10 @@ new class extends Component {
                                 </td>
                                 <td class="py-4 px-2 text-right">
                                     <div class="flex justify-end gap-1">
-                                        <flux:button variant="ghost" size="sm" icon="users" wire:click="openGroupsModal('{{ $cycle->id }}')" />
-                                        <flux:button variant="ghost" size="sm" icon="pencil" wire:click="edit({{ $cycle->id }})" />
+                                        <flux:button variant="ghost" size="sm" icon="users" title="Gestionar grupos" wire:click="openGroupsModal('{{ $cycle->id }}')" />
+                                        <flux:button variant="ghost" size="sm" icon="pencil" title="Editar ciclo" wire:click="edit({{ $cycle->id }})" />
                                         @if($cycle->groups_count === 0 && $cycle->reports_count === 0 && $cycle->notices_count === 0 && $cycle->citations_count === 0)
-                                            <flux:button variant="ghost" size="sm" icon="trash" wire:click="confirmDelete('{{ $cycle->id }}')" />
+                                            <flux:button variant="ghost" size="sm" icon="trash" title="Eliminar ciclo" wire:click="confirmDelete('{{ $cycle->id }}')" />
                                         @else
                                             <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar por registros asociados" disabled />
                                         @endif
@@ -394,9 +394,9 @@ new class extends Component {
                                 </div>
                             </div>
                             <div class="flex items-center gap-1">
-                                <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editGroup('{{ $group->id }}')" />
+                                <flux:button variant="ghost" size="sm" icon="pencil" title="Editar grupo" wire:click="editGroup('{{ $group->id }}')" />
                                 @if($group->student_cycle_associations_count === 0)
-                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDeleteGroup('{{ $group->id }}')" />
+                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" title="Eliminar grupo" wire:click="confirmDeleteGroup('{{ $group->id }}')" />
                                 @else
                                     <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar porque tiene alumnos" disabled />
                                 @endif

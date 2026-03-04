@@ -292,23 +292,98 @@ new class extends Component {
         </div>
     @endif
 
+    {{-- Filtros Rápidos (Pills for mobile style) --}}
+    <div class="flex flex-wrap gap-2 sm:hidden pb-2 overflow-x-auto no-scrollbar">
+        @if($search) <flux:badge variant="solid" color="zinc" class="shrink-0">"{{ $search }}"</flux:badge> @endif
+        @if($statusFilter) 
+            <flux:badge variant="solid" color="zinc" class="shrink-0">
+                {{ match($statusFilter) { 'PENDING' => 'Pendiente', 'COMPLETED' => 'Completado', 'MISSED' => 'Incumplido', default => $statusFilter } }}
+            </flux:badge> 
+        @endif
+        @if($onlyActiveCycle) <flux:badge variant="solid" color="zinc" class="shrink-0">Ciclo Activo</flux:badge> @endif
+        <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="$refs.filterPanel.classList.toggle('hidden')" />
+    </div>
+
     <!-- Filters -->
-    <div class="flex flex-col md:flex-row gap-4">
-        <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Buscar alumno o actividad..." class="flex-1" />
-        <flux:select wire:model.live="statusFilter" class="w-full md:w-64" placeholder="Todos los estados">
-            <option value="">Todos los estados</option>
-            <option value="PENDING">Pendientes</option>
-            <option value="COMPLETED">Completados</option>
-            <option value="MISSED">No asistió</option>
-        </flux:select>
-        <div class="flex items-center gap-2 px-2">
-            <flux:switch wire:model.live="onlyActiveCycle" label="Solo ciclo activo" />
+    <div x-ref="filterPanel" class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm transition-all mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <flux:field class="md:col-span-2">
+                <flux:label>Búsqueda</flux:label>
+                <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Buscar alumno o actividad..." />
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Estado</flux:label>
+                <flux:select wire:model.live="statusFilter">
+                    <option value="">Todos los estados</option>
+                    <option value="PENDING">Pendientes</option>
+                    <option value="COMPLETED">Completados</option>
+                    <option value="MISSED">No asistió</option>
+                </flux:select>
+            </flux:field>
+
+            <div class="flex items-center gap-2 h-10 mb-0.5">
+                <flux:switch wire:model.live="onlyActiveCycle" label="Solo ciclo activo" />
+            </div>
         </div>
     </div>
 
     @if(auth()->user()->isViewStaff())
         <!-- Services Table (Staff View) -->
-        <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">
+        <!-- Mobile Cards (Staff View) -->
+        <div class="space-y-4 sm:hidden pb-10">
+            @forelse($services as $service)
+                <div wire:key="svc-mob-{{ $service->id }}" class="p-4 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm relative">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex flex-col">
+                            <flux:text size="sm" class="font-bold">{{ $service->student->name }}</flux:text>
+                            <flux:text size="xs" class="text-zinc-500">{{ $service->student->grade }}{{ $service->student->group_name }}</flux:text>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <flux:text size="xs" class="font-medium text-indigo-600 dark:text-indigo-400">{{ $service->scheduled_date->format('d/m/Y') }}</flux:text>
+                            <flux:text size="xs" class="text-zinc-500 italic">{{ $service->scheduled_date->diffForHumans() }}</flux:text>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 bg-blue-50/30 dark:bg-zinc-800/50 p-3 rounded-lg border border-blue-50 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300">
+                        <flux:text size="xs" class="font-bold uppercase text-[9px] text-zinc-400 mb-1">Actividad:</flux:text>
+                        <div class="font-medium mb-1">{{ $service->activity }}</div>
+                        <div class="line-clamp-2 italic text-zinc-500">{{ $service->description }}</div>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                        <div class="flex gap-2">
+                             @if($service->status === 'PENDING')
+                                <flux:badge color="amber" size="xs">Pendiente</flux:badge>
+                            @elseif($service->status === 'COMPLETED')
+                                <flux:badge color="green" size="xs">Completado</flux:badge>
+                            @else
+                                <flux:badge color="red" size="xs">Incumplido</flux:badge>
+                            @endif
+                        </div>
+
+                        <div class="flex gap-1">
+                            @if($service->status === 'PENDING')
+                                <flux:button variant="ghost" size="xs" icon="check-circle" class="text-green-600" title="Marcar como cumplido" wire:click="updateStatus('{{ $service->id }}', 'COMPLETED')" />
+                                <flux:button variant="ghost" size="xs" icon="x-circle" class="text-red-600" title="Marcar como no asistió" wire:click="updateStatus('{{ $service->id }}', 'MISSED')" />
+                                <flux:button variant="ghost" size="xs" icon="pencil" title="Editar servicio" wire:click="editService('{{ $service->id }}')" />
+                            @endif
+                            <flux:button variant="ghost" size="xs" icon="trash" class="text-red-500" title="Eliminar servicio" wire:click="confirmDelete('{{ $service->id }}')" />
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="py-12 text-center text-zinc-500 italic bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-dashed border-zinc-300">
+                    No hay servicios programados.
+                </div>
+            @endforelse
+            <div class="mt-4">
+                {{ $services->links() }}
+            </div>
+        </div>
+
+        <!-- Desktop Table (Staff View) -->
+        <div class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-zinc-200 dark:border-zinc-700 text-zinc-500">
@@ -321,7 +396,7 @@ new class extends Component {
                 </thead>
                 <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                     @forelse($services as $service)
-                        <tr wire:key="{{ $service->id }}">
+                        <tr wire:key="svc-desk-{{ $service->id }}">
                             <td class="py-4 px-2">
                                 <div class="font-medium">{{ $service->scheduled_date->format('d/m/Y') }}</div>
                                 <div class="text-xs text-zinc-500 italic">{{ $service->scheduled_date->diffForHumans() }}</div>
