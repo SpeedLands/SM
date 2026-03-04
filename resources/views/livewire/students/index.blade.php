@@ -234,12 +234,12 @@ new class extends Component {
 
     protected array $rules = [
         'name' => 'required|string|max:100',
-        'curp' => 'required|string|size:18|unique:students,curp',
+        'curp' => 'nullable|string|size:18|unique:students,curp',
         'birthDate' => 'required|date', // Changed from birth_date to birthDate to match property
         // 'gender' => 'required|in:M,F', // Not present in current properties
         // 'blood_type' => 'nullable|string|max:5', // Not present in current properties
         'allergies' => 'nullable|string',
-        'emergencyContact' => 'required|string|max:20', // Changed from emergency_contact_phone
+        'emergencyContact' => 'nullable|string|max:20', // Changed from emergency_contact_phone
         // 'emergency_contact_name' => 'required|string|max:100', // Not present in current properties
         // 'grade' => 'required', // Grade is derived from classGroup, not directly set
         'classGroupId' => 'required|exists:class_groups,id', // Matches property
@@ -255,7 +255,7 @@ new class extends Component {
         'birthDate.required' => 'La fecha de nacimiento es obligatoria.',
         // 'gender.required' => 'El género es obligatorio.',
         // 'emergency_contact_name.required' => 'El nombre del contacto de emergencia es obligatorio.',
-        'emergencyContact.required' => 'El teléfono de emergencia es obligatorio.',
+        'emergencyContact.max' => 'El teléfono de emergencia no debe exceder 20 caracteres.',
         // 'grade.required' => 'El grado es obligatorio.',
         'classGroupId.required' => 'El grupo es obligatorio.',
         'turn.required' => 'El turno es obligatorio.',
@@ -265,7 +265,7 @@ new class extends Component {
     {
         $rules = $this->rules;
         if ($this->studentId) { // Assuming studentId is used for editing
-            $rules['curp'] = 'required|string|size:18|unique:students,curp,' . $this->studentId;
+            $rules['curp'] = 'nullable|string|size:18|unique:students,curp,' . $this->studentId;
         }
         return $rules;
     }

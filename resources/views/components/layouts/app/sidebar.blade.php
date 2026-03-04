@@ -231,34 +231,62 @@
                     });
                 }
 
-                // Global Autofocus on validation error
-                window.addEventListener('livewire:initialized', () => {
-                    Livewire.hook('commit.processed', ({ component, commit }) => {
-                        // Wait for DOM to update
-                        setTimeout(() => {
-                            const firstError = document.querySelector('[data-flux-error], .text-red-600, .invalid-feedback, [role="alert"]');
-                            if (firstError && !firstError.hasAttribute('data-autofocused')) {
-                                // Mark as processed for this cycle so we don't jump multiple times
-                                firstError.setAttribute('data-autofocused', 'true');
-                                
-                                // Scroll to error
-                                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                
-                                // Try to focus associated input
-                                const container = firstError.closest('flux-field, .space-y-4, .space-y-6, div');
-                                if (container) {
-                                    const input = container.querySelector('input:not([type="hidden"]), select, textarea');
-                                    if (input) {
-                                        input.focus({ preventScroll: true });
-                                    }
-                                }
+                // Global Autofocus on validation error — uses MutationObserver to fire
+                // at the exact moment Flux sets aria-invalid="true", before focus-traps re-capture focus.
+                (function () {
+                    let _debounce = null;
 
-                                // Cleanup markers after some time
-                                setTimeout(() => firstError.removeAttribute('data-autofocused'), 1000);
+                    const focusFirstInvalidInput = () => {
+                        const target = document.querySelector(
+                            'input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"]'
+                        );
+                        if (!target) return;
+
+                        // Find nearest scrollable ancestor (handles modals with overflow-y: auto/scroll)
+                        let scrollEl = target.parentElement;
+                        while (scrollEl && scrollEl !== document.body) {
+                            const ov = window.getComputedStyle(scrollEl).overflowY;
+                            if ((ov === 'auto' || ov === 'scroll') && scrollEl.scrollHeight > scrollEl.clientHeight) break;
+                            scrollEl = scrollEl.parentElement;
+                        }
+
+                        const rect = target.getBoundingClientRect();
+                        if (scrollEl && scrollEl !== document.body) {
+                            scrollEl.scrollTo({
+                                top: scrollEl.scrollTop + (rect.top - scrollEl.getBoundingClientRect().top) - 80,
+                                behavior: 'smooth'
+                            });
+                        } else {
+                            window.scrollTo({ top: rect.top + window.scrollY - 130, behavior: 'smooth' });
+                        }
+
+                        target.focus();
+                    };
+
+                    const observer = new MutationObserver((mutations) => {
+                        for (const m of mutations) {
+                            if (
+                                m.type === 'attributes' &&
+                                m.attributeName === 'aria-invalid' &&
+                                (m.target.tagName === 'INPUT' || m.target.tagName === 'SELECT' || m.target.tagName === 'TEXTAREA') &&
+                                m.target.getAttribute('aria-invalid') === 'true'
+                            ) {
+                                // Debounce: if multiple fields become invalid at once, focus the first one
+                                clearTimeout(_debounce);
+                                _debounce = setTimeout(focusFirstInvalidInput, 50);
+                                break;
                             }
-                        }, 50);
+                        }
                     });
-                });
+
+                    // Observe the entire document for attribute changes on inputs
+                    observer.observe(document.body, {
+                        attributes: true,
+                        attributeFilter: ['aria-invalid'],
+                        subtree: true
+                    });
+                })();
+
 
                 window.addEventListener('load', initDateInputs);
                 document.addEventListener('livewire:navigated', initDateInputs);
