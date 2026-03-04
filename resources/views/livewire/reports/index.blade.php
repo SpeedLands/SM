@@ -332,34 +332,117 @@ new class extends Component {
         @endif
     </div>
 
-    <!-- Filters -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm">
-        <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Buscar por alumno o asunto..." class="md:col-span-2" />
-        <flux:select wire:model.live="status" placeholder="Estado...">
-            <option value="">Todos los estados</option>
-            <option value="PENDING_SIGNATURE">Pendiente de Firma</option>
-            <option value="SIGNED">Firmado</option>
-        </flux:select>
-        <flux:select wire:model.live="severity" placeholder="Gravedad...">
-            <option value="">Todas las gravedades</option>
-            <option value="NORMAL">Normal</option>
-            <option value="GRAVE">Grave</option>
-        </flux:select>
-
-        @if(auth()->user()->isViewParent())
-            <div class="flex items-center gap-2 px-2">
-                <flux:checkbox wire:model.live="onlyPending" label="Solo pendientes" />
-            </div>
-        @else
-            <div class="flex items-center gap-2 px-2">
-                <flux:switch wire:model.live="onlyActiveCycle" label="Solo ciclo activo" />
-            </div>
+    {{-- Filtros Rápidos (Pills for mobile style) --}}
+    <div class="flex flex-wrap gap-2 sm:hidden pb-2 overflow-x-auto no-scrollbar">
+        @if($search) <flux:badge variant="solid" color="zinc" class="shrink-0">"{{ $search }}"</flux:badge> @endif
+        @if($status) 
+            <flux:badge variant="solid" color="zinc" class="shrink-0">
+                {{ match($status) { 'PENDING_SIGNATURE' => 'Pendiente de Firma', 'SIGNED' => 'Firmado', default => $status } }}
+            </flux:badge> 
         @endif
+        @if($severity) 
+            <flux:badge variant="solid" color="zinc" class="shrink-0">
+                {{ match($severity) { 'NORMAL' => 'Normal', 'GRAVE' => 'Grave', default => $severity } }}
+            </flux:badge> 
+        @endif
+        @if($onlyActiveCycle) <flux:badge variant="solid" color="zinc" class="shrink-0">Ciclo Activo</flux:badge> @endif
+        @if($onlyPending) <flux:badge variant="solid" color="zinc" class="shrink-0">Pendientes</flux:badge> @endif
+        <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="$refs.filterPanel.classList.toggle('hidden')" />
+    </div>
+
+    <!-- Filters -->
+    <div x-ref="filterPanel" class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm transition-all mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <flux:field class="md:col-span-2">
+                <flux:label>Búsqueda</flux:label>
+                <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Buscar por alumno o asunto..." />
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Estado</flux:label>
+                <flux:select wire:model.live="status">
+                    <option value="">Todos los estados</option>
+                    <option value="PENDING_SIGNATURE">Pendiente de Firma</option>
+                    <option value="SIGNED">Firmado</option>
+                </flux:select>
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Gravedad</flux:label>
+                <flux:select wire:model.live="severity">
+                    <option value="">Todas las gravedades</option>
+                    <option value="NORMAL">Normal</option>
+                    <option value="GRAVE">Grave</option>
+                </flux:select>
+            </flux:field>
+
+            <div class="md:col-span-4 mt-2">
+                @if(auth()->user()->isViewParent())
+                    <flux:checkbox wire:model.live="onlyPending" label="Solo pendientes de firma" />
+                @else
+                    <flux:switch wire:model.live="onlyActiveCycle" label="Solo mostrar reportes del ciclo activo" />
+                @endif
+            </div>
+        </div>
     </div>
 
     @if(auth()->user()->isViewStaff())
         <!-- Reports Table (Staff View) -->
-        <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">
+        <!-- Mobile Cards (Staff View) -->
+        <div class="space-y-4 sm:hidden pb-10">
+            @forelse ($reports as $report)
+                <div wire:key="rep-mob-{{ $report->id }}" class="p-4 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm relative">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex flex-col">
+                            <flux:text size="sm" class="font-bold">{{ $report->student->name }}</flux:text>
+                            <flux:text size="xs" class="text-zinc-500">{{ $report->date->format('d/m/Y H:i') }}</flux:text>
+                        </div>
+                        <div class="flex flex-col items-end">
+                             @if($report->status === 'SIGNED')
+                                <flux:badge color="green" size="xs">Firmado</flux:badge>
+                            @else
+                                <flux:badge color="amber" size="xs">Pendiente</flux:badge>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="mb-4 bg-red-50/30 dark:bg-zinc-800/50 p-3 rounded-lg border border-red-50 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300">
+                        <div class="flex items-center gap-2 mb-1">
+                            <flux:badge size="xs" color="{{ $report->infraction->severity === 'GRAVE' ? 'red' : 'blue' }}" variant="solid" class="scale-90 origin-left">
+                                {{ $report->infraction->severity === 'GRAVE' ? 'Grave' : 'Normal' }}
+                            </flux:badge>
+                            <div class="font-bold text-blue-600 dark:text-blue-400 truncate">{{ $report->infraction->description }}</div>
+                        </div>
+                        @if($report->subject)
+                            <div class="text-[10px] font-bold uppercase text-zinc-400 mb-1">Asunto: {{ $report->subject }}</div>
+                        @endif
+                        <div class="line-clamp-2 italic text-zinc-500">{{ $report->description }}</div>
+                    </div>
+
+                    <div class="flex justify-end gap-1 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                        <flux:dropdown>
+                            <flux:button variant="ghost" size="xs" icon="plus-circle" title="Crear citatorio o servicio" />
+                            <flux:menu>
+                                <flux:menu.item icon="calendar-days" href="{{ route('citations.index', ['open_create' => 1, 'student_id' => $report->student_id, 'student_name' => $report->student->name]) }}" wire:navigate>Generar Citatorio</flux:menu.item>
+                                <flux:menu.item icon="briefcase" href="{{ route('community-services.index', ['open_create' => 1, 'student_id' => $report->student_id, 'student_name' => $report->student->name]) }}" wire:navigate>Servicio Comunitario</flux:menu.item>
+                            </flux:menu>
+                        </flux:dropdown>
+                        <flux:button variant="ghost" size="xs" icon="pencil" wire:click="editReport('{{ $report->id }}')" title="Editar reporte" />
+                        <flux:button variant="ghost" size="xs" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $report->id }}')" title="Eliminar reporte" />
+                    </div>
+                </div>
+            @empty
+                <div class="py-12 text-center text-zinc-500 italic bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-dashed border-zinc-300">
+                    No se encontraron reportes.
+                </div>
+            @endforelse
+            <div class="mt-4">
+                {{ $reports->links() }}
+            </div>
+        </div>
+
+        <!-- Desktop Table (Staff View) -->
+        <div class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-zinc-200 dark:border-zinc-700">
@@ -372,7 +455,7 @@ new class extends Component {
                 </thead>
                 <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                     @forelse ($reports as $report)
-                        <tr wire:key="{{ $report->id }}">
+                        <tr wire:key="rep-desk-{{ $report->id }}">
                             <td class="py-4 px-2">
                                 <div class="font-medium">{{ $report->date->format('d/m/Y') }}</div>
                                 <div class="text-xs text-zinc-500">{{ $report->date->format('H:i') }}</div>
@@ -401,8 +484,15 @@ new class extends Component {
                             </td>
                             <td class="py-4 px-2 text-right">
                                 <div class="flex justify-end gap-1">
-                                    <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editReport('{{ $report->id }}')" />
-                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $report->id }}')" />
+                                    <flux:dropdown>
+                                        <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" title="Crear citatorio o servicio" />
+                                        <flux:menu>
+                                            <flux:menu.item icon="calendar-days" href="{{ route('citations.index', ['open_create' => 1, 'student_id' => $report->student_id, 'student_name' => $report->student->name]) }}" wire:navigate>Generar Citatorio</flux:menu.item>
+                                            <flux:menu.item icon="briefcase" href="{{ route('community-services.index', ['open_create' => 1, 'student_id' => $report->student_id, 'student_name' => $report->student->name]) }}" wire:navigate>Servicio Comunitario</flux:menu.item>
+                                        </flux:menu>
+                                    </flux:dropdown>
+                                    <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editReport('{{ $report->id }}')" title="Editar reporte" />
+                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete('{{ $report->id }}')" title="Eliminar reporte" />
                                 </div>
                             </td>
                         </tr>

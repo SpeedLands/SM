@@ -20,6 +20,7 @@ class Student extends Model
 
     protected $fillable = [
         'name',
+        'curp',
         'birth_date',
         'grade',
         'group_name',
@@ -77,5 +78,10 @@ class Student extends Model
     public function noticeSignatures(): HasMany
     {
         return $this->hasMany(NoticeSignature::class);
+    }
+
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
     }
 }

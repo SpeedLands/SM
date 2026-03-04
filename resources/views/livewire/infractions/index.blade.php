@@ -171,9 +171,9 @@ new class extends Component {
                         </td>
                         <td class="py-4 px-2 text-right">
                             <div class="flex justify-end gap-1">
-                                <flux:button variant="ghost" size="sm" icon="pencil" wire:click="openEditModal({{ $infraction->id }})" />
+                                <flux:button variant="ghost" size="sm" icon="pencil" title="Editar tipo de reporte" wire:click="openEditModal({{ $infraction->id }})" />
                                 @if($infraction->reports_count === 0)
-                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" wire:click="confirmDelete({{ $infraction->id }})" />
+                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-500" title="Eliminar tipo de reporte" wire:click="confirmDelete({{ $infraction->id }})" />
                                 @else
                                     <flux:button variant="ghost" size="sm" icon="trash" class="text-zinc-300 dark:text-zinc-600" title="No se puede eliminar porque tiene reportes asociados" disabled />
                                 @endif

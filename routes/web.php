@@ -22,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('exportar/maestros', [\App\Http\Controllers\ExportController::class, 'teachers'])->name('export.teachers');
         Route::get('exportar/padres', [\App\Http\Controllers\ExportController::class, 'parents'])->name('export.parents');
         Route::get('exportar/alumnos', [\App\Http\Controllers\ExportController::class, 'students'])->name('export.students');
+        Route::get('exportar/asistencias', [\App\Http\Controllers\ExportController::class, 'attendance'])->name('export.attendance');
     });
     Volt::route('reglamento', 'regulations.index')->name('regulations.index');
     Volt::route('alumnos', 'students.index')->name('students.index');
@@ -34,6 +35,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('tutoriales', 'tutorials.index')->name('tutorials.index');
     Volt::route('reportes/tipos', 'infractions.index')->name('infractions.index');
     Volt::route('calendario', 'calendar.index')->name('calendar.index');
+
+    // Attendance System
+    Volt::route('asistencia', 'attendance.index')->name('attendance.index');
+    Volt::route('asistencia/escanear', 'attendance.scanner')->name('attendance.scanner');
 
     Route::post('toggle-view', function () {
         $user = auth()->user();
@@ -77,6 +82,7 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
     Volt::route('settings/notifications', 'settings.notifications')->name('notifications.edit');
+    Volt::route('settings/asistencia', 'settings.attendance')->middleware('can:admin-only')->name('settings.attendance');
 
     Volt::route('settings/two-factor', 'settings.two-factor')
         ->middleware(

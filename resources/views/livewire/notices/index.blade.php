@@ -359,8 +359,8 @@ new class extends Component {
                         </div>
                         <div class="flex flex-col items-end gap-2">
                             <div class="flex gap-1 mb-1">
-                                <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editNotice('{{ $notice->id }}')" />
-                                <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="confirmDelete('{{ $notice->id }}')" />
+                                <flux:button variant="ghost" size="sm" icon="pencil" title="Editar aviso" wire:click="editNotice('{{ $notice->id }}')" />
+                                <flux:button variant="ghost" size="sm" icon="trash" color="red" title="Eliminar aviso" wire:click="confirmDelete('{{ $notice->id }}')" />
                             </div>
                             
                             @php
@@ -372,6 +372,7 @@ new class extends Component {
                                 size="sm" 
                                 icon="finger-print" 
                                 color="{{ $stats['percentage'] === 100 ? 'green' : 'zinc' }}"
+                                title="Ver firmas y progreso"
                                 wire:click="viewSignatures('{{ $notice->id }}')"
                                 class="cursor-pointer"
                             >
