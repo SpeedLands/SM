@@ -442,7 +442,7 @@ new class extends Component {
         </div>
     @else
         <!-- Parent View: Feed style (Modern Cards) -->
-        <div class="space-y-6 max-w-3xl mx-auto">
+        <div class="space-y-6 max-w-3xl mx-auto sm:hidden">
             @forelse ($services as $service)
                 <div wire:key="svc-{{ $service->id }}" class="p-6 rounded-2xl border {{ !$service->parent_signature ? 'border-blue-200 bg-white shadow-lg' : 'border-zinc-200 bg-zinc-50/50' }} dark:border-zinc-700 dark:bg-zinc-900 relative transition-all hover:shadow-xl group">
                     
@@ -525,6 +525,67 @@ new class extends Component {
                     <flux:text class="text-zinc-500">No hay actividades de servicio programadas para sus hijos.</flux:text>
                 </div>
             @endforelse
+            <div class="mt-4">
+                {{ $services->links() }}
+            </div>
+        </div>
+
+        <!-- Desktop Table (Parent View) -->
+        <div class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b border-zinc-200 dark:border-zinc-700 text-zinc-500">
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs">Fecha Programada</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs">Alumno</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs">Actividad</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs text-center">Estado</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                    @forelse($services as $service)
+                        <tr wire:key="svc-par-desk-{{ $service->id }}">
+                            <td class="py-4 px-2">
+                                <div class="font-medium">{{ $service->scheduled_date->format('d/m/Y') }}</div>
+                                <div class="text-xs text-zinc-500">{{ $service->scheduled_date->diffForHumans() }}</div>
+                            </td>
+                            <td class="py-4 px-2">
+                                <div class="font-bold">{{ $service->student->name }}</div>
+                            </td>
+                            <td class="py-4 px-2">
+                                <div class="font-medium">{{ $service->activity }}</div>
+                                <div class="text-[10px] text-zinc-400">Asignado por: {{ $service->assignedBy->name }}</div>
+                            </td>
+                            <td class="py-4 px-2 text-center">
+                                @if($service->status === 'PENDING')
+                                    <flux:badge color="amber" size="sm" inset="left">Pendiente</flux:badge>
+                                @elseif($service->status === 'COMPLETED')
+                                    <flux:badge color="green" size="sm" inset="left">Completado</flux:badge>
+                                @else
+                                    <flux:badge color="red" size="sm" inset="left">Incumplido</flux:badge>
+                                @endif
+                                
+                                @if($service->parent_signature)
+                                    <div class="mt-1">
+                                        <flux:badge color="green" size="sm" inset="left" icon="check-badge">Firmado</flux:badge>
+                                    </div>
+                                @endif
+                            </td>
+                            <td class="py-4 px-2 text-right">
+                                @if(!$service->parent_signature)
+                                    <flux:button variant="primary" size="sm" icon="finger-print" wire:click="signService('{{ $service->id }}')">
+                                        Firmar
+                                    </flux:button>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-12 text-center text-zinc-500 italic">No hay actividades de servicio programadas para sus hijos.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
             <div class="mt-4">
                 {{ $services->links() }}
             </div>

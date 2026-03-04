@@ -63,7 +63,9 @@ class StoreCitationRequest extends FormRequest
         return [
             'selectedStudentId.required' => 'Debe seleccionar un alumno.',
             'reason.required' => 'El motivo es obligatorio.',
+            'citationDate.required' => 'La fecha de la cita es obligatoria.',
             'citationDate.after_or_equal' => 'La fecha de la cita debe ser hoy o posterior.',
+            'citationTime.required' => 'La hora de la cita es obligatoria.',
         ];
     }
 }

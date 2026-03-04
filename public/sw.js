@@ -201,3 +201,16 @@ self.addEventListener('fetch', event => {
         })
     );
 });
+
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'CLEAR_CACHE') {
+        console.log('[SW] Clearing all caches...');
+        event.waitUntil(
+            caches.keys().then(keys => Promise.all(
+                keys.map(key => caches.delete(key))
+            )).then(() => {
+                console.log('[SW] Caches cleared.');
+            })
+        );
+    }
+});

@@ -40,23 +40,7 @@ new class extends Component {
             return;
         }
 
-        $today = Carbon::today();
-
-        $existing = Attendance::where('student_id', $student->id)
-            ->where('date', $today)
-            ->first();
-
-        if ($existing) {
-            $this->statusMessage = "Ya se registró asistencia hoy para: $student->name";
-            $this->statusColor = 'amber';
-            $this->lastStatus = 'duplicate';
-            $this->lastStudent = $student;
-            $this->lastEntryTime = $existing->entry_time->format('H:i:s');
-            $this->curp = '';
-            $this->dispatch('play-sound', ['type' => 'warning']);
-            return;
-        }
-
+        $today = Carbon::today()->toDateString(); // Force Y-m-d string for SQLite consistency
         $now = Carbon::now();
         $status = 'PRESENTE';
         $graceMinutes = (int) Setting::get('attendance.grace_minutes', 10);
@@ -75,12 +59,39 @@ new class extends Component {
             }
         }
 
-        Attendance::create([
-            'student_id' => $student->id,
-            'date' => $today,
-            'entry_time' => $now->format('H:i:s'),
-            'status' => $status,
-        ]);
+        try {
+            $attendance = Attendance::updateOrCreate(
+                ['student_id' => $student->id, 'date' => $today],
+                [
+                    'entry_time' => $now->format('H:i:s'),
+                    'status' => $status,
+                ]
+            );
+
+            // If it was an update and not a create, it means it's a "duplicate" scan in terms of logic
+            if (!$attendance->wasRecentlyCreated && $attendance->status !== $status) {
+                // We updated the status, but for the scanner UX we might want to still show it as success or duplicate
+                $this->statusMessage = "Ya se registró asistencia hoy para: $student->name";
+                $this->statusColor = 'amber';
+                $this->lastStatus = 'duplicate';
+                $this->lastStudent = $student;
+                $this->lastEntryTime = $attendance->entry_time->format('H:i:s');
+                $this->curp = '';
+                $this->dispatch('play-sound', ['type' => 'warning']);
+                return;
+            }
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            // Race condition handled: someone else created it, just show as duplicate
+            $existing = Attendance::where('student_id', $student->id)->where('date', $today)->first();
+            $this->statusMessage = "Ya se registró asistencia hoy para: $student->name";
+            $this->statusColor = 'amber';
+            $this->lastStatus = 'duplicate';
+            $this->lastStudent = $student;
+            $this->lastEntryTime = $existing ? $existing->entry_time->format('H:i:s') : $now->format('H:i:s');
+            $this->curp = '';
+            $this->dispatch('play-sound', ['type' => 'warning']);
+            return;
+        }
 
         $this->lastStudent = $student;
         $this->lastStatus = $status === 'RETARDO' ? 'retardo' : 'success';

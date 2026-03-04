@@ -133,9 +133,10 @@ new class extends Component {
         ], [
             'selectedStudentId.required' => 'Debe seleccionar un alumno.',
             'infractionId.required' => 'Debe seleccionar un tipo de infracción.',
-            'subject.required' => 'El asunto es obligatorio.',
             'description.required' => 'La descripción es obligatoria.',
+            'reportDate.required' => 'La fecha del reporte es obligatoria.',
             'reportDate.before_or_equal' => 'La fecha del reporte debe ser una fecha anterior o igual a mañana.',
+            'reportTime.required' => 'La hora del reporte es obligatoria.',
         ], [
             'selectedStudentId' => 'alumno',
             'infractionId' => 'tipo de infracción',
@@ -509,7 +510,7 @@ new class extends Component {
         </div>
     @else
         <!-- Parent View: Feed style (Modern Cards) -->
-        <div class="space-y-6 max-w-3xl mx-auto">
+        <div class="space-y-6 max-w-3xl mx-auto sm:hidden">
             @forelse ($reports as $report)
                 <div wire:key="rep-{{ $report->id }}" class="p-6 rounded-2xl border {{ $report->status === 'SIGNED' ? 'border-zinc-200 bg-zinc-50/50' : 'border-amber-200 bg-white shadow-lg' }} dark:border-zinc-700 dark:bg-zinc-900 relative transition-all hover:shadow-xl group">
                     @if($report->status !== 'SIGNED' && $report->infraction->severity === 'GRAVE')
@@ -585,6 +586,67 @@ new class extends Component {
                     <flux:text class="text-zinc-500">No se han encontrado incidencias disciplinarias para sus hijos en este ciclo.</flux:text>
                 </div>
             @endforelse
+            <div class="mt-4">
+                {{ $reports->links() }}
+            </div>
+        </div>
+
+        <!-- Desktop Table (Parent View) -->
+        <div class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b border-zinc-200 dark:border-zinc-700">
+                        <th class="py-3 px-2 font-semibold">Fecha</th>
+                        <th class="py-3 px-2 font-semibold">Alumno</th>
+                        <th class="py-3 px-2 font-semibold">Infracción / Asunto</th>
+                        <th class="py-3 px-2 font-semibold text-center">Estado</th>
+                        <th class="py-3 px-2 text-right font-semibold">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                    @forelse ($reports as $report)
+                        <tr wire:key="rep-par-desk-{{ $report->id }}">
+                            <td class="py-4 px-2">
+                                <div class="font-medium">{{ $report->date->format('d/m/Y') }}</div>
+                                <div class="text-xs text-zinc-500">{{ $report->date->format('H:i') }}</div>
+                            </td>
+                            <td class="py-4 px-2">
+                                <div class="font-bold">{{ $report->student->name }}</div>
+                            </td>
+                            <td class="py-4 px-2">
+                                <div class="font-medium text-blue-600 dark:text-blue-400 whitespace-normal">{{ $report->infraction->description }}</div>
+                                @if($report->subject)
+                                    <div class="text-xs font-semibold uppercase mt-1 whitespace-normal">Asunto: {{ $report->subject }}</div>
+                                @endif
+                                <div class="text-xs text-zinc-500 whitespace-normal line-clamp-2 italic">{{ $report->description }}</div>
+                            </td>
+                            <td class="py-4 px-2 text-center">
+                                @if($report->status === 'SIGNED')
+                                    <div class="flex flex-col items-center">
+                                        <flux:badge color="green" size="sm" inset="left" icon="check-badge">Firmado</flux:badge>
+                                        @if($report->signed_at)
+                                            <span class="text-[10px] text-zinc-500 mt-1">{{ $report->signed_at->format('d/m/Y H:i') }}</span>
+                                        @endif
+                                    </div>
+                                @else
+                                    <flux:badge color="amber" size="sm" inset="left" icon="clock">Pendiente</flux:badge>
+                                @endif
+                            </td>
+                            <td class="py-4 px-2 text-right">
+                                @if($report->status !== 'SIGNED')
+                                    <flux:button variant="primary" size="sm" icon="finger-print" wire:click="signReport('{{ $report->id }}')">
+                                        Firmar
+                                    </flux:button>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-12 text-center text-zinc-500 italic">No se han encontrado incidencias disciplinarias para sus hijos en este ciclo.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
             <div class="mt-4">
                 {{ $reports->links() }}
             </div>

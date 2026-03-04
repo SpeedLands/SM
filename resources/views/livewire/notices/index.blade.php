@@ -29,7 +29,10 @@ new class extends Component {
     public array $targetClassGroups = [];
     public bool $requiresAuthorization = false;
     public string $eventDate = '';
+    public string $endDate = '';
     public string $eventTime = '';
+    public ?string $targetStudentId = null;
+    public string $studentSearch = '';
     
     // Signatures Modal
     public bool $showSignaturesModal = false;
@@ -59,6 +62,26 @@ new class extends Component {
         $this->resetPage();
     }
 
+    public function updatedType($value): void
+    {
+        if ($value === 'TRABAJO_EN_CASA') {
+            $this->title = 'Trabajo en Casa';
+            $this->requiresAuthorization = false;
+            $this->targetAudience = 'STUDENT';
+            $this->targetStudentId = null;
+            $this->studentSearch = '';
+            if (empty($this->content)) {
+                $this->content = "Por medio de la presente le notificamos que su hijo(a) realizará estudio y trabajo en casa.\n\nMotivo: ";
+            }
+        }
+    }
+
+    public function selectStudent(string $id): void
+    {
+        $this->targetStudentId = $id;
+        $this->studentSearch = Student::find($id)->name;
+    }
+
     public function mount(): void
     {
         $this->eventDate = now()->format('Y-m-d');
@@ -74,9 +97,16 @@ new class extends Component {
             'content' => 'required|string',
             'type' => 'required',
             'targetAudience' => 'required',
+            'targetStudentId' => 'required_if:targetAudience,STUDENT|required_if:type,TRABAJO_EN_CASA',
+            'eventDate' => 'required_if:type,TRABAJO_EN_CASA|date|nullable',
+            'endDate' => 'required_if:type,TRABAJO_EN_CASA|date|after_or_equal:eventDate|nullable',
         ], [
-            'title.required' => 'El título es obligatorio.',
-            'content.required' => 'El contenido es obligatorio.',
+            'title.required' => 'El título del aviso es obligatorio.',
+            'content.required' => 'El contenido o mensaje del aviso es obligatorio.',
+            'targetStudentId.required_if' => 'Debe seleccionar un alumno para este aviso.',
+            'eventDate.required_if' => 'La fecha de inicio es obligatoria para trabajo en casa.',
+            'endDate.required_if' => 'La fecha de término es obligatoria para trabajo en casa.',
+            'endDate.after_or_equal' => 'La fecha de término debe ser igual o posterior a la de inicio.',
         ]);
 
         if ($this->editingNoticeId) {
@@ -88,8 +118,10 @@ new class extends Component {
                 'target_audience' => $this->targetAudience,
                 'target_grades' => count($this->targetGrades) > 0 ? $this->targetGrades : null,
                 'target_class_groups' => count($this->targetClassGroups) > 0 ? $this->targetClassGroups : null,
+                'target_student_id' => $this->targetStudentId ?: null,
                 'requires_authorization' => $this->requiresAuthorization,
                 'event_date' => $this->eventDate ?: null,
+                'end_date' => $this->endDate ?: null,
                 'event_time' => $this->eventTime ?: null,
             ]);
             $message = 'Aviso actualizado exitosamente.';
@@ -109,8 +141,10 @@ new class extends Component {
                 'target_audience' => $this->targetAudience,
                 'target_grades' => count($this->targetGrades) > 0 ? $this->targetGrades : null,
                 'target_class_groups' => count($this->targetClassGroups) > 0 ? $this->targetClassGroups : null,
+                'target_student_id' => $this->targetStudentId ?: null,
                 'requires_authorization' => $this->requiresAuthorization,
                 'event_date' => $this->eventDate ?: null,
+                'end_date' => $this->endDate ?: null,
                 'event_time' => $this->eventTime ?: null,
                 'date' => now(),
             ]);
@@ -134,7 +168,7 @@ new class extends Component {
 
         $this->showCreateModal = false;
         $this->editingNoticeId = null;
-        $this->reset(['title', 'content', 'requiresAuthorization', 'type', 'targetAudience', 'targetGrades', 'targetClassGroups']);
+        $this->reset(['title', 'content', 'requiresAuthorization', 'type', 'targetAudience', 'targetGrades', 'targetClassGroups', 'targetStudentId', 'studentSearch', 'endDate']);
         $this->dispatch('notify', ['message' => $message]);
     }
 
@@ -150,8 +184,11 @@ new class extends Component {
         $this->targetAudience = $notice->target_audience;
         $this->targetGrades = $notice->target_grades ?? [];
         $this->targetClassGroups = $notice->target_class_groups ?? [];
+        $this->targetStudentId = $notice->target_student_id;
+        $this->studentSearch = $notice->targetStudent?->name ?? '';
         $this->requiresAuthorization = (bool) $notice->requires_authorization;
         $this->eventDate = $notice->event_date ? $notice->event_date->format('Y-m-d') : '';
+        $this->endDate = $notice->end_date ? $notice->end_date->format('Y-m-d') : '';
         $this->eventTime = $notice->event_time ?? '';
         
         $this->showCreateModal = true;
@@ -219,11 +256,29 @@ new class extends Component {
         }
 
         try {
-            // Intentar crear o actualizar la firma. Una restricción única en BD evita duplicados en concurrencia.
-            NoticeSignature::updateOrCreate(
+            $signature = NoticeSignature::updateOrCreate(
                 ['notice_id' => $noticeId, 'student_id' => $studentId, 'parent_id' => auth()->id()],
                 ['signed_at' => now(), 'authorized' => $isAuthorized]
             );
+
+            // Si es un permiso de Trabajo en Casa y fue autorizado (firmado), generar asistencias
+            $notice = Notice::find($noticeId);
+            if ($notice && $notice->type === 'TRABAJO_EN_CASA' && $isAuthorized) {
+                $start = $notice->event_date;
+                $end = $notice->end_date ?: $start;
+                
+                $current = $start->copy();
+                while ($current->lte($end)) {
+                    // Solo marcar si es día de semana (opcional, pero recomendado)
+                    if (!$current->isWeekend()) {
+                        \App\Models\Attendance::updateOrCreate(
+                            ['student_id' => $studentId, 'date' => $current->toDateString()],
+                            ['status' => 'TRABAJO_EN_CASA']
+                        );
+                    }
+                    $current->addDay();
+                }
+            }
 
             $this->dispatch('navigation-refresh');
             $this->dispatch('notify', ['message' => 'Firma registrada correctamente.']);
@@ -263,6 +318,9 @@ new class extends Component {
                 'notices' => $notices,
                 'isStaff' => true,
                 'availableGroups' => $activeCycle ? \App\Models\ClassGroup::where('cycle_id', $activeCycle->id)->withCount('students')->get() : collect(),
+                'studentResults' => (strlen($this->studentSearch) >= 3 && !$this->targetStudentId) 
+                    ? \App\Models\Student::where('name', 'like', "%{$this->studentSearch}%")->limit(5)->get() 
+                    : [],
             ];
         } else {
             // Parent view (Normal parent or Staff in Parent mode)
@@ -275,8 +333,8 @@ new class extends Component {
             
             $notices = Notice::with(['author', 'signatures' => fn($q) => $q->whereIn('student_id', $studentIds)])
                 ->when($this->onlyActiveCycle && $activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
-                ->whereIn('target_audience', ['PARENTS', 'ALL'])
-                ->where(function($query) use ($studentGrades, $studentGroupIds) {
+                ->whereIn('target_audience', ['PARENTS', 'ALL', 'STUDENT'])
+                ->where(function($query) use ($studentGrades, $studentGroupIds, $studentIds) {
                     $query->where('target_audience', 'ALL')
                         ->orWhere(function($q) use ($studentGrades, $studentGroupIds) {
                             $q->where('target_audience', 'PARENTS')
@@ -296,6 +354,10 @@ new class extends Component {
                                         }
                                     });
                                 });
+                        })
+                        ->orWhere(function($q) use ($studentIds) {
+                            $q->where('target_audience', 'STUDENT')
+                                ->whereIn('target_student_id', $studentIds);
                         });
                 })
                 ->when($this->onlyPending, function($q) use ($studentIds) {
@@ -401,7 +463,7 @@ new class extends Component {
         </div>
 
         <!-- Parent View: Feed style -->
-        <div class="space-y-8 max-w-3xl mx-auto">
+        <div class="space-y-8 max-w-3xl mx-auto sm:hidden">
             @forelse($notices as $notice)
                 @foreach($myStudents as $student)
                     @if($notice->isTargeting($student))
@@ -434,15 +496,21 @@ new class extends Component {
                             {!! nl2br(e($notice->content)) !!}
                         </div>
 
-                        @if($notice->type === 'EVENT' && $notice->event_date)
-                            <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30 flex items-center gap-4">
-                                <div class="p-3 rounded-lg bg-blue-500 text-white shadow-lg">
-                                    <flux:icon icon="calendar-days" />
+                        @if(($notice->type === 'EVENT' || $notice->type === 'TRABAJO_EN_CASA') && $notice->event_date)
+                            <div class="mt-6 p-4 {{ $notice->type === 'TRABAJO_EN_CASA' ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-100' }} rounded-xl border dark:border-blue-800/30 flex items-center gap-4">
+                                <div class="p-3 rounded-lg {{ $notice->type === 'TRABAJO_EN_CASA' ? 'bg-indigo-600' : 'bg-blue-500' }} text-white shadow-lg">
+                                    <flux:icon icon="{{ $notice->type === 'TRABAJO_EN_CASA' ? 'home' : 'calendar-days' }}" />
                                 </div>
                                 <div>
-                                    <flux:text size="sm" class="font-bold text-blue-800 dark:text-blue-200">Detalles del Evento</flux:text>
-                                    <flux:text size="lg" class="text-blue-700 dark:text-blue-300 font-medium">
-                                        {{ $notice->event_date->format('l, d de F Y') }} {{ $notice->event_time ? 'a las '.$notice->event_time : '' }}
+                                    <flux:text size="sm" class="font-bold {{ $notice->type === 'TRABAJO_EN_CASA' ? 'text-indigo-800 dark:text-indigo-200' : 'text-blue-800 dark:text-blue-200' }}">
+                                        {{ $notice->type === 'TRABAJO_EN_CASA' ? 'Periodo de Trabajo en Casa' : 'Detalles del Evento' }}
+                                    </flux:text>
+                                    <flux:text size="lg" class="{{ $notice->type === 'TRABAJO_EN_CASA' ? 'text-indigo-700 dark:text-indigo-300' : 'text-blue-700 dark:text-blue-300' }} font-medium">
+                                        @if($notice->type === 'TRABAJO_EN_CASA' && $notice->end_date)
+                                            Del {{ $notice->event_date->format('d/m/Y') }} Al {{ $notice->end_date->format('d/m/Y') }}
+                                        @else
+                                            {{ $notice->event_date->format('l, d de F Y') }} {{ $notice->event_time ? 'a las '.$notice->event_time : '' }}
+                                        @endif
                                     </flux:text>
                                 </div>
                             </div>
@@ -455,16 +523,18 @@ new class extends Component {
                                         <div class="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-800/30">
                                             <flux:icon icon="information-circle" class="text-purple-600 shrink-0 mt-0.5" />
                                             <flux:text size="sm" class="text-purple-900 dark:text-purple-200 italic">
-                                                Este comunicado requiere una respuesta de su parte para autorizar o denegar la participación del alumno en la actividad descrita.
+                                                {{ $notice->type === 'TRABAJO_EN_CASA' ? 'Este documento digital sustituye al formato impreso. Al firmar, usted autoriza a su hijo(a) a realizar estudio en casa en el periodo indicado.' : 'Este comunicado requiere una respuesta de su parte para autorizar o denegar la participación del alumno en la actividad descrita.' }}
                                             </flux:text>
                                         </div>
                                         <div class="flex flex-col sm:flex-row gap-3">
-                                            <flux:button variant="primary" icon="check" class="flex-1 py-3" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', true)">
-                                                Autorizar Participación
+                                            <flux:button variant="primary" icon="{{ $notice->type === 'TRABAJO_EN_CASA' ? 'finger-print' : 'check' }}" class="flex-1 py-3" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', true)">
+                                                {{ $notice->type === 'TRABAJO_EN_CASA' ? 'Firmar de Conformidad' : 'Autorizar Participación' }}
                                             </flux:button>
-                                            <flux:button variant="filled" color="red" icon="x-mark" class="flex-1 py-3" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', false)">
-                                                No Autorizar
-                                            </flux:button>
+                                            @if($notice->type !== 'TRABAJO_EN_CASA')
+                                                <flux:button variant="filled" color="red" icon="x-mark" class="flex-1 py-3" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', false)">
+                                                    No Autorizar
+                                                </flux:button>
+                                            @endif
                                         </div>
                                     </div>
                                 @else
@@ -508,6 +578,92 @@ new class extends Component {
                     <flux:text class="text-zinc-500">Por el momento no hay comunicados nuevos para sus hijos.</flux:text>
                 </div>
             @endforelse
+            <div class="mt-6">
+                {{ $notices->links() }}
+            </div>
+        </div>
+
+        <!-- Desktop Table (Parent View) -->
+        <div class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b border-zinc-200 dark:border-zinc-700 text-zinc-500">
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs">Fecha</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs">Tipo / Título</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs">Dirigido a</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs text-center">Estado</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                    @php $noticeCount = 0; @endphp
+                    @foreach($notices as $notice)
+                        @foreach($myStudents as $student)
+                            @if($notice->isTargeting($student))
+                                @php 
+                                    $noticeCount++;
+                                    $signature = $notice->signatures->where('student_id', $student->id)->first();
+                                @endphp
+                                <tr wire:key="not-par-desk-{{ $notice->id }}-{{ $student->id }}">
+                                    <td class="py-4 px-2">
+                                        <div class="font-medium">{{ $notice->date->format('d/m/Y') }}</div>
+                                        <div class="text-[10px] text-zinc-500">{{ $notice->date->format('H:i') }} hrs</div>
+                                    </td>
+                                    <td class="py-4 px-2">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <flux:badge size="xs" color="{{ $notice->type === 'URGENT' ? 'red' : ($notice->type === 'EVENT' ? 'blue' : ($notice->type === 'TRABAJO_EN_CASA' ? 'indigo' : 'neutral')) }}" inset="left">
+                                                {{ $notice->type }}
+                                            </flux:badge>
+                                        </div>
+                                        <div class="font-bold text-zinc-800 dark:text-zinc-200">{{ $notice->title }}</div>
+                                        <div class="text-xs text-zinc-500 truncate max-w-xs italic">{{ Str::limit($notice->content, 60) }}</div>
+                                    </td>
+                                    <td class="py-4 px-2">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] font-bold">
+                                                {{ substr($student->name, 0, 1) }}
+                                            </div>
+                                            <span class="text-sm font-medium">{{ $student->name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-2 text-center text-xs">
+                                        @if($signature)
+                                            <div class="flex flex-col items-center gap-1">
+                                                @if($notice->requires_authorization)
+                                                    <flux:badge size="sm" color="{{ $signature->authorized ? 'green' : 'red' }}">
+                                                        {{ $signature->authorized ? 'Autorizado' : 'No Autorizado' }}
+                                                    </flux:badge>
+                                                @else
+                                                    <flux:badge size="sm" color="green" icon="check-badge">Enterado</flux:badge>
+                                                @endif
+                                                <span class="text-[9px] text-zinc-400">{{ $signature->signed_at->format('d/m/Y H:i') }}</span>
+                                            </div>
+                                        @else
+                                            <flux:badge size="sm" color="amber" icon="clock">Pendiente</flux:badge>
+                                        @endif
+                                    </td>
+                                    <td class="py-4 px-2 text-right">
+                                        @if(!$signature)
+                                            <flux:button variant="primary" size="sm" icon="finger-print" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', true)">
+                                                Firmar
+                                            </flux:button>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endif
+                        @endforeach
+                    @endforeach
+
+                    @if($noticeCount === 0)
+                        <tr>
+                            <td colspan="5" class="py-12 text-center text-zinc-500 italic">No se han encontrado avisos para sus hijos.</td>
+                        </tr>
+                    @endif
+                </tbody>
+            </table>
+            <div class="mt-6">
+                {{ $notices->links() }}
+            </div>
         </div>
     @endif
 
@@ -528,12 +684,42 @@ new class extends Component {
                             <option value="GENERAL">General</option>
                             <option value="URGENT">Urgente</option>
                             <option value="EVENT">Evento</option>
+                            <option value="TRABAJO_EN_CASA">Trabajo en Casa</option>
                         </flux:select>
-                        <flux:select wire:model="targetAudience" label="Dirigido a">
+                        <flux:select wire:model.live="targetAudience" label="Dirigido a" :disabled="$type === 'TRABAJO_EN_CASA'">
                             <option value="ALL">Todo el plantel</option>
                             <option value="PARENTS">Solo Padres</option>
+                            <option value="STUDENT">Alumno Específico</option>
                         </flux:select>
                     </div>
+
+                    @if($targetAudience === 'STUDENT' || $type === 'TRABAJO_EN_CASA')
+                        <div class="relative">
+                            <flux:input 
+                                wire:model.live.debounce.300ms="studentSearch" 
+                                label="Buscar Alumno (Nombre)" 
+                                icon="user" 
+                                placeholder="Escriba al menos 3 caracteres..." 
+                                x-on:focus="$wire.targetStudentId = null"
+                            />
+                            @if(count($studentResults) > 0)
+                                <div class="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden">
+                                    @foreach($studentResults as $student)
+                                        <button type="button" wire:click="selectStudent('{{ $student->id }}')" class="w-full text-left px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 flex flex-col">
+                                            <span class="font-bold text-sm text-zinc-800 dark:text-zinc-200">{{ $student->name }}</span>
+                                            <flux:text size="xs">{{ $student->grade }}{{ $student->group_name }}</flux:text>
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @endif
+                            @if($targetStudentId)
+                                <div class="mt-2 flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-medium animate-in fade-in duration-300">
+                                    <flux:icon icon="check-circle" variant="micro" />
+                                    Alumno seleccionado correctamente.
+                                </div>
+                            @endif
+                        </div>
+                    @endif
 
                     @if($targetAudience === 'PARENTS')
                         <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/30 space-y-4">
@@ -571,10 +757,14 @@ new class extends Component {
                         </div>
                     @endif
 
-                    @if($type === 'EVENT')
+                    @if($type === 'EVENT' || $type === 'TRABAJO_EN_CASA')
                         <div class="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                            <flux:input type="date" wire:model="eventDate" label="Fecha del Evento" />
-                            <flux:input type="time" wire:model="eventTime" label="Hora" />
+                            <flux:input type="date" wire:model="eventDate" label="{{ $type === 'TRABAJO_EN_CASA' ? 'Fecha de Inicio' : 'Fecha del Evento' }}" x-on:click="$el.showPicker()" />
+                            @if($type === 'TRABAJO_EN_CASA')
+                                <flux:input type="date" wire:model="endDate" label="Fecha de Término" x-on:click="$el.showPicker()" />
+                            @else
+                                <flux:input type="time" wire:model="eventTime" label="Hora" />
+                            @endif
                         </div>
                     @endif
 

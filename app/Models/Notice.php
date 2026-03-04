@@ -26,8 +26,10 @@ class Notice extends Model
         'target_audience',
         'target_grades',
         'target_class_groups',
+        'target_student_id',
         'requires_authorization',
         'event_date',
+        'end_date',
         'event_time',
         'date',
     ];
@@ -35,6 +37,7 @@ class Notice extends Model
     protected $casts = [
         'requires_authorization' => 'boolean',
         'event_date' => 'date',
+        'end_date' => 'date',
         'date' => 'datetime',
         'target_grades' => 'array',
         'target_class_groups' => 'array',
@@ -55,23 +58,32 @@ class Notice extends Model
         return $this->belongsTo(Cycle::class);
     }
 
+    public function targetStudent(): BelongsTo
+    {
+        return $this->belongsTo(Student::class, 'target_student_id');
+    }
+
     /**
      * Get the query for students who are expected to sign this notice.
      */
     public function getExpectedRecipientsQuery()
     {
         return Student::query()
-            ->whereHas('currentCycleAssociation', function ($query) {
-                $query->where('cycle_id', $this->cycle_id);
-            })
-            ->when($this->target_audience === 'PARENTS', function ($query) {
-                $query->when(! empty($this->target_grades), function ($q) {
-                    $q->whereIn('grade', $this->target_grades);
+            ->when($this->target_student_id, function ($query) {
+                $query->where('id', $this->target_student_id);
+            }, function ($query) {
+                $query->whereHas('currentCycleAssociation', function ($query) {
+                    $query->where('cycle_id', $this->cycle_id);
                 })
-                    ->when(! empty($this->target_class_groups), function ($q) {
-                        $q->whereHas('currentCycleAssociation', function ($sq) {
-                            $sq->whereIn('class_group_id', $this->target_class_groups);
-                        });
+                    ->when($this->target_audience === 'PARENTS', function ($query) {
+                        $query->when(! empty($this->target_grades), function ($q) {
+                            $q->whereIn('grade', $this->target_grades);
+                        })
+                            ->when(! empty($this->target_class_groups), function ($q) {
+                                $q->whereHas('currentCycleAssociation', function ($sq) {
+                                    $sq->whereIn('class_group_id', $this->target_class_groups);
+                                });
+                            });
                     });
             });
     }
@@ -107,12 +119,18 @@ class Notice extends Model
      */
     public function isTargeting(Student $student): bool
     {
+        // If specific student is targeted
+        if ($this->target_student_id) {
+            return $student->id === $this->target_student_id;
+        }
+
         // Must be in the cycle of the notice
         $association = $student->cycleAssociations->firstWhere('cycle_id', $this->cycle_id);
 
         if (! $association) {
             return false;
         }
+        // ...
 
         // If target audience is ALL, then yes.
         if ($this->target_audience === 'ALL') {

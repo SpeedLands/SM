@@ -196,7 +196,7 @@ new class extends Component {
                 ->paginate(10);
         } else {
             $studentIds = $user->students->pluck('id');
-            $citations = $query->whereIn('student_id', $studentIds)->get();
+            $citations = $query->whereIn('student_id', $studentIds)->paginate(10);
         }
 
         return [
@@ -382,7 +382,7 @@ new class extends Component {
         </div>
     @else
         <!-- Parent View -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:hidden">
             @forelse($citations as $citation)
                 <div wire:key="cit-{{ $citation->id }}" class="p-6 rounded-2xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm relative">
                     <div class="flex justify-between items-start mb-4">
@@ -437,6 +437,70 @@ new class extends Component {
                     <flux:text class="text-zinc-500">Agradecemos su compromiso con la educación de sus hijos.</flux:text>
                 </div>
             @endforelse
+            <div class="mt-4">
+                {{ $citations->links() }}
+            </div>
+        </div>
+
+        <!-- Desktop Table (Parent View) -->
+        <div class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b border-zinc-200 dark:border-zinc-700 text-zinc-500">
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs">Fecha y Hora</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs">Alumno</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs">Motivo</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs text-center">Estado</th>
+                        <th class="py-3 px-2 font-semibold uppercase tracking-wider text-xs text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                    @forelse($citations as $citation)
+                        <tr wire:key="cit-par-desk-{{ $citation->id }}">
+                            <td class="py-4 px-2">
+                                <div class="font-medium">{{ $citation->citation_date->format('d/m/Y') }}</div>
+                                <div class="text-xs text-zinc-500">{{ $citation->citation_date->format('H:i') }} hrs</div>
+                            </td>
+                            <td class="py-4 px-2">
+                                <div class="font-bold">{{ $citation->student->name }}</div>
+                            </td>
+                            <td class="py-4 px-2">
+                                <div class="font-medium max-w-xs truncate" title="{{ $citation->reason }}">{{ $citation->reason }}</div>
+                                <div class="text-[10px] text-zinc-400">Solicitado por: {{ $citation->teacher->name }}</div>
+                            </td>
+                            <td class="py-4 px-2 text-center">
+                                @if($citation->status === 'PENDING')
+                                    <flux:badge color="amber" size="sm" inset="left">Agendado</flux:badge>
+                                @elseif($citation->status === 'ATTENDED')
+                                    <flux:badge color="green" size="sm" inset="left">Asistió</flux:badge>
+                                @else
+                                    <flux:badge color="red" size="sm" inset="left">Inasistencia</flux:badge>
+                                @endif
+                                
+                                @if($citation->parent_signature)
+                                    <div class="mt-1">
+                                        <flux:badge color="green" size="sm" inset="left" icon="check-badge">Enterado</flux:badge>
+                                    </div>
+                                @endif
+                            </td>
+                            <td class="py-4 px-2 text-right">
+                                @if(auth()->user()->isViewParent() && !$citation->parent_signature)
+                                    <flux:button variant="primary" size="sm" icon="finger-print" wire:click="signCitation('{{ $citation->id }}')">
+                                        Confirmar
+                                    </flux:button>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-12 text-center text-zinc-500 italic">No tiene citatorios pendientes.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+            <div class="mt-4">
+                {{ $citations->links() }}
+            </div>
         </div>
     @endif
 

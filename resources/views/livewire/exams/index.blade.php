@@ -92,6 +92,13 @@ new class extends Component {
             'period' => 'required|in:1,2,3',
             'subject' => 'required|string|max:100',
             'examDate' => 'required|date',
+        ], [
+            'grade.required' => 'El grado es obligatorio.',
+            'groupName.required' => 'El grupo es obligatorio.',
+            'period.required' => 'El trimestre es obligatorio.',
+            'subject.required' => 'La materia es obligatoria.',
+            'examDate.required' => 'La fecha del examen es obligatoria.',
+            'examDate.date' => 'La fecha del examen no es válida.',
         ]);
 
         $activeCycle = Cycle::where('is_active', true)->first();
@@ -227,7 +234,7 @@ new class extends Component {
     {{-- Filtros Rápidos (Pills for mobile style) --}}
     <div class="flex flex-wrap gap-2 sm:hidden pb-2 overflow-x-auto no-scrollbar">
         @if($periodFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">{{ $periodFilter }}º Trimestre</flux:badge> @endif
-        @if($gradeFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">{{ $gradeFilter }}º Grado</flux:badge> @endif
+        @if($gradeFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">{{ $gradeFilter }} Grado</flux:badge> @endif
         @if($groupFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">Grupo {{ $groupFilter }}</flux:badge> @endif
         <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="$refs.filterPanel.classList.toggle('hidden')" />
     </div>

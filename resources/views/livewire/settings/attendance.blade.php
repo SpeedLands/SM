@@ -23,6 +23,13 @@ new class extends Component {
             'matinoEntryTime' => ['required', 'date_format:H:i'],
             'vespertinoEntryTime' => ['required', 'date_format:H:i'],
             'graceMinutes' => ['required', 'integer', 'min:0', 'max:60'],
+        ], [
+            'matinoEntryTime.required' => 'La hora de entrada matutina es obligatoria.',
+            'vespertinoEntryTime.required' => 'La hora de entrada vespertina es obligatoria.',
+            'graceMinutes.required' => 'Los minutos de gracia son obligatorios.',
+            'graceMinutes.integer' => 'Los minutos de gracia deben ser un número entero.',
+            'graceMinutes.min' => 'Los minutos de gracia no pueden ser negativos.',
+            'graceMinutes.max' => 'Los minutos de gracia no pueden exceder los 60 minutos.',
         ]);
 
         Setting::set('attendance.matutino_entry_time', $this->matinoEntryTime);
