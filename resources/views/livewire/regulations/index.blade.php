@@ -39,6 +39,9 @@ new class extends Component {
         $this->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+        ], [
+            'title.required' => 'El título del reglamento es obligatorio.',
+            'content.required' => 'El contenido del reglamento es obligatorio.',
         ]);
 
         if ($this->regulation) {

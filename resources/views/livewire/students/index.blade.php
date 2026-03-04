@@ -232,16 +232,49 @@ new class extends Component {
         $this->showStudentModal = true;
     }
 
+    protected array $rules = [
+        'name' => 'required|string|max:100',
+        'curp' => 'required|string|size:18|unique:students,curp',
+        'birthDate' => 'required|date', // Changed from birth_date to birthDate to match property
+        // 'gender' => 'required|in:M,F', // Not present in current properties
+        // 'blood_type' => 'nullable|string|max:5', // Not present in current properties
+        'allergies' => 'nullable|string',
+        'emergencyContact' => 'required|string|max:20', // Changed from emergency_contact_phone
+        // 'emergency_contact_name' => 'required|string|max:100', // Not present in current properties
+        // 'grade' => 'required', // Grade is derived from classGroup, not directly set
+        'classGroupId' => 'required|exists:class_groups,id', // Matches property
+        // 'status' => 'required|in:ACTIVE,INACTIVE,GRADUATED,TRANSFERRED', // Status is set by association, not directly
+        'turn' => 'required|in:MATUTINO,VESPERTINO',
+    ];
+
+    protected array $messages = [
+        'name.required' => 'El nombre completo es obligatorio.',
+        'curp.required' => 'El CURP es obligatorio.',
+        'curp.size' => 'El CURP debe tener exactamente 18 caracteres.',
+        'curp.unique' => 'Este CURP ya está registrado.',
+        'birthDate.required' => 'La fecha de nacimiento es obligatoria.',
+        // 'gender.required' => 'El género es obligatorio.',
+        // 'emergency_contact_name.required' => 'El nombre del contacto de emergencia es obligatorio.',
+        'emergencyContact.required' => 'El teléfono de emergencia es obligatorio.',
+        // 'grade.required' => 'El grado es obligatorio.',
+        'classGroupId.required' => 'El grupo es obligatorio.',
+        'turn.required' => 'El turno es obligatorio.',
+    ];
+
+    public function rules(): array
+    {
+        $rules = $this->rules;
+        if ($this->studentId) { // Assuming studentId is used for editing
+            $rules['curp'] = 'required|string|size:18|unique:students,curp,' . $this->studentId;
+        }
+        return $rules;
+    }
+
     public function save(): void
     {
         if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
-        $this->validate([
-            'name' => 'required|string|max:100',
-            'curp' => 'nullable|string|size:18',
-            'turn' => 'required|in:MATUTINO,VESPERTINO',
-            'classGroupId' => 'required|exists:class_groups,id',
-        ]);
+        $this->validate($this->rules(), $this->messages);
 
         $activeCycle = Cycle::where('is_active', true)->first();
         if (!$activeCycle) {

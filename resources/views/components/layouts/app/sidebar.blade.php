@@ -231,6 +231,35 @@
                     });
                 }
 
+                // Global Autofocus on validation error
+                window.addEventListener('livewire:initialized', () => {
+                    Livewire.hook('commit.processed', ({ component, commit }) => {
+                        // Wait for DOM to update
+                        setTimeout(() => {
+                            const firstError = document.querySelector('[data-flux-error], .text-red-600, .invalid-feedback, [role="alert"]');
+                            if (firstError && !firstError.hasAttribute('data-autofocused')) {
+                                // Mark as processed for this cycle so we don't jump multiple times
+                                firstError.setAttribute('data-autofocused', 'true');
+                                
+                                // Scroll to error
+                                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                
+                                // Try to focus associated input
+                                const container = firstError.closest('flux-field, .space-y-4, .space-y-6, div');
+                                if (container) {
+                                    const input = container.querySelector('input:not([type="hidden"]), select, textarea');
+                                    if (input) {
+                                        input.focus({ preventScroll: true });
+                                    }
+                                }
+
+                                // Cleanup markers after some time
+                                setTimeout(() => firstError.removeAttribute('data-autofocused'), 1000);
+                            }
+                        }, 50);
+                    });
+                });
+
                 window.addEventListener('load', initDateInputs);
                 document.addEventListener('livewire:navigated', initDateInputs);
             });

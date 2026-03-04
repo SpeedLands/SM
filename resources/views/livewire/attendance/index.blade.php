@@ -41,24 +41,44 @@ new class extends Component {
 
     public function setStatus(string $studentId, string $status): void
     {
-        Attendance::updateOrCreate(
-            ['student_id' => $studentId, 'date' => $this->date],
-            [
+        try {
+            Attendance::updateOrCreate(
+                ['student_id' => $studentId, 'date' => Carbon\Carbon::parse($this->date)->toDateString()],
+                [
+                    'status' => $status,
+                    'entry_time' => in_array($status, ['PRESENTE', 'RETARDO']) ? now()->format('H:i') : null,
+                ]
+            );
+
+            $this->dispatch('notify', ['message' => 'Asistencia actualizada', 'variant' => 'success']);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            // Already exists, just update it if needed or ignore
+            Attendance::where([
+                'student_id' => $studentId, 
+                'date' => Carbon\Carbon::parse($this->date)->toDateString()
+            ])->update([
                 'status' => $status,
                 'entry_time' => in_array($status, ['PRESENTE', 'RETARDO']) ? now()->format('H:i') : null,
-            ]
-        );
-
-        $this->dispatch('notify', ['message' => 'Asistencia actualizada', 'variant' => 'success']);
+            ]);
+            $this->dispatch('notify', ['message' => 'Asistencia actualizada', 'variant' => 'success']);
+        }
     }
 
     public function markAllPresent(): void
     {
         foreach ($this->students() as $student) {
-            Attendance::updateOrCreate(
-                ['student_id' => $student->id, 'date' => $this->date],
-                ['status' => 'PRESENTE', 'entry_time' => now()->format('H:i')]
-            );
+            try {
+                Attendance::updateOrCreate(
+                    ['student_id' => $student->id, 'date' => Carbon\Carbon::parse($this->date)->toDateString()],
+                    ['status' => 'PRESENTE', 'entry_time' => now()->format('H:i')]
+                );
+            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                // Ignore or update silently
+                Attendance::where([
+                    'student_id' => $student->id, 
+                    'date' => Carbon\Carbon::parse($this->date)->toDateString()
+                ])->update(['status' => 'PRESENTE', 'entry_time' => now()->format('H:i')]);
+            }
         }
 
         $this->dispatch('notify', ['message' => 'Todos marcados como presentes', 'variant' => 'success']);
@@ -76,6 +96,7 @@ new class extends Component {
             ->where('student_cycle_association.class_group_id', (string) $this->group_id)
             ->with(['attendances' => fn($q) => $q->where('date', $this->date)])
             ->select('students.*')
+            ->distinct()
             ->orderBy('students.name')
             ->get();
     }

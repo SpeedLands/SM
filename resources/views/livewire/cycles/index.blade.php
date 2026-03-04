@@ -39,6 +39,15 @@ new class extends Component {
         'is_active' => 'boolean',
     ];
 
+    protected $messages = [
+        'name.required' => 'El nombre del ciclo es obligatorio.',
+        'start_date.required' => 'La fecha de inicio es obligatoria.',
+        'end_date.required' => 'La fecha de fin es obligatoria.',
+        'end_date.after' => 'La fecha de fin debe ser posterior a la de inicio.',
+        'grade.required' => 'El grado es obligatorio.',
+        'section.required' => 'La sección es obligatoria.',
+    ];
+
     public function mount(): void
     {
         abort_unless(auth()->user()->isAdmin() && auth()->user()->isViewStaff(), 403);

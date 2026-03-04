@@ -108,8 +108,13 @@ new class extends Component {
             'destinationGroupId' => 'required',
             'selectedStudents' => 'required|array|min:1',
         ], [
+            'sourceCycleId.required' => 'El ciclo de origen es obligatorio.',
+            'sourceGroupId.required' => 'El grupo de origen es obligatorio.',
+            'destinationCycleId.required' => 'El ciclo de destino es obligatorio.',
             'destinationCycleId.different' => 'El ciclo de destino debe ser diferente al de origen.',
+            'destinationGroupId.required' => 'El grupo de destino es obligatorio.',
             'selectedStudents.required' => 'Debe seleccionar al menos un alumno.',
+            'selectedStudents.min' => 'Debe seleccionar al menos un alumno.',
         ]);
 
         $destinationGroup = ClassGroup::findOrFail($this->destinationGroupId);
@@ -253,7 +258,7 @@ new class extends Component {
                                     <div class="text-sm font-medium text-zinc-900 dark:text-white">{{ $student['name'] }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <flux:badge size="sm">{{ $student['current_grade'] }}º {{ $student['current_group'] }}</flux:badge>
+                                    <flux:badge size="sm">{{ $student['current_grade'] }} {{ $student['current_group'] }}</flux:badge>
                                 </td>
                             </tr>
                         @endforeach

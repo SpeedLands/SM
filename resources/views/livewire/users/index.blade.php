@@ -45,7 +45,13 @@ new class extends Component {
     ];
 
     protected $messages = [
+        'userName.required' => 'El nombre completo es obligatorio.',
+        'userEmail.required' => 'El correo electrónico es obligatorio.',
+        'userEmail.email' => 'El formato del correo no es válido.',
         'userEmail.unique' => 'Este correo electrónico ya está registrado en el sistema.',
+        'userRole.required' => 'El rol de usuario es obligatorio.',
+        'userPassword.required' => 'La contraseña es obligatoria para nuevos usuarios.',
+        'userPassword.min' => 'La contraseña debe tener al menos 8 caracteres.',
     ];
 
     public function rules() 
