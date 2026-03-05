@@ -63,6 +63,19 @@ new class extends Component {
 
     public function getSections($name)
     {
+        // Custom sections for user management tutorial
+        if ($name === 'tutorial-a-users') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'añadir', 'title' => '1. Añadir nuevo usuario'],
+                ['id' => 'buscar', 'title' => '2. Buscar usuarios'],
+                ['id' => 'editar', 'title' => '3. Editar usuarios'],
+                ['id' => 'bloquear', 'title' => '4. Bloquear usuarios'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
         $sections = [
             ['id' => 'intro', 'title' => 'Introducción'],
             ['id' => 'requisitos', 'title' => 'Requisitos'],
@@ -215,6 +228,9 @@ new class extends Component {
                 'edit' => '',
                 'delete' => ''
             ],
+            'tutorial-a-users' => [
+                'custom' => true,
+            ],
             'tutorial-c-notifications' => [
                 'desc' => 'Activa las notificaciones push para recibir alertas al instante sobre reportes, citatorios y avisos.',
                 'req' => 'Un navegador moderno (Chrome, Safari, Edge) con soporte para Service Workers.',
@@ -231,6 +247,11 @@ new class extends Component {
             'edit' => '<h2 id="editar">Cómo Editar registros</h2><p>Para editar, busca el registro específico y presiona el botón de edición. El sistema guardará la versión anterior para auditoría.</p>',
             'delete' => '<h2 id="eliminar">Cómo Eliminar registros</h2><p>La eliminación puede estar restringida según tu perfil. Si el botón no aparece, contacta a un administrador.</p>'
         ];
+
+        // Custom full-page content for user management tutorial
+        if (!empty($specifics['custom']) && $name === 'tutorial-a-users') {
+            return $this->getUserManagementContent();
+        }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
 
@@ -255,6 +276,188 @@ new class extends Component {
                 <div>
                     <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Tip de eficiencia</p>
                     <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>{$specifics['tip']}</p>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getUserManagementContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Gestión de Usuarios</strong> permite administrar las cuentas de acceso a la plataforma escolar. Desde aquí podrás crear cuentas para maestros, administrativos y padres de familia, así como buscar, editar y bloquear usuarios según sea necesario.</p>
+
+            {$img('gestionUsuarios/menu.png', 'Vista general del apartado de Gestión de Usuarios en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener los datos del usuario a registrar: nombre completo, correo electrónico y rol.</li>
+            </ul>
+
+            <h2 id='añadir'>1. Añadir nuevo usuario</h2>
+            <p>Para registrar una nueva cuenta de usuario en la plataforma, siga los siguientes pasos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Gestión de Usuarios\"</strong> que se encuentra en el menú lateral izquierdo. Esto le mostrará la lista de usuarios registrados.')}
+
+            {$img('gestionUsuarios/filaUsuario.png', 'Tabla de usuarios registrados en la plataforma')}
+
+            {$step(2, 'Presione el botón <strong>\"Añadir Nuevo Usuario\"</strong> ubicado en la parte superior. Se abrirá un formulario con los campos necesarios.')}
+
+            {$img('gestionUsuarios/botonA%C3%B1adirNuevoUsuario.png', 'Botón para añadir un nuevo usuario en la parte superior de la tabla')}
+
+            {$img('gestionUsuarios/formularioNuevoUsuario.png', 'Formulario vacío para registrar un nuevo usuario')}
+
+            {$step(3, 'Complete los campos del formulario:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Nombre</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo obligatorio. Coloque el nombre completo del usuario.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Correo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo obligatorio. La cuenta debe seguir el formato de número de teléfono con terminación <code>@escuela.edu.mx</code>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Rol</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el tipo de usuario: <strong>Maestro</strong>, <strong>Administrativo</strong> o <strong>Padre/Tutor</strong>. Dependiendo del rol, el usuario podrá acceder a diferentes apartados.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Teléfono</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Exclusivo del rol <strong>Padre/Tutor</strong>. Registre el número de teléfono del padre o tutor.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Contraseña</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo obligatorio. Debe tener una longitud mínima de <strong>8 caracteres</strong>.</span>
+                </div>
+            </div>
+
+            {$img('gestionUsuarios/formularioLLenadoA%C3%B1adirNuevoUsuario.png', 'Formulario completado con los datos del nuevo usuario')}
+
+            {$step(4, 'Presione el botón <strong>\"Guardar\"</strong> para crear la cuenta. El nuevo usuario aparecerá en la tabla.')}
+
+            {$img('gestionUsuarios/resultadoNuevoUsuarioAgregado.png', 'Nuevo usuario creado y visible en la tabla de usuarios')}
+
+            <h2 id='buscar'>2. Buscar usuarios</h2>
+            <p>La plataforma ofrece herramientas de filtrado para localizar usuarios de forma rápida.</p>
+
+            {$step(1, 'En el apartado de Gestión de Usuarios, ubique la sección de filtros en la parte superior de la tabla.')}
+
+            {$img('gestionUsuarios/camposFiltroBuscarUsuario.png', 'Campos de filtro para buscar usuarios por nombre, correo o rol')}
+
+            {$step(2, 'Utilice los campos de búsqueda disponibles:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Búsqueda</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Permite buscar usuarios por <strong>nombre</strong> o <strong>correo electrónico</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Filtrar por Rol</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre por tipo de usuario: <strong>Todos los roles</strong>, <strong>Administrativo</strong>, <strong>Maestro</strong> o <strong>Padre/Tutor</strong>.</span>
+                </div>
+            </div>
+
+            {$img('gestionUsuarios/resultadoBuscarPorNombre.png', 'Resultado al buscar un usuario por nombre')}
+            {$img('gestionUsuarios/resultadoBuscarPorRol.png', 'Resultado al filtrar usuarios por rol')}
+
+            <h2 id='editar'>3. Editar usuarios</h2>
+            <p>Para modificar la información de un usuario existente:</p>
+
+            {$step(1, 'En la tabla de usuarios, localice el registro que desea modificar.')}
+            {$img('gestionUsuarios/usuarioHaEditar.png', 'Fila del usuario seleccionado para editar')}
+            {$step(2, 'Presione el ícono de <strong>\"Lápiz\"</strong> (editar). Se abrirá un formulario con los datos actuales del usuario.')}
+
+            {$img('gestionUsuarios/formularioUsuarioEditado.png', 'Formulario de edición con los datos actuales del usuario seleccionado')}
+
+            {$step(3, 'Modifique los campos necesarios:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Nombre</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Puede actualizar el nombre completo del usuario.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Correo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Actualice el correo electrónico del usuario manteniendo el formato <code>@escuela.edu.mx</code>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Rol</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Cambie el rol del usuario entre Maestro, Administrativo o Padre/Tutor.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Contraseña</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo opcional — dejarlo vacío mantendrá la contraseña actual. Si desea cambiarla, debe tener mínimo <strong>8 caracteres</strong>.</span>
+                </div>
+            </div>
+
+            {$img('gestionUsuarios/formularioLLenadoEditarUsuario.png', 'Formulario con los datos modificados del usuario')}
+
+            {$step(4, 'Presione el botón <strong>\"Actualizar\"</strong> para guardar los cambios.')}
+
+            {$img('gestionUsuarios/resultadoUsuarioEditado.png', 'Usuario actualizado correctamente en la tabla')}
+
+            <h2 id='bloquear'>4. Bloquear usuarios</h2>
+            <p>Si necesita impedir que un usuario acceda a la plataforma sin eliminar su cuenta:</p>
+
+            {$step(1, 'En la tabla de usuarios, localice el registro del usuario a bloquear.')}
+            {$step(2, 'Presione el ícono de <strong>\"Candado\"</strong>. Se mostrará un cuadro de confirmación.')}
+
+            {$img('gestionUsuarios/modalBloquearUsuario.png', 'Cuadro de confirmación para bloquear al usuario seleccionado')}
+
+            {$step(3, 'Confirme la acción. El usuario bloqueado no podrá iniciar sesión en la plataforma.')}
+
+            {$img('gestionUsuarios/candadoAbierto.png', 'El ícono cambia a un candado abierto indicando que el usuario está bloqueado')}
+
+            {$important('Al bloquear un usuario, el ícono cambiará a un <strong>candado abierto</strong>, indicando que la cuenta está bloqueada. El usuario verá un mensaje informándole que su acceso ha sido restringido. Para desbloquear, simplemente vuelva a presionar el ícono del candado.')}
+
+            {$img('gestionUsuarios/mensajeBloqueadoUsuario.png', 'Mensaje que visualiza el usuario cuando su cuenta ha sido bloqueada')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Prefiera bloquear antes que eliminar</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si un usuario ya no requiere acceso, bloquéelo en lugar de eliminarlo. Esto preserva el historial de actividades vinculado a esa cuenta.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Formato de correo consistente</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Asegúrese de que todos los correos sigan el formato del número de teléfono con <code>@escuela.edu.mx</code> para mantener consistencia en el sistema.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use filtros para gestión masiva</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Filtre por rol para revisar rápidamente todas las cuentas de un tipo específico, ideal para inicio de ciclo escolar.</p>
+                    </div>
                 </div>
             </div>
         ";
@@ -329,7 +532,33 @@ new class extends Component {
         </div>
     @else
         {{-- Article view (Hostinger Style) --}}
-        <div class="animate-in fade-in slide-in-from-left-4 duration-500">
+        <div class="animate-in fade-in slide-in-from-left-4 duration-500"
+            x-data="{
+                activeSection: '',
+                init() {
+                    const ids = @js(collect($this->getSections($selectedTutorial))->pluck('id')->toArray());
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                this.activeSection = entry.target.id;
+                            }
+                        });
+                    }, { rootMargin: '-10% 0px -70% 0px' });
+                    this.$nextTick(() => {
+                        ids.forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) observer.observe(el);
+                        });
+                    });
+                    const lastId = ids[ids.length - 1];
+                    const self = this;
+                    window.addEventListener('scroll', () => {
+                        if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 50)) {
+                            self.activeSection = lastId;
+                        }
+                    });
+                }
+            }">
             <button wire:click="back" class="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white mb-6 group transition-colors">
                 <flux:icon icon="arrow-left" variant="micro" class="group-hover:-translate-x-1 transition-transform" />
                 <span class="text-sm font-medium">Volver a tutoriales</span>
@@ -342,9 +571,18 @@ new class extends Component {
                         <flux:heading size="sm" class="uppercase tracking-widest text-zinc-400 mb-4 px-2">En este artículo</flux:heading>
                         <nav class="space-y-1">
                             @foreach($this->getSections($selectedTutorial) as $section)
-                                <a href="#{{ $section['id'] }}" class="flex items-center justify-between group px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
-                                    <span class="text-sm text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">{{ $section['title'] }}</span>
-                                    <flux:icon icon="chevron-right" variant="micro" class="text-zinc-300 group-hover:text-indigo-600 transition-colors" />
+                                <a href="#{{ $section['id'] }}"
+                                    class="flex items-center justify-between group px-3 py-2 rounded-lg transition-all duration-200"
+                                    :class="activeSection === '{{ $section['id'] }}'
+                                        ? 'bg-indigo-50 dark:bg-indigo-900/30 border-l-2 border-indigo-500'
+                                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 border-l-2 border-transparent'">
+                                    <span class="text-sm transition-colors duration-200"
+                                        :class="activeSection === '{{ $section['id'] }}'
+                                            ? 'text-indigo-600 dark:text-indigo-400 font-semibold'
+                                            : 'text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'">{{ $section['title'] }}</span>
+                                    <flux:icon icon="chevron-right" variant="micro"
+                                        class="transition-colors duration-200"
+                                        ::class="activeSection === '{{ $section['id'] }}' ? 'text-indigo-500' : 'text-zinc-300 group-hover:text-indigo-600'" />
                                 </a>
                             @endforeach
                         </nav>
@@ -365,9 +603,15 @@ new class extends Component {
                         <flux:heading size="lg">En este artículo</flux:heading>
                         <nav class="space-y-2">
                             @foreach($this->getSections($selectedTutorial) as $section)
-                                <a href="#{{ $section['id'] }}" x-on:click="$dispatch('close-modal', { name: 'mobile-toc' })" class="flex items-center justify-between p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 transition-colors">
-                                    <span class="text-sm font-medium">{{ $section['title'] }}</span>
-                                    <flux:icon icon="chevron-right" variant="micro" />
+                                <a href="#{{ $section['id'] }}" x-on:click="$dispatch('close-modal', { name: 'mobile-toc' })"
+                                    class="flex items-center justify-between p-3 rounded-xl border transition-colors"
+                                    :class="activeSection === '{{ $section['id'] }}'
+                                        ? 'border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30'
+                                        : 'border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50'">
+                                    <span class="text-sm font-medium"
+                                        :class="activeSection === '{{ $section['id'] }}' ? 'text-indigo-600 dark:text-indigo-400' : ''">{{ $section['title'] }}</span>
+                                    <flux:icon icon="chevron-right" variant="micro"
+                                        ::class="activeSection === '{{ $section['id'] }}' ? 'text-indigo-500' : ''" />
                                 </a>
                             @endforeach
                         </nav>
@@ -397,7 +641,7 @@ new class extends Component {
                     </div>
 
                     {{-- Main Content (Rendered from a separate method/component for cleanliness) --}}
-                    <div class="prose prose-indigo dark:prose-invert max-w-none prose-h2:text-2xl prose-h2:font-black prose-h2:mt-12 prose-h2:mb-6 prose-p:text-zinc-600 dark:prose-p:text-zinc-400 prose-p:leading-relaxed prose-li:text-zinc-600 dark:prose-li:text-zinc-400">
+                    <div class="prose prose-indigo dark:prose-invert max-w-none prose-h2:text-2xl prose-h2:font-black prose-h2:mt-24 prose-h2:mb-10 prose-h2:pt-12 prose-h2:border-t prose-h2:border-zinc-100 dark:prose-h2:border-zinc-800 prose-p:text-zinc-600 dark:prose-p:text-zinc-400 prose-p:leading-relaxed prose-li:text-zinc-600 dark:prose-li:text-zinc-400">
                         {!! $this->getContent($selectedTutorial) !!}
                     </div>
                 </article>
@@ -408,6 +652,7 @@ new class extends Component {
     <style>
         .wrap-break-word { word-break: break-all; }
         aside.sticky { height: calc(100vh - 3rem); }
-        article h2 { scroll-margin-top: 1.5rem; }
+        article h2 { scroll-margin-top: 5rem; }
+        article h2:first-of-type { border-top: none !important; padding-top: 0 !important; margin-top: 2rem !important; }
     </style>
 </div>
