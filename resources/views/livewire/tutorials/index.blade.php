@@ -131,6 +131,47 @@ new class extends Component {
             ];
         }
 
+        // Custom sections for community service tutorial
+        if ($name === 'tutorial-d-community') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'asignar', 'title' => '1. Asignar servicio'],
+                ['id' => 'buscar', 'title' => '2. Buscar servicios'],
+                ['id' => 'firmar', 'title' => '3. Firmar servicios'],
+                ['id' => 'borrar', 'title' => '4. Borrar servicios'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for notices tutorial
+        if ($name === 'tutorial-d-notices') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'agregar', 'title' => '1. Agregar aviso'],
+                ['id' => 'buscar', 'title' => '2. Buscar avisos'],
+                ['id' => 'editar', 'title' => '3. Editar avisos'],
+                ['id' => 'borrar', 'title' => '4. Borrar avisos'],
+                ['id' => 'firmas', 'title' => '5. Visualizar firmas'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for citations tutorial
+        if ($name === 'tutorial-d-citations') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'agregar', 'title' => '1. Agregar citatorio'],
+                ['id' => 'buscar', 'title' => '2. Buscar citatorios'],
+                ['id' => 'editar', 'title' => '3. Editar citatorios'],
+                ['id' => 'borrar', 'title' => '4. Borrar citatorios'],
+                ['id' => 'firmar', 'title' => '5. Firmar citatorios'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
         $sections = [
             ['id' => 'intro', 'title' => 'Introducción'],
             ['id' => 'requisitos', 'title' => 'Requisitos'],
@@ -274,6 +315,15 @@ new class extends Component {
             'tutorial-a-promote' => [
                 'custom' => true,
             ],
+            'tutorial-d-community' => [
+                'custom' => true,
+            ],
+            'tutorial-d-notices' => [
+                'custom' => true,
+            ],
+            'tutorial-d-citations' => [
+                'custom' => true,
+            ],
             'tutorial-c-notifications' => [
                 'desc' => 'Activa las notificaciones push para recibir alertas al instante sobre reportes, citatorios y avisos.',
                 'req' => 'Un navegador moderno (Chrome, Safari, Edge) con soporte para Service Workers.',
@@ -298,6 +348,9 @@ new class extends Component {
             if ($name === 'tutorial-a-cycles') return $this->getCyclesContent();
             if ($name === 'tutorial-a-promote') return $this->getPromoteContent();
             if ($name === 'tutorial-a-import') return $this->getImportContent();
+            if ($name === 'tutorial-d-community') return $this->getCommunityServiceContent();
+            if ($name === 'tutorial-d-notices') return $this->getNoticesContent();
+            if ($name === 'tutorial-d-citations') return $this->getCitationsContent();
         }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
@@ -1104,6 +1157,583 @@ new class extends Component {
                     <div>
                         <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Siempre previsualice antes de importar</p>
                         <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>La previsualización le permite detectar errores en los datos antes de que se registren. Tómese el tiempo de verificar que la información sea correcta.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+    public function getCommunityServiceContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Servicio Comunitario</strong> permite asignar, dar seguimiento y gestionar las actividades reparatorias asignadas a los alumnos. Estas actividades se generan como consecuencia de reportes acumulados y buscan la reflexión y reparación del daño por parte del estudiante.</p>
+
+            {$img('servicioComunitario/menu.png', 'Vista general del apartado de Servicio Comunitario en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Docente</strong> o <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener alumnos inscritos en el ciclo escolar actual.</li>
+                <li>El alumno debe contar con reportes acumulados que ameriten la asignación de servicio comunitario.</li>
+            </ul>
+
+            <h2 id='asignar'>1. Asignar servicio comunitario</h2>
+            <p>Para asignar una actividad de servicio comunitario a un alumno:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Servicio Comunitario\"</strong> que se encuentra en el menú lateral izquierdo.')}
+
+            {$step(2, 'Presione el botón <strong>\"Asignar Servicio\"</strong>. Esto abrirá un recuadro con campos a llenar.')}
+
+            {$img('servicioComunitario/agregarServicio.png', 'Botón Asignar Servicio para iniciar el proceso')}
+            {$img('servicioComunitario/formularioAgregarServicio.png', 'Formulario vacío para asignar un servicio comunitario')}
+
+            {$step(3, 'Complete los campos del formulario:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Buscar Alumno</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Coloque al menos <strong>3 caracteres</strong> del nombre del alumno para buscarlo. Una vez encontrado, selecciónelo haciendo clic en su nombre.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Actividad</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Detalle el tipo de actividad que deberá cumplir el alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Instrucciones Adicionales</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Agregue instrucciones adicionales que el alumno deberá seguir para cumplir el servicio.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Fecha de Cumplimiento</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica la fecha en la que se deberá cumplir el servicio. Por defecto muestra la fecha actual.</span>
+                </div>
+            </div>
+
+            {$important('No se pueden asignar servicios comunitarios los <strong>domingos</strong>. Asegúrese de seleccionar una fecha válida.')}
+
+            {$img('servicioComunitario/formularioLlenadoSubirServicio.png', 'Formulario completado con los datos del servicio comunitario')}
+
+            {$step(4, 'Presione el botón <strong>\"Guardar\"</strong> para registrar el servicio. El nuevo servicio se verá reflejado en la tabla.')}
+
+            {$img('servicioComunitario/nuevoServicioEnLaTabla.png', 'Nuevo servicio comunitario registrado en la tabla')}
+
+            <h2 id='buscar'>2. Buscar servicios comunitarios</h2>
+            <p>La plataforma ofrece herramientas de búsqueda y filtrado para localizar servicios rápidamente.</p>
+
+            {$step(1, 'En el apartado de Servicio Comunitario, ubique los campos de búsqueda en la parte superior de la tabla.')}
+
+            {$img('servicioComunitario/camposBusquedaServicios.png', 'Campos de búsqueda y filtrado de servicios comunitarios')}
+
+            {$step(2, 'Utilice los filtros disponibles:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Búsqueda</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Permite buscar servicios por <strong>nombre del alumno</strong> o <strong>tipo de actividad</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Filtrar por Estado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre los servicios por su estado actual: <strong>Pendientes</strong>, <strong>Completados</strong> o <strong>No asistió</strong>.</span>
+                </div>
+            </div>
+
+            {$img('servicioComunitario/campoBusqueda.png', 'Resultado al buscar un servicio por nombre de alumno')}
+            {$img('servicioComunitario/campoEstados.png', 'Resultado al filtrar servicios por estado')}
+
+            <h2 id='firmar'>3. Firmar servicios comunitarios</h2>
+            <p>Una vez que el alumno ha cumplido (o no) con la actividad asignada, deberá registrar el resultado:</p>
+
+            {$step(1, 'En la tabla de servicios comunitarios, ubique el registro correspondiente.')}
+
+            {$img('servicioComunitario/tablaServiciosPorFirmar.png', 'Tabla de servicios con los botones de acción para firmar')}
+
+            {$step(2, 'En la columna de <strong>\"Acciones\"</strong>, visualizará dos botones:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider pt-0.5'>✓ Palomita</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica que el servicio fue <strong>cumplido</strong>. El estado cambiará a <strong>Completado</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider pt-0.5'>✗ Equis</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica que el servicio <strong>no fue cumplido</strong>. El estado cambiará a <strong>No asistió</strong>.</span>
+                </div>
+            </div>
+
+            {$img('servicioComunitario/servicioFirmado.png', 'Servicio comunitario firmado con el estado actualizado')}
+
+            <h2 id='borrar'>4. Borrar servicios comunitarios</h2>
+            <p>Para eliminar un servicio comunitario registrado:</p>
+
+            {$step(1, 'En la tabla de servicios comunitarios, localice el registro a eliminar.')}
+
+            {$img('servicioComunitario/tablaServicioPorBorrar.png', 'Tabla de servicios con el ícono de basura para eliminar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Basura\"</strong> del registro. Se abrirá un cuadro de confirmación.')}
+
+            {$img('servicioComunitario/modalEliminacion.png', 'Cuadro de confirmación para eliminar el servicio comunitario')}
+
+            {$step(3, 'Presione el botón <strong>\"Eliminar\"</strong> para confirmar. El servicio será eliminado de la tabla.')}
+
+            {$img('servicioComunitario/servicioEliminado.png', 'Servicio comunitario eliminado correctamente de la tabla')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Asigne actividades claras y específicas</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Describa la actividad con detalle para que el alumno y el padre de familia entiendan exactamente qué se espera. Use las instrucciones adicionales para dar contexto.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Firme los servicios a tiempo</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Registre el cumplimiento o incumplimiento del servicio en la fecha establecida. Esto mantiene actualizado el historial del alumno y notifica a los padres.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use los filtros para dar seguimiento</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Filtre por estado <strong>\"Pendientes\"</strong> para identificar rápidamente los servicios que aún no han sido firmados y requieren atención.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getNoticesContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Avisos</strong> permite crear, buscar, editar, eliminar y dar seguimiento a comunicados dirigidos a padres de familia y docentes. Los avisos pueden ser de distintos tipos y permiten verificar quién los ha leído mediante un sistema de firmas.</p>
+
+            {$img('avisos/menu.png', 'Vista general del apartado de Avisos en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Docente</strong> o <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener un ciclo escolar activo con alumnos y padres registrados.</li>
+                <li>El mensaje debe estar autorizado por la dirección si es de carácter general.</li>
+            </ul>
+
+            <h2 id='agregar'>1. Agregar aviso</h2>
+            <p>Para crear y publicar un nuevo aviso:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Avisos\"</strong> que se encuentra en el menú lateral izquierdo.')}
+
+            {$step(2, 'Presione el botón <strong>\"Nuevo Aviso\"</strong>. Esto abrirá un recuadro con campos a llenar.')}
+
+            {$img('avisos/botonNuevoAviso.png', 'Botón Nuevo Aviso para iniciar la creación')}
+            {$img('avisos/modalAgregarAviso.png', 'Formulario vacío para crear un nuevo aviso')}
+
+            {$step(3, 'Complete los campos del formulario:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Título del Aviso</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Coloque un título representativo o general para el mensaje.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Tipo de Aviso</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Permite elegir el tipo de aviso. Existen tres tipos: <strong>General</strong>, <strong>Urgente</strong> y <strong>Evento</strong>.</span>
+                </div>
+            </div>
+
+            {$important('Al seleccionar el tipo <strong>Evento</strong>, se muestran 2 campos adicionales: <strong>Fecha de Evento</strong> (para agendar el día) y <strong>Hora</strong> (para agendar la hora del evento).')}
+
+            {$img('avisos/camposEspecialesAvisoEvento.png', 'Campos adicionales al seleccionar tipo Evento')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Dirigido a</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Define a qué público irá dirigido. <strong>Todo el plantel</strong> (docentes y padres) o <strong>Solo padres</strong> (exclusivo para padres de familia).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Filtros de Audiencia</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Permite especificar la audiencia: por <strong>grado</strong> (padres con hijos en ese grado) o por <strong>salón</strong> (grupo y grado específico). Si no se selecciona ninguno, el mensaje será general.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Mensaje</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Detalle el comunicado o cuerpo del mensaje que recibirán los destinatarios.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Requiere Autorización</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Activa una opción que otorga al padre de familia un permiso explícito para la realización de una actividad.</span>
+                </div>
+            </div>
+
+            {$img('avisos/formularioAgregarAvisoLLeno.png', 'Formulario completado con los datos del aviso')}
+
+            {$step(4, 'Presione el botón <strong>\"Publicar Aviso\"</strong>. El aviso se visualizará en el tablero.')}
+
+            {$img('avisos/nuevoAvisoPublicado.png', 'Nuevo aviso publicado en el tablero de avisos')}
+
+            <h2 id='buscar'>2. Buscar avisos</h2>
+            <p>La plataforma ofrece herramientas de búsqueda y filtrado para localizar avisos rápidamente.</p>
+
+            {$step(1, 'En el apartado de Avisos, ubique los campos de búsqueda en la parte superior del tablero.')}
+
+            {$img('avisos/camposBuscarAvisos.png', 'Campos de búsqueda y filtrado de avisos')}
+
+            {$step(2, 'Utilice los filtros disponibles:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Búsqueda</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Permite buscar avisos por <strong>título del aviso</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Tipo de Aviso</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre los avisos por tipo: <strong>General</strong>, <strong>Urgente</strong> o <strong>Evento</strong>.</span>
+                </div>
+            </div>
+
+            {$img('avisos/campoBusquedaAviso.png', 'Resultado al buscar un aviso por título')}
+            {$img('avisos/campoBusquedaTiposDeAviso.png', 'Resultado al filtrar avisos por tipo de aviso')}
+
+            <h2 id='editar'>3. Editar avisos</h2>
+            <p>Para modificar un aviso existente:</p>
+
+            {$step(1, 'En el tablero de avisos, localice el aviso a editar.')}
+
+            {$img('avisos/avisoParaEditar.png', 'Aviso en el tablero con el ícono de lápiz para editar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Lápiz\"</strong> del registro. Esto abrirá un recuadro con los datos actuales del aviso.')}
+
+            {$img('avisos/modalEdicionAviso.png', 'Modal de edición con los datos actuales del aviso')}
+
+            {$step(3, 'Modifique los campos que necesite. El formulario cuenta con los mismos campos que al crear un aviso:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Campos editables</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Título, Tipo de Aviso, Dirigido a, Filtros de Audiencia, Mensaje y Requiere Autorización.</span>
+                </div>
+            </div>
+
+            {$important('Si cambia el tipo de aviso a <strong>Evento</strong>, se mostrarán los campos adicionales de Fecha y Hora del evento.')}
+
+            {$img('avisos/camposEspecialesAvisoEventoEdicion.png', 'Campos de evento mostrados durante la edición')}
+            {$img('avisos/modalEdicionNuevaInformacion.png', 'Modal de edición con la nueva información ingresada')}
+
+            {$step(4, 'Presione el botón <strong>\"Actualizar Aviso\"</strong>. Los cambios se verán reflejados en el tablero.')}
+
+            {$img('avisos/avisoEditado.png', 'Aviso actualizado correctamente en el tablero')}
+
+            <h2 id='borrar'>4. Borrar avisos</h2>
+            <p>Para eliminar un aviso publicado:</p>
+
+            {$step(1, 'En el tablero de avisos, localice el aviso a eliminar.')}
+
+            {$img('avisos/avisoParaBorrar.png', 'Aviso en el tablero con el ícono de basura para eliminar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Basura\"</strong> del registro. Se abrirá un cuadro de confirmación.')}
+
+            {$img('avisos/modalBorrarAviso.png', 'Cuadro de confirmación para eliminar el aviso')}
+
+            {$step(3, 'Presione el botón <strong>\"Eliminar\"</strong> para confirmar. El aviso será eliminado del tablero y dejará de ser visible para los usuarios.')}
+
+            {$img('avisos/tableroVacioAvisoBorrado.png', 'Tablero de avisos tras eliminar el registro')}
+
+            <h2 id='firmas'>5. Visualizar firmas de padres</h2>
+            <p>El sistema permite verificar qué padres han leído y firmado cada aviso:</p>
+
+            {$step(1, 'En el tablero de avisos, localice el aviso del cual desea revisar las firmas.')}
+
+            {$img('avisos/avisoPorRevisarFirmas.png', 'Aviso en el tablero con el ícono de huella dactilar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Huella Dactilar\"</strong> del registro. Se abrirá un cuadro con los detalles de las firmas.')}
+
+            {$img('avisos/modalVisualizacionFirmas.png', 'Modal con la información de firmas del aviso')}
+
+            {$step(3, 'El cuadro muestra tres indicadores:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/30'>
+                    <span class='shrink-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider pt-0.5'>Cuadro Verde</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el número de personas que <strong>han firmado</strong> el aviso.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider pt-0.5'>Cuadro Gris</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el número de personas que <strong>recibieron</strong> el aviso y se espera que firmen.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30'>
+                    <span class='shrink-0 text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider pt-0.5'>Cuadro Azul</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el <strong>progreso en porcentaje</strong> del número de firmas.</span>
+                </div>
+            </div>
+
+            {$step(4, 'Debajo de los indicadores encontrará dos secciones:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Firmados</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Muestra el número y nombre de los padres que <strong>ya han firmado</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Pendientes</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Muestra el número y nombre de los padres que están <strong>pendientes de firmar</strong>.</span>
+                </div>
+            </div>
+
+            {$img('avisos/modalVisualizacionPendientesFirma.png', 'Detalle de padres firmados y pendientes de firma')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use los filtros de audiencia estratégicamente</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Segmente sus avisos por grado o salón para que el mensaje llegue únicamente a los padres relevantes. Esto evita saturar a toda la comunidad con información que no les compete.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Revise las firmas periódicamente</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use el ícono de huella dactilar para verificar quién ha leído el aviso. Si hay padres pendientes, considere reenviar la información por otro medio.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active \"Requiere Autorización\" para eventos importantes</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Para salidas, actividades extracurriculares o eventos que requieran consentimiento, active esta opción para obtener un permiso explícito de cada padre.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getCitationsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Citatorios</strong> permite agendar, gestionar y dar seguimiento a reuniones presenciales con los padres de familia. Los citatorios se generan cuando es necesario tratar un tema académico o disciplinario directamente con el tutor del alumno.</p>
+
+            {$img('citatorios/menu.png', 'Vista general del apartado de Citatorios en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Docente</strong> o <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener alumnos inscritos en el ciclo escolar actual.</li>
+                <li>Contar con un motivo justificado (académico o disciplinario) para la cita.</li>
+            </ul>
+
+            <h2 id='agregar'>1. Agregar citatorio</h2>
+            <p>Para crear y agendar un nuevo citatorio:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Citatorios\"</strong> que se encuentra en el menú lateral izquierdo.')}
+
+            {$step(2, 'Presione el botón <strong>\"Nuevo Citatorio\"</strong>. Esto abrirá un recuadro con campos a llenar.')}
+
+            {$img('citatorios/agregarCitatorio.png', 'Botón Nuevo Citatorio para iniciar el proceso')}
+            {$img('citatorios/modalAgregarCitatorio.png', 'Formulario vacío para crear un nuevo citatorio')}
+
+            {$step(3, 'Complete los campos del formulario:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Buscar Alumno</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Coloque al menos <strong>3 caracteres</strong> del nombre del alumno para buscarlo. Selecciónelo haciendo clic en su nombre.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Fecha de la Cita</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica la fecha en la que se agendará la cita con el padre de familia.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Hora</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica la hora en la que se agendará la cita.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Motivo de la Cita</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Describa el motivo por el cual se otorga el citatorio.</span>
+                </div>
+            </div>
+
+            {$img('citatorios/modalAgregarCitatorioLLeno.png', 'Formulario completado con los datos del citatorio')}
+
+            {$step(4, 'Presione el botón <strong>\"Generar Citatorio\"</strong>. El citatorio se verá reflejado en la tabla.')}
+
+            {$img('citatorios/citatorioCreado.png', 'Nuevo citatorio registrado en la tabla de citatorios')}
+
+            <h2 id='buscar'>2. Buscar citatorios</h2>
+            <p>La plataforma ofrece herramientas de búsqueda y filtrado para localizar citatorios rápidamente.</p>
+
+            {$step(1, 'En el apartado de Citatorios, ubique los campos de búsqueda en la parte superior de la tabla.')}
+
+            {$img('citatorios/camposDeFiltro.png', 'Campos de búsqueda y filtrado de citatorios')}
+
+            {$step(2, 'Utilice los filtros disponibles:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Búsqueda</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Permite buscar citatorios por <strong>nombre del alumno</strong> o <strong>motivo</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Filtrar por Estado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre los citatorios por estado: <strong>Todos los estados</strong>, <strong>Pendientes</strong>, <strong>Asistió</strong> o <strong>No asistió</strong>.</span>
+                </div>
+            </div>
+
+            {$img('citatorios/campoBusquedaAviso.png', 'Resultado al buscar un citatorio por nombre o motivo')}
+            {$img('citatorios/campoTipoDeAviso.png', 'Resultado al filtrar citatorios por estado')}
+
+            <h2 id='editar'>3. Editar citatorios</h2>
+            <p>Para modificar un citatorio existente:</p>
+
+            {$step(1, 'En la tabla de citatorios, localice el registro a editar.')}
+
+            {$img('citatorios/tableroCitatoriosHaEditar.png', 'Tabla de citatorios con el ícono de lápiz para editar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Lápiz\"</strong> del registro. Esto abrirá un recuadro con los datos actuales del citatorio.')}
+
+            {$img('citatorios/modalEdicionCitatorio.png', 'Modal de edición con los datos actuales del citatorio')}
+
+            {$step(3, 'Modifique los campos que necesite:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Campos editables</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Buscar Alumno, Fecha de la Cita, Hora y Motivo de la Cita.</span>
+                </div>
+            </div>
+
+            {$img('citatorios/modalEdicionCitatorioLLeno.png', 'Modal de edición con la nueva información ingresada')}
+
+            {$step(4, 'Presione el botón <strong>\"Actualizar Citatorio\"</strong>. Los cambios se verán reflejados en la tabla.')}
+
+            {$img('citatorios/citatorioEditado.png', 'Citatorio actualizado correctamente en la tabla')}
+
+            <h2 id='borrar'>4. Borrar citatorios</h2>
+            <p>Para eliminar un citatorio registrado:</p>
+
+            {$step(1, 'En la tabla de citatorios, localice el registro a eliminar.')}
+
+            {$img('citatorios/tableroCitatoriosBorrar.png', 'Tabla de citatorios con el ícono de basura para eliminar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Basura\"</strong> del registro. Se abrirá un cuadro de confirmación.')}
+
+            {$img('citatorios/modalBorrarCitatorio.png', 'Cuadro de confirmación para eliminar el citatorio')}
+
+            {$step(3, 'Presione el botón <strong>\"Eliminar\"</strong> para confirmar. El citatorio será eliminado de la tabla.')}
+
+            {$img('citatorios/citatorioBorrado.png', 'Citatorio eliminado correctamente de la tabla')}
+
+            <h2 id='firmar'>5. Firmar citatorios</h2>
+            <p>Una vez que la cita se ha llevado a cabo (o no), deberá registrar el resultado de la asistencia:</p>
+
+            {$step(1, 'En la tabla de citatorios, ubique el registro correspondiente.')}
+
+            {$img('citatorios/tableroCitatoriosAFirmar.png', 'Tabla de citatorios con los botones de acción para firmar')}
+
+            {$step(2, 'En la columna de <strong>\"Acciones\"</strong>, visualizará dos botones:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider pt-0.5'>✓ Palomita</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica que el padre <strong>asistió</strong> a la cita. El estado cambiará a <strong>Asistió</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider pt-0.5'>✗ Equis</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica que el padre <strong>no asistió</strong>. El estado cambiará a <strong>No asistió</strong>.</span>
+                </div>
+            </div>
+
+            {$img('citatorios/citatorioFirmado.png', 'Citatorio firmado con el estado de asistencia actualizado')}
+
+            {$important('Una vez firmado un citatorio, su estado cambiará y se reflejará en los filtros de búsqueda. Esto permite llevar un registro claro de la asistencia de los padres.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Redacte motivos claros y detallados</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Un motivo bien descrito facilita la disposición del padre al diálogo y le permite prepararse para la reunión. Sea específico sobre el tema a tratar.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Firme los citatorios inmediatamente después de la cita</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Registre la asistencia o inasistencia del padre el mismo día de la cita. Esto mantiene el historial actualizado y permite tomar acciones oportunas.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use los filtros de estado para dar seguimiento</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Filtre por <strong>\"Pendientes\"</strong> para identificar citas próximas y por <strong>\"No asistió\"</strong> para reagendar reuniones con padres que no se presentaron.</p>
                     </div>
                 </div>
             </div>
