@@ -76,6 +76,33 @@ new class extends Component {
             ];
         }
 
+        // Custom sections for regulation tutorial
+        if ($name === 'tutorial-a-regulations') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'acceder', 'title' => '1. Acceder al reglamento'],
+                ['id' => 'editar', 'title' => '2. Editar el reglamento'],
+                ['id' => 'herramientas', 'title' => '3. Campos y herramientas'],
+                ['id' => 'guardar', 'title' => '4. Guardar cambios'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for cycles tutorial
+        if ($name === 'tutorial-a-cycles') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'registrar', 'title' => '1. Registrar nuevo ciclo'],
+                ['id' => 'activar', 'title' => '2. Activar/Desactivar ciclo'],
+                ['id' => 'editar', 'title' => '3. Editar ciclo escolar'],
+                ['id' => 'salones', 'title' => '4. Gestionar grupos'],
+                ['id' => 'borrar', 'title' => '5. Borrar ciclo escolar'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
         $sections = [
             ['id' => 'intro', 'title' => 'Introducción'],
             ['id' => 'requisitos', 'title' => 'Requisitos'],
@@ -189,20 +216,10 @@ new class extends Component {
                 'delete' => '<h2 id="eliminar">Archivar Aviso</h2><p>En lugar de eliminar, puedes archivar avisos antiguos para mantener limpia la bandeja de los padres.</p>'
             ],
             'tutorial-a-cycles' => [
-                'desc' => 'Configura los periodos escolares para organizar los grupos y reportes.',
-                'req' => 'Inicio de periodo vacacional o reinscripciones.',
-                'steps' => '<li>Crea un "Nuevo Ciclo".</li><li>Define fecha de inicio y fin.</li><li>Actívalo para que sea el ciclo vigente del sistema.</li>',
-                'tip' => 'Solo debe haber un ciclo activo a la vez para evitar confusiones en los reportes.',
-                'edit' => '<h2 id="editar">Editar Fechas</h2><p>Puedes ajustar las fechas de inicio/fin si hay cambios en el calendario oficial.</p>',
-                'delete' => '<h2 id="eliminar">Cerrar Ciclo</h2><p>Al cerrar un ciclo, todos los registros pasan a modo "Historial" y no pueden ser modificados.</p>'
+                'custom' => true,
             ],
             'tutorial-a-regulations' => [
-                'desc' => 'Mantén actualizado el reglamento institucional que rige las sanciones y méritos.',
-                'req' => 'Acuerdo del consejo escolar o directivos.',
-                'steps' => '<li>Ingresa a "Configuración" -> "Reglamento".</li><li>Edita los artículos específicos.</li><li>Guarda para que los nuevos reportes usen la versión actualizada.</li>',
-                'tip' => 'Un reglamento claro reduce las apelaciones de los padres.',
-                'edit' => '<h2 id="editar">Actualizar Artículos</h2><p>Usa el editor de texto para dar formato a los puntos clave del reglamento.</p>',
-                'delete' => '<h2 id="eliminar">Eliminar Fracción</h2><p>Puedes eliminar secciones obsoletas del reglamento en tiempo real.</p>'
+                'custom' => true,
             ],
             'tutorial-a-inscribe' => [
                 'desc' => 'Proceso para registrar nuevos alumnos y vincularlos con sus tutores en el sistema.',
@@ -248,9 +265,11 @@ new class extends Component {
             'delete' => '<h2 id="eliminar">Cómo Eliminar registros</h2><p>La eliminación puede estar restringida según tu perfil. Si el botón no aparece, contacta a un administrador.</p>'
         ];
 
-        // Custom full-page content for user management tutorial
-        if (!empty($specifics['custom']) && $name === 'tutorial-a-users') {
-            return $this->getUserManagementContent();
+        // Custom full-page content
+        if (!empty($specifics['custom'])) {
+            if ($name === 'tutorial-a-users') return $this->getUserManagementContent();
+            if ($name === 'tutorial-a-regulations') return $this->getRegulationContent();
+            if ($name === 'tutorial-a-cycles') return $this->getCyclesContent();
         }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
@@ -457,6 +476,347 @@ new class extends Component {
                     <div>
                         <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use filtros para gestión masiva</p>
                         <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Filtre por rol para revisar rápidamente todas las cuentas de un tipo específico, ideal para inicio de ciclo escolar.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+    public function getRegulationContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Reglamento</strong> permite visualizar y editar el reglamento escolar institucional. Este documento es visible para todos los usuarios de la plataforma y establece las normas de convivencia, sanciones y lineamientos generales de la institución.</p>
+
+            {$img('reglamento/menu.png', 'Vista general del apartado de Reglamento en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener definido el contenido y título del reglamento institucional aprobado por el consejo escolar.</li>
+            </ul>
+
+            <h2 id='acceder'>1. Acceder al reglamento</h2>
+            <p>Para visualizar el reglamento escolar actual:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Reglamento\"</strong> que se encuentra en el menú lateral izquierdo. Con esta acción, podrá visualizar el reglamento escolar vigente.')}
+
+            {$img('reglamento/menu.png', 'Opción de Reglamento ubicada en el menú lateral izquierdo')}
+
+            {$important('El reglamento es visible para <strong>todos los usuarios</strong> de la plataforma (administradores, maestros y padres de familia). Cualquier cambio se reflejará de inmediato para todos.')}
+
+            <h2 id='editar'>2. Editar el reglamento</h2>
+            <p>Para modificar el contenido del reglamento institucional:</p>
+
+            {$step(1, 'Una vez en el apartado de Reglamento, localice y presione el botón <strong>\"Editar Reglamento\"</strong>. Esto iniciará el proceso de modificación.')}
+
+            {$img('reglamento/botonEditarReglamento.png', 'Botón Editar Reglamento para iniciar la modificación')}
+
+            {$step(2, 'Se abrirá una <strong>caja de herramientas</strong> que le permitirá editar el contenido del reglamento, incluyendo campos de texto y opciones de formato.')}
+
+            {$img('reglamento/cajaHerramientasEditar.png', 'Caja de herramientas con opciones de edición del reglamento')}
+
+            <h2 id='herramientas'>3. Campos y herramientas</h2>
+            <p>El editor de reglamento cuenta con los siguientes campos y herramientas de formato:</p>
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Título</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Aquí colocará el título que represente al reglamento escolar.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Contenido</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>La descripción y detalles del reglamento que será visible por todos los usuarios de la plataforma.</span>
+                </div>
+            </div>
+
+            <p>Además, la barra de herramientas ofrece las siguientes opciones de formato:</p>
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Negrita</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Resalta texto importante con <strong>formato en negrita</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Cursiva</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Aplica <em>formato cursiva</em> para énfasis o referencias.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Subrayado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Subraya texto para destacar puntos relevantes.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Tachado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Subraya por el medio del texto para indicar texto eliminado o corregido.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Títulos</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Cambie el tamaño del texto para crear secciones y subtítulos dentro del reglamento.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Alineación</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Alinee el texto a la izquierda, centro o derecha según la necesidad del documento.</span>
+                </div>
+            </div>
+
+            <h2 id='guardar'>4. Guardar cambios</h2>
+            <p>Una vez que haya realizado las modificaciones necesarias al reglamento:</p>
+
+            {$step(1, 'Verifique que el <strong>título</strong> y el <strong>contenido</strong> del reglamento estén correctos.')}
+
+            {$step(2, 'Presione el botón <strong>\"Guardar Cambios\"</strong> para aplicar las modificaciones.')}
+
+            {$img('reglamento/guardarCambios.png', 'Botón Guardar Cambios para aplicar las modificaciones al reglamento')}
+
+            {$step(3, 'Los cambios se verán reflejados inmediatamente en el apartado de Reglamento para <strong>todos los usuarios</strong>.')}
+
+            {$img('reglamento/cambiosReflejados.png', 'Reglamento actualizado visible para todos los usuarios')}
+
+            {$important('Una vez guardados los cambios, el reglamento actualizado será visible de inmediato para todos los usuarios de la plataforma. Asegúrese de que el contenido sea el correcto antes de guardar.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Estructura clara con títulos</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use las herramientas de <strong>tamaño de título</strong> para organizar el reglamento en secciones claras. Esto facilita la lectura tanto para maestros como para padres de familia.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Resalte las sanciones importantes</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Utilice <strong>negrita</strong> y <strong>subrayado</strong> para destacar las faltas graves y sus consecuencias. Un reglamento claro reduce las apelaciones de los padres.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Actualice al inicio de cada ciclo</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Revise y actualice el reglamento al inicio de cada ciclo escolar para reflejar los acuerdos más recientes del consejo escolar.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+    public function getCyclesContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Ciclos Escolares</strong> permite administrar los periodos académicos de la institución. Desde aquí podrá crear nuevos ciclos, activarlos, editarlos, gestionar los grupos (salones) de cada ciclo y eliminar ciclos que ya no sean necesarios.</p>
+
+            {$img('ciclosEscolares/menu.png', 'Vista general del apartado de Ciclos Escolares en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener definidos los años que comprenderá el nuevo ciclo escolar.</li>
+            </ul>
+
+            <h2 id='registrar'>1. Registrar nuevo ciclo escolar</h2>
+            <p>Para crear un nuevo ciclo escolar en la plataforma:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Ciclos Escolares\"</strong> que se encuentra en el menú lateral izquierdo. Con esta acción, podrá visualizar el apartado de Ciclos Escolares.')}
+
+            {$img('ciclosEscolares/tablalistaCiclos.png', 'Apartado de Ciclos Escolares con la lista de ciclos registrados')}
+
+            {$step(2, 'Diríjase al recuadro que dice <strong>\"Registrar Nuevo Ciclo\"</strong>. Aquí podrá añadir un nuevo ciclo escolar, asignándole los años que comprenderá dicho ciclo.')}
+
+            {$img('ciclosEscolares/modalRegistrarCiclo.png', 'Formulario para registrar un nuevo ciclo escolar')}
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Nombre del Ciclo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Debe respetar el formato que se muestra en el recuadro (ejemplo: <code>2025-2026</code>).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Ciclo Activo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Opción para activar el ciclo escolar y usarlo apenas sea creado.</span>
+                </div>
+            </div>
+
+            {$step(3, 'Presione el botón <strong>\"Guardar\"</strong> para registrar el ciclo. El nuevo ciclo aparecerá en la Lista de Ciclos.')}
+
+            {$important('El formato del nombre del ciclo debe seguir el patrón de años (ejemplo: <strong>2025-2026</strong>). Esto es importante para mantener la consistencia en todo el sistema.')}
+
+            <h2 id='activar'>2. Activar/Desactivar ciclo escolar</h2>
+            <p>Para cambiar el ciclo activo de la plataforma:</p>
+
+            {$step(1, 'Primero deberá haber creado ciclos escolares. Para visualizarlos, estos se encontrarán en el recuadro con el título de <strong>\"Lista de Ciclos\"</strong>. Una vez visualizados, seleccione el ciclo escolar presionando el ícono de <strong>\"Lápiz\"</strong>.')}
+
+            {$img('ciclosEscolares/tablalistaCiclos2.png', 'Lista de Ciclos con el ícono de edición para seleccionar un ciclo')}
+
+            {$step(2, 'Una vez seleccionado, el recuadro de registro cambiará a <strong>\"Editar Ciclo\"</strong> donde verá el nombre del ciclo elegido. Para activarlo, presione el switch del campo <strong>\"Ciclo Activo\"</strong> y presione el botón <strong>\"Actualizar\"</strong>.')}
+
+            {$img('ciclosEscolares/cuadroEditarActivarCiclo.png', 'Cuadro de Editar Ciclo con el switch de Ciclo Activo')}
+
+            {$img('ciclosEscolares/cicloAFaltaDeSerActivado.png', 'Ciclo escolar a punto de ser activado con el switch encendido')}
+
+            {$step(3, 'Una vez activado, visualizará tanto en el <strong>tablero general</strong> como en el apartado de Ciclos Escolares que el ciclo activo es el previamente seleccionado.')}
+
+            {$img('ciclosEscolares/cicloActivado.png', 'Ciclo escolar activado correctamente en la lista')}
+            {$img('ciclosEscolares/visualizacionTableroCicloActivado.png', 'Tablero general mostrando el ciclo activo actualizado')}
+
+            {$important('Al activar un ciclo, podrá iniciar un nuevo periodo con nuevos reportes, servicios comunitarios, avisos, entre otros. Solo debe haber <strong>un ciclo activo</strong> a la vez.')}
+
+            <h2 id='editar'>3. Editar ciclo escolar</h2>
+            <p>Para modificar el nombre o estado de un ciclo existente:</p>
+
+            {$step(1, 'En la <strong>\"Lista de Ciclos\"</strong>, seleccione el ciclo escolar que desea editar presionando el ícono de <strong>\"Lápiz\"</strong>.')}
+
+            {$img('ciclosEscolares/tablalistaCiclos3.png', 'Lista de Ciclos con el ícono de lápiz para editar')}
+
+            {$step(2, 'El recuadro cambiará a <strong>\"Editar Ciclo\"</strong> mostrando el nombre del ciclo elegido. Podrá cambiar el nombre del ciclo siguiendo el formato de años, así como activar o desactivar el ciclo.')}
+
+            {$img('ciclosEscolares/cicloCampoNombreAEditar.png', 'Campo de nombre del ciclo listo para ser editado')}
+            {$img('ciclosEscolares/cicloCampoNombreAPuntoDeEditar.png', 'Campo de nombre del ciclo con el nuevo valor ingresado')}
+
+            {$step(3, 'Una vez modificados los campos, presione el botón <strong>\"Actualizar\"</strong> para guardar los cambios.')}
+
+            {$img('ciclosEscolares/cicloCambiadoEditatoNombre.png', 'Ciclo actualizado correctamente en la lista de ciclos')}
+            {$img('ciclosEscolares/cicloCambiadoNombreTablero.png', 'Tablero general reflejando el cambio del nombre del ciclo')}
+
+            <h2 id='salones'>4. Gestionar grupos</h2>
+            <p>Cada ciclo escolar puede tener grupos (salones) asignados. Para administrarlos:</p>
+
+            {$step(1, 'En la <strong>\"Lista de Ciclos\"</strong>, seleccione el ciclo escolar presionando el ícono de <strong>\"Personas\"</strong>. Esto abrirá un recuadro para gestionar los grupos.')}
+
+            {$img('ciclosEscolares/tablalistaCiclos.png', 'Lista de Ciclos con el ícono de personas para gestionar grupos')}
+
+            <h3>Añadir un grupo</h3>
+
+            {$step(2, 'En el recuadro, complete los campos para crear un nuevo grupo:')}
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Seleccione el grado escolar del grupo.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Sección</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Indique la sección o letra del grupo (A, B, C, etc.).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Tutor</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Asigne un maestro como tutor responsable del grupo.</span>
+                </div>
+            </div>
+
+            {$img('ciclosEscolares/modalA%C3%B1adirSalon.png', 'Recuadro para añadir un nuevo grupo al ciclo escolar')}
+            {$img('ciclosEscolares/modalA%C3%B1adirSalonCamposLLenados.png', 'Campos del grupo completados listos para guardar')}
+
+            {$step(3, 'Presione el botón <strong>\"Guardar\"</strong>. El nuevo grupo se visualizará en el mismo recuadro.')}
+
+            {$img('ciclosEscolares/salonA%C3%B1adido.png', 'Grupo añadido correctamente al ciclo escolar')}
+
+            <h3>Modificar un grupo</h3>
+
+            {$step(4, 'Para modificar un grupo, presione el ícono de <strong>\"Lápiz\"</strong> del grupo correspondiente. Esto llenará automáticamente los campos con los datos actuales del grupo.')}
+
+            {$img('ciclosEscolares/modificarSalonMismaInformacion.png', 'Campos del grupo cargados con la información actual')}
+
+            {$step(5, 'Modifique los datos necesarios y presione el botón <strong>\"Actualizar\"</strong>. Para cancelar, presione el botón <strong>\"X\"</strong>.')}
+
+            {$img('ciclosEscolares/modificarSalonInformacionCambiada.png', 'Campos del grupo con los nuevos datos ingresados')}
+            {$img('ciclosEscolares/resultadoSalonModificado.png', 'Grupo modificado correctamente')}
+
+            <h3>Borrar un grupo</h3>
+
+            {$step(6, 'Para borrar un grupo, presione el ícono de <strong>\"Bote de Basura\"</strong> del grupo correspondiente.')}
+
+            {$img('ciclosEscolares/borrarGrupo.png', 'Ícono de bote de basura para eliminar un grupo')}
+
+            {$important('Para poder borrar un grupo con éxito, deberá <strong>desvincular los alumnos</strong> que estén registrados en dicho grupo. De lo contrario, el ícono de borrar estará bloqueado.')}
+
+            <h2 id='borrar'>5. Borrar ciclo escolar</h2>
+            <p>Para eliminar un ciclo escolar que ya no sea necesario:</p>
+
+            {$step(1, 'En el apartado de Ciclos Escolares, diríjase a la tabla <strong>\"Lista de Ciclos\"</strong>.')}
+
+            {$img('ciclosEscolares/tablalistaCiclos4.png', 'Lista de Ciclos con el ícono de basura para eliminar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Basura\"</strong> del registro a eliminar. Se abrirá un cuadro preguntando si está seguro de la decisión.')}
+
+            {$img('ciclosEscolares/modaBorrarCiclo.png', 'Cuadro de confirmación para eliminar el ciclo escolar')}
+
+            {$step(3, 'Confirme la acción para eliminar el ciclo escolar.')}
+
+            {$img('ciclosEscolares/cicloBorrado.png', 'Ciclo escolar eliminado correctamente de la lista')}
+
+            {$important('En algunos casos el ciclo escolar tendrá <strong>bloqueada</strong> la opción de eliminar debido a que tiene vinculados grupos, secciones, entre otros. Deberá eliminar previamente esta información para poder proceder con la eliminación del ciclo.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Un solo ciclo activo</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Mantenga siempre <strong>un solo ciclo activo</strong> a la vez. Esto evita confusiones en los reportes, avisos y demás módulos que dependen del ciclo vigente.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Configure los grupos antes de inscribir</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Antes de inscribir alumnos, asegúrese de tener todos los <strong>grupos y secciones</strong> creados. Esto facilitará el proceso de asignación durante las inscripciones.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Asigne tutores a cada grupo</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Aunque el tutor es opcional, asignarlo permite que el maestro tenga acceso directo a los reportes y citatorios de su grupo.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>4</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>No elimine ciclos con historial</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Los ciclos anteriores contienen el historial de reportes y actividades. Prefiera <strong>desactivarlos</strong> en lugar de eliminarlos para conservar la información.</p>
                     </div>
                 </div>
             </div>
