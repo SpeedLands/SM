@@ -11,20 +11,56 @@ use App\Models\Report;
 use App\Models\CommunityService;
 use App\Models\NoticeSignature;
 use Livewire\Volt\Component;
+use Livewire\Attributes\Computed;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 
 new class extends Component {
     use WithPagination;
+    use WithFileUploads;
 
     public string $search = '';
     public string $gradeFilter = 'Todos';
     public string $groupFilter = 'Todos';
     public bool $onlyActiveCycle = true;
+    public array $selectedStudents = [];
+    public float $scale = 1.0;
+    public bool $bulkMode = false;
+
+    public function exitBulkMode(): void
+    {
+        $this->bulkMode = false;
+        $this->selectedStudents = [];
+    }
+
+    public function selectAll(): void
+    {
+        $allIds = Student::pluck('id')->toArray();
+        if (count($this->selectedStudents) === count($allIds)) {
+            $this->selectedStudents = [];
+        } else {
+            $this->selectedStudents = $allIds;
+        }
+    }
+
+    public function bulkPrint(): void
+    {
+        if (empty($this->selectedStudents)) {
+            $this->dispatch('notify', ['variant' => 'warning', 'message' => 'Seleccione al menos un alumno.']);
+            return;
+        }
+
+        $this->dispatch('bulk-print', [
+            'ids' => $this->selectedStudents,
+            'scale' => $this->scale,
+        ]);
+    }
 
     // Student Modal State
     public bool $showStudentModal = false;
     public string $studentId = '';
+    public string $previewStudentId = '';
     
     // Core Student Fields
     public string $name = '';
@@ -33,6 +69,8 @@ new class extends Component {
     public string $turn = 'MATUTINO';
     public int $siblingsCount = 0;
     public int $birthOrder = 1;
+    public $photo;
+    public ?string $currentPhotoUrl = null;
     
     // Academic Fields
     public string $classGroupId = '';
@@ -84,7 +122,7 @@ new class extends Component {
     {
         if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
-        $this->reset(['studentId', 'name', 'curp', 'birthDate', 'turn', 'siblingsCount', 'birthOrder', 'classGroupId', 'address', 'allergies', 'medicalConditions', 'emergencyContact', 'otherContact', 'motherName', 'fatherName', 'motherWorkplace', 'fatherWorkplace']);
+        $this->reset(['studentId', 'name', 'curp', 'birthDate', 'turn', 'siblingsCount', 'birthOrder', 'classGroupId', 'address', 'allergies', 'medicalConditions', 'emergencyContact', 'otherContact', 'motherName', 'fatherName', 'motherWorkplace', 'fatherWorkplace', 'photo', 'currentPhotoUrl']);
         $this->showStudentModal = true;
     }
 
@@ -199,6 +237,8 @@ new class extends Component {
         $this->historyItems = $items->sortByDesc('date')->values()->toArray();
     }
 
+
+
     public function editStudent(string $id): void
     {
         if (!auth()->user()->isViewStaff()) abort(403);
@@ -227,10 +267,15 @@ new class extends Component {
             $this->fatherWorkplace = $student->pii->father_workplace_encrypted ?? '';
         }
 
+        $this->photo = null;
+        $this->currentPhotoUrl = $student->photo_url;
+
         $this->parentSearch = '';
         $this->selectedParentId = '';
         $this->showStudentModal = true;
     }
+
+
 
     protected array $rules = [
         'name' => 'required|string|max:100',
@@ -243,8 +288,8 @@ new class extends Component {
         // 'emergency_contact_name' => 'required|string|max:100', // Not present in current properties
         // 'grade' => 'required', // Grade is derived from classGroup, not directly set
         'classGroupId' => 'required|exists:class_groups,id', // Matches property
-        // 'status' => 'required|in:ACTIVE,INACTIVE,GRADUATED,TRANSFERRED', // Status is set by association, not directly
         'turn' => 'required|in:MATUTINO,VESPERTINO',
+        'photo' => 'nullable|image|max:2048', // 2MB Max
     ];
 
     protected array $messages = [
@@ -259,6 +304,8 @@ new class extends Component {
         // 'grade.required' => 'El grado es obligatorio.',
         'classGroupId.required' => 'El grupo es obligatorio.',
         'turn.required' => 'El turno es obligatorio.',
+        'photo.image' => 'El archivo debe ser una imagen.',
+        'photo.max' => 'La imagen no debe pesar más de 2MB.',
     ];
 
     public function rules(): array
@@ -305,6 +352,11 @@ new class extends Component {
                 'turn' => $this->turn,
             ]);
             $this->studentId = $student->id; // Set ID for new student so parents can be added
+        }
+
+        if ($this->photo) {
+            $path = $this->photo->store('students/photos', 'public');
+            $student->update(['photo_path' => $path]);
         }
 
         // Handle PII
@@ -511,8 +563,12 @@ new class extends Component {
             <div wire:key="std-mob-{{ $student->id }}" class="p-4 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm relative">
                 <div class="flex justify-between items-start mb-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0">
-                            <flux:icon icon="user" class="text-indigo-600 dark:text-indigo-400" variant="solid" />
+                        <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700">
+                            @if($student->photo_url)
+                                <img src="{{ $student->photo_url }}" class="w-full h-full object-cover">
+                            @else
+                                <flux:icon icon="user" class="text-indigo-600 dark:text-indigo-400" variant="solid" />
+                            @endif
                         </div>
                         <div class="flex flex-col">
                             <flux:text size="sm" class="font-bold uppercase">{{ $student->name }}</flux:text>
@@ -528,9 +584,25 @@ new class extends Component {
                             {{ $student->turn }}
                         </flux:badge>
                     </div>
+
+                    @if($bulkMode)
+                        <div class="ml-4 pt-1">
+                            <flux:checkbox wire:model.live="selectedStudents" value="{{ $student->id }}" />
+                        </div>
+                    @endif
                 </div>
+                
 
                 <div class="flex justify-end gap-1 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                                    @if(auth()->user()->isAdmin())
+                                        <flux:dropdown>
+                                            <flux:button variant="ghost" size="xs" icon="identification" title="Opciones de Credencial" />
+                                            <flux:menu>
+                                                <flux:menu.item icon="printer" x-on:click.stop="window.open('{{ route('students.credential', $student->id) }}', '_blank')">Imprimir esta credencial</flux:menu.item>
+                                                <flux:menu.item icon="list-bullet" wire:click="$toggle('bulkMode')" x-on:click.stop="$wire.selectedStudents = ['{{ $student->id }}']">Selección múltiple</flux:menu.item>
+                                            </flux:menu>
+                                        </flux:dropdown>
+                                    @endif
                     <flux:button variant="ghost" size="xs" icon="eye" wire:click="viewHistory('{{ $student->id }}')" title="Ver historial" />
                     @if(auth()->user()->isViewStaff())
                         {{-- Mobile quick actions --}}
@@ -570,6 +642,11 @@ new class extends Component {
                 <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-zinc-200 dark:border-zinc-700 text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                        @if($bulkMode)
+                        <th class="py-3 px-2 w-10">
+                            <flux:checkbox wire:click="selectAll" :checked="count($selectedStudents) > 0 && count($selectedStudents) === \App\Models\Student::count()" />
+                        </th>
+                        @endif
                         <th class="py-3 px-2 font-semibold">Alumno</th>
                         <th class="py-3 px-2 font-semibold text-center">Grado / Grupo</th>
                         <th class="py-3 px-2 font-semibold text-center">Turno</th>
@@ -580,15 +657,28 @@ new class extends Component {
                     @forelse ($students as $student)
                         <tr wire:key="std-desk-{{ $student->id }}" 
                         @if(auth()->user()->isViewStaff())
-                            x-on:click="select($event)" data-id="{{ $student->id }}" data-name="{{ $student->name }}" class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                            class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors cursor-pointer {{ in_array($student->id, $selectedStudents) ? 'bg-indigo-50 dark:bg-indigo-900/10' : '' }}"
                         @else
                             class="hover:bg-zinc-800/5 dark:hover:bg-white/5 transition-colors"
                         @endif
                         >
-                            <td class="py-4 px-2">
+                            @if($bulkMode)
+                            <td class="py-4 px-2" x-on:click.stop>
+                                <flux:checkbox wire:model.live="selectedStudents" value="{{ $student->id }}" />
+                            </td>
+                            @endif
+                            <td class="py-4 px-2"
+                                @if(auth()->user()->isViewStaff())
+                                    x-on:click="select($event)" data-id="{{ $student->id }}" data-name="{{ $student->name }}"
+                                @endif
+                            >
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                                        <flux:icon icon="user" class="text-indigo-600 dark:text-indigo-400" variant="solid" />
+                                    <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center overflow-hidden">
+                                        @if($student->photo_url)
+                                            <img src="{{ $student->photo_url }}" class="w-full h-full object-cover">
+                                        @else
+                                            <flux:icon icon="user" class="text-indigo-600 dark:text-indigo-400" variant="solid" />
+                                        @endif
                                     </div>
                                     <div>
                                         <div class="font-bold text-zinc-900 dark:text-white uppercase">{{ $student->name }}</div>
@@ -612,6 +702,15 @@ new class extends Component {
                             </td>
                             <td class="py-4 px-2 text-right">
                                 <div class="flex justify-end gap-1">
+                                    @if(auth()->user()->isAdmin())
+                                        <flux:dropdown>
+                                            <flux:button variant="ghost" size="sm" icon="identification" title="Opciones de Credencial" />
+                                            <flux:menu>
+                                                <flux:menu.item icon="printer" x-on:click.stop="window.open('{{ route('students.credential', $student->id) }}', '_blank')">Imprimir esta credencial</flux:menu.item>
+                                                <flux:menu.item icon="list-bullet" wire:click="$toggle('bulkMode')" x-on:click.stop="$wire.selectedStudents = ['{{ $student->id }}']">Selección múltiple</flux:menu.item>
+                                            </flux:menu>
+                                        </flux:dropdown>
+                                    @endif
                                     <flux:button x-on:click.stop variant="ghost" size="sm" icon="eye" wire:click="viewHistory('{{ $student->id }}')" title="Ver historial" />
                                     @if(auth()->user()->isViewStaff())
                                         <flux:button x-on:click.stop variant="ghost" size="sm" icon="pencil" wire:click="editStudent('{{ $student->id }}')" title="Editar alumno" />
@@ -653,32 +752,59 @@ new class extends Component {
                     <!-- Section: Basic Info -->
                     <div class="space-y-4">
                         <flux:separator text="Información Básica" />
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <flux:input 
-                                label="Nombre Completo" 
-                                wire:model="name" 
-                                placeholder="Ej. JUAN PEREZ LOPEZ" 
-                                class="uppercase md:col-span-1"
-                                x-on:input="name = $event.target.value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z ]/g, '')"
-                            />
-                            <flux:input 
-                                label="CURP" 
-                                wire:model="curp" 
-                                placeholder="ABCD010101XXXXX000" 
-                                class="uppercase"
-                                x-on:input="curp = $event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 18)"
-                            />
-                            <flux:select label="Turno" wire:model="turn">
-                                <option value="MATUTINO">Matutino</option>
-                                <option value="VESPERTINO">Vespertino</option>
-                            </flux:select>
-                            <flux:select label="Grupo / Grado" wire:model="classGroupId">
-                                <option value="">Seleccione grupo...</option>
-                                @foreach($classGroups as $group)
-                                    <option value="{{ $group->id }}">{{ $group->grade }} {{ $group->section }}</option>
-                                @endforeach
-                            </flux:select>
+                        
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex flex-col items-center gap-2">
+                                <flux:label>Foto del Alumno</flux:label>
+                                <div class="w-32 h-40 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center overflow-hidden relative group">
+                                    @if($photo)
+                                        <img src="{{ $photo->temporaryUrl() }}" class="w-full h-full object-cover">
+                                    @elseif($currentPhotoUrl)
+                                        <img src="{{ $currentPhotoUrl }}" class="w-full h-full object-cover">
+                                    @else
+                                        <flux:icon icon="user" size="xl" class="text-zinc-300 dark:text-zinc-600" variant="solid" />
+                                    @endif
+
+                                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer" onclick="document.getElementById('student-photo-input').click()">
+                                        <flux:icon icon="pencil" class="text-white" />
+                                    </div>
+                                    
+                                    <div wire:loading wire:target="photo" class="absolute inset-0 bg-white/80 dark:bg-zinc-900/80 flex items-center justify-center">
+                                        <flux:icon icon="arrow-path" class="animate-spin" />
+                                    </div>
+                                </div>
+                                <input type="file" id="student-photo-input" class="hidden" wire:model="photo" accept="image/*">
+                                <flux:error name="photo" />
+                            </div>
+
+                            <div class="grow grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <flux:input 
+                                    label="Nombre Completo" 
+                                    wire:model="name" 
+                                    placeholder="Ej. JUAN PEREZ LOPEZ" 
+                                    class="uppercase md:col-span-2"
+                                    x-on:input="name = $event.target.value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z ]/g, '')"
+                                />
+                                <flux:input 
+                                    label="CURP" 
+                                    wire:model="curp" 
+                                    placeholder="ABCD010101XXXXX000" 
+                                    class="uppercase"
+                                    x-on:input="curp = $event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 18)"
+                                />
+                                <flux:select label="Turno" wire:model="turn">
+                                    <option value="MATUTINO">Matutino</option>
+                                    <option value="VESPERTINO">Vespertino</option>
+                                </flux:select>
+                                <flux:select label="Grupo / Grado" wire:model="classGroupId" class="md:col-span-2">
+                                    <option value="">Seleccione grupo...</option>
+                                    @foreach($classGroups as $group)
+                                        <option value="{{ $group->id }}">{{ $group->grade }} {{ $group->section }}</option>
+                                    @endforeach
+                                </flux:select>
+                            </div>
                         </div>
+                    </div>
                     <!-- Section: Contact Info -->
                     <div class="space-y-4">
                         <flux:separator text="Información de Contacto" />
@@ -800,7 +926,7 @@ new class extends Component {
                 </form>
             </div>
         </flux:modal>
-    @endcan
+    @endif
 
     <!-- Student History Modal -->
     <flux:modal wire:model="showHistoryModal" class="w-full max-w-3xl">
@@ -972,6 +1098,67 @@ new class extends Component {
             <button type="button" class="w-full text-left px-3 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-black rounded" x-on:click="goToCitation()">Citatorio</button>
         </div>
     </div>
+
+    @if(auth()->user()->isAdmin())
+        <!-- Bulk Actions Bar -->
+        <div 
+            x-show="$wire.selectedStudents.length > 0"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-10"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4"
+        >
+            <div class="bg-zinc-900 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between gap-6 border border-zinc-800">
+                <div class="flex items-center gap-4 border-r border-zinc-800 pr-6">
+                    <flux:badge color="blue" size="sm" variant="solid" class="rounded-full h-8 w-8 flex items-center justify-center p-0">
+                        <span x-text="$wire.selectedStudents.length"></span>
+                    </flux:badge>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-zinc-400 font-bold uppercase shrink-0">Seleccionados</span>
+                        <span class="text-sm">Imprimir</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 grow">
+                    <div class="flex flex-col grow">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] text-zinc-500 uppercase font-black">Escala</span>
+                            <span class="text-xs font-mono" x-text="Math.round($wire.scale * 100) + '%'"></span>
+                        </div>
+                        <input type="range" wire:model.live="scale" min="0.5" max="2.0" step="0.1" class="w-full h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                    </div>
+
+                    <flux:button 
+                        variant="primary" 
+                        icon="printer" 
+                        type="submit"
+                        form="bulk-print-form"
+                    >
+                        Generar PDF
+                    </flux:button>
+                    
+                    <flux:button 
+                        variant="ghost" 
+                        size="sm" 
+                        icon="x-mark" 
+                        wire:click="exitBulkMode"
+                        title="Cancelar selección"
+                    />
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(auth()->user()->isAdmin())
+        <!-- Hidden form for bulk printing (native submission to bypass popup blockers) -->
+        <form id="bulk-print-form" method="POST" action="{{ route('students.credential.bulk') }}" target="_blank" class="hidden">
+            @csrf
+            @foreach($selectedStudents as $id)
+                <input type="hidden" name="ids[]" value="{{ $id }}">
+            @endforeach
+            <input type="hidden" name="scale" value="{{ $scale }}">
+        </form>
+    @endif
 </div>
 
 <script>
