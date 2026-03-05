@@ -27,6 +27,7 @@ class Student extends Model
         'turn',
         'siblings_count',
         'birth_order',
+        'photo_path',
     ];
 
     protected function casts(): array
@@ -83,5 +84,14 @@ class Student extends Model
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function photoUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn () => $this->photo_path
+                ? \Illuminate\Support\Facades\Storage::url($this->photo_path)
+                : null
+        );
     }
 }
