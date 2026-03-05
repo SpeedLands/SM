@@ -43,6 +43,7 @@ new class extends Component {
             'tutorial-a-inscribe' => 'Proceso de Inscripción de Alumnos',
             'tutorial-a-import' => 'Guía de Importación Masiva de Datos',
             'tutorial-a-export' => 'Exportación de Listas y Reportes',
+            'tutorial-a-promote' => 'Guía para Promover Alumnos de Ciclo',
             'tutorial-c-install' => 'Cómo Instalar la Aplicación (PWA)',
             'tutorial-c-notifications' => 'Activar Notificaciones Push',
         ][$name] ?? 'Tutorial';
@@ -99,6 +100,33 @@ new class extends Component {
                 ['id' => 'editar', 'title' => '3. Editar ciclo escolar'],
                 ['id' => 'salones', 'title' => '4. Gestionar grupos'],
                 ['id' => 'borrar', 'title' => '5. Borrar ciclo escolar'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for promote students tutorial
+        if ($name === 'tutorial-a-promote') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'acceder', 'title' => '1. Acceder al apartado'],
+                ['id' => 'configurar', 'title' => '2. Configurar origen y destino'],
+                ['id' => 'promover', 'title' => '3. Promover alumnos'],
+                ['id' => 'verificar', 'title' => '4. Verificar el cambio'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for import data tutorial
+        if ($name === 'tutorial-a-import') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'acceder', 'title' => '1. Acceder al apartado'],
+                ['id' => 'cargar', 'title' => '2. Cargar archivo'],
+                ['id' => 'configurar', 'title' => '3. Configuración'],
+                ['id' => 'previsualizar', 'title' => '4. Previsualizar datos'],
+                ['id' => 'resultados', 'title' => '5. Resultados'],
                 ['id' => 'beneficios', 'title' => 'Tips de experto'],
             ];
         }
@@ -230,12 +258,7 @@ new class extends Component {
                 'delete' => '<h2 id="eliminar">Baja de Alumno</h2><p>El sistema permite dar de baja a un alumno, lo cual inhabilita su acceso y detiene las notificaciones a los padres.</p>'
             ],
             'tutorial-a-import' => [
-                'desc' => 'Carga masiva de alumnos, padres y grupos mediante archivos de Excel.',
-                'req' => 'Archivo en formato .xlsx siguiendo la plantilla oficial.',
-                'steps' => '<li>Sube tu archivo en el módulo de "Importación".</li><li>Valida que las columnas coincidan con el sistema.</li><li>Procesa la carga y revisa el log de errores si los hubiera.</li>',
-                'tip' => 'Limpia los datos de duplicados en el Excel antes de subirlo para evitar errores de validación.',
-                'edit' => '',
-                'delete' => ''
+                'custom' => true,
             ],
             'tutorial-a-export' => [
                 'desc' => 'Genera reportes detallados en Excel de cualquier módulo del sistema.',
@@ -246,6 +269,9 @@ new class extends Component {
                 'delete' => ''
             ],
             'tutorial-a-users' => [
+                'custom' => true,
+            ],
+            'tutorial-a-promote' => [
                 'custom' => true,
             ],
             'tutorial-c-notifications' => [
@@ -270,6 +296,8 @@ new class extends Component {
             if ($name === 'tutorial-a-users') return $this->getUserManagementContent();
             if ($name === 'tutorial-a-regulations') return $this->getRegulationContent();
             if ($name === 'tutorial-a-cycles') return $this->getCyclesContent();
+            if ($name === 'tutorial-a-promote') return $this->getPromoteContent();
+            if ($name === 'tutorial-a-import') return $this->getImportContent();
         }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
@@ -822,6 +850,265 @@ new class extends Component {
             </div>
         ";
     }
+    public function getPromoteContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Promover Alumnos</strong> permite cambiar de grupo o ciclo escolar a los alumnos de forma masiva o individual. Esta herramienta es esencial al finalizar un ciclo escolar para trasladar a los estudiantes a su nuevo grado y sección.</p>
+
+            {$img('promoverAlumnos/menu.png', 'Vista general del apartado de Promover Alumnos en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener <strong>ciclos escolares</strong> y <strong>grupos</strong> previamente creados en el apartado de Ciclos Escolares.</li>
+                <li>Los alumnos deben estar inscritos y vinculados a un grupo del ciclo actual.</li>
+            </ul>
+
+            <h2 id='acceder'>1. Acceder al apartado</h2>
+            <p>Para iniciar el proceso de promoción de alumnos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Promover Alumnos\"</strong> que se encuentra en el menú lateral izquierdo. Con esta acción, visualizará el apartado de Promover Alumnos.')}
+
+            <h2 id='configurar'>2. Configurar origen y destino</h2>
+            <p>El apartado cuenta con dos recuadros principales que deberá configurar:</p>
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Origen</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el <strong>ciclo actual</strong> y el <strong>grupo o salón</strong> a promover. Aquí se mostrarán los alumnos vinculados a dicho grupo. Tiene la opción de seleccionar alumnos <strong>individualmente</strong> o de forma <strong>general</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Destino</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el <strong>ciclo al que desea promover</strong> y el <strong>grupo o salón destinado</strong> donde se trasladarán los alumnos.</span>
+                </div>
+            </div>
+
+            {$img('promoverAlumnos/recuadroSinSeleccionarAlumnos.png', 'Recuadros de Origen y Destino con los campos a configurar')}
+
+            {$important('Los ciclos escolares y los grupos deberán haber sido creados <strong>previamente</strong> en el apartado de Ciclos Escolares. Si no visualiza opciones, verifique que existan ciclos y grupos registrados.')}
+
+            {$step(1, 'En el recuadro <strong>Origen</strong>, seleccione el ciclo escolar actual y el grupo del que provienen los alumnos.')}
+
+            {$step(2, 'En el recuadro <strong>Destino</strong>, seleccione el ciclo escolar destino y el grupo al que serán promovidos.')}
+
+            {$step(3, 'Seleccione los alumnos que desea promover. Puede seleccionarlos <strong>individualmente</strong> marcando cada casilla, o usar la opción de <strong>selección general</strong> para elegir a todos.')}
+
+            {$img('promoverAlumnos/recuadroAlumnoSeleccionado.png', 'Alumnos seleccionados listos para ser promovidos')}
+
+            <h2 id='promover'>3. Promover alumnos</h2>
+            <p>Una vez configurados los campos y seleccionados los alumnos:</p>
+
+            {$step(1, 'Presione el botón <strong>\"Promover Alumnos Seleccionados\"</strong>. Esto cambiará de grupo a los alumnos seleccionados, trasladándolos al ciclo y grupo destino.')}
+
+            {$important('Esta acción moverá a los alumnos del grupo de origen al grupo de destino. Asegúrese de que los datos seleccionados sean correctos antes de confirmar.')}
+
+            <h2 id='verificar'>4. Verificar el cambio</h2>
+            <p>Para confirmar que la promoción se realizó correctamente:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Alumnos\"</strong> en el menú lateral.')}
+
+            {$step(2, 'Seleccione la casilla <strong>\"Solo mostrar inscritos en ciclo actual\"</strong> para visualizar los alumnos que ahora pertenecen al nuevo ciclo y grupo.')}
+
+            {$img('promoverAlumnos/tabla.png', 'Apartado de Promover Alumnos con los recuadros de Origen y Destino')}
+
+            {$img('promoverAlumnos/resultado.png', 'Apartado de Alumnos mostrando los alumnos promovidos en el nuevo ciclo')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Cree primero los ciclos y grupos</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Antes de promover, asegúrese de que el <strong>ciclo destino</strong> y sus <strong>grupos</strong> ya estén configurados en el apartado de Ciclos Escolares.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Promueva por grupos completos</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use la <strong>selección general</strong> para agilizar el proceso cuando todo el grupo avanza al mismo grado y sección.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Verifique siempre el resultado</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Después de promover, vaya al apartado de <strong>Alumnos</strong> y use el filtro de ciclo actual para confirmar que los alumnos aparecen en el grupo correcto.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+    public function getImportContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Importar Datos</strong> permite realizar cargas masivas de información a la plataforma mediante archivos de Excel. Puede importar datos de <strong>maestros/administrativos</strong>, <strong>padres de familia</strong> y <strong>alumnos</strong>, agilizando significativamente el proceso de registro al inicio de cada ciclo escolar.</p>
+
+            {$img('importarDatos/menu.png', 'Vista general del apartado de Importar Datos en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener un archivo Excel con extensión <strong>.xlsx</strong> o <strong>.xls</strong> con los datos a importar.</li>
+                <li>Verificar que los datos del archivo no contengan duplicados.</li>
+            </ul>
+
+            <h2 id='acceder'>1. Acceder al apartado</h2>
+            <p>Para iniciar el proceso de importación:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Importar Datos\"</strong> que se encuentra en el menú lateral izquierdo. Con esta acción, visualizará el apartado de Importar Datos.')}
+
+            <h2 id='cargar'>2. Cargar archivo</h2>
+            <p>El primer paso del proceso de importación es seleccionar el archivo Excel:</p>
+
+            {$step(1, 'En la sección <strong>\"Cargar archivo\"</strong>, seleccione el archivo Excel con extensión <strong>.xlsx</strong> o <strong>.xls</strong> que desea importar.')}
+
+            {$img('importarDatos/seleecionarArchivo.png', 'Sección para cargar el archivo Excel a importar')}
+
+            {$step(2, 'Una vez cargado, se mostrará un indicador de carga mientras el sistema procesa el archivo.')}
+
+            {$important('Asegúrese de que el archivo Excel tenga el formato correcto y que las columnas coincidan con los datos esperados por el sistema.')}
+
+            <h2 id='configurar'>3. Configuración</h2>
+            <p>Una vez cargado el archivo, deberá configurar qué información desea importar:</p>
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Tipo de Datos</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indique qué tipo de datos desea importar. Hay <strong>3 tipos</strong>: <strong>Maestros / Admins</strong>, <strong>Padres de Familia</strong> y <strong>Alumnos</strong>. Estos corresponden a los roles del apartado de Gestión de Usuarios y Alumnos.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Hoja de Excel</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione qué <strong>hoja del archivo Excel</strong> contiene los datos a importar.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Hoja de Padres</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>, exclusivo del tipo de dato <strong>\"Alumnos\"</strong>. Indique qué hoja del archivo Excel contiene los datos de los padres para vincularlos automáticamente con sus respectivos hijos.</span>
+                </div>
+            </div>
+
+            {$img('importarDatos/importarHojas.png', 'Campos de configuración para seleccionar tipo de datos y hojas del Excel')}
+
+            <h2 id='previsualizar'>4. Previsualizar datos</h2>
+            <p>Antes de confirmar la importación, el sistema le permite revisar los datos:</p>
+
+            {$step(1, 'En la sección <strong>\"Previsualizar\"</strong>, se mostrará una tabla con los datos contenidos en la hoja de Excel seleccionada. Verifique que la información sea correcta.')}
+
+            {$img('importarDatos/previsualizacion.png', 'Previsualización de los datos del archivo Excel antes de importar')}
+
+            {$step(2, 'Si los datos son correctos, presione el botón <strong>\"Importar Datos\"</strong>. Esto abrirá una ventana de confirmación.')}
+
+            {$step(3, 'Confirme la acción para iniciar el proceso de importación.')}
+
+            {$important('Revise cuidadosamente la previsualización antes de confirmar. Una vez importados, los datos se registrarán en el sistema.')}
+
+            <h2 id='resultados'>5. Resultados</h2>
+            <p>Una vez completada la importación, el sistema mostrará un resumen detallado con los siguientes datos:</p>
+
+            {$img('importarDatos/importacionExitosa.png', 'Pantalla de resultados después de la importación exitosa')}
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Alumnos</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Número de alumnos nuevos importados al sistema.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Padres</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Número de padres nuevos importados al sistema.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Vínculos</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Número de vínculos concretados entre alumnos y padres, así como el número de errores en la vinculación.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Casos Identificados</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Casos de vinculación donde algún alumno tiene vínculo familiar o tutorado con un <strong>docente de la institución</strong>, identificados automáticamente.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Acciones de Seguimiento</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Casos pendientes de concretarse, como falta de vinculación con un padre, madre u otro tutor.</span>
+                </div>
+            </div>
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Limpie los datos antes de importar</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Elimine <strong>duplicados</strong> y verifique el formato de los datos en el archivo Excel antes de subirlo. Esto evitará errores de validación durante la importación.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use la hoja de padres para alumnos</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Al importar <strong>Alumnos</strong>, aproveche el campo de <strong>Hoja de Padres</strong> para vincular automáticamente a los alumnos con sus tutores en un solo paso.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Revise las acciones de seguimiento</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Después de cada importación, revise los <strong>casos pendientes</strong> en la sección de resultados para completar manualmente las vinculaciones que no se concretaron.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>4</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Siempre previsualice antes de importar</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>La previsualización le permite detectar errores en los datos antes de que se registren. Tómese el tiempo de verificar que la información sea correcta.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
 }; ?>
 
 @section('title', 'Guía Escolar: Tutoriales y Ayuda Digital')
@@ -879,6 +1166,7 @@ new class extends Component {
                 <x-tutorial-card icon="user-plus" title="Inscripción Rápida" description="Registra nuevos alumnos y vincula a sus tutores." name="tutorial-a-inscribe" />
                 <x-tutorial-card icon="cloud-arrow-down" title="Importación Masiva" description="Carga masiva de datos mediante archivos Excel/CSV." name="tutorial-a-import" />
                 <x-tutorial-card icon="cloud-arrow-up" title="Exportación de Datos" description="Genera respaldos y listas en formatos exportables." name="tutorial-a-export" />
+                <x-tutorial-card icon="arrow-up-circle" title="Promover Alumnos" description="Cambia de grupo o ciclo a los alumnos de forma masiva." name="tutorial-a-promote" />
             </div>
             @endif
             @endcan
