@@ -40,10 +40,11 @@ new class extends Component {
             'tutorial-a-users' => 'Panel de Administración de Usuarios',
             'tutorial-a-cycles' => 'Configuración de Ciclos Escolares',
             'tutorial-a-regulations' => 'Edición del Reglamento Institucional',
-            'tutorial-a-inscribe' => 'Proceso de Inscripción de Alumnos',
+            'tutorial-a-inscribe' => 'Gestión del Apartado de Alumnos',
             'tutorial-a-import' => 'Guía de Importación Masiva de Datos',
             'tutorial-a-export' => 'Exportación de Listas y Reportes',
             'tutorial-a-promote' => 'Guía para Promover Alumnos de Ciclo',
+            'tutorial-a-report-types' => 'Gestión de Tipos de Reportes',
             'tutorial-c-install' => 'Cómo Instalar la Aplicación (PWA)',
             'tutorial-c-notifications' => 'Activar Notificaciones Push',
         ][$name] ?? 'Tutorial';
@@ -172,6 +173,45 @@ new class extends Component {
             ];
         }
 
+        // Custom sections for exams tutorial
+        if ($name === 'tutorial-d-exams') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'programar', 'title' => '1. Programar examen'],
+                ['id' => 'buscar', 'title' => '2. Buscar exámenes'],
+                ['id' => 'borrar', 'title' => '3. Borrar examen'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for report types tutorial
+        if ($name === 'tutorial-a-report-types') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'acceder', 'title' => '1. Acceder al apartado'],
+                ['id' => 'agregar', 'title' => '2. Añadir tipo de reporte'],
+                ['id' => 'editar', 'title' => '3. Modificar tipo de reporte'],
+                ['id' => 'borrar', 'title' => '4. Eliminar tipo de reporte'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for students tutorial
+        if ($name === 'tutorial-a-inscribe') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'inscribir', 'title' => '1. Inscribir alumno'],
+                ['id' => 'vincular', 'title' => '2. Vincular padres'],
+                ['id' => 'buscar', 'title' => '3. Buscar alumnos'],
+                ['id' => 'editar', 'title' => '4. Editar alumno'],
+                ['id' => 'borrar', 'title' => '5. Borrar alumno'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
         $sections = [
             ['id' => 'intro', 'title' => 'Introducción'],
             ['id' => 'requisitos', 'title' => 'Requisitos'],
@@ -291,12 +331,7 @@ new class extends Component {
                 'custom' => true,
             ],
             'tutorial-a-inscribe' => [
-                'desc' => 'Proceso para registrar nuevos alumnos y vincularlos con sus tutores en el sistema.',
-                'req' => 'Documentación física ya validada.',
-                'steps' => '<li>Ve a "Alumnos" -> "Nueva Inscripción".</li><li>Completa los datos personales y académicos.</li><li>Busca y vincula al padre mediante su correo electrónico.</li>',
-                'tip' => 'Vincular correctamente al padre es crucial para que reciba las notificaciones.',
-                'edit' => '<h2 id="editar">Editar Datos de Alumno</h2><p>Cambia el grupo o grado si hubo una promoción o ajuste administrativo.</p>',
-                'delete' => '<h2 id="eliminar">Baja de Alumno</h2><p>El sistema permite dar de baja a un alumno, lo cual inhabilita su acceso y detiene las notificaciones a los padres.</p>'
+                'custom' => true,
             ],
             'tutorial-a-import' => [
                 'custom' => true,
@@ -322,6 +357,12 @@ new class extends Component {
                 'custom' => true,
             ],
             'tutorial-d-citations' => [
+                'custom' => true,
+            ],
+            'tutorial-d-exams' => [
+                'custom' => true,
+            ],
+            'tutorial-a-report-types' => [
                 'custom' => true,
             ],
             'tutorial-c-notifications' => [
@@ -351,6 +392,9 @@ new class extends Component {
             if ($name === 'tutorial-d-community') return $this->getCommunityServiceContent();
             if ($name === 'tutorial-d-notices') return $this->getNoticesContent();
             if ($name === 'tutorial-d-citations') return $this->getCitationsContent();
+            if ($name === 'tutorial-d-exams') return $this->getExamsContent();
+            if ($name === 'tutorial-a-report-types') return $this->getReportTypesContent();
+            if ($name === 'tutorial-a-inscribe') return $this->getStudentsContent();
         }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
@@ -1739,6 +1783,490 @@ new class extends Component {
             </div>
         ";
     }
+
+    public function getExamsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Exámenes</strong> permite programar, buscar y eliminar evaluaciones para que padres y alumnos puedan visualizar las fechas de sus exámenes. Los exámenes programados también se reflejan en el calendario general de la plataforma.</p>
+
+            {$img('examenes/menu.png', 'Vista general del apartado de Exámenes en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Docente</strong> o <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener un ciclo escolar activo con grados y grupos configurados.</li>
+                <li>Conocer la materia, grado, grupo y trimestre del examen a programar.</li>
+            </ul>
+
+            <h2 id='programar'>1. Programar examen</h2>
+            <p>Para agendar un nuevo examen:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Exámenes\"</strong> que se encuentra en el menú lateral izquierdo.')}
+
+            {$step(2, 'Presione el botón <strong>\"Programar Examen\"</strong>. Esto abrirá un recuadro con campos a llenar.')}
+
+            {$img('examenes/botonAgregarExamen.png', 'Botón Programar Examen para iniciar el proceso')}
+            {$img('examenes/modalAgregarExamen.png', 'Formulario vacío para programar un nuevo examen')}
+
+            {$step(3, 'Complete los campos del formulario:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Nombre de la Materia</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Coloque el nombre de la materia en la que se asignará el examen.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el grado al que se le aplicará el examen.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el grupo o sección al que se le aplicará el examen.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Trimestre</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el trimestre al que corresponde el examen.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Fecha del Examen</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica la fecha en la que se aplicará el examen. Se asigna por defecto la fecha actual.</span>
+                </div>
+            </div>
+
+            {$img('examenes/modalAgregarExamenLLeno.png', 'Formulario completado con los datos del examen')}
+
+            {$step(4, 'Presione el botón <strong>\"Guardar Examen\"</strong>. El examen se verá reflejado en el tablero.')}
+
+            {$img('examenes/examenAgregado.png', 'Nuevo examen programado en el tablero de exámenes')}
+
+            <h2 id='buscar'>2. Buscar exámenes</h2>
+            <p>La plataforma ofrece filtros para localizar exámenes programados rápidamente.</p>
+
+            {$step(1, 'En el apartado de Exámenes, ubique los campos de filtrado en la parte superior del tablero.')}
+
+            {$img('examenes/camposFiltrarExamenes.png', 'Campos de filtrado de exámenes')}
+
+            {$step(2, 'Utilice los filtros disponibles:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Trimestre</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre exámenes por trimestre: <strong>Todos los trimestres</strong>, <strong>1° Trimestre</strong>, <strong>2° Trimestre</strong> o <strong>3° Trimestre</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre exámenes por grado. Los grados se generan a partir del ciclo escolar activo.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre exámenes por grupo o sección. Los grupos se generan a partir del ciclo escolar activo.</span>
+                </div>
+            </div>
+
+            {$img('examenes/campoFiltradoTrimestre.png', 'Resultado al filtrar exámenes por trimestre')}
+            {$img('examenes/campoFiltradoGrado.png', 'Resultado al filtrar exámenes por grado')}
+            {$img('examenes/campoFiltradoSeccion.png', 'Resultado al filtrar exámenes por grupo o sección')}
+
+            <h2 id='borrar'>3. Borrar examen</h2>
+            <p>Para eliminar un examen programado:</p>
+
+            {$step(1, 'En el tablero de exámenes, localice el examen a eliminar.')}
+
+            {$img('examenes/tableroBorrarExamen.png', 'Tablero de exámenes con el registro a eliminar')}
+
+            {$step(2, 'Pase el cursor por encima del examen y presione el ícono de <strong>\"Basura\"</strong>. Se abrirá un cuadro de confirmación.')}
+
+            {$img('examenes/examenIconoBasura.png', 'Ícono de basura visible al pasar el cursor sobre el examen')}
+            {$img('examenes/modalEliminarExamen.png', 'Cuadro de confirmación para eliminar el examen')}
+
+            {$step(3, 'Presione el botón <strong>\"Eliminar\"</strong> para confirmar. El examen será eliminado del tablero.')}
+
+            {$img('examenes/tableroExamenesBorrados.png', 'Tablero de exámenes tras eliminar el registro')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Programe los exámenes con anticipación</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Agende las evaluaciones con suficiente tiempo de antelación para que padres y alumnos puedan prepararse. Los exámenes se reflejan en el calendario general.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use los filtros para organizar por trimestre</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Filtre por trimestre para tener una vista clara de las evaluaciones pendientes en cada periodo. Combine con filtros de grado y grupo para mayor precisión.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Sea específico con el nombre de la materia</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use nombres claros y consistentes para las materias (ej. \"Matemáticas\", \"Español\") para que padres y alumnos identifiquen fácilmente cada evaluación.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getReportTypesContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Tipos de Reportes</strong> permite al administrador gestionar el catálogo de infracciones disponibles al momento de generar un reporte disciplinario. Cada tipo de reporte cuenta con una descripción y un nivel de gravedad que los docentes utilizarán al registrar faltas.</p>
+
+            {$img('tiposReportes/visualizacionApartado.png', 'Vista general del apartado de Tipos de Reportes')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener un ciclo escolar activo.</li>
+                <li>Acceder primero al apartado de <strong>Reportes</strong> en el menú lateral.</li>
+            </ul>
+
+            <h2 id='acceder'>1. Acceder al apartado</h2>
+            <p>Para llegar al apartado de tipos de reportes:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Reportes\"</strong> en el menú lateral izquierdo.')}
+
+            {$step(2, 'Presione el botón <strong>\"Gestionar Tipos\"</strong>. Esto lo llevará al apartado de tipos de reportes.')}
+
+            {$img('tiposReportes/botonAccederApartado.png', 'Botón Gestionar Tipos en el apartado de Reportes')}
+
+            <h2 id='agregar'>2. Añadir nuevo tipo de reporte</h2>
+            <p>Para crear un nuevo tipo de infracción:</p>
+
+            {$step(1, 'En el apartado de tipos de reportes, presione el botón <strong>\"Nuevo tipo\"</strong>. Esto abrirá un recuadro con campos a llenar.')}
+
+            {$img('tiposReportes/botonAgregarTipoReporte.png', 'Botón Nuevo tipo para crear una infracción')}
+            {$img('tiposReportes/modalAgregarTipoReporte.png', 'Formulario vacío para crear un nuevo tipo de reporte')}
+
+            {$step(2, 'Complete los campos del formulario:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Descripción</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Coloque el título o detalles del nuevo tipo de reporte.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Gravedad</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Define qué tan grave es la falta. Cuenta con dos valores: <strong>Normal</strong> y <strong>Grave</strong>.</span>
+                </div>
+            </div>
+
+            {$img('tiposReportes/modalAgregarTipoReporteLLeno.png', 'Formulario completado con los datos del nuevo tipo de reporte')}
+
+            {$step(3, 'Presione el botón <strong>\"Guardar\"</strong>. El nuevo tipo se verá reflejado en la tabla.')}
+
+            {$img('tiposReportes/tipoReporteAgregado.png', 'Nuevo tipo de reporte registrado en la tabla')}
+
+            <h2 id='editar'>3. Modificar tipo de reporte</h2>
+            <p>Para editar un tipo de reporte existente:</p>
+
+            {$step(1, 'En la tabla de tipos de reportes, localice el registro a modificar.')}
+
+            {$img('tiposReportes/tipoReporteAModificar.png', 'Tabla de tipos de reportes con el ícono de lápiz para editar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Lápiz\"</strong> del registro. Esto abrirá un recuadro con los datos actuales.')}
+
+            {$img('tiposReportes/modalEditarReporte.png', 'Modal de edición con los datos actuales del tipo de reporte')}
+
+            {$step(3, 'Modifique los campos que necesite (Descripción y/o Gravedad).')}
+
+            {$img('tiposReportes/modalEditarNuevaInformacion.png', 'Modal de edición con la nueva información ingresada')}
+
+            {$step(4, 'Presione el botón <strong>\"Guardar\"</strong>. Los cambios se verán reflejados en la tabla.')}
+
+            {$img('tiposReportes/tipoReporteEditado.png', 'Tipo de reporte actualizado correctamente en la tabla')}
+
+            {$important('Al modificar la descripción de un tipo de reporte, los reportes existentes que tenían la antigua descripción cambiarán automáticamente al nuevo formato.')}
+
+            <h2 id='borrar'>4. Eliminar tipo de reporte</h2>
+            <p>Para eliminar un tipo de reporte del catálogo:</p>
+
+            {$step(1, 'En la tabla de tipos de reportes, localice el registro a eliminar.')}
+
+            {$img('tiposReportes/tipoReporteAEliminar.png', 'Tabla de tipos de reportes con el ícono de basura para eliminar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Basura\"</strong> del registro. Se abrirá un cuadro de confirmación.')}
+
+            {$img('tiposReportes/modalEliminar.png', 'Cuadro de confirmación para eliminar el tipo de reporte')}
+
+            {$important('En algunos casos el tipo de reporte tendrá <strong>bloqueada</strong> la opción de eliminar debido a que está vinculado a reportes existentes. Deberá eliminar previamente esos reportes para poder eliminar el tipo.')}
+
+            {$step(3, 'Presione el botón <strong>\"Eliminar\"</strong> para confirmar. El tipo será eliminado de la tabla.')}
+
+            {$img('tiposReportes/tipoReporteEliminado.png', 'Tipo de reporte eliminado correctamente de la tabla')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use descripciones claras y estandarizadas</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Defina las infracciones con títulos específicos para que los docentes las identifiquen fácilmente al momento de generar un reporte. Evite descripciones ambiguas.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Clasifique correctamente la gravedad</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Asigne <strong>\"Normal\"</strong> a faltas menores y <strong>\"Grave\"</strong> a conductas que requieran atención inmediata. Esto ayuda a los docentes a filtrar reportes y a los padres a entender la severidad.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Configure los tipos antes de iniciar el ciclo</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Defina todos los tipos de reporte al inicio del ciclo escolar. Así los docentes tendrán disponible el catálogo completo desde el primer día.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getStudentsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Alumnos</strong> permite inscribir, buscar, editar, eliminar y vincular padres de familia a los alumnos registrados en el sistema. Es el módulo central para la gestión del alumnado de la institución.</p>
+
+            {$img('alumnos/menu.png', 'Vista general del apartado de Alumnos en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener un ciclo escolar activo con <strong>grados y grupos</strong> creados previamente en el apartado de Ciclos Escolares.</li>
+                <li>Para vincular padres, estos deberán estar registrados previamente en el apartado de Gestión de Usuarios.</li>
+            </ul>
+
+            <h2 id='inscribir'>1. Inscribir nuevo alumno</h2>
+            <p>Para registrar un nuevo alumno en el sistema:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Alumnos\"</strong> en el menú lateral izquierdo.')}
+
+            {$step(2, 'Presione el botón <strong>\"Inscribir Alumno\"</strong>. Esto abrirá un recuadro con campos a llenar.')}
+
+            {$img('alumnos/botonAgregarAlumno.png', 'Botón Inscribir Alumno para iniciar el registro')}
+            {$img('alumnos/modalAgregarAlumnoVacio.png', 'Formulario vacío para inscribir un nuevo alumno')}
+
+            {$step(3, 'Complete los campos del formulario:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Nombre</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Coloque el nombre completo del alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Turno</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Por defecto <strong>Matutino</strong>. Puede cambiarse a Vespertino y viceversa.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo / Grado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Seleccione el grupo y grado del alumno. Estos deben haber sido creados previamente en Ciclos Escolares.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Dirección</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Dirección domiciliaria del alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Teléfonos de Contacto</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Teléfono de la casa del alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Otro Contacto / Parentesco</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Números de familiares cercanos. Para más de uno, sepárelos con el símbolo <strong>\"/\"</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Padres de Familia</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Al principio no se visualizarán. Primero deberá crear al alumno y después vincularlo con sus padres (ver sección siguiente).</span>
+                </div>
+            </div>
+
+            {$img('alumnos/modalAgregarAlumnoLLeno.png', 'Formulario completado con los datos del alumno')}
+
+            {$step(4, 'Presione el botón <strong>\"Inscribir Alumno\"</strong> para guardar. El alumno se verá reflejado en la tabla.')}
+
+            <h2 id='vincular'>2. Vincular padres de familia</h2>
+            <p>Una vez inscrito el alumno, podrá vincular a sus padres o tutores:</p>
+
+            {$step(1, 'El alumno ya debe estar inscrito y ser visible en la tabla de alumnos.')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Lápiz\"</strong> del alumno a vincular. Esto abrirá el recuadro de edición donde el apartado de Padres de Familia estará desbloqueado.')}
+
+            {$img('alumnos/alumnoAVincular.png', 'Alumno en la tabla listo para vincular padres')}
+            {$img('alumnos/modalVinculacionPadresVacio.png', 'Sección de Padres de Familia desbloqueada en el modal de edición')}
+
+            {$step(3, 'Coloque el nombre del padre de familia, elija el rol <strong>(Padre o Madre)</strong> y presione el botón <strong>\"Vincular\"</strong>.')}
+
+            {$important('Los nombres de los padres siguen el formato <strong>\"Padre de (nombre del alumno)\"</strong> y <strong>\"Madre de (nombre del alumno)\"</strong>, según el registro en Gestión de Usuarios.')}
+
+            {$img('alumnos/modalVinculacionPadresHecho.png', 'Padres de familia vinculados correctamente al alumno')}
+
+            {$step(4, 'Presione el botón <strong>\"Actualizar\"</strong> para finalizar la vinculación.')}
+
+            <h2 id='buscar'>3. Buscar alumnos</h2>
+            <p>La plataforma ofrece herramientas de búsqueda y filtrado para localizar alumnos rápidamente.</p>
+
+            {$step(1, 'En el apartado de Alumnos, ubique el recuadro <strong>\"Filtros\"</strong> en la parte superior.')}
+
+            {$img('alumnos/camposBuscarAlumnos.png', 'Campos de búsqueda y filtrado de alumnos')}
+
+            {$step(2, 'Utilice los filtros disponibles:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Buscar Alumno</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Permite buscar alumnos por <strong>nombre</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre alumnos por su <strong>grado</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre alumnos por su <strong>grupo o sección</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Solo mostrar inscritos en ciclo actual</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Switch que muestra únicamente alumnos inscritos en el ciclo activo. De lo contrario, muestra todos los alumnos registrados.</span>
+                </div>
+            </div>
+
+            {$img('alumnos/campoBuscarAlumnoNombre.png', 'Resultado al buscar un alumno por nombre')}
+            {$img('alumnos/camposBuscarGradoSeccion.png', 'Resultado al filtrar alumnos por grado y grupo')}
+            {$img('alumnos/switchMostrarAlumnosCicloActivo.png', 'Switch para mostrar solo alumnos del ciclo actual')}
+
+            <h2 id='editar'>4. Editar alumno</h2>
+            <p>Para modificar los datos de un alumno existente:</p>
+
+            {$step(1, 'En la tabla de alumnos, localice el registro a editar.')}
+
+            {$img('alumnos/alumnoAEditar.png', 'Alumno en la tabla con el ícono de lápiz para editar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Lápiz\"</strong> del registro. Esto abrirá el recuadro de edición con la información actual.')}
+
+            {$img('alumnos/modalEdicionAlumno.png', 'Modal de edición con los datos actuales del alumno')}
+
+            {$step(3, 'Modifique los campos que necesite. Cuenta con los mismos campos que al inscribir: Nombre, Turno, Grupo/Grado, Dirección, Teléfonos, Contactos y Padres de Familia.')}
+
+            {$img('alumnos/modalEdicionAlumnoNuevaInformacion.png', 'Modal de edición con la nueva información ingresada')}
+
+            {$step(4, 'Presione el botón <strong>\"Actualizar Registro\"</strong>. Los cambios se verán reflejados en la tabla.')}
+
+            {$img('alumnos/alumnoEditado.png', 'Alumno actualizado correctamente en la tabla')}
+
+            <h2 id='borrar'>5. Borrar alumno</h2>
+            <p>Para eliminar un alumno del sistema:</p>
+
+            {$step(1, 'En la tabla de alumnos, localice el registro a eliminar.')}
+
+            {$img('alumnos/alumnoAEliminar.png', 'Alumno en la tabla con el ícono de basura para eliminar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Basura\"</strong> del registro. Se abrirá un cuadro de confirmación.')}
+
+            {$img('alumnos/modalEliminar.png', 'Cuadro de confirmación para eliminar el alumno')}
+
+            {$important('En algunos casos el alumno tendrá <strong>bloqueada</strong> la opción de eliminar debido a que tiene vinculados reportes, servicios, citatorios, entre otros. Deberá eliminar previamente esa información para poder eliminarlo.')}
+
+            {$step(3, 'Presione el botón <strong>\"Eliminar Alumno\"</strong> para confirmar. El alumno será eliminado de la tabla.')}
+
+            {$img('alumnos/alumnoEliminado.png', 'Alumno eliminado correctamente de la tabla')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Vincule padres inmediatamente después de inscribir</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>La vinculación correcta es crucial para que los padres reciban notificaciones de reportes, citatorios y avisos. No deje esta tarea pendiente.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use el switch de ciclo activo para mantener orden</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Active <strong>\"Solo mostrar inscritos en ciclo actual\"</strong> para trabajar únicamente con alumnos vigentes y evitar confusiones con registros de ciclos anteriores.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Cree los ciclos y grupos antes de inscribir</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Los grados y grupos deben existir en el apartado de Ciclos Escolares antes de poder asignarlos a los alumnos. Planifique la estructura escolar primero.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
 }; ?>
 
 @section('title', 'Guía Escolar: Tutoriales y Ayuda Digital')
@@ -1793,10 +2321,11 @@ new class extends Component {
                 <x-tutorial-card icon="users" title="Gestión de Usuarios" description="Administra cuentas, restablece contraseñas y permisos." name="tutorial-a-users" />
                 <x-tutorial-card icon="arrow-path" title="Control de Ciclos" description="Configura periodos escolares y activa el ciclo vigente." name="tutorial-a-cycles" />
                 <x-tutorial-card icon="document-duplicate" title="Editar Reglamento" description="Actualiza la normativa institucional en tiempo real." name="tutorial-a-regulations" />
-                <x-tutorial-card icon="user-plus" title="Inscripción Rápida" description="Registra nuevos alumnos y vincula a sus tutores." name="tutorial-a-inscribe" />
+                <x-tutorial-card icon="user-plus" title="Gestión de Alumnos" description="Inscribe, busca, edita y vincula padres a tus alumnos." name="tutorial-a-inscribe" />
                 <x-tutorial-card icon="cloud-arrow-down" title="Importación Masiva" description="Carga masiva de datos mediante archivos Excel/CSV." name="tutorial-a-import" />
                 <x-tutorial-card icon="cloud-arrow-up" title="Exportación de Datos" description="Genera respaldos y listas en formatos exportables." name="tutorial-a-export" />
                 <x-tutorial-card icon="arrow-up-circle" title="Promover Alumnos" description="Cambia de grupo o ciclo a los alumnos de forma masiva." name="tutorial-a-promote" />
+                <x-tutorial-card icon="tag" title="Tipos de Reportes" description="Gestiona los tipos de infracciones y su nivel de gravedad." name="tutorial-a-report-types" />
             </div>
             @endif
             @endcan
