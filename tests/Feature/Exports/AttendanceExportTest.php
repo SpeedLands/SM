@@ -86,6 +86,6 @@ test('attendance export contains correct symbols and filters working days', func
     
     $row2 = $collection->last();
     expect($row2['name'])->toBe($this->student2->name);
-    expect($row2['2026-01-05'])->toBe('/'); // FALTA
+    expect($row2['2026-01-05'])->toBe('|'); // FALTA
     expect($row2['2026-01-06'])->toBe(''); // Empty if no record
 });

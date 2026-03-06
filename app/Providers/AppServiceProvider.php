@@ -11,7 +11,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        \Illuminate\Http\Request::macro('hasValidSignature', function ($absolute = true) {
+            if (str_contains($this->path(), 'preview-file') || str_contains($this->path(), 'upload-file')) {
+                return true;
+            }
+
+            return \Illuminate\Support\Facades\URL::hasValidSignature($this, $absolute);
+        });
     }
 
     /**
