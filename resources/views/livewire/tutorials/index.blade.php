@@ -32,7 +32,7 @@ new class extends Component {
             'tutorial-p-citations' => 'Atención Efectiva de Citatorios Docentes',
             'tutorial-p-exams' => 'Consulta de Calendario de Evaluaciones',
             'tutorial-p-community' => 'Seguimiento de Servicio Comunitario',
-            'tutorial-d-create-report' => 'Manual para el Registro de Reportes Disciplinarios',
+            'tutorial-d-create-report' => 'Gestión de Reportes Disciplinarios',
             'tutorial-d-exams' => 'Programación de Exámenes y Evaluaciones',
             'tutorial-d-citations' => 'Gestión de Citatorios para Padres',
             'tutorial-d-notices' => 'Publicación de Avisos Masivos',
@@ -212,6 +212,18 @@ new class extends Component {
             ];
         }
 
+        // Custom sections for reports tutorial
+        if ($name === 'tutorial-d-create-report') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'crear', 'title' => '1. Crear reporte'],
+                ['id' => 'buscar', 'title' => '2. Buscar reportes'],
+                ['id' => 'borrar', 'title' => '3. Borrar reporte'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
         $sections = [
             ['id' => 'intro', 'title' => 'Introducción'],
             ['id' => 'requisitos', 'title' => 'Requisitos'],
@@ -285,12 +297,7 @@ new class extends Component {
                 'edit' => '', 'delete' => ''
             ],
             'tutorial-d-create-report' => [
-                'desc' => 'Como docente, puedes documentar incidencias o méritos de tus alumnos.',
-                'req' => 'Estar asignado como docente de un grupo activo.',
-                'steps' => '<li>Haz clic en "Nuevo Reporte".</li><li>Selecciona al alumno y la falta.</li><li>Describe el evento y guarda.</li>',
-                'tip' => 'Usa descripciones claras y objetivas para evitar malentendidos.',
-                'edit' => '<h2 id="editar">Cómo Editar un Reporte</h2><p>Busca el reporte en tu historial, haz clic en el ícono de lápiz, modifica el texto y guarda. Nota: No puedes cambiar el alumno una vez creado.</p>',
-                'delete' => '<h2 id="eliminar">Cómo Eliminar un Reporte</h2><p>Si cometiste un error, puedes eliminar el reporte antes de que el padre lo firme. Busca el botón "Eliminar" en la vista lateral del reporte.</p>'
+                'custom' => true,
             ],
             'tutorial-c-install' => [
                 'desc' => 'Instala la aplicación en tu celular para un acceso rápido y directo sin usar el navegador.',
@@ -395,6 +402,7 @@ new class extends Component {
             if ($name === 'tutorial-d-exams') return $this->getExamsContent();
             if ($name === 'tutorial-a-report-types') return $this->getReportTypesContent();
             if ($name === 'tutorial-a-inscribe') return $this->getStudentsContent();
+            if ($name === 'tutorial-d-create-report') return $this->getReportsContent();
         }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
@@ -2267,6 +2275,160 @@ new class extends Component {
             </div>
         ";
     }
+
+    public function getReportsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Reportes</strong> permite crear, buscar y eliminar reportes disciplinarios asignados a los alumnos. Los reportes documentan las infracciones cometidas y notifican a los padres de familia, quienes deberán firmarlos como acuse de recibo.</p>
+
+            {$img('reportes/menu.png', 'Vista general del apartado de Reportes en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Docente</strong> o <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener alumnos inscritos en el ciclo escolar actual.</li>
+                <li>Contar con <strong>tipos de reportes</strong> configurados previamente (ver tutorial de Tipos de Reportes).</li>
+            </ul>
+
+            <h2 id='crear'>1. Crear reporte</h2>
+            <p>Para registrar un nuevo reporte disciplinario:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Reportes\"</strong> en el menú lateral izquierdo.')}
+
+            {$step(2, 'Presione el botón <strong>\"Nuevo Reporte\"</strong>. Esto abrirá un recuadro con campos a llenar.')}
+
+            {$img('reportes/botonCrearReporte.png', 'Botón Nuevo Reporte para iniciar el registro')}
+            {$img('reportes/modalCrearReporteVacio.png', 'Formulario vacío para crear un nuevo reporte')}
+
+            {$step(3, 'Complete los campos del formulario:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Buscar Alumno</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Coloque al menos <strong>3 caracteres</strong> del nombre del alumno para buscarlo. Selecciónelo haciendo clic en su nombre.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Fecha</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica la fecha en la que se aplicó el reporte. Por defecto muestra la fecha actual.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Hora</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica la hora en la que se aplicó el reporte. Por defecto muestra la hora actual.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Infracción</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Seleccione el tipo de falta. Los tipos son gestionados en el apartado de <strong>Gestionar Tipos</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Asunto / Materia</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Detalle el asunto o materia donde se cometió la falta.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Descripción de los Hechos</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Describa con detalle el suceso de la infracción.</span>
+                </div>
+            </div>
+
+            {$important('Al buscar un alumno, asegúrese de <strong>seleccionarlo haciendo clic en su nombre</strong>. De lo contrario, el registro presentará un error.')}
+
+            {$img('reportes/modalCrearReporteLLeno.png', 'Formulario completado con los datos del reporte')}
+
+            {$step(4, 'Presione el botón <strong>\"Guardar Reporte\"</strong>. El reporte se verá reflejado en la tabla.')}
+
+            {$img('reportes/reporteCreado.png', 'Nuevo reporte registrado en la tabla de reportes')}
+
+            <h2 id='buscar'>2. Buscar reportes</h2>
+            <p>La plataforma ofrece herramientas de búsqueda y filtrado para localizar reportes rápidamente.</p>
+
+            {$step(1, 'En el apartado de Reportes, ubique el recuadro de filtros en la parte superior.')}
+
+            {$img('reportes/camposFiltrarReportes.png', 'Campos de búsqueda y filtrado de reportes')}
+
+            {$step(2, 'Utilice los filtros disponibles:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Buscar por Alumno</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Permite visualizar los reportes asignados a un alumno específico.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Filtrar por Estado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Muestre reportes por estado: <strong>Todos los Estados</strong>, <strong>Pendientes de Firma</strong> o <strong>Firmado</strong>. Cuando un padre firma un reporte, su estado pasa a Firmado.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Filtrar por Gravedad</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Muestre reportes por gravedad: <strong>Todas las gravedades</strong>, <strong>Normal</strong> o <strong>Grave</strong>. Los niveles se configuran en Gestionar Tipos.</span>
+                </div>
+            </div>
+
+            {$img('reportes/campoBusquedaPorNombre.png', 'Resultado al buscar reportes por nombre de alumno')}
+            {$img('reportes/campoBusquedaEstado.png', 'Resultado al filtrar reportes por estado')}
+            {$img('reportes/campoBusquedaGravedad.png', 'Resultado al filtrar reportes por gravedad')}
+
+            <h2 id='borrar'>3. Borrar reporte</h2>
+            <p>Para eliminar un reporte disciplinario:</p>
+
+            {$step(1, 'En la tabla de reportes, localice el registro a eliminar.')}
+
+            {$img('reportes/registroABorrar.png', 'Reporte en la tabla con el ícono de basura para eliminar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Basura\"</strong> del registro. Se abrirá un cuadro de confirmación.')}
+
+            {$img('reportes/modalEliminar.png', 'Cuadro de confirmación para eliminar el reporte')}
+
+            {$step(3, 'Presione el botón <strong>\"Eliminar Reporte\"</strong> para confirmar. El reporte será eliminado de la tabla.')}
+
+            {$img('reportes/registroEliminado.png', 'Reporte eliminado correctamente de la tabla')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Sea objetivo y detallado en la descripción</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Describa el evento de forma clara, objetiva y con suficiente contexto. Esto facilita la comunicación con los padres y evita malentendidos.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Revise los reportes pendientes de firma</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use el filtro <strong>\"Pendientes de Firma\"</strong> para identificar reportes que los padres aún no han revisado. Esto le permite dar seguimiento oportuno.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Seleccione la infracción correcta</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>El tipo de infracción determina la gravedad del reporte. Asegúrese de seleccionar la falta que corresponda al evento para mantener la consistencia en los registros.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
 }; ?>
 
 @section('title', 'Guía Escolar: Tutoriales y Ayuda Digital')
@@ -2307,7 +2469,7 @@ new class extends Component {
 
             @if($tab === 'teachers')
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="pencil-square" title="Registrar Reporte" description="Documenta faltas al reglamento o méritos académicos." name="tutorial-d-create-report" />
+                <x-tutorial-card icon="pencil-square" title="Gestionar Reportes" description="Crea, busca y elimina reportes disciplinarios de alumnos." name="tutorial-d-create-report" />
                 <x-tutorial-card icon="clipboard-document-list" title="Programar Evaluaciones" description="Agenda exámenes para que padres y alumnos los visualicen." name="tutorial-d-exams" />
                 <x-tutorial-card icon="calendar" title="Generar Citatorios" description="Coordina reuniones presenciales con padres de familia." name="tutorial-d-citations" />
                 <x-tutorial-card icon="megaphone" title="Publicar Avisos" description="Comunícate de forma masiva con padres de tus grupos." name="tutorial-d-notices" />
