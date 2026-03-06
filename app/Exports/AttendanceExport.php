@@ -48,8 +48,8 @@ class AttendanceExport implements FromCollection, ShouldAutoSize, WithHeadings, 
 
         $statusSymbols = [
             'PRESENTE' => '.',
-            'FALTA' => '/',
-            'JUSTIFICADO' => '|',
+            'FALTA' => '|',
+            'JUSTIFICADO' => 'J',
             'RETARDO' => '+',
             'TRABAJO_EN_CASA' => 'TC',
         ];
@@ -88,7 +88,7 @@ class AttendanceExport implements FromCollection, ShouldAutoSize, WithHeadings, 
             ->distinct()
             ->orderBy('date')
             ->pluck('date')
-            ->map(fn ($date) => Carbon::parse($date)->format('d/m'));
+            ->map(fn ($date) => Carbon::parse($date)->format('d'));
 
         return array_merge(['Nombre'], $workingDays->toArray());
     }

@@ -421,7 +421,6 @@
             });
         </script>
 
-        <!-- Custom Toast Container for Flux Free -->
         <div 
             x-data="{ 
                 toasts: [],
@@ -435,18 +434,18 @@
                 }
             }"
             @flux-toast.window="add($event.detail)"
-            class="fixed bottom-0 right-0 p-6 z-50 flex flex-col gap-3 w-full max-w-sm"
+            class="fixed top-4 right-4 sm:top-6 sm:right-6 z-9999 flex flex-col gap-3 w-full max-w-sm pointer-events-none"
         >
             <template x-for="toast in toasts" :key="toast.id">
                 <div 
                     x-show="true"
                     x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 transform translate-y-2"
+                    x-transition:enter-start="opacity-0 transform -translate-y-2"
                     x-transition:enter-end="opacity-100 transform translate-y-0"
                     x-transition:leave="transition ease-in duration-200"
                     x-transition:leave-start="opacity-100 transform translate-y-0"
-                    x-transition:leave-end="opacity-0 transform translate-y-2"
-                    class="cursor-pointer"
+                    x-transition:leave-end="opacity-0 transform -translate-y-2"
+                    class="cursor-pointer pointer-events-auto w-full shadow-lg rounded-xl"
                     @click="toast.url ? window.location.href = toast.url : remove(toast.id)"
                 >
                     <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-xl p-4 relative overflow-hidden">

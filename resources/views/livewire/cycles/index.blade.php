@@ -4,6 +4,8 @@ use App\Models\Cycle;
 use App\Models\ClassGroup;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
@@ -127,9 +129,18 @@ new class extends Component {
     public function saveGroup(): void
     {
         $this->validate([
-            'grade' => 'required|string',
+            'grade' => [
+                'required',
+                'string',
+                Rule::unique('class_groups', 'grade')
+                    ->where('section', $this->section)
+                    ->where('cycle_id', $this->groupCycle->id)
+                    ->ignore($this->editingGroup?->id),
+            ],
             'section' => 'required|string',
             'tutorId' => 'nullable|exists:users,id',
+        ], [
+            'grade.unique' => 'Este grupo (grado y sección) ya está registrado en este ciclo.',
         ]);
 
         if ($this->editingGroup) {
@@ -141,6 +152,7 @@ new class extends Component {
             $this->editingGroup = null;
         } else {
             ClassGroup::create([
+                'id' => (string) Str::uuid(),
                 'cycle_id' => $this->groupCycle->id,
                 'grade' => $this->grade,
                 'section' => $this->section,
@@ -362,28 +374,37 @@ new class extends Component {
             </header>
 
             <form wire:submit="saveGroup" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700">
-                <flux:select label="Grado" wire:model="grade" class="w-full">
-                    <option value="">Grado...</option>
-                    <option value="1º">1º Secundaria</option>
-                    <option value="2º">2º Secundaria</option>
-                    <option value="3º">3º Secundaria</option>
-                </flux:select>
-                <flux:select label="Sección" wire:model="section" class="w-full">
-                    <option value="">Sección...</option>
-                    @foreach(['A', 'B', 'C', 'D', 'G', 'H', 'I'] as $letter)
-                        <option value="{{ $letter }}">{{ $letter }}</option>
-                    @endforeach
-                </flux:select>
-                <flux:select label="Tutor" wire:model="tutorId" class="w-full">
-                    <option value="">Seleccione tutor...</option>
-                    @foreach($teachers as $teacher)
-                        <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
-                    @endforeach
-                </flux:select>
-                <div class="flex gap-2 w-full">
+                <div class="flex flex-col gap-1 w-full sm:col-span-1">
+                    <flux:select label="Grado" wire:model="grade" class="w-full">
+                        <option value="">Grado...</option>
+                        <option value="1º">1º Secundaria</option>
+                        <option value="2º">2º Secundaria</option>
+                        <option value="3º">3º Secundaria</option>
+                    </flux:select>
+                    <flux:error name="grade" />
+                </div>
+                <div class="flex flex-col gap-1 w-full sm:col-span-1">
+                    <flux:select label="Sección" wire:model="section" class="w-full">
+                        <option value="">Sección...</option>
+                        @foreach(['A', 'B', 'C', 'D', 'G', 'H', 'I'] as $letter)
+                            <option value="{{ $letter }}">{{ $letter }}</option>
+                        @endforeach
+                    </flux:select>
+                    <flux:error name="section" />
+                </div>
+                <div class="flex flex-col gap-1 w-full sm:col-span-1">
+                    <flux:select label="Tutor" wire:model="tutorId" class="w-full">
+                        <option value="">Seleccione tutor...</option>
+                        @foreach($teachers as $teacher)
+                            <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                        @endforeach
+                    </flux:select>
+                    <flux:error name="tutorId" />
+                </div>
+                <div class="flex gap-2 w-full sm:col-span-1">
                     <flux:button variant="primary" type="submit" class="flex-1">{{ $editingGroup ? 'Actualizar' : 'Añadir' }}</flux:button>
                     @if($editingGroup)
-                        <flux:button wire:click="cancelGroupEdit" class="shrink-0">X</flux:button>
+                        <flux:button type="button" wire:click="cancelGroupEdit" class="shrink-0">X</flux:button>
                     @endif
                 </div>
             </form>

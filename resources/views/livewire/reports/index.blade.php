@@ -318,17 +318,17 @@ new class extends Component {
 }; ?>
 
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
             <flux:heading size="xl" level="1">Reportes Disciplinarios</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Seguimiento de conducta y faltas al reglamento.</flux:text>
         </div>
         @if(auth()->user()->isViewStaff())
-            <div class="flex flex-col sm:flex-row gap-2">
+            <div class="flex flex-col gap-2 w-full sm:w-auto">
                 @can('admin-only')
-                    <flux:button variant="ghost" icon="cog-6-tooth" href="{{ route('infractions.index') }}" wire:navigate>Gestionar Tipos</flux:button>
+                    <flux:button variant="ghost" icon="cog-6-tooth" href="{{ route('infractions.index') }}" wire:navigate class="w-full sm:w-auto justify-center">Gestionar Tipos</flux:button>
                 @endcan
-                <flux:button variant="primary" icon="plus-circle" wire:click="openCreateModal">Nuevo Reporte</flux:button>
+                <flux:button variant="primary" icon="plus-circle" wire:click="openCreateModal" class="w-full sm:w-auto">Nuevo Reporte</flux:button>
             </div>
         @endif
     </div>

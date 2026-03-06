@@ -29,6 +29,10 @@ new #[Layout('components.layouts.app')] class extends Component {
 
         $this->attendanceMonth = (int) now()->format('m');
         $this->attendanceYear = (int) now()->format('Y');
+
+        if ($this->attendanceCycleId) {
+            $this->attendanceGroupId = $this->attendanceGroups()->first()?->id;
+        }
     }
 
     #[Computed]

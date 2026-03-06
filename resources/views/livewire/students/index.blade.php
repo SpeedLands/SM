@@ -98,6 +98,11 @@ new class extends Component {
     public bool $historyOnlyActiveCycle = true;
     public array $historyItems = [];
 
+    public function mount(): void
+    {
+        $this->birthDate = now()->subYears(12)->format('Y-m-d');
+    }
+
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -123,6 +128,7 @@ new class extends Component {
         if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
         $this->reset(['studentId', 'name', 'curp', 'birthDate', 'turn', 'siblingsCount', 'birthOrder', 'classGroupId', 'address', 'allergies', 'medicalConditions', 'emergencyContact', 'otherContact', 'motherName', 'fatherName', 'motherWorkplace', 'fatherWorkplace', 'photo', 'currentPhotoUrl']);
+        $this->birthDate = now()->subYears(12)->format('Y-m-d');
         $this->showStudentModal = true;
     }
 
@@ -587,7 +593,7 @@ new class extends Component {
 
                     @if($bulkMode)
                         <div class="ml-4 pt-1">
-                            <flux:checkbox wire:model.live="selectedStudents" value="{{ $student->id }}" />
+                            <flux:checkbox wire:model.live="selectedStudents" value="{{ $student->id }}" :disabled="!$student->curp" />
                         </div>
                     @endif
                 </div>
@@ -596,10 +602,18 @@ new class extends Component {
                 <div class="flex justify-end gap-1 pt-3 border-t border-zinc-100 dark:border-zinc-800">
                                     @if(auth()->user()->isAdmin())
                                         <flux:dropdown>
-                                            <flux:button variant="ghost" size="xs" icon="identification" title="Opciones de Credencial" />
+                                            <flux:button variant="ghost" size="xs" icon="identification" :title="$student->curp ? 'Opciones de Credencial' : 'Falta CURP para generar credencial'" />
                                             <flux:menu>
-                                                <flux:menu.item icon="printer" x-on:click.stop="window.open('{{ route('students.credential', $student->id) }}', '_blank')">Imprimir esta credencial</flux:menu.item>
-                                                <flux:menu.item icon="list-bullet" wire:click="$toggle('bulkMode')" x-on:click.stop="$wire.selectedStudents = ['{{ $student->id }}']">Selección múltiple</flux:menu.item>
+                                                <flux:menu.item icon="printer" x-on:click.stop="window.open('{{ route('students.credential', $student->id) }}', '_blank')" :disabled="!$student->curp">
+                                                    Imprimir esta credencial
+                                                </flux:menu.item>
+                                                <flux:menu.item icon="list-bullet" wire:click="$toggle('bulkMode')" x-on:click.stop="$wire.selectedStudents = ['{{ $student->id }}']" :disabled="!$student->curp">
+                                                    Selección múltiple
+                                                </flux:menu.item>
+                                                @if(!$student->curp)
+                                                    <flux:menu.separator />
+                                                    <flux:menu.item icon="exclamation-triangle" variant="danger" disabled>Falta CURP</flux:menu.item>
+                                                @endif
                                             </flux:menu>
                                         </flux:dropdown>
                                     @endif
@@ -644,7 +658,8 @@ new class extends Component {
                     <tr class="border-b border-zinc-200 dark:border-zinc-700 text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                         @if($bulkMode)
                         <th class="py-3 px-2 w-10">
-                            <flux:checkbox wire:click="selectAll" :checked="count($selectedStudents) > 0 && count($selectedStudents) === \App\Models\Student::count()" />
+                            {{-- We only count students WITH CURP for the select all comparison, as others can't be selected --}}
+                            <flux:checkbox wire:click="selectAll" :checked="count($selectedStudents) > 0 && count($selectedStudents) === \App\Models\Student::whereNotNull('curp')->count()" />
                         </th>
                         @endif
                         <th class="py-3 px-2 font-semibold">Alumno</th>
@@ -664,7 +679,7 @@ new class extends Component {
                         >
                             @if($bulkMode)
                             <td class="py-4 px-2" x-on:click.stop>
-                                <flux:checkbox wire:model.live="selectedStudents" value="{{ $student->id }}" />
+                                <flux:checkbox wire:model.live="selectedStudents" value="{{ $student->id }}" :disabled="!$student->curp" />
                             </td>
                             @endif
                             <td class="py-4 px-2"
@@ -704,10 +719,18 @@ new class extends Component {
                                 <div class="flex justify-end gap-1">
                                     @if(auth()->user()->isAdmin())
                                         <flux:dropdown>
-                                            <flux:button variant="ghost" size="sm" icon="identification" title="Opciones de Credencial" />
+                                            <flux:button variant="ghost" size="sm" icon="identification" :title="$student->curp ? 'Opciones de Credencial' : 'Falta CURP para generar credencial'" />
                                             <flux:menu>
-                                                <flux:menu.item icon="printer" x-on:click.stop="window.open('{{ route('students.credential', $student->id) }}', '_blank')">Imprimir esta credencial</flux:menu.item>
-                                                <flux:menu.item icon="list-bullet" wire:click="$toggle('bulkMode')" x-on:click.stop="$wire.selectedStudents = ['{{ $student->id }}']">Selección múltiple</flux:menu.item>
+                                                <flux:menu.item icon="printer" x-on:click.stop="window.open('{{ route('students.credential', $student->id) }}', '_blank')" :disabled="!$student->curp">
+                                                    Imprimir esta credencial
+                                                </flux:menu.item>
+                                                <flux:menu.item icon="list-bullet" wire:click="$toggle('bulkMode')" x-on:click.stop="$wire.selectedStudents = ['{{ $student->id }}']" :disabled="!$student->curp">
+                                                    Selección múltiple
+                                                </flux:menu.item>
+                                                @if(!$student->curp)
+                                                    <flux:menu.separator />
+                                                    <flux:menu.item icon="exclamation-triangle" variant="danger" disabled>Falta CURP</flux:menu.item>
+                                                @endif
                                             </flux:menu>
                                         </flux:dropdown>
                                     @endif
@@ -769,8 +792,8 @@ new class extends Component {
                                         <flux:icon icon="pencil" class="text-white" />
                                     </div>
                                     
-                                    <div wire:loading wire:target="photo" class="absolute inset-0 bg-white/80 dark:bg-zinc-900/80 flex items-center justify-center">
-                                        <flux:icon icon="arrow-path" class="animate-spin" />
+                                    <div wire:loading wire:target="photo" class="absolute inset-0 bg-white/80 dark:bg-zinc-900/80 flex items-center justify-center z-10 rounded-xl">
+                                        <flux:icon icon="arrow-path" class="size-8 animate-spin text-indigo-600 dark:text-indigo-400" />
                                     </div>
                                 </div>
                                 <input type="file" id="student-photo-input" class="hidden" wire:model="photo" accept="image/*">
@@ -778,30 +801,42 @@ new class extends Component {
                             </div>
 
                             <div class="grow grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <flux:input 
-                                    label="Nombre Completo" 
-                                    wire:model="name" 
-                                    placeholder="Ej. JUAN PEREZ LOPEZ" 
-                                    class="uppercase md:col-span-2"
-                                    x-on:input="name = $event.target.value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z ]/g, '')"
-                                />
-                                <flux:input 
-                                    label="CURP" 
-                                    wire:model="curp" 
-                                    placeholder="ABCD010101XXXXX000" 
-                                    class="uppercase"
-                                    x-on:input="curp = $event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 18)"
-                                />
-                                <flux:select label="Turno" wire:model="turn">
-                                    <option value="MATUTINO">Matutino</option>
-                                    <option value="VESPERTINO">Vespertino</option>
-                                </flux:select>
-                                <flux:select label="Grupo / Grado" wire:model="classGroupId" class="md:col-span-2">
-                                    <option value="">Seleccione grupo...</option>
-                                    @foreach($classGroups as $group)
-                                        <option value="{{ $group->id }}">{{ $group->grade }} {{ $group->section }}</option>
-                                    @endforeach
-                                </flux:select>
+                                <div class="md:col-span-2">
+                                    <flux:input 
+                                        label="Nombre Completo" 
+                                        wire:model="name" 
+                                        placeholder="Ej. JUAN PEREZ LOPEZ" 
+                                        class="uppercase"
+                                        x-on:input="name = $event.target.value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z ]/g, '')"
+                                    />
+                                    <flux:error name="name" />
+                                </div>
+                                <div>
+                                    <flux:input 
+                                        label="CURP" 
+                                        wire:model="curp" 
+                                        placeholder="ABCD010101XXXXX000" 
+                                        class="uppercase"
+                                        x-on:input="curp = $event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 18)"
+                                    />
+                                    <flux:error name="curp" />
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <flux:select label="Turno" wire:model="turn">
+                                        <option value="MATUTINO">Matutino</option>
+                                        <option value="VESPERTINO">Vespertino</option>
+                                    </flux:select>
+                                    <flux:error name="turn" />
+                                </div>
+                                <div class="md:col-span-2 flex flex-col gap-1">
+                                    <flux:select label="Grupo / Grado" wire:model="classGroupId">
+                                        <option value="">Seleccione grupo...</option>
+                                        @foreach($classGroups as $group)
+                                            <option value="{{ $group->id }}">{{ $group->grade }} {{ $group->section }}</option>
+                                        @endforeach
+                                    </flux:select>
+                                    <flux:error name="classGroupId" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1108,9 +1143,9 @@ new class extends Component {
             x-transition:enter-end="opacity-100 translate-y-0"
             class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4"
         >
-            <div class="bg-zinc-900 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between gap-6 border border-zinc-800">
-                <div class="flex items-center gap-4 border-r border-zinc-800 pr-6">
-                    <flux:badge color="blue" size="sm" variant="solid" class="rounded-full h-8 w-8 flex items-center justify-center p-0">
+            <div class="bg-zinc-900 text-white p-4 rounded-2xl shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 border border-zinc-800">
+                <div class="flex items-center gap-4 border-b md:border-b-0 md:border-r border-zinc-800 pb-3 md:pb-0 md:pr-6 w-full md:w-auto">
+                    <flux:badge color="blue" size="sm" variant="solid" class="rounded-full h-8 w-8 flex items-center justify-center p-0 shrink-0">
                         <span x-text="$wire.selectedStudents.length"></span>
                     </flux:badge>
                     <div class="flex flex-col">
@@ -1119,8 +1154,8 @@ new class extends Component {
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4 grow">
-                    <div class="flex flex-col grow">
+                <div class="flex items-center gap-4 grow w-full">
+                    <div class="flex flex-col grow min-w-0">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-[10px] text-zinc-500 uppercase font-black">Escala</span>
                             <span class="text-xs font-mono" x-text="Math.round($wire.scale * 100) + '%'"></span>
@@ -1128,22 +1163,26 @@ new class extends Component {
                         <input type="range" wire:model.live="scale" min="0.5" max="2.0" step="0.1" class="w-full h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
                     </div>
 
-                    <flux:button 
-                        variant="primary" 
-                        icon="printer" 
-                        type="submit"
-                        form="bulk-print-form"
-                    >
-                        Generar PDF
-                    </flux:button>
-                    
-                    <flux:button 
-                        variant="ghost" 
-                        size="sm" 
-                        icon="x-mark" 
-                        wire:click="exitBulkMode"
-                        title="Cancelar selección"
-                    />
+                    <div class="flex items-center gap-2 shrink-0">
+                        <flux:button 
+                            variant="primary" 
+                            size="sm"
+                            icon="printer" 
+                            type="submit"
+                            form="bulk-print-form"
+                        >
+                            <span class="hidden sm:inline">Generar PDF</span>
+                            <span class="sm:hidden">PDF</span>
+                        </flux:button>
+                        
+                        <flux:button 
+                            variant="ghost" 
+                            size="sm" 
+                            icon="x-mark" 
+                            wire:click="exitBulkMode"
+                            title="Cancelar selección"
+                        />
+                    </div>
                 </div>
             </div>
         </div>

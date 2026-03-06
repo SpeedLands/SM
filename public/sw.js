@@ -155,6 +155,12 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
     const request = event.request;
+    const url = new URL(request.url);
+
+    // Exclude Livewire routes from Service Worker
+    if (url.pathname.includes('/livewire')) {
+        return;
+    }
 
     if (request.destination === 'manifest' || request.url.endsWith('/manifest.json') || request.url.endsWith('/manifest.webmanifest')) {
         return;
