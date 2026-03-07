@@ -792,7 +792,7 @@ new class extends Component {
                                         <flux:icon icon="pencil" class="text-white" />
                                     </div>
                                     
-                                    <div wire:loading wire:target="photo" class="absolute inset-0 bg-white/80 dark:bg-zinc-900/80 flex items-center justify-center z-10 rounded-xl">
+                                    <div wire:loading.flex wire:target="photo" class="absolute inset-0 bg-white/80 dark:bg-zinc-900/80 items-center justify-center z-10 rounded-xl">
                                         <flux:icon icon="arrow-path" class="size-8 animate-spin text-indigo-600 dark:text-indigo-400" />
                                     </div>
                                 </div>

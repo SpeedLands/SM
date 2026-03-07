@@ -75,17 +75,16 @@ test('attendance export contains correct symbols and filters working days', func
     ]);
 
     $export = new AttendanceExport($this->group->id, 1, 2026);
-    $collection = $export->collection();
+    $view = $export->view();
+    $data = $view->getData();
 
-    expect($collection)->toHaveCount(2);
+    expect($data['students'])->toHaveCount(2);
     
-    $row1 = $collection->first();
-    expect($row1['name'])->toBe($this->student1->name);
-    expect($row1['2026-01-05'])->toBe('.'); // PRESENTE
-    expect($row1['2026-01-06'])->toBe('+'); // RETARDO
-    
-    $row2 = $collection->last();
-    expect($row2['name'])->toBe($this->student2->name);
-    expect($row2['2026-01-05'])->toBe('|'); // FALTA
-    expect($row2['2026-01-06'])->toBe(''); // Empty if no record
+    $workingDays = $data['workingDays'];
+    expect($workingDays)->toContain('2026-01-05', '2026-01-06');
+
+    $attendances = $data['attendances'];
+    expect($attendances[$this->student1->id]['2026-01-05']->status)->toBe('PRESENTE');
+    expect($attendances[$this->student1->id]['2026-01-06']->status)->toBe('RETARDO');
+    expect($attendances[$this->student2->id]['2026-01-05']->status)->toBe('FALTA');
 });

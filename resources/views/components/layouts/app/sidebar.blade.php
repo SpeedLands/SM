@@ -297,7 +297,7 @@
             x-data="{ 
                 toasts: [],
                 add(toast) {
-                    toast.id = Date.now();
+                    toast.id = Date.now() + Math.random();
                     this.toasts.push(toast);
                     setTimeout(() => this.remove(toast.id), 5000);
                 },
@@ -306,17 +306,17 @@
                 }
             }"
             @flux-toast.window="add($event.detail)"
-            class="fixed top-4 right-4 sm:top-6 sm:right-6 z-9999 flex flex-col gap-3 w-full max-w-sm pointer-events-none"
+            class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col gap-3 w-full max-w-sm pointer-events-none"
         >
             <template x-for="toast in toasts" :key="toast.id">
                 <div 
                     x-show="true"
                     x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 transform -translate-y-2"
+                    x-transition:enter-start="opacity-0 transform translate-y-2"
                     x-transition:enter-end="opacity-100 transform translate-y-0"
                     x-transition:leave="transition ease-in duration-200"
                     x-transition:leave-start="opacity-100 transform translate-y-0"
-                    x-transition:leave-end="opacity-0 transform -translate-y-2"
+                    x-transition:leave-end="opacity-0 transform translate-y-2"
                     class="cursor-pointer pointer-events-auto w-full shadow-lg rounded-xl"
                     @click="toast.url ? window.location.href = toast.url : remove(toast.id)"
                 >
