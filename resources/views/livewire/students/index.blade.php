@@ -34,6 +34,16 @@ new class extends Component {
         $this->selectedStudents = [];
     }
 
+    public function toggleBulkModeForStudent(string $studentId): void
+    {
+        if ($this->bulkMode && count($this->selectedStudents) === 1 && $this->selectedStudents[0] === $studentId) {
+            $this->exitBulkMode();
+        } else {
+            $this->bulkMode = true;
+            $this->selectedStudents = [$studentId];
+        }
+    }
+
     public function selectAll(): void
     {
         $allIds = Student::pluck('id')->toArray();
@@ -601,21 +611,11 @@ new class extends Component {
 
                 <div class="flex justify-end gap-1 pt-3 border-t border-zinc-100 dark:border-zinc-800">
                                     @if(auth()->user()->isAdmin())
-                                        <flux:dropdown>
-                                            <flux:button variant="ghost" size="xs" icon="identification" :title="$student->curp ? 'Opciones de Credencial' : 'Falta CURP para generar credencial'" />
-                                            <flux:menu>
-                                                <flux:menu.item icon="printer" x-on:click.stop="window.open('{{ route('students.credential', $student->id) }}', '_blank')" :disabled="!$student->curp">
-                                                    Imprimir esta credencial
-                                                </flux:menu.item>
-                                                <flux:menu.item icon="list-bullet" wire:click="$toggle('bulkMode')" x-on:click.stop="$wire.selectedStudents = ['{{ $student->id }}']" :disabled="!$student->curp">
-                                                    Selección múltiple
-                                                </flux:menu.item>
-                                                @if(!$student->curp)
-                                                    <flux:menu.separator />
-                                                    <flux:menu.item icon="exclamation-triangle" variant="danger" disabled>Falta CURP</flux:menu.item>
-                                                @endif
-                                            </flux:menu>
-                                        </flux:dropdown>
+                                        <flux:button variant="ghost" size="xs" icon="identification" 
+                                            :title="$student->curp ? 'Selección para credencial' : 'Falta CURP para generar credencial'" 
+                                            :disabled="!$student->curp"
+                                            wire:click.stop="toggleBulkModeForStudent('{{ $student->id }}')" 
+                                        />
                                     @endif
                     <flux:button variant="ghost" size="xs" icon="eye" wire:click="viewHistory('{{ $student->id }}')" title="Ver historial" />
                     @if(auth()->user()->isViewStaff())
@@ -718,21 +718,11 @@ new class extends Component {
                             <td class="py-4 px-2 text-right">
                                 <div class="flex justify-end gap-1">
                                     @if(auth()->user()->isAdmin())
-                                        <flux:dropdown>
-                                            <flux:button variant="ghost" size="sm" icon="identification" :title="$student->curp ? 'Opciones de Credencial' : 'Falta CURP para generar credencial'" />
-                                            <flux:menu>
-                                                <flux:menu.item icon="printer" x-on:click.stop="window.open('{{ route('students.credential', $student->id) }}', '_blank')" :disabled="!$student->curp">
-                                                    Imprimir esta credencial
-                                                </flux:menu.item>
-                                                <flux:menu.item icon="list-bullet" wire:click="$toggle('bulkMode')" x-on:click.stop="$wire.selectedStudents = ['{{ $student->id }}']" :disabled="!$student->curp">
-                                                    Selección múltiple
-                                                </flux:menu.item>
-                                                @if(!$student->curp)
-                                                    <flux:menu.separator />
-                                                    <flux:menu.item icon="exclamation-triangle" variant="danger" disabled>Falta CURP</flux:menu.item>
-                                                @endif
-                                            </flux:menu>
-                                        </flux:dropdown>
+                                        <flux:button variant="ghost" size="sm" icon="identification" 
+                                            :title="$student->curp ? 'Selección para credencial' : 'Falta CURP para generar credencial'" 
+                                            :disabled="!$student->curp"
+                                            wire:click.stop="toggleBulkModeForStudent('{{ $student->id }}')" 
+                                        />
                                     @endif
                                     <flux:button x-on:click.stop variant="ghost" size="sm" icon="eye" wire:click="viewHistory('{{ $student->id }}')" title="Ver historial" />
                                     @if(auth()->user()->isViewStaff())

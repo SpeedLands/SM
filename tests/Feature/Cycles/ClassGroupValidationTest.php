@@ -1,17 +1,17 @@
 <?php
 
-use App\Models\Cycle;
 use App\Models\ClassGroup;
+use App\Models\Cycle;
 use App\Models\User;
-use Livewire\Volt\Volt;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Volt\Volt;
 
 uses(RefreshDatabase::class);
 
 it('cannot create a duplicate group in the same cycle', function () {
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $cycle = Cycle::factory()->create(['is_active' => true]);
-    
+
     ClassGroup::create([
         'id' => (string) \Illuminate\Support\Str::uuid(),
         'cycle_id' => $cycle->id,
@@ -31,7 +31,7 @@ it('cannot create a duplicate group in the same cycle', function () {
 it('can update a group without changing grade/section', function () {
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $cycle = Cycle::factory()->create(['is_active' => true]);
-    
+
     $group = ClassGroup::create([
         'id' => (string) \Illuminate\Support\Str::uuid(),
         'cycle_id' => $cycle->id,
@@ -52,7 +52,7 @@ it('can update a group without changing grade/section', function () {
 it('cannot update a group to a duplicate grade/section', function () {
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $cycle = Cycle::factory()->create(['is_active' => true]);
-    
+
     ClassGroup::create([
         'id' => (string) \Illuminate\Support\Str::uuid(),
         'cycle_id' => $cycle->id,

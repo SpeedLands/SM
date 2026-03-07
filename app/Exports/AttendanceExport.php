@@ -6,12 +6,11 @@ use App\Models\Attendance;
 use App\Models\ClassGroup;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AttendanceExport implements FromView, WithStyles
 {
@@ -82,11 +81,11 @@ class AttendanceExport implements FromView, WithStyles
         // Excel subtracts approximately ~0.78 from the specified width.
         // To achieve 3.44 we set 4.22 (3.44 + 0.78)
         $sheet->getColumnDimension('A')->setWidth(4.22);
-        
+
         $sheet->getColumnDimension('B')->setAutoSize(true);
-        
+
         $highestCol = $sheet->getHighestColumn();
-        
+
         // Ensure we don't try to loop 'C' to 'B' or 'A' if there are no days
         if ($highestCol !== 'A' && $highestCol !== 'B') {
             $col = 'C';
@@ -100,7 +99,7 @@ class AttendanceExport implements FromView, WithStyles
 
         $highestRow = $sheet->getHighestRow();
         $highestCol = $sheet->getHighestColumn();
-        $range = 'A5:' . $highestCol . $highestRow;
+        $range = 'A5:'.$highestCol.$highestRow;
 
         $sheet->getStyle($range)->applyFromArray([
             'borders' => [
@@ -113,12 +112,12 @@ class AttendanceExport implements FromView, WithStyles
                 'vertical' => Alignment::VERTICAL_CENTER,
             ],
         ]);
-        
-        $sheet->getStyle('A1:' . $highestCol . '4')->applyFromArray([
+
+        $sheet->getStyle('A1:'.$highestCol.'4')->applyFromArray([
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER,
                 'vertical' => Alignment::VERTICAL_CENTER,
-            ]
+            ],
         ]);
 
         return [];

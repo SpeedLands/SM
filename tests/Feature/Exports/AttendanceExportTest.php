@@ -1,14 +1,14 @@
 <?php
 
+use App\Exports\AttendanceExport;
 use App\Models\Attendance;
 use App\Models\ClassGroup;
 use App\Models\Cycle;
 use App\Models\Student;
-use App\Models\User;
 use App\Models\StudentCycleAssociation;
-use App\Exports\AttendanceExport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\User;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 beforeEach(function () {
     $this->admin = User::factory()->create(['role' => 'ADMIN']);
@@ -18,7 +18,7 @@ beforeEach(function () {
         'grade' => '2',
         'section' => 'A',
     ]);
-    
+
     $this->student1 = Student::factory()->create(['name' => 'A Student']);
     $this->student2 = Student::factory()->create(['name' => 'B Student']);
 
@@ -79,7 +79,7 @@ test('attendance export contains correct symbols and filters working days', func
     $data = $view->getData();
 
     expect($data['students'])->toHaveCount(2);
-    
+
     $workingDays = $data['workingDays'];
     expect($workingDays)->toContain('2026-01-05', '2026-01-06');
 
