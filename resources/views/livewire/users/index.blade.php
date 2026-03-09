@@ -227,17 +227,17 @@ new class extends Component {
 
 <div class="space-y-6 text-zinc-900 dark:text-white">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+        <div data-tour="users-heading">
             <flux:heading size="xl" level="1">Gestión de Usuarios y Roles</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Administre el acceso, asigne roles y gestione credenciales de seguridad.</flux:text>
         </div>
-        <flux:button variant="primary" icon="plus" wire:click="openCreateModal">Añadir Nuevo Usuario</flux:button>
+        <flux:button variant="primary" icon="plus" wire:click="openCreateModal" data-tour="users-create-btn">Añadir Nuevo Usuario</flux:button>
     </div>
 
     <!-- Filters Section -->
     <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <flux:field>
+            <flux:field data-tour="users-search">
                 <flux:label>Buscar usuario</flux:label>
                 <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Nombre o Correo electrónico..." />
             </flux:field>
@@ -276,7 +276,7 @@ new class extends Component {
     </div>
 
     <!-- Users Table -->
-    <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-hidden">
+    <div class="p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-hidden" data-tour="users-table">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm whitespace-nowrap">
                 <thead>

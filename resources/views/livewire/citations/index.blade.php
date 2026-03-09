@@ -213,11 +213,11 @@ new class extends Component {
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <flux:heading size="lg" level="1">Citatorios a Padres</flux:heading>
+            <flux:heading size="lg" level="1" data-tour="citations-heading">Citatorios a Padres</flux:heading>
             <flux:text class="text-zinc-500">Gestión de citas y reuniones presenciales.</flux:text>
         </div>
         @if($isStaff)
-            <flux:button variant="primary" icon="calendar" wire:click="openCreateModal">Nuevo Citatorio</flux:button>
+            <flux:button variant="primary" icon="calendar" wire:click="openCreateModal" data-tour="citations-create-btn">Nuevo Citatorio</flux:button>
         @endif
     </div>
 

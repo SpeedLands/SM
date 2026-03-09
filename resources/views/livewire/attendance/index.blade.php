@@ -113,7 +113,7 @@ new class extends Component {
     {{-- Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <flux:heading size="xl">Asistencia</flux:heading>
+            <flux:heading size="xl" data-tour="attendance-heading">Asistencia</flux:heading>
             <flux:subheading>Control diario de asistencia por grupo</flux:subheading>
         </div>
         <div class="flex items-center gap-2">
@@ -127,7 +127,7 @@ new class extends Component {
                     <span wire:loading wire:target="markAllPresent">Guardando...</span>
                 </flux:button>
             @endif
-            <flux:button :href="route('attendance.scanner')" icon="qr-code" variant="primary" size="sm" title="Escanear código QR" class="w-full sm:w-auto">
+            <flux:button :href="route('attendance.scanner')" icon="qr-code" variant="primary" size="sm" title="Escanear código QR" class="w-full sm:w-auto" data-tour="attendance-scanner-btn">
                 Escáner
             </flux:button>
         </div>
@@ -173,7 +173,7 @@ new class extends Component {
 
             <flux:field>
                 <flux:label>Grupo / Sección</flux:label>
-                <flux:select wire:model.live="group_id">
+                <flux:select wire:model.live="group_id" data-tour="attendance-group-select">
                     <option value="">Selecciona Grupo</option>
                     @foreach($this->groups as $group)
                         <option value="{{ $group->id }}">Sección {{ $group->section }}</option>

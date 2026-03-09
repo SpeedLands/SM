@@ -98,7 +98,7 @@ new #[Layout('components.layouts.app')] class extends Component {
 
 <div class="py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
-        <div class="mb-8">
+        <div class="mb-8" data-tour="exporter-heading">
             <flux:heading size="xl" level="1">Exportar Datos a Excel</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Descargue la información del sistema en formatos compatibles con el importador.</flux:text>
         </div>

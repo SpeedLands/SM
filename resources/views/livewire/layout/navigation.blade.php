@@ -94,6 +94,6 @@ new class extends Component {
         @endif
 
         <flux:navlist.item icon="book-open" href="{{ route('regulations.index') }}" :current="request()->routeIs('regulations.index')">Reglamento</flux:navlist.item>
-        <flux:navlist.item icon="question-mark-circle" href="{{ route('tutorials.index') }}" :current="request()->routeIs('tutorials.index')">Tutoriales</flux:navlist.item>
+        <flux:navlist.item data-tour="nav-tutorials" icon="question-mark-circle" href="{{ route('tutorials.index') }}" :current="request()->routeIs('tutorials.index')">Tutoriales</flux:navlist.item>
     </flux:navlist.group>
 </flux:navlist>

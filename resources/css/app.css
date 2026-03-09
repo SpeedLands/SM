@@ -1,10 +1,6 @@
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
-
-@source '../views';
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
-@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+@import 'driver.js/dist/driver.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -56,12 +52,143 @@
     line-height: 1.25 !important;
 }
 
+
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */
+/* driver.js Custom Theme - Using Raw CSS to avoid @apply formatting issues */
+.driver-popover-custom {
+    border-radius: 1rem !important;
+    padding: 1.5rem !important;
+    border-width: 0 !important;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25) !important;
+    background-color: white !important;
+    color: var(--color-zinc-900) !important;
+    max-width: 320px !important;
+}
+
+.dark .driver-popover-custom {
+    background-color: var(--color-zinc-900) !important;
+    color: var(--color-zinc-100) !important;
+}
+
+.driver-popover-custom .driver-popover-title {
+    @apply text-xl font-black mb-3;
+    color: var(--color-indigo-600) !important;
+    font-family: var(--font-sans) !important;
+}
+
+.dark .driver-popover-custom .driver-popover-title {
+    color: var(--color-indigo-400) !important;
+}
+
+.driver-popover-custom .driver-popover-description {
+    @apply text-sm leading-relaxed;
+    color: var(--color-zinc-600) !important;
+}
+
+.dark .driver-popover-custom .driver-popover-description {
+    color: var(--color-zinc-400) !important;
+}
+
+.driver-popover-footer {
+    margin-top: 1.5rem !important;
+    display: flex !important;
+    gap: 0.5rem !important;
+}
+
+.driver-popover-custom .driver-popover-next-btn,
+.driver-popover-custom .driver-popover-prev-btn {
+    @apply rounded-xl px-5 py-2.5 text-sm font-bold transition-all;
+    border-width: 0 !important;
+    text-shadow: none !important;
+}
+
+.driver-popover-custom .driver-popover-next-btn:active,
+.driver-popover-custom .driver-popover-prev-btn:active {
+    transform: scale(0.95) !important;
+}
+
+.driver-popover-custom .driver-popover-next-btn {
+    background-color: var(--color-indigo-600) !important;
+    color: white !important;
+    box-shadow: 0 10px 15px -3px rgba(129, 140, 248, 0.5) !important;
+}
+
+.driver-popover-custom .driver-popover-next-btn:hover {
+    background-color: var(--color-indigo-700) !important;
+}
+
+.dark .driver-popover-custom .driver-popover-next-btn {
+    box-shadow: none !important;
+}
+
+.driver-popover-custom .driver-popover-prev-btn {
+    background-color: var(--color-zinc-100) !important;
+    color: var(--color-zinc-600) !important;
+}
+
+.driver-popover-custom .driver-popover-prev-btn:hover {
+    background-color: var(--color-zinc-200) !important;
+}
+
+.dark .driver-popover-custom .driver-popover-prev-btn {
+    background-color: var(--color-zinc-800) !important;
+    color: var(--color-zinc-400) !important;
+}
+
+.dark .driver-popover-custom .driver-popover-prev-btn:hover {
+    background-color: var(--color-zinc-700) !important;
+}
+
+.driver-popover-close-btn {
+    color: var(--color-zinc-400) !important;
+}
+
+.driver-popover-close-btn:hover {
+    color: var(--color-zinc-600) !important;
+}
+
+.dark .driver-popover-close-btn:hover {
+    color: var(--color-zinc-200) !important;
+}
+
+.driver-popover-progress-text {
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1em !important;
+    font-weight: 900 !important;
+    color: var(--color-zinc-300) !important;
+    margin-top: auto !important;
+    margin-bottom: 0.125rem !important;
+}
+
+.dark .driver-popover-progress-text {
+    color: var(--color-zinc-600) !important;
+}
+
+.driver-popover-arrow {
+    border-color: white !important;
+}
+
+.dark .driver-popover-arrow {
+    border-color: var(--color-zinc-900) !important;
+}
+
+/* Active Element Overlay */
+.driver-active-element {
+    border-radius: 0.75rem !important;
+    transition-property: all !important;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition-duration: 300ms !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+    .driver-popover {
+        max-width: calc(100vw - 48px) !important;
+    }
+}

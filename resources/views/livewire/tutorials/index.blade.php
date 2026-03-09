@@ -2459,35 +2459,35 @@ new class extends Component {
         <div class="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
             @if($tab === 'parents')
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="document-text" title="Ver y Firmar Reportes" description="Consulta el historial disciplinario y firma de enterado." name="tutorial-p-reports" />
-                <x-tutorial-card icon="megaphone" title="Avisos y Autorizaciones" description="Mantente al día con los eventos y firma permisos digitales." name="tutorial-p-notices" />
-                <x-tutorial-card icon="calendar-days" title="Atender Citatorios" description="Confirma asistencia a reuniones con el personal docente." name="tutorial-p-citations" />
-                <x-tutorial-card icon="book-open" title="Calendario de Exámenes" description="Consulta las fechas de evaluación de todos tus hijos." name="tutorial-p-exams" />
-                <x-tutorial-card icon="heart" title="Servicio Comunitario" description="Seguimiento de actividades reparatorias asignadas." name="tutorial-p-community" />
+                <x-tutorial-card icon="document-text" title="Ver y Firmar Reportes" description="Consulta el historial disciplinario y firma de enterado." name="tutorial-p-reports" tourRoute="reports.index" />
+                <x-tutorial-card icon="megaphone" title="Avisos y Autorizaciones" description="Mantente al día con los eventos y firma permisos digitales." name="tutorial-p-notices" tourRoute="notices.index" />
+                <x-tutorial-card icon="calendar-days" title="Atender Citatorios" description="Confirma asistencia a reuniones con el personal docente." name="tutorial-p-citations" tourRoute="citations.index" />
+                <x-tutorial-card icon="book-open" title="Calendario de Exámenes" description="Consulta las fechas de evaluación de todos tus hijos." name="tutorial-p-exams" tourRoute="exams.index" />
+                <x-tutorial-card icon="heart" title="Servicio Comunitario" description="Seguimiento de actividades reparatorias asignadas." name="tutorial-p-community" tourRoute="community-services.index" />
             </div>
             @endif
 
             @if($tab === 'teachers')
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="pencil-square" title="Gestionar Reportes" description="Crea, busca y elimina reportes disciplinarios de alumnos." name="tutorial-d-create-report" />
-                <x-tutorial-card icon="clipboard-document-list" title="Programar Evaluaciones" description="Agenda exámenes para que padres y alumnos los visualicen." name="tutorial-d-exams" />
-                <x-tutorial-card icon="calendar" title="Generar Citatorios" description="Coordina reuniones presenciales con padres de familia." name="tutorial-d-citations" />
-                <x-tutorial-card icon="megaphone" title="Publicar Avisos" description="Comunícate de forma masiva con padres de tus grupos." name="tutorial-d-notices" />
-                <x-tutorial-card icon="user-group" title="Asignar Servicio" description="Asigna actividades de servicio comunitario por reportes acumulados." name="tutorial-d-community" />
+                <x-tutorial-card icon="pencil-square" title="Gestionar Reportes" description="Crea, busca y elimina reportes disciplinarios de alumnos." name="tutorial-d-create-report" tourRoute="reports.index" />
+                <x-tutorial-card icon="clipboard-document-list" title="Programar Evaluaciones" description="Agenda exámenes para que padres y alumnos los visualicen." name="tutorial-d-exams" tourRoute="exams.index" />
+                <x-tutorial-card icon="calendar" title="Generar Citatorios" description="Coordina reuniones presenciales con padres de familia." name="tutorial-d-citations" tourRoute="citations.index" />
+                <x-tutorial-card icon="megaphone" title="Publicar Avisos" description="Comunícate de forma masiva con padres de tus grupos." name="tutorial-d-notices" tourRoute="notices.index" />
+                <x-tutorial-card icon="user-group" title="Asignar Servicio" description="Asigna actividades de servicio comunitario por reportes acumulados." name="tutorial-d-community" tourRoute="community-services.index" />
             </div>
             @endif
 
             @can('admin-only')
             @if($tab === 'admin')
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="users" title="Gestión de Usuarios" description="Administra cuentas, restablece contraseñas y permisos." name="tutorial-a-users" />
-                <x-tutorial-card icon="arrow-path" title="Control de Ciclos" description="Configura periodos escolares y activa el ciclo vigente." name="tutorial-a-cycles" />
-                <x-tutorial-card icon="document-duplicate" title="Editar Reglamento" description="Actualiza la normativa institucional en tiempo real." name="tutorial-a-regulations" />
-                <x-tutorial-card icon="user-plus" title="Gestión de Alumnos" description="Inscribe, busca, edita y vincula padres a tus alumnos." name="tutorial-a-inscribe" />
-                <x-tutorial-card icon="cloud-arrow-down" title="Importación Masiva" description="Carga masiva de datos mediante archivos Excel/CSV." name="tutorial-a-import" />
-                <x-tutorial-card icon="cloud-arrow-up" title="Exportación de Datos" description="Genera respaldos y listas en formatos exportables." name="tutorial-a-export" />
-                <x-tutorial-card icon="arrow-up-circle" title="Promover Alumnos" description="Cambia de grupo o ciclo a los alumnos de forma masiva." name="tutorial-a-promote" />
-                <x-tutorial-card icon="tag" title="Tipos de Reportes" description="Gestiona los tipos de infracciones y su nivel de gravedad." name="tutorial-a-report-types" />
+                <x-tutorial-card icon="users" title="Gestión de Usuarios" description="Administra cuentas, restablece contraseñas y permisos." name="tutorial-a-users" tourRoute="users.index" />
+                <x-tutorial-card icon="arrow-path" title="Control de Ciclos" description="Configura periodos escolares y activa el ciclo vigente." name="tutorial-a-cycles" tourRoute="cycles.index" />
+                <x-tutorial-card icon="document-duplicate" title="Editar Reglamento" description="Actualiza la normativa institucional en tiempo real." name="tutorial-a-regulations" tourRoute="regulations.index" />
+                <x-tutorial-card icon="user-plus" title="Gestión de Alumnos" description="Inscribe, busca, edita y vincula padres a tus alumnos." name="tutorial-a-inscribe" tourRoute="students.index" />
+                <x-tutorial-card icon="cloud-arrow-down" title="Importación Masiva" description="Carga masiva de datos mediante archivos Excel/CSV." name="tutorial-a-import" tourRoute="data-importer" />
+                <x-tutorial-card icon="cloud-arrow-up" title="Exportación de Datos" description="Genera respaldos y listas en formatos exportables." name="tutorial-a-export" tourRoute="data-exporter" />
+                <x-tutorial-card icon="arrow-up-circle" title="Promover Alumnos" description="Cambia de grupo o ciclo a los alumnos de forma masiva." name="tutorial-a-promote" tourRoute="students.promote" />
+                <x-tutorial-card icon="tag" title="Tipos de Reportes" description="Gestiona los tipos de infracciones y su nivel de gravedad." name="tutorial-a-report-types" tourRoute="infractions.index" />
             </div>
             @endif
             @endcan

@@ -141,7 +141,7 @@ new class extends Component {
 
 <div class="space-y-8 pb-10">
     <div class="flex items-center justify-between">
-        <div>
+        <div data-tour="dashboard-heading">
             <flux:heading size="xl" level="1">¡Bienvenido, {{ auth()->user()->name }}!</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400 text-lg">
                 {{ $activeCycle ? "Ciclo Escolar Activo: {$activeCycle->name}" : 'No hay un ciclo escolar activo actualmente.' }}
@@ -160,7 +160,7 @@ new class extends Component {
 
     @if(isset($isAdmin) && $isAdmin)
         <!-- Admin/Teacher Dashboard -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-tour="dashboard-stats">
             <div class="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm flex items-center gap-4">
                 <div class="size-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
                     <flux:icon icon="user-group" variant="solid" />
@@ -204,7 +204,7 @@ new class extends Component {
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Recent Reports -->
-            <div class="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+            <div class="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm" data-tour="dashboard-recent-reports">
                 <div class="flex items-center justify-between mb-6">
                     <flux:heading size="lg">Reportes Recientes</flux:heading>
                     <flux:button variant="ghost" size="sm" icon="arrow-right" href="{{ route('reports.index') }}">Ver todos</flux:button>
@@ -228,7 +228,7 @@ new class extends Component {
             </div>
 
             <!-- Upcoming Citations -->
-            <div class="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+            <div class="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm" data-tour="dashboard-citations">
                 <div class="flex items-center justify-between mb-6">
                     <flux:heading size="lg">Próximos Citatorios</flux:heading>
                     <flux:button variant="ghost" size="sm" icon="arrow-right" href="{{ route('citations.index') }}">Ver todos</flux:button>
@@ -380,7 +380,7 @@ new class extends Component {
         <!-- Parent Dashboard -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Students Column -->
-            <div class="lg:col-span-2 space-y-6">
+            <div class="lg:col-span-2 space-y-6" data-tour="dashboard-students">
                 <flux:heading size="lg">Mis Hijos / Alumnos Vinculados</flux:heading>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -454,7 +454,7 @@ new class extends Component {
             <!-- Side Column: Citations and Notices -->
             <div class="space-y-8">
                 <!-- Upcoming Citations -->
-                <div class="p-6 rounded-4xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                <div class="p-6 rounded-4xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm" data-tour="dashboard-parent-citations">
                     <flux:heading size="lg" class="mb-6">Citatorios Próximos</flux:heading>
                     <div class="space-y-4">
                         @forelse($citations as $citation)

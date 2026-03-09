@@ -7,6 +7,11 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// ── Tour System (driver.js) ──────────────────────────────────────────────────
+import { initTourSystem } from './tour-launcher.js';
+// Initialize on first load
+document.addEventListener('DOMContentLoaded', () => initTourSystem());
+
 // PWA install prompt handling (only show toast if present on page)
 let deferredInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
