@@ -134,11 +134,11 @@ new class extends Component {
 
 <div class="space-y-6">
     <div class="flex items-center justify-between">
-        <div data-tour="infractions-heading">
+        <div>
             <flux:heading size="xl" level="1">Tipos de Reporte</flux:heading>
             <flux:subheading>Gestione los tipos de infracciones displinarias.</flux:subheading>
         </div>
-        <flux:button variant="primary" icon="plus" wire:click="openCreateModal" data-tour="infractions-create-btn">Nuevo Tipo</flux:button>
+        <flux:button variant="primary" icon="plus" wire:click="openCreateModal">Nuevo Tipo</flux:button>
     </div>
 
     <!-- Filters -->

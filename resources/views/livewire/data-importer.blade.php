@@ -1,5 +1,5 @@
 <div class="max-w-4xl mx-auto py-12">
-    <flux:heading size="xl" level="1" class="mb-6" data-tour="importer-heading">Importar Datos</flux:heading>
+    <flux:heading size="xl" level="1" class="mb-6">Importar Datos</flux:heading>
 
     <div class="space-y-8">
         <!-- Step Indicator -->

@@ -319,7 +319,7 @@ new class extends Component {
 
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div data-tour="reports-heading">
+        <div>
             <flux:heading size="xl" level="1">Reportes Disciplinarios</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Seguimiento de conducta y faltas al reglamento.</flux:text>
         </div>
@@ -328,7 +328,7 @@ new class extends Component {
                 @can('admin-only')
                     <flux:button variant="ghost" icon="cog-6-tooth" href="{{ route('infractions.index') }}" wire:navigate class="w-full sm:w-auto justify-center">Gestionar Tipos</flux:button>
                 @endcan
-                <flux:button data-tour="reports-create-btn" variant="primary" icon="plus-circle" wire:click="openCreateModal" class="w-full sm:w-auto">Nuevo Reporte</flux:button>
+                <flux:button variant="primary" icon="plus-circle" wire:click="openCreateModal" class="w-full sm:w-auto">Nuevo Reporte</flux:button>
             </div>
         @endif
     </div>
@@ -352,7 +352,7 @@ new class extends Component {
     </div>
 
     <!-- Filters -->
-    <div x-ref="filterPanel" class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm transition-all mb-6" data-tour="reports-filters">
+    <div x-ref="filterPanel" class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm transition-all mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <flux:field class="md:col-span-2">
                 <flux:label>Búsqueda</flux:label>
@@ -443,7 +443,7 @@ new class extends Component {
         </div>
 
         <!-- Desktop Table (Staff View) -->
-        <div class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto" data-tour="reports-table-desktop">
+        <div class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-zinc-200 dark:border-zinc-700">
@@ -557,7 +557,7 @@ new class extends Component {
                                     <flux:icon icon="information-circle" variant="micro" />
                                     <flux:text size="sm" class="font-medium text-inherit">Requiere su firma de enterado</flux:text>
                                 </div>
-                                <flux:button data-tour="reports-sign-btn" variant="primary" icon="finger-print" class="w-full sm:w-auto px-10 shadow-lg shadow-amber-500/30" wire:click="signReport('{{ $report->id }}')">
+                                <flux:button variant="primary" icon="finger-print" class="w-full sm:w-auto px-10 shadow-lg shadow-amber-500/30" wire:click="signReport('{{ $report->id }}')">
                                     Firmar Reporte
                                 </flux:button>
                             </div>

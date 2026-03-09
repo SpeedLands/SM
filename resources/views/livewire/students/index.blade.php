@@ -507,12 +507,12 @@ new class extends Component {
 
 <div x-data="studentPopover()" x-init="init()" class="space-y-6 text-zinc-900 dark:text-white pb-10">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div data-tour="students-heading">
+        <div>
             <flux:heading size="xl" level="1">Gestión de Alumnos</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Administre el padrón de estudiantes, sus datos de contacto y su situación académica.</flux:text>
         </div>
         @if(auth()->user()->isViewStaff())
-            <flux:button variant="primary" icon="user-plus" wire:click="openCreateModal" :disabled="count($classGroups) === 0" data-tour="students-create-btn">Inscribir Alumno</flux:button>
+            <flux:button variant="primary" icon="user-plus" wire:click="openCreateModal" :disabled="count($classGroups) === 0">Inscribir Alumno</flux:button>
         @endif
     </div>
 
@@ -540,16 +540,16 @@ new class extends Component {
     </div>
 
     <!-- Search and Filters -->
-    <div x-ref="filterPanel" id="students-filter-panel" class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm space-y-6 transition-all">
+    <div x-ref="filterPanel" class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm space-y-6 transition-all">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <flux:heading size="lg" level="2">Filtros</flux:heading>
             <flux:switch wire:model.live="onlyActiveCycle" label="Solo mostrar inscritos en ciclo actual" />
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <flux:field data-tour="students-search">
-                    <flux:label>Buscar Alumno</flux:label>
-                    <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Nombre..." />
-                </flux:field>
+            <flux:field>
+                <flux:label>Buscar Alumno</flux:label>
+                <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Nombre..." />
+            </flux:field>
 
             <flux:field>
                 <flux:label>Grado</flux:label>
@@ -574,7 +574,7 @@ new class extends Component {
     </div>
 
     <!-- Mobile Cards (Staff View) -->
-    <div class="space-y-4 sm:hidden pb-10" data-tour="students-table-mobile">
+    <div class="space-y-4 sm:hidden pb-10">
         @forelse($students as $student)
             <div wire:key="std-mob-{{ $student->id }}" class="p-4 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm relative">
                 <div class="flex justify-between items-start mb-3">
@@ -609,7 +609,7 @@ new class extends Component {
                 </div>
                 
 
-                <div class="flex justify-end gap-1 pt-3 border-t border-zinc-100 dark:border-zinc-800" data-tour="students-actions-mobile">
+                <div class="flex justify-end gap-1 pt-3 border-t border-zinc-100 dark:border-zinc-800">
                                     @if(auth()->user()->isAdmin())
                                         <flux:button variant="ghost" size="xs" icon="identification" 
                                             :title="$student->curp ? 'Selección para credencial' : 'Falta CURP para generar credencial'" 
@@ -651,7 +651,7 @@ new class extends Component {
     </div>
 
     <!-- Students Table (Desktop View) -->
-    <div class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-hidden" data-tour="students-table-desktop">
+    <div class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
                 <thead>
@@ -716,7 +716,7 @@ new class extends Component {
                                 </flux:badge>
                             </td>
                             <td class="py-4 px-2 text-right">
-                                <div class="flex justify-end gap-1" data-tour="students-actions-desktop">
+                                <div class="flex justify-end gap-1">
                                     @if(auth()->user()->isAdmin())
                                         <flux:button variant="ghost" size="sm" icon="identification" 
                                             :title="$student->curp ? 'Selección para credencial' : 'Falta CURP para generar credencial'" 

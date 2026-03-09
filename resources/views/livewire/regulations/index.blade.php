@@ -68,7 +68,7 @@ new class extends Component {
     <link rel="stylesheet" href="{{ asset('/css/quill.snow.css') }}">
     
     <div class="flex items-center justify-between">
-        <div data-tour="regulations-heading">
+        <div>
             <flux:heading size="xl" level="1">Reglamento Escolar</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Consulta las normas y estatutos de convivencia de la institución.</flux:text>
         </div>

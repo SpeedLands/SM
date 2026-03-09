@@ -262,11 +262,11 @@ new class extends Component {
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <flux:heading size="xl" level="1" data-tour="community-services-heading">Servicio Comunitario</flux:heading>
+            <flux:heading size="xl" level="1">Servicio Comunitario</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Asignación y seguimiento de actividades reparatorias.</flux:text>
         </div>
         @if(auth()->user()->isViewStaff())
-            <flux:button variant="primary" icon="plus" wire:click="openCreateModal()" data-tour="community-services-create-btn">Asignar Servicio</flux:button>
+            <flux:button variant="primary" icon="plus" wire:click="openCreateModal()">Asignar Servicio</flux:button>
         @endif
     </div>
 

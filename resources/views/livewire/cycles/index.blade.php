@@ -233,7 +233,7 @@ new class extends Component {
 
 <div class="space-y-6 text-zinc-900 dark:text-white">
     <div class="flex items-center justify-between">
-        <div data-tour="cycles-heading">
+        <div>
             <flux:heading size="xl" level="1">Gestión de Ciclos Escolares</flux:heading>
             <flux:text class="text-zinc-500 dark:text-zinc-400">Administra los periodos académicos y define el año activo.</flux:text>
         </div>
@@ -273,7 +273,7 @@ new class extends Component {
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Register Form -->
-        <div class="lg:col-span-1 p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm self-start" data-tour="cycles-create">
+        <div class="lg:col-span-1 p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm self-start">
             <flux:heading size="lg" level="2" class="flex items-center gap-2 mb-6">
                 <flux:icon icon="plus-circle" />
                 {{ $editing ? 'Editar Ciclo' : 'Registrar Nuevo Ciclo' }}
@@ -304,7 +304,7 @@ new class extends Component {
         </div>
 
         <!-- Cycles List -->
-        <div class="lg:col-span-2 p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm" data-tour="cycles-table">
+        <div class="lg:col-span-2 p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm">
             <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <flux:heading size="lg" level="2">Lista de Ciclos</flux:heading>
                 <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Buscar..." class="w-full sm:w-64" />

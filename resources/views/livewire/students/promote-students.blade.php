@@ -161,7 +161,7 @@ new class extends Component {
 
 <div class="space-y-6">
     <div class="flex justify-between items-center">
-        <div data-tour="promote-heading">
+        <div>
             <flux:heading size="xl" level="1">Promoción de Alumnos</flux:heading>
             <flux:text class="text-zinc-500">Mueva grupos de alumnos de un ciclo escolar a otro masivamente.</flux:text>
         </div>

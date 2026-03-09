@@ -379,18 +379,18 @@ new class extends Component {
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <flux:heading size="lg" level="1" data-tour="notices-heading">Avisos y Comunicados</flux:heading>
+            <flux:heading size="lg" level="1">Avisos y Comunicados</flux:heading>
             <flux:text class="text-zinc-500">Mural digital de avisos escolares.</flux:text>
         </div>
         @if($isStaff)
-            <flux:button variant="primary" icon="plus" wire:click="$set('showCreateModal', true)" data-tour="notices-create-btn">Nuevo Aviso</flux:button>
+            <flux:button variant="primary" icon="plus" wire:click="$set('showCreateModal', true)">Nuevo Aviso</flux:button>
         @endif
     </div>
 
     @if($isStaff)
         <!-- Admin/Teacher View: Dashboard with stats -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <flux:select wire:model.live="typeFilter" placeholder="Filtrar por tipo..." data-tour="notices-search">
+            <flux:select wire:model.live="typeFilter" placeholder="Filtrar por tipo...">
                 <option value="">Todos los tipos</option>
                 <option value="GENERAL">General</option>
                 <option value="URGENT">Urgente</option>

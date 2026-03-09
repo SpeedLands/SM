@@ -223,11 +223,11 @@ new class extends Component {
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <flux:heading size="lg" level="1" data-tour="exams-heading">Calendario de Exámenes</flux:heading>
+            <flux:heading size="lg" level="1">Calendario de Exámenes</flux:heading>
             <flux:text class="text-zinc-500">Programación de evaluaciones por trimestre.</flux:text>
         </div>
         @if($isStaff)
-            <flux:button variant="primary" icon="plus" wire:click="openCreateModal" data-tour="exams-create-btn">Programar Examen</flux:button>
+            <flux:button variant="primary" icon="plus" wire:click="openCreateModal">Programar Examen</flux:button>
         @endif
     </div>
 
