@@ -52,12 +52,13 @@ class StudentsExport extends StringValueBinder implements FromCollection, Should
                 'address' => $student->pii?->address_encrypted ?? '',
                 'phone' => $student->pii?->contact_phone_encrypted ?? '',
                 'other_contact' => $student->pii?->other_contact_encrypted ?? '',
+                'curp' => $student->curp ?? '',
             ]);
     }
 
     public function headings(): array
     {
-        return ['Nombre', 'Turno', 'Grado/Grupo', 'Dirección', 'Teléfono', 'Otro Contacto'];
+        return ['Nombre', 'Turno', 'Grado/Grupo', 'Dirección', 'Teléfono', 'Otro Contacto', 'CURP'];
     }
 
     public function styles(Worksheet $sheet): array

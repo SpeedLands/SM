@@ -5,15 +5,14 @@ namespace App\Exports;
 use App\Models\Attendance;
 use App\Models\ClassGroup;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
+use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class AttendanceExport implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles, WithTitle
+class AttendanceExport implements FromView, WithStyles
 {
     public function __construct(
         private readonly string $groupId,
@@ -21,30 +20,41 @@ class AttendanceExport implements FromCollection, ShouldAutoSize, WithHeadings, 
         private readonly int $year,
     ) {}
 
-    public function collection(): Collection
+    public function view(): View
     {
-        $group = ClassGroup::findOrFail($this->groupId);
+        $group = ClassGroup::with('cycle')->findOrFail($this->groupId);
         $students = $group->students()->orderBy('name')->get();
 
         $startDate = Carbon::createFromDate($this->year, $this->month, 1)->startOfMonth();
         $endDate = $startDate->copy()->endOfMonth();
 
+        $daysInMonth = [];
+        $currentDate = $startDate->copy();
+        while ($currentDate->lte($endDate)) {
+            if ($currentDate->isWeekday()) {
+                $daysInMonth[] = $currentDate->copy();
+            }
+            $currentDate->addDay();
+        }
+
         // Get all attendances for these students in this month
-        $attendances = Attendance::whereIn('student_id', $students->pluck('id'))
+        $attendancesQuery = Attendance::whereIn('student_id', $students->pluck('id'))
             ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
-            ->get()
-            ->groupBy('student_id');
+            ->get();
+
+        $attendances = [];
+        foreach ($attendancesQuery as $att) {
+            $attendances[$att->student_id][$att->date->format('Y-m-d')] = $att;
+        }
 
         // Identify "working days" (days with at least one record in the group)
         $workingDays = Attendance::whereIn('student_id', $students->pluck('id'))
             ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
             ->select('date')
             ->distinct()
-            ->orderBy('date')
             ->pluck('date')
-            ->map(fn ($date) => Carbon::parse($date)->format('Y-m-d'));
-
-        $rows = new Collection;
+            ->map(fn ($date) => Carbon::parse($date)->format('Y-m-d'))
+            ->toArray();
 
         $statusSymbols = [
             'PRESENTE' => '.',
@@ -54,57 +64,62 @@ class AttendanceExport implements FromCollection, ShouldAutoSize, WithHeadings, 
             'TRABAJO_EN_CASA' => 'TC',
         ];
 
-        foreach ($students as $student) {
-            $studentAttendances = $attendances->get($student->id, new Collection)->keyBy(function ($item) {
-                return $item->date->format('Y-m-d');
-            });
+        return view('exports.attendance', [
+            'group' => $group,
+            'cycleName' => $group->cycle->name ?? '2025-2026',
+            'monthName' => Carbon::createFromDate($this->year, $this->month, 1)->translatedFormat('F'),
+            'daysInMonth' => $daysInMonth,
+            'students' => $students,
+            'workingDays' => $workingDays,
+            'attendances' => $attendances,
+            'statusSymbols' => $statusSymbols,
+        ]);
+    }
 
-            $row = [
-                'name' => $student->name,
-            ];
+    public function styles(Worksheet $sheet)
+    {
+        // Excel subtracts approximately ~0.78 from the specified width.
+        // To achieve 3.44 we set 4.22 (3.44 + 0.78)
+        $sheet->getColumnDimension('A')->setWidth(4.22);
 
-            foreach ($workingDays as $day) {
-                $attendance = $studentAttendances->get($day);
-                $row[$day] = $attendance ? ($statusSymbols[$attendance->status] ?? $attendance->status) : '';
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+
+        $highestCol = $sheet->getHighestColumn();
+
+        // Ensure we don't try to loop 'C' to 'B' or 'A' if there are no days
+        if ($highestCol !== 'A' && $highestCol !== 'B') {
+            $col = 'C';
+            while ($col !== $highestCol) {
+                // To achieve 2.22 we set 3.00 (2.22 + 0.78)
+                $sheet->getColumnDimension($col)->setWidth(3.00);
+                $col++;
             }
-
-            $rows->push($row);
+            $sheet->getColumnDimension($highestCol)->setWidth(3.00);
         }
 
-        return $rows;
-    }
+        $highestRow = $sheet->getHighestRow();
+        $highestCol = $sheet->getHighestColumn();
+        $range = 'A5:'.$highestCol.$highestRow;
 
-    public function headings(): array
-    {
-        $group = ClassGroup::findOrFail($this->groupId);
-        $startDate = Carbon::createFromDate($this->year, $this->month, 1)->startOfMonth();
-        $endDate = $startDate->copy()->endOfMonth();
+        $sheet->getStyle($range)->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => '00000000'],
+                ],
+            ],
+            'alignment' => [
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+        ]);
 
-        $students = $group->students()->pluck('students.id');
+        $sheet->getStyle('A1:'.$highestCol.'4')->applyFromArray([
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+        ]);
 
-        $workingDays = Attendance::whereIn('student_id', $students)
-            ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
-            ->select('date')
-            ->distinct()
-            ->orderBy('date')
-            ->pluck('date')
-            ->map(fn ($date) => Carbon::parse($date)->format('d'));
-
-        return array_merge(['Nombre'], $workingDays->toArray());
-    }
-
-    public function styles(Worksheet $sheet): array
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
-        ];
-    }
-
-    public function title(): string
-    {
-        $group = ClassGroup::findOrFail($this->groupId);
-        $monthName = Carbon::createFromDate($this->year, $this->month, 1)->translatedFormat('F');
-
-        return "Asistencia {$group->grade}{$group->section} - ".ucfirst($monthName);
+        return [];
     }
 }
