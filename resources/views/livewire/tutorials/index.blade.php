@@ -47,6 +47,7 @@ new class extends Component {
             'tutorial-a-report-types' => 'Gestión de Tipos de Reportes',
             'tutorial-c-install' => 'Cómo Instalar la Aplicación (PWA)',
             'tutorial-c-notifications' => 'Configuración de Notificaciones Push',
+            'tutorial-d-attendance' => 'Control de Asistencia de Alumnos',
         ][$name] ?? 'Tutorial';
     }
 
@@ -170,6 +171,30 @@ new class extends Component {
                 ['id' => 'editar', 'title' => '3. Editar citatorios'],
                 ['id' => 'borrar', 'title' => '4. Borrar citatorios'],
                 ['id' => 'firmar', 'title' => '5. Firmar citatorios'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for attendance tutorial
+        if ($name === 'tutorial-d-attendance') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'funcionamiento', 'title' => '1. Funcionamiento'],
+                ['id' => 'escaner', 'title' => '2. Escáner'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for export tutorial
+        if ($name === 'tutorial-a-export') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'maestros', 'title' => '1. Exportar maestros'],
+                ['id' => 'padres', 'title' => '2. Exportar padres'],
+                ['id' => 'alumnos', 'title' => '3. Exportar alumnos'],
+                ['id' => 'asistencias', 'title' => '4. Exportar asistencias'],
                 ['id' => 'beneficios', 'title' => 'Tips de experto'],
             ];
         }
@@ -361,12 +386,7 @@ new class extends Component {
                 'custom' => true,
             ],
             'tutorial-a-export' => [
-                'desc' => 'Genera reportes detallados en Excel de cualquier módulo del sistema.',
-                'req' => 'Seleccionar los filtros adecuados para el reporte deseado.',
-                'steps' => '<li>Elige el módulo (Ej: Reportes Disciplinarios).</li><li>Aplica filtros de fecha o grado.</li><li>Haz clic en "Exportar a Excel".</li>',
-                'tip' => 'Las exportaciones son ideales para juntas de consejo o análisis estadísticos.',
-                'edit' => '',
-                'delete' => ''
+                'custom' => true,
             ],
             'tutorial-a-users' => [
                 'custom' => true,
@@ -390,6 +410,9 @@ new class extends Component {
                 'custom' => true,
             ],
             'tutorial-c-notifications' => [
+                'custom' => true,
+            ],
+            'tutorial-d-attendance' => [
                 'custom' => true,
             ],
         ][$name] ?? [
@@ -416,6 +439,8 @@ new class extends Component {
             if ($name === 'tutorial-a-inscribe') return $this->getStudentsContent();
             if ($name === 'tutorial-d-create-report') return $this->getReportsContent();
             if ($name === 'tutorial-c-notifications') return $this->getNotificationsContent();
+            if ($name === 'tutorial-d-attendance') return $this->getAttendanceContent();
+            if ($name === 'tutorial-a-export') return $this->getExportContent();
         }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
@@ -2709,6 +2734,338 @@ new class extends Component {
             </div>
         ";
     }
+    public function getAttendanceContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Asistencias</strong> permite registrar la asistencia diaria de los alumnos por salón. Se puede marcar de forma manual mediante íconos de acción o de forma automática utilizando un escáner de credenciales con código QR.</p>
+
+            {$img('asistencia/menu.png', 'Vista general del apartado de Asistencias en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Docente</strong> o <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener un ciclo escolar activo con grados y grupos configurados.</li>
+                <li>Tener alumnos inscritos en los grupos del ciclo actual.</li>
+                <li>Para usar el escáner: tener un dispositivo lector conectado y credenciales generadas para los alumnos.</li>
+            </ul>
+
+            <h2 id='funcionamiento'>1. Funcionamiento del apartado</h2>
+            <p>Para comenzar a registrar la asistencia:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Asistencias\"</strong> que se encuentra en el menú lateral izquierdo.')}
+
+            {$step(2, 'Configure los campos de filtrado para seleccionar el salón:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Fecha</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el día donde se planea marcar asistencia. Por defecto muestra el <strong>día actual</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Ciclo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el ciclo donde se planea marcar asistencia. Por defecto muestra el <strong>ciclo activo</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el grado donde se planea marcar asistencia. Debe estar acompañado por un <strong>grupo/sección</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo/Sección</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el grupo donde se planea marcar asistencia. Debe estar acompañado por un <strong>grado</strong>.</span>
+                </div>
+            </div>
+
+            {$img('asistencia/camposAsistencia.png', 'Campos de filtrado para seleccionar el salón')}
+
+            {$step(3, 'Una vez seleccionado el salón, se desplegarán los alumnos pertenecientes y los recuadros de conteo:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800'>
+                    <span class='shrink-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider pt-0.5'>Presentes (Verde)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Contador de los alumnos que <strong>asistieron</strong> a clases.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800'>
+                    <span class='shrink-0 text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider pt-0.5'>Faltas (Rojo)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Contador de los alumnos que <strong>no asistieron</strong> a clases y no justificaron.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800'>
+                    <span class='shrink-0 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider pt-0.5'>Retardos (Amarillo)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Contador de los alumnos que asistieron pero <strong>llegaron fuera de tiempo</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-700'>
+                    <span class='shrink-0 text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider pt-0.5'>Pendientes (Gris)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Contador de los alumnos que <strong>faltan por marcar</strong> asistencia.</span>
+                </div>
+            </div>
+
+            {$img('asistencia/recuadroRegistrosMarcados.png', 'Recuadros de conteo de asistencia por estado')}
+
+            {$step(4, 'Dentro de la tabla de alumnos, cada registro cuenta con 5 íconos de acción para registrar el estado:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider pt-0.5'>✓ Palomita</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Marca al alumno como <strong>presente</strong> (asistió a clases).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider pt-0.5'>✗ Equis</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Marca al alumno como <strong>falta</strong> (no asistió).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider pt-0.5'>🕐 Reloj</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Marca al alumno como <strong>retardo</strong> (llegó fuera de tiempo).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider pt-0.5'>📄 Hoja</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Marca al alumno con <strong>justificación</strong> (faltó pero presentó justificante).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider pt-0.5'>🏠 Casa</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Marca al alumno con <strong>permiso</strong> o trabajo en casa.</span>
+                </div>
+            </div>
+
+            {$important('En la parte superior derecha existe un botón <strong>\"Todos presentes\"</strong>. Este es un atajo que sirve para marcar a <strong>todos los alumnos como asistidos</strong> de un solo clic.')}
+
+            {$img('asistencia/botonAsistidosTodos.png', 'Botón Todos presentes para marcar asistencia masiva')}
+
+            {$img('asistencia/alumnosAsistidos.png', 'Tabla de alumnos con los íconos de acción para marcar asistencia')}
+
+            <h2 id='escaner'>2. Escáner de credenciales</h2>
+            <p>La plataforma también permite marcar asistencia mediante un escáner de credenciales QR:</p>
+
+            {$step(1, 'En la parte superior derecha, presione el botón <strong>\"Escáner\"</strong>. Esto abrirá el apartado del escáner.')}
+
+            {$img('asistencia/botonEscaner.png', 'Botón Escáner para abrir el lector de credenciales')}
+
+            {$step(2, 'Pase la credencial del alumno por el escáner conectado. La asistencia se registrará automáticamente.')}
+
+            {$img('asistencia/apartadoEscaner.png', 'Apartado del escáner listo para leer credenciales')}
+
+            {$important('Para que funcione el escáner, deberá tener el <strong>dispositivo lector conectado previamente</strong>. Si el lente no capta bien la imagen, use el botón <strong>\"Re-enfocar escáner\"</strong> para volver a enfocar.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use \"Todos presentes\" como punto de partida</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si la mayoría de alumnos asistió, marque \"Todos presentes\" primero y luego ajuste individualmente las faltas y retardos. Esto ahorra tiempo significativo.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Registre la asistencia a primera hora</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Marcar la asistencia al inicio del día permite que los padres reciban las notificaciones a tiempo y estén al tanto de la situación de sus hijos.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Aproveche el escáner para agilizar</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si cuenta con escáner y las credenciales están generadas, el registro de asistencia es automático y mucho más rápido que el método manual.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+    public function getExportContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Exportar Datos</strong> permite generar archivos Excel con información del sistema. Se pueden exportar listas de maestros, padres, alumnos y asistencias, con opciones de filtrado por ciclo y grupo.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener un ciclo escolar activo con datos registrados.</li>
+            </ul>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Exportar Datos\"</strong> que se encuentra en el menú lateral izquierdo.')}
+
+            <h2 id='maestros'>1. Exportar Maestros y Administradores</h2>
+            <p>Permite exportar la lista de maestros y administradores del sistema en un archivo Excel.</p>
+
+            {$img('exportarDatos/cuadroExportarMaestros.png', 'Cuadro de exportación de maestros y administradores')}
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Generar nuevas contraseñas</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Opción para <strong>rotar contraseñas</strong> como protocolo de seguridad. Las nuevas contraseñas se incluirán en el Excel generado.</span>
+                </div>
+            </div>
+
+            {$important('En caso de usar la opción de generar contraseñas, deberá <strong>notificar a los maestros y administradores</strong> del plantel del respectivo cambio.')}
+
+            {$img('exportarDatos/excelMaestros.png', 'Vista del archivo Excel exportado con los datos de maestros')}
+
+            <h2 id='padres'>2. Exportar Padres y Tutores</h2>
+            <p>Permite exportar la lista de padres y tutores del sistema en un archivo Excel.</p>
+
+            {$img('exportarDatos/cuadroExportarPadres.png', 'Cuadro de exportación de padres y tutores')}
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Generar nuevas contraseñas</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Opción para <strong>rotar contraseñas</strong> como protocolo de seguridad.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Ciclo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el ciclo escolar de donde desea exportar.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el grupo específico para filtrar la exportación.</span>
+                </div>
+            </div>
+
+            {$important('En caso de usar la opción de generar contraseñas, deberá <strong>notificar a los padres y tutores</strong> de los alumnos del respectivo cambio.')}
+
+            {$img('exportarDatos/excelPadres.png', 'Vista del archivo Excel exportado con los datos de padres y tutores')}
+
+            <h2 id='alumnos'>3. Exportar Alumnos</h2>
+            <p>Permite exportar la lista de alumnos del sistema en un archivo Excel.</p>
+
+            {$img('exportarDatos/cuadroExportarAlumnos.png', 'Cuadro de exportación de alumnos')}
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Ciclo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el ciclo escolar de donde desea exportar.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el grupo específico para filtrar la exportación.</span>
+                </div>
+            </div>
+
+            {$important('Los datos de alumnos son <strong>sensibles</strong>. Procure no compartir la información con personas sin autorización.')}
+
+            {$img('exportarDatos/excelAlumnos.png', 'Vista del archivo Excel exportado con los datos de alumnos')}
+
+            <h2 id='asistencias'>4. Exportar Asistencias</h2>
+            <p>Permite exportar el registro de asistencias de los alumnos en un archivo Excel.</p>
+
+            {$img('exportarDatos/cuadroExportarAsistencias.png', 'Cuadro de exportación de asistencias')}
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Ciclo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el ciclo escolar.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el grupo específico.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Mes</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el mes del que desea exportar asistencias.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Año</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el año correspondiente.</span>
+                </div>
+            </div>
+
+            <p>En el Excel de asistencias, los registros se representan con la siguiente simbología:</p>
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider pt-0.5'>. (Punto)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica que el alumno <strong>asistió</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider pt-0.5'>| (Línea)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica que el alumno <strong>faltó</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider pt-0.5'>+ (Cruz)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica que el alumno tuvo <strong>retardo</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider pt-0.5'>J</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica <strong>justificación</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider pt-0.5'>TC</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica <strong>trabajo en casa</strong>.</span>
+                </div>
+            </div>
+
+            {$img('exportarDatos/excelAsistencia.png', 'Vista del archivo Excel exportado con los registros de asistencia')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Rote contraseñas periódicamente</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use la opción de generar nuevas contraseñas al exportar maestros o padres como protocolo de seguridad. No olvide notificar a los usuarios afectados.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Exporte antes de las juntas de consejo</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Las listas en Excel son ideales para presentar estadísticas en juntas de consejo técnico o reuniones con directivos.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Proteja los datos sensibles</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Los archivos exportados contienen información personal. Almacene los Excel de forma segura y no los comparta con personas sin autorización.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
 }; ?>
 
 @section('title', 'Guía Escolar: Tutoriales y Ayuda Digital')
@@ -2754,6 +3111,7 @@ new class extends Component {
                 <x-tutorial-card icon="calendar" title="Generar Citatorios" description="Coordina reuniones presenciales con padres de familia." name="tutorial-d-citations" />
                 <x-tutorial-card icon="megaphone" title="Publicar Avisos" description="Comunícate de forma masiva con padres de tus grupos." name="tutorial-d-notices" />
                 <x-tutorial-card icon="user-group" title="Asignar Servicio" description="Asigna actividades de servicio comunitario por reportes acumulados." name="tutorial-d-community" />
+                <x-tutorial-card icon="clipboard-document-check" title="Control de Asistencia" description="Marca asistencia diaria de alumnos de forma manual o con escáner." name="tutorial-d-attendance" />
             </div>
             @endif
 
