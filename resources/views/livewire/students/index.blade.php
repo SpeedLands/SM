@@ -505,6 +505,7 @@ new class extends Component {
     }
 }; ?>
 
+<div x-data="{ showFilters: false }">
 <div x-data="studentPopover()" x-init="init()" class="space-y-6 text-zinc-900 dark:text-white pb-10">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -536,11 +537,11 @@ new class extends Component {
         @if($gradeFilter !== 'Todos') <flux:badge variant="solid" color="zinc" class="shrink-0">{{ $gradeFilter }}</flux:badge> @endif
         @if($groupFilter !== 'Todos') <flux:badge variant="solid" color="zinc" class="shrink-0">Sección {{ $groupFilter }}</flux:badge> @endif
         @if($onlyActiveCycle) <flux:badge variant="solid" color="zinc" class="shrink-0">Ciclo Activo</flux:badge> @endif
-        <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="$refs.filterPanel.classList.toggle('hidden')" />
+        <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="showFilters = !showFilters" />
     </div>
 
     <!-- Search and Filters -->
-    <div x-ref="filterPanel" class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm space-y-6 transition-all">
+    <div x-show="showFilters" class="sm:block! p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm space-y-6 transition-all">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <flux:heading size="lg" level="2">Filtros</flux:heading>
             <flux:switch wire:model.live="onlyActiveCycle" label="Solo mostrar inscritos en ciclo actual" />
@@ -797,9 +798,9 @@ new class extends Component {
                                         wire:model="name" 
                                         placeholder="Ej. JUAN PEREZ LOPEZ" 
                                         class="uppercase"
+                                        autofocus
                                         x-on:input="name = $event.target.value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Z ]/g, '')"
                                     />
-                                    <flux:error name="name" />
                                 </div>
                                 <div>
                                     <flux:input 
@@ -809,23 +810,20 @@ new class extends Component {
                                         class="uppercase"
                                         x-on:input="curp = $event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 18)"
                                     />
-                                    <flux:error name="curp" />
                                 </div>
-                                <div class="flex flex-col gap-1">
+                                <div>
                                     <flux:select label="Turno" wire:model="turn">
                                         <option value="MATUTINO">Matutino</option>
                                         <option value="VESPERTINO">Vespertino</option>
                                     </flux:select>
-                                    <flux:error name="turn" />
                                 </div>
-                                <div class="md:col-span-2 flex flex-col gap-1">
+                                <div class="md:col-span-2">
                                     <flux:select label="Grupo / Grado" wire:model="classGroupId">
                                         <option value="">Seleccione grupo...</option>
                                         @foreach($classGroups as $group)
                                             <option value="{{ $group->id }}">{{ $group->grade }} {{ $group->section }}</option>
                                         @endforeach
                                     </flux:select>
-                                    <flux:error name="classGroupId" />
                                 </div>
                             </div>
                         </div>

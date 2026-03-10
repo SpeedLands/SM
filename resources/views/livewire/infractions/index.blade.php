@@ -200,7 +200,7 @@ new class extends Component {
             </header>
 
             <div class="space-y-4">
-                <flux:input wire:model="description" label="Descripción" placeholder="Ej: Falta de tarea..." required />
+                <flux:input wire:model="description" label="Descripción" placeholder="Ej: Falta de tarea..." required autofocus />
                 
                 <flux:select wire:model="severity" label="Gravedad">
                     <option value="NORMAL">Normal</option>

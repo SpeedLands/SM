@@ -14,6 +14,7 @@ new class extends Component {
     public string $lastEntryTime = '';
     public string $lastStatus = '';
     public array $recentScans = [];
+    public bool $useCamera = false;
 
     public function mount(): void
     {
@@ -115,18 +116,22 @@ new class extends Component {
 
 }; ?>
 
-<div class="max-w-2xl mx-auto py-8 px-4 space-y-6">
+<div class="max-w-2xl mx-auto py-8 px-4 space-y-6" x-data="scannerComponent()">
+    {{-- html5-qrcode CDN --}}
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     {{-- Header --}}
     <div class="flex items-center gap-3">
         <flux:button :href="route('attendance.index')" icon="arrow-left" variant="subtle" size="sm" title="Volver a asistencia" />
-        <div>
+        <div class="flex-1">
             <flux:heading size="xl">Escáner de Asistencia</flux:heading>
-            <flux:subheading>Pasa el QR o código de barras por el lector</flux:subheading>
+            <flux:subheading>Pasa el QR o código de barras por el lector <span x-show="!localUseCamera">o usa la cámara</span></flux:subheading>
         </div>
+        <flux:button x-show="!localUseCamera" icon="camera" size="sm" x-on:click="toggleCamera()">Usar Cámara</flux:button>
+        <flux:button x-show="localUseCamera" icon="computer-desktop" size="sm" x-on:click="toggleCamera()" x-cloak>Usar Lector</flux:button>
     </div>
 
     {{-- Scan Area --}}
-    <div class="relative">
+    <div class="relative" x-show="!localUseCamera">
         {{-- Hidden autofocus input --}}
         <input
             autofocus
@@ -156,6 +161,23 @@ new class extends Component {
             <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">
                 {{ $lastStatus ? 'Listo para siguiente lectura' : 'Esperando lectura...' }}
             </p>
+        </div>
+    </div>
+
+    {{-- Camera Area --}}
+    <div x-show="localUseCamera" class="space-y-4" x-cloak>
+        <div class="relative max-w-sm mx-auto aspect-square overflow-hidden rounded-3xl border-4 border-zinc-200 dark:border-zinc-700 bg-black" wire:ignore>
+            {{-- Loading State --}}
+            <div x-show="isStarting" class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900 z-10">
+                <flux:icon name="camera" class="w-12 h-12 text-zinc-700 animate-pulse mb-4" />
+                <flux:text size="sm" class="text-zinc-500">Iniciando cámara...</flux:text>
+            </div>
+
+            <div id="reader" class="w-full h-full [&>video]:object-cover [&>video]:w-full [&>video]:h-full"></div>
+        </div>
+        
+        <div class="text-center">
+            <flux:text size="sm" class="text-zinc-500">Apunta la cámara al código QR o de barras</flux:text>
         </div>
     </div>
 
@@ -221,7 +243,7 @@ new class extends Component {
     @endif
 
     {{-- Re-focus button --}}
-    <div class="text-center">
+    <div class="text-center" x-show="!localUseCamera">
         <flux:button variant="subtle" size="sm" icon="cursor-arrow-rays"
             title="Enfocar cursor para escanear"
             x-on:click="document.getElementById('scanner-input').focus()">
@@ -229,40 +251,112 @@ new class extends Component {
         </flux:button>
     </div>
 
-    {{-- Script --}}
+    @script
     <script>
-        document.addEventListener('livewire:initialized', () => {
-            const input = document.getElementById('scanner-input');
+        Alpine.data('scannerComponent', () => ({
+            localUseCamera: false,
+            html5QrCode: null,
+            lastScan: null,
+            scanCooldown: false,
+            isStarting: false,
 
-            document.addEventListener('click', () => input?.focus());
-            document.addEventListener('keydown', (e) => {
-                if (e.target !== input) input?.focus();
-            });
+            init() {
+                this.setupFocus();
+            },
 
-            Livewire.on('play-sound', (params) => {
-                const type = params[0].type;
-                const sequences = {
-                    'success': [[660, 0.15], [880, 0.15]],
-                    'error':   [[440, 0.2], [220, 0.3]],
-                    'warning': [[520, 0.15], [520, 0.15]],
-                };
-
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                sequences[type].forEach(([freq, dur], i) => {
-                    setTimeout(() => {
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(freq, ctx.currentTime);
-                        gain.gain.setValueAtTime(0.12, ctx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.start();
-                        osc.stop(ctx.currentTime + dur);
-                    }, i * 200);
+            setupFocus() {
+                const input = document.getElementById('scanner-input');
+                document.addEventListener('click', () => {
+                    if (!this.localUseCamera) input?.focus();
                 });
+                document.addEventListener('keydown', (e) => {
+                    if (this.localUseCamera) return;
+                    if (e.target !== input) input?.focus();
+                });
+            },
+
+            toggleCamera() {
+                this.localUseCamera = !this.localUseCamera;
+                if (this.localUseCamera) {
+                    this.isStarting = true;
+                    this.startCamera();
+                } else {
+                    this.stopCamera();
+                }
+            },
+
+            async startCamera() {
+                this.html5QrCode = new Html5Qrcode("reader");
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                
+                try {
+                    await this.html5QrCode.start(
+                        { facingMode: "environment" }, 
+                        config, 
+                        (decodedText) => this.onScanSuccess(decodedText)
+                    );
+                    this.isStarting = false;
+                } catch (err) {
+                    console.error("Error starting camera", err);
+                    this.localUseCamera = false;
+                    this.isStarting = false;
+                    alert("No se pudo acceder a la cámara. Verifica los permisos.");
+                }
+            },
+
+            async stopCamera() {
+                if (this.html5QrCode) {
+                    try {
+                        await this.html5QrCode.stop();
+                        this.html5QrCode = null;
+                    } catch (err) {
+                        console.error("Error stopping camera", err);
+                    }
+                }
+            },
+
+            onScanSuccess(decodedText) {
+                if (this.scanCooldown) return;
+                
+                this.scanCooldown = true;
+
+                this.lastScan = decodedText;
+                $wire.curp = this.lastScan;
+                $wire.processScan();
+
+                // Cooldown of 3 seconds between scans to avoid double scans
+                setTimeout(() => {
+                    this.scanCooldown = false;
+                }, 3000);
+            }
+        }));
+
+        Livewire.on('play-sound', (params) => {
+            const type = params[0].type;
+            const sequences = {
+                'success': [[660, 0.15], [880, 0.15]],
+                'error':   [[440, 0.2], [220, 0.3]],
+                'warning': [[520, 0.15], [520, 0.15]],
+            };
+
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended') ctx.resume();
+
+            sequences[type].forEach(([freq, dur], i) => {
+                setTimeout(() => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + dur);
+                }, i * 200);
             });
         });
     </script>
+    @endscript
 </div>

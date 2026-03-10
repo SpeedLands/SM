@@ -27,7 +27,7 @@
                 ? route('notifications.edit')
                 : (auth()->user()->isAdmin() ? route('profile.edit') : route('appearance.edit'));
         @endphp
-        <flux:menu.item :href="$settingsRoute" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+        <flux:menu.item :href="$settingsRoute" icon="cog">{{ __('Settings') }}</flux:menu.item>
     </flux:menu.radio.group>
 
     <flux:menu.separator />

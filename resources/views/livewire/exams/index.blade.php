@@ -220,7 +220,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="space-y-6">
+<div class="space-y-6" x-data="{ showFilters: false }">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <flux:heading size="lg" level="1">Calendario de Exámenes</flux:heading>
@@ -236,11 +236,11 @@ new class extends Component {
         @if($periodFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">{{ $periodFilter }}º Trimestre</flux:badge> @endif
         @if($gradeFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">{{ $gradeFilter }} Grado</flux:badge> @endif
         @if($groupFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">Grupo {{ $groupFilter }}</flux:badge> @endif
-        <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="$refs.filterPanel.classList.toggle('hidden')" />
+        <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="showFilters = !showFilters" />
     </div>
 
     <!-- Filters -->
-    <div x-ref="filterPanel" class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm transition-all mb-6">
+    <div x-show="showFilters" x-collapse class="sm:block! p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm transition-all mb-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <flux:field>
                 <flux:label>Trimestre</flux:label>

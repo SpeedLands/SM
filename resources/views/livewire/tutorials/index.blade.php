@@ -46,7 +46,8 @@ new class extends Component {
             'tutorial-a-promote' => 'Guía para Promover Alumnos de Ciclo',
             'tutorial-a-report-types' => 'Gestión de Tipos de Reportes',
             'tutorial-c-install' => 'Cómo Instalar la Aplicación (PWA)',
-            'tutorial-c-notifications' => 'Activar Notificaciones Push',
+            'tutorial-c-notifications' => 'Configuración de Notificaciones Push',
+            'tutorial-d-attendance' => 'Control de Asistencia de Alumnos',
         ][$name] ?? 'Tutorial';
     }
 
@@ -140,7 +141,8 @@ new class extends Component {
                 ['id' => 'asignar', 'title' => '1. Asignar servicio'],
                 ['id' => 'buscar', 'title' => '2. Buscar servicios'],
                 ['id' => 'firmar', 'title' => '3. Firmar servicios'],
-                ['id' => 'borrar', 'title' => '4. Borrar servicios'],
+                ['id' => 'editar', 'title' => '4. Editar servicio'],
+                ['id' => 'borrar', 'title' => '5. Borrar servicio'],
                 ['id' => 'beneficios', 'title' => 'Tips de experto'],
             ];
         }
@@ -173,6 +175,30 @@ new class extends Component {
             ];
         }
 
+        // Custom sections for attendance tutorial
+        if ($name === 'tutorial-d-attendance') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'funcionamiento', 'title' => '1. Funcionamiento'],
+                ['id' => 'escaner', 'title' => '2. Escáner'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for export tutorial
+        if ($name === 'tutorial-a-export') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'maestros', 'title' => '1. Exportar maestros'],
+                ['id' => 'padres', 'title' => '2. Exportar padres'],
+                ['id' => 'alumnos', 'title' => '3. Exportar alumnos'],
+                ['id' => 'asistencias', 'title' => '4. Exportar asistencias'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
         // Custom sections for exams tutorial
         if ($name === 'tutorial-d-exams') {
             return [
@@ -180,7 +206,8 @@ new class extends Component {
                 ['id' => 'requisitos', 'title' => 'Requisitos previos'],
                 ['id' => 'programar', 'title' => '1. Programar examen'],
                 ['id' => 'buscar', 'title' => '2. Buscar exámenes'],
-                ['id' => 'borrar', 'title' => '3. Borrar examen'],
+                ['id' => 'editar', 'title' => '3. Editar examen'],
+                ['id' => 'borrar', 'title' => '4. Borrar examen'],
                 ['id' => 'beneficios', 'title' => 'Tips de experto'],
             ];
         }
@@ -208,6 +235,9 @@ new class extends Component {
                 ['id' => 'buscar', 'title' => '3. Buscar alumnos'],
                 ['id' => 'editar', 'title' => '4. Editar alumno'],
                 ['id' => 'borrar', 'title' => '5. Borrar alumno'],
+                ['id' => 'credencial', 'title' => '6. Generar credencial'],
+                ['id' => 'historial', 'title' => '7. Ver historial'],
+                ['id' => 'atajo', 'title' => '8. Atajos rápidos'],
                 ['id' => 'beneficios', 'title' => 'Tips de experto'],
             ];
         }
@@ -219,7 +249,19 @@ new class extends Component {
                 ['id' => 'requisitos', 'title' => 'Requisitos previos'],
                 ['id' => 'crear', 'title' => '1. Crear reporte'],
                 ['id' => 'buscar', 'title' => '2. Buscar reportes'],
-                ['id' => 'borrar', 'title' => '3. Borrar reporte'],
+                ['id' => 'atajo', 'title' => '3. Asignar citatorios/servicios'],
+                ['id' => 'editar', 'title' => '4. Editar reporte'],
+                ['id' => 'borrar', 'title' => '5. Borrar reporte'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for notifications tutorial
+        if ($name === 'tutorial-c-notifications') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'activar', 'title' => '1. Activar notificaciones'],
                 ['id' => 'beneficios', 'title' => 'Tips de experto'],
             ];
         }
@@ -344,12 +386,7 @@ new class extends Component {
                 'custom' => true,
             ],
             'tutorial-a-export' => [
-                'desc' => 'Genera reportes detallados en Excel de cualquier módulo del sistema.',
-                'req' => 'Seleccionar los filtros adecuados para el reporte deseado.',
-                'steps' => '<li>Elige el módulo (Ej: Reportes Disciplinarios).</li><li>Aplica filtros de fecha o grado.</li><li>Haz clic en "Exportar a Excel".</li>',
-                'tip' => 'Las exportaciones son ideales para juntas de consejo o análisis estadísticos.',
-                'edit' => '',
-                'delete' => ''
+                'custom' => true,
             ],
             'tutorial-a-users' => [
                 'custom' => true,
@@ -373,12 +410,10 @@ new class extends Component {
                 'custom' => true,
             ],
             'tutorial-c-notifications' => [
-                'desc' => 'Activa las notificaciones push para recibir alertas al instante sobre reportes, citatorios y avisos.',
-                'req' => 'Un navegador moderno (Chrome, Safari, Edge) con soporte para Service Workers.',
-                'steps' => '<li>Ve a tu perfil (abajo a la izquierda).</li><li>Selecciona "Configuración" en el menú desplegable.</li><li>Haz clic en la pestaña "Notificaciones".</li><li>Presiona el botón "Activar" y concede los permisos en tu navegador.</li>',
-                'tip' => 'Si activas las notificaciones pero no las recibes, revisa que tu sistema operativo (Windows/Android/iOS) no esté en modo "No molestar".',
-                'edit' => '',
-                'delete' => ''
+                'custom' => true,
+            ],
+            'tutorial-d-attendance' => [
+                'custom' => true,
             ],
         ][$name] ?? [
             'desc' => "Esta guía te ayudará a dominar la sección de <strong>{$title}</strong>.",
@@ -403,6 +438,9 @@ new class extends Component {
             if ($name === 'tutorial-a-report-types') return $this->getReportTypesContent();
             if ($name === 'tutorial-a-inscribe') return $this->getStudentsContent();
             if ($name === 'tutorial-d-create-report') return $this->getReportsContent();
+            if ($name === 'tutorial-c-notifications') return $this->getNotificationsContent();
+            if ($name === 'tutorial-d-attendance') return $this->getAttendanceContent();
+            if ($name === 'tutorial-a-export') return $this->getExportContent();
         }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
@@ -1240,7 +1278,7 @@ new class extends Component {
             </div>";
 
         return "
-            <p id='intro'>El apartado de <strong>Servicio Comunitario</strong> permite asignar, dar seguimiento y gestionar las actividades reparatorias asignadas a los alumnos. Estas actividades se generan como consecuencia de reportes acumulados y buscan la reflexión y reparación del daño por parte del estudiante.</p>
+            <p id='intro'>El apartado de <strong>Servicio Comunitario</strong> permite asignar, buscar, firmar, editar y eliminar las actividades reparatorias asignadas a los alumnos. Estas actividades se generan como consecuencia de reportes acumulados y buscan la reflexión y reparación del daño por parte del estudiante.</p>
 
             {$img('servicioComunitario/menu.png', 'Vista general del apartado de Servicio Comunitario en el menú lateral')}
 
@@ -1306,19 +1344,22 @@ new class extends Component {
                 </div>
                 <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
                     <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Filtrar por Estado</span>
-                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre los servicios por su estado actual: <strong>Pendientes</strong>, <strong>Completados</strong> o <strong>No asistió</strong>.</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre los servicios por su estado actual: <strong>Pendientes</strong>, <strong>Completados</strong> o <strong>No asistió</strong>. El estado depende de la firma asignada (ver sección Firmar).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Solo ciclo activo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Switch que permite visualizar los servicios comunitarios generados en el ciclo activo. De lo contrario, muestra todos los servicios registrados hasta la fecha.</span>
                 </div>
             </div>
 
             {$img('servicioComunitario/campoBusqueda.png', 'Resultado al buscar un servicio por nombre de alumno')}
             {$img('servicioComunitario/campoEstados.png', 'Resultado al filtrar servicios por estado')}
+            {$img('servicioComunitario/switchMostrarServiciosCiclo.png', 'Switch para mostrar solo servicios del ciclo activo')}
 
             <h2 id='firmar'>3. Firmar servicios comunitarios</h2>
             <p>Una vez que el alumno ha cumplido (o no) con la actividad asignada, deberá registrar el resultado:</p>
 
             {$step(1, 'En la tabla de servicios comunitarios, ubique el registro correspondiente.')}
-
-            {$img('servicioComunitario/tablaServiciosPorFirmar.png', 'Tabla de servicios con los botones de acción para firmar')}
 
             {$step(2, 'En la columna de <strong>\"Acciones\"</strong>, visualizará dos botones:')}
 
@@ -1335,7 +1376,28 @@ new class extends Component {
 
             {$img('servicioComunitario/servicioFirmado.png', 'Servicio comunitario firmado con el estado actualizado')}
 
-            <h2 id='borrar'>4. Borrar servicios comunitarios</h2>
+            <h2 id='editar'>4. Editar servicio comunitario</h2>
+            <p>Para modificar los datos de un servicio comunitario existente:</p>
+
+            {$step(1, 'En la tabla de servicios comunitarios, localice el registro a editar.')}
+
+            {$img('servicioComunitario/servicioAEditar.png', 'Servicio en la tabla con el ícono de lápiz para editar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Lápiz\"</strong> del registro. Esto abrirá el recuadro de edición con la información actual del servicio.')}
+
+            {$img('servicioComunitario/modalEditarServicio.png', 'Modal de edición con los datos actuales del servicio comunitario')}
+
+            {$step(3, 'Modifique los campos que necesite. Cuenta con los mismos campos que al asignar: Buscar Alumno, Actividad, Instrucciones Adicionales y Fecha de Cumplimiento.')}
+
+            {$important('No se pueden asignar servicios comunitarios los <strong>domingos</strong>. Asegúrese de seleccionar una fecha válida.')}
+
+            {$img('servicioComunitario/modalEditarServicioNuevaInformacion.png', 'Modal de edición con la nueva información ingresada')}
+
+            {$step(4, 'Presione el botón <strong>\"Actualizar Servicio\"</strong>. Los cambios se verán reflejados en la tabla.')}
+
+            {$img('servicioComunitario/servicioEditado.png', 'Servicio comunitario actualizado correctamente en la tabla')}
+
+            <h2 id='borrar'>5. Borrar servicio comunitario</h2>
             <p>Para eliminar un servicio comunitario registrado:</p>
 
             {$step(1, 'En la tabla de servicios comunitarios, localice el registro a eliminar.')}
@@ -1371,6 +1433,13 @@ new class extends Component {
                     <div>
                         <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use los filtros para dar seguimiento</p>
                         <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Filtre por estado <strong>\"Pendientes\"</strong> para identificar rápidamente los servicios que aún no han sido firmados y requieren atención.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>4</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Edite antes de la fecha de cumplimiento</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si necesita cambiar la actividad o la fecha, edite el servicio antes de que llegue la fecha de cumplimiento para mantener la comunicación clara con el alumno y sus padres.</p>
                     </div>
                 </div>
             </div>
@@ -1818,7 +1887,7 @@ new class extends Component {
             </div>";
 
         return "
-            <p id='intro'>El apartado de <strong>Exámenes</strong> permite programar, buscar y eliminar evaluaciones para que padres y alumnos puedan visualizar las fechas de sus exámenes. Los exámenes programados también se reflejan en el calendario general de la plataforma.</p>
+            <p id='intro'>El apartado de <strong>Exámenes</strong> permite programar, buscar, editar y eliminar evaluaciones para que padres y alumnos puedan visualizar las fechas de sus exámenes. Los exámenes programados también se reflejan en el calendario general de la plataforma.</p>
 
             {$img('examenes/menu.png', 'Vista general del apartado de Exámenes en el menú lateral')}
 
@@ -1898,7 +1967,27 @@ new class extends Component {
             {$img('examenes/campoFiltradoGrado.png', 'Resultado al filtrar exámenes por grado')}
             {$img('examenes/campoFiltradoSeccion.png', 'Resultado al filtrar exámenes por grupo o sección')}
 
-            <h2 id='borrar'>3. Borrar examen</h2>
+            <h2 id='editar'>3. Editar examen</h2>
+            <p>Para modificar los datos de un examen programado:</p>
+
+            {$step(1, 'En el tablero de exámenes, localice el examen a editar.')}
+
+            {$img('examenes/examenAEditar.png', 'Examen en el tablero listo para ser editado')}
+
+            {$step(2, 'Pase el cursor por encima del examen y presione el ícono de <strong>\"Lápiz\"</strong> del registro. Esto abrirá el recuadro de edición con la información actual del examen.')}
+
+            {$img('examenes/iconoEditarExamen.png', 'Ícono de lápiz visible al pasar el cursor sobre el examen')}
+            {$img('examenes/modalExamenEditarVacio.png', 'Modal de edición con los datos actuales del examen')}
+
+            {$step(3, 'Modifique los campos que necesite. Cuenta con los mismos campos que al programar: Nombre de la Materia, Grado, Grupo, Trimestre y Fecha del Examen.')}
+
+            {$img('examenes/modalExamenEditarLleno.png', 'Modal de edición con la nueva información ingresada')}
+
+            {$step(4, 'Presione el botón <strong>\"Guardar Examen\"</strong>. Los cambios se verán reflejados en el tablero.')}
+
+            {$img('examenes/examenEditado.png', 'Examen modificado correctamente en el tablero')}
+
+            <h2 id='borrar'>4. Borrar examen</h2>
             <p>Para eliminar un examen programado:</p>
 
             {$step(1, 'En el tablero de exámenes, localice el examen a eliminar.')}
@@ -1911,8 +2000,6 @@ new class extends Component {
             {$img('examenes/modalEliminarExamen.png', 'Cuadro de confirmación para eliminar el examen')}
 
             {$step(3, 'Presione el botón <strong>\"Eliminar\"</strong> para confirmar. El examen será eliminado del tablero.')}
-
-            {$img('examenes/tableroExamenesBorrados.png', 'Tablero de exámenes tras eliminar el registro')}
 
             <h2 id='beneficios'>Tips de experto</h2>
             <div class='not-prose my-4 space-y-4'>
@@ -1935,6 +2022,13 @@ new class extends Component {
                     <div>
                         <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Sea específico con el nombre de la materia</p>
                         <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use nombres claros y consistentes para las materias (ej. \"Matemáticas\", \"Español\") para que padres y alumnos identifiquen fácilmente cada evaluación.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>4</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Edite en lugar de borrar y recrear</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si necesita cambiar la fecha o materia de un examen, use la opción de editar en lugar de eliminarlo y crear uno nuevo. Esto mantiene el registro limpio.</p>
                     </div>
                 </div>
             </div>
@@ -2105,7 +2199,7 @@ new class extends Component {
             </div>";
 
         return "
-            <p id='intro'>El apartado de <strong>Alumnos</strong> permite inscribir, buscar, editar, eliminar y vincular padres de familia a los alumnos registrados en el sistema. Es el módulo central para la gestión del alumnado de la institución.</p>
+            <p id='intro'>El apartado de <strong>Alumnos</strong> permite inscribir, buscar, editar, eliminar y vincular padres de familia a los alumnos registrados en el sistema. Además, podrá generar credenciales, consultar el historial disciplinario y asignar reportes, citatorios o servicios comunitarios de forma rápida.</p>
 
             {$img('alumnos/menu.png', 'Vista general del apartado de Alumnos en el menú lateral')}
 
@@ -2134,8 +2228,16 @@ new class extends Component {
                     <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Coloque el nombre completo del alumno.</span>
                 </div>
                 <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>CURP</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Coloque la CURP del alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
                     <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Turno</span>
                     <span class='text-sm text-zinc-600 dark:text-zinc-400'>Por defecto <strong>Matutino</strong>. Puede cambiarse a Vespertino y viceversa.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Foto del Alumno</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Suba la foto del alumno para posteriormente generar la credencial.</span>
                 </div>
                 <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
                     <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo / Grado</span>
@@ -2224,7 +2326,7 @@ new class extends Component {
 
             {$img('alumnos/modalEdicionAlumno.png', 'Modal de edición con los datos actuales del alumno')}
 
-            {$step(3, 'Modifique los campos que necesite. Cuenta con los mismos campos que al inscribir: Nombre, Turno, Grupo/Grado, Dirección, Teléfonos, Contactos y Padres de Familia.')}
+            {$step(3, 'Modifique los campos que necesite. Cuenta con los mismos campos que al inscribir: Nombre, CURP, Turno, Foto, Grupo/Grado, Dirección, Teléfonos, Contactos y Padres de Familia.')}
 
             {$img('alumnos/modalEdicionAlumnoNuevaInformacion.png', 'Modal de edición con la nueva información ingresada')}
 
@@ -2249,6 +2351,70 @@ new class extends Component {
 
             {$img('alumnos/alumnoEliminado.png', 'Alumno eliminado correctamente de la tabla')}
 
+            <h2 id='credencial'>6. Generar credencial del alumno</h2>
+            <p>La plataforma permite generar credenciales de identificación con código QR para cada alumno.</p>
+
+            {$step(1, 'En la tabla de alumnos, localice el registro al que desea generar su credencial.')}
+
+            {$img('alumnos/alumnoGenerarCredencial.png', 'Alumno en la tabla con el ícono de credencial')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Credencial\"</strong> del registro. Esto abrirá un recuadro donde podrá escalar la imagen de la foto y configurar la credencial.')}
+
+            {$img('alumnos/cuadroEscalarGenerarPDF.png', 'Recuadro para escalar la foto y generar el PDF de la credencial')}
+
+            {$step(3, 'Una vez configurado, presione el botón <strong>\"Generar PDF\"</strong> para crear el archivo.')}
+
+            {$img('alumnos/credencialFinalAlumno.png', 'Credencial generada en formato PDF con código QR')}
+
+            {$important('La credencial incluye un <strong>código QR</strong> que permite marcar asistencia mediante un escáner. Asegúrese de que la foto del alumno esté cargada previamente.')}
+
+            <h2 id='historial'>7. Ver historial del alumno</h2>
+            <p>Consulte el historial disciplinario completo de un alumno:</p>
+
+            {$step(1, 'En la tabla de alumnos, localice el registro a consultar.')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Ojo\"</strong> del registro. Esto abrirá un recuadro con el historial del alumno.')}
+
+            {$img('alumnos/historialAlumno.png', 'Recuadro con el historial disciplinario del alumno')}
+
+            {$step(3, 'El historial presenta los siguientes indicadores:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 h-5 w-5 rounded-full bg-red-500 mt-0.5'></span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>El símbolo <strong>Rojo</strong> muestra los <strong>reportes</strong> del alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 h-5 w-5 rounded-full bg-green-500 mt-0.5'></span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>El símbolo <strong>Verde</strong> muestra los <strong>servicios comunitarios</strong> del alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 h-5 w-5 rounded-full bg-yellow-500 mt-0.5'></span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>El símbolo <strong>Amarillo</strong> muestra los <strong>citatorios</strong> del alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Solo ciclo activo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Switch que permite visualizar solo los registros del ciclo activo. De lo contrario, muestra todos los registros aplicados al alumno en su instancia en la institución.</span>
+                </div>
+            </div>
+
+            <h2 id='atajo'>8. Atajo para asignar citatorios, servicios y reportes</h2>
+            <p>La plataforma ofrece un atajo rápido para asignar citatorios, servicios comunitarios o reportes directamente desde la tabla de alumnos.</p>
+
+            {$step(1, 'En la tabla de alumnos, localice el registro al que desea asignar una acción.')}
+
+            {$img('alumnos/registroAtajoReportesCitatoriosServicios.png', 'Registro del alumno en la tabla para usar el atajo')}
+
+            {$step(2, 'Presione la <strong>fila del registro</strong>. Esto abrirá un cuadro con las opciones disponibles.')}
+
+            {$img('alumnos/cuadroOpcionesAtajo.png', 'Cuadro con las opciones de atajo: Reporte, Citatorio y Servicio Comunitario')}
+
+            {$step(3, 'Seleccione la opción deseada. Será redirigido al apartado correspondiente con la información del alumno precargada.')}
+
+            {$img('alumnos/cuadroAtajoReporte.png', 'Atajo para asignar un reporte al alumno')}
+            {$img('alumnos/cuadroAtajoCitatorio.png', 'Atajo para asignar un citatorio al alumno')}
+            {$img('alumnos/cuadroAtajoServicio.png', 'Atajo para asignar un servicio comunitario al alumno')}
+
             <h2 id='beneficios'>Tips de experto</h2>
             <div class='not-prose my-4 space-y-4'>
                 <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
@@ -2261,15 +2427,22 @@ new class extends Component {
                 <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
                     <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
                     <div>
-                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use el switch de ciclo activo para mantener orden</p>
-                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Active <strong>\"Solo mostrar inscritos en ciclo actual\"</strong> para trabajar únicamente con alumnos vigentes y evitar confusiones con registros de ciclos anteriores.</p>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use los atajos para agilizar la gestión disciplinaria</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Presione directamente la fila del alumno para asignar reportes, citatorios o servicios sin necesidad de navegar a cada apartado por separado.</p>
                     </div>
                 </div>
                 <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
                     <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
                     <div>
-                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Cree los ciclos y grupos antes de inscribir</p>
-                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Los grados y grupos deben existir en el apartado de Ciclos Escolares antes de poder asignarlos a los alumnos. Planifique la estructura escolar primero.</p>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Suba la foto antes de generar credenciales</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Para que la credencial se genere correctamente, asegúrese de cargar la <strong>Foto del Alumno</strong> al momento de inscribirlo o editarlo.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>4</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Consulte el historial para tomar decisiones informadas</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use el historial del alumno para ver todos sus reportes, citatorios y servicios comunitarios antes de tomar una decisión disciplinaria.</p>
                     </div>
                 </div>
             </div>
@@ -2302,7 +2475,7 @@ new class extends Component {
             </div>";
 
         return "
-            <p id='intro'>El apartado de <strong>Reportes</strong> permite crear, buscar y eliminar reportes disciplinarios asignados a los alumnos. Los reportes documentan las infracciones cometidas y notifican a los padres de familia, quienes deberán firmarlos como acuse de recibo.</p>
+            <p id='intro'>El apartado de <strong>Reportes</strong> permite crear, buscar, editar y eliminar reportes disciplinarios asignados a los alumnos. Además, podrá asignar citatorios o servicios comunitarios directamente desde un reporte existente. Los reportes documentan las infracciones cometidas y notifican a los padres de familia, quienes deberán firmarlos como acuse de recibo.</p>
 
             {$img('reportes/menu.png', 'Vista general del apartado de Reportes en el menú lateral')}
 
@@ -2382,13 +2555,55 @@ new class extends Component {
                     <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Filtrar por Gravedad</span>
                     <span class='text-sm text-zinc-600 dark:text-zinc-400'>Muestre reportes por gravedad: <strong>Todas las gravedades</strong>, <strong>Normal</strong> o <strong>Grave</strong>. Los niveles se configuran en Gestionar Tipos.</span>
                 </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Solo mostrar reportes del ciclo activo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Switch que permite visualizar los reportes generados en el ciclo activo. De lo contrario, muestra todos los reportes registrados hasta la fecha.</span>
+                </div>
             </div>
 
             {$img('reportes/campoBusquedaPorNombre.png', 'Resultado al buscar reportes por nombre de alumno')}
             {$img('reportes/campoBusquedaEstado.png', 'Resultado al filtrar reportes por estado')}
             {$img('reportes/campoBusquedaGravedad.png', 'Resultado al filtrar reportes por gravedad')}
+            {$img('reportes/switchVerReportesCicloActivo.png', 'Switch para mostrar solo reportes del ciclo activo')}
 
-            <h2 id='borrar'>3. Borrar reporte</h2>
+            <h2 id='atajo'>3. Asignar citatorios o servicios desde un reporte</h2>
+            <p>Desde la tabla de reportes puede asignar citatorios o servicios comunitarios directamente a un alumno reportado.</p>
+
+            {$step(1, 'En la tabla de reportes, localice el registro al que desea asignar un citatorio o servicio.')}
+
+            {$img('reportes/atajoAsignarCitatorioServicios.png', 'Registro en la tabla de reportes con el ícono de tres puntos')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Tres Puntos\"</strong> del registro. Esto abrirá un cuadro con las opciones disponibles.')}
+
+            {$img('reportes/cuadroOpcionesCitatorioServicios.png', 'Cuadro con las opciones para asignar citatorio o servicio comunitario')}
+
+            {$step(3, 'Seleccione la opción deseada. Será redirigido al apartado correspondiente para el llenado de información según el tipo de acción.')}
+
+            {$img('reportes/generarCitatorio.png', 'Redirección al apartado de Citatorios para asignar al alumno')}
+            {$img('reportes/generarServicio.png', 'Redirección al apartado de Servicio Comunitario para asignar al alumno')}
+
+            <h2 id='editar'>4. Editar reporte</h2>
+            <p>Para modificar los datos de un reporte existente:</p>
+
+            {$step(1, 'En la tabla de reportes, localice el registro a editar.')}
+
+            {$img('reportes/registroAEditar.png', 'Reporte en la tabla con el ícono de lápiz para editar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Lápiz\"</strong> del registro. Esto abrirá el recuadro de edición con la información actual del reporte.')}
+
+            {$img('reportes/modalEditar.png', 'Modal de edición con los datos actuales del reporte')}
+
+            {$step(3, 'Modifique los campos que necesite. Cuenta con los mismos campos que al crear: Buscar Alumno, Fecha, Hora, Infracción, Asunto/Materia y Descripción de los Hechos.')}
+
+            {$important('Al buscar un alumno, asegúrese de <strong>seleccionarlo haciendo clic en su nombre</strong>. De lo contrario, el registro presentará un error.')}
+
+            {$img('reportes/modalEditarNuevaInformacion.png', 'Modal de edición con la nueva información ingresada')}
+
+            {$step(4, 'Presione el botón <strong>\"Guardar Reporte\"</strong>. Los cambios se verán reflejados en la tabla.')}
+
+            {$img('reportes/registroEditado.png', 'Reporte actualizado correctamente en la tabla')}
+
+            <h2 id='borrar'>5. Borrar reporte</h2>
             <p>Para eliminar un reporte disciplinario:</p>
 
             {$step(1, 'En la tabla de reportes, localice el registro a eliminar.')}
@@ -2422,8 +2637,430 @@ new class extends Component {
                 <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
                     <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
                     <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Asigne citatorios o servicios directamente</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use el ícono de <strong>\"Tres Puntos\"</strong> en la tabla para asignar citatorios o servicios comunitarios sin perder el contexto del reporte original.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>4</div>
+                    <div>
                         <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Seleccione la infracción correcta</p>
                         <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>El tipo de infracción determina la gravedad del reporte. Asegúrese de seleccionar la falta que corresponda al evento para mantener la consistencia en los registros.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getNotificationsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>Las <strong>notificaciones push</strong> permiten que la plataforma le avise al instante sobre reportes, citatorios, avisos y demás eventos importantes, directamente en su navegador o dispositivo móvil. Esta guía le mostrará cómo activarlas.</p>
+
+            {$img('configuracion/menu.png', 'Vista general del apartado de Configuración')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con una cuenta activa en la plataforma (cualquier rol).</li>
+                <li>Usar un <strong>navegador moderno</strong> compatible (Chrome, Edge, Safari, Firefox) con soporte para Service Workers.</li>
+                <li>Asegurarse de que el navegador <strong>no esté bloqueando las notificaciones</strong> del sitio.</li>
+            </ul>
+
+            <h2 id='activar'>1. Activar notificaciones</h2>
+            <p>Para habilitar las notificaciones push en su cuenta:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Configuración\"</strong> desde el menú lateral izquierdo o desde su perfil de usuario.')}
+
+            {$img('configuracion/accederConfiguracion.png', 'Acceso al apartado de Configuración desde el menú')}
+
+            {$step(2, 'En el apartado de <strong>Notificaciones</strong>, localice el botón <strong>\"Activar\"</strong>.')}
+
+            {$img('configuracion/notificacionesPendiente.png', 'Botón para activar las notificaciones push')}
+
+            {$step(3, 'Presione el botón <strong>\"Activar\"</strong>. El navegador mostrará un mensaje solicitando permiso para recibir notificaciones.')}
+
+            {$important('Cuando el navegador le solicite permiso, presione <strong>\"Permitir\"</strong>. Si selecciona \"Bloquear\", deberá cambiar el permiso manualmente desde la configuración del navegador.')}
+
+            {$step(4, 'Una vez concedido el permiso, las notificaciones quedarán activadas. Verá una confirmación en pantalla.')}
+
+            {$img('configuracion/notificacionesActivadas.png', 'Notificaciones push activadas correctamente')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Revise el modo \"No molestar\"</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si activó las notificaciones pero no las recibe, verifique que su sistema operativo (Windows, Android o iOS) no esté en modo <strong>\"No molestar\"</strong> o <strong>\"Concentración\"</strong>.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active en todos sus dispositivos</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Las notificaciones se activan por navegador. Si usa la plataforma en su computadora y en su celular, active las notificaciones en <strong>ambos dispositivos</strong> para no perderse ninguna alerta.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Desbloquee las notificaciones si las rechazó</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si bloqueó el permiso por error, vaya a la configuración de su navegador → sitio de la plataforma → permisos → <strong>Notificaciones</strong> y cámbielo a \"Permitir\".</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+    public function getAttendanceContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Asistencias</strong> permite registrar la asistencia diaria de los alumnos por salón. Se puede marcar de forma manual mediante íconos de acción o de forma automática utilizando un escáner de credenciales con código QR.</p>
+
+            {$img('asistencia/menu.png', 'Vista general del apartado de Asistencias en el menú lateral')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Docente</strong> o <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener un ciclo escolar activo con grados y grupos configurados.</li>
+                <li>Tener alumnos inscritos en los grupos del ciclo actual.</li>
+                <li>Para usar el escáner: tener un dispositivo lector conectado y credenciales generadas para los alumnos.</li>
+            </ul>
+
+            <h2 id='funcionamiento'>1. Funcionamiento del apartado</h2>
+            <p>Para comenzar a registrar la asistencia:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Asistencias\"</strong> que se encuentra en el menú lateral izquierdo.')}
+
+            {$step(2, 'Configure los campos de filtrado para seleccionar el salón:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Fecha</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el día donde se planea marcar asistencia. Por defecto muestra el <strong>día actual</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Ciclo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el ciclo donde se planea marcar asistencia. Por defecto muestra el <strong>ciclo activo</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el grado donde se planea marcar asistencia. Debe estar acompañado por un <strong>grupo/sección</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo/Sección</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica el grupo donde se planea marcar asistencia. Debe estar acompañado por un <strong>grado</strong>.</span>
+                </div>
+            </div>
+
+            {$img('asistencia/camposAsistencia.png', 'Campos de filtrado para seleccionar el salón')}
+
+            {$step(3, 'Una vez seleccionado el salón, se desplegarán los alumnos pertenecientes y los recuadros de conteo:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800'>
+                    <span class='shrink-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider pt-0.5'>Presentes (Verde)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Contador de los alumnos que <strong>asistieron</strong> a clases.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800'>
+                    <span class='shrink-0 text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider pt-0.5'>Faltas (Rojo)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Contador de los alumnos que <strong>no asistieron</strong> a clases y no justificaron.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800'>
+                    <span class='shrink-0 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider pt-0.5'>Retardos (Amarillo)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Contador de los alumnos que asistieron pero <strong>llegaron fuera de tiempo</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-700'>
+                    <span class='shrink-0 text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider pt-0.5'>Pendientes (Gris)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Contador de los alumnos que <strong>faltan por marcar</strong> asistencia.</span>
+                </div>
+            </div>
+
+            {$img('asistencia/recuadroRegistrosMarcados.png', 'Recuadros de conteo de asistencia por estado')}
+
+            {$step(4, 'Dentro de la tabla de alumnos, cada registro cuenta con 5 íconos de acción para registrar el estado:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider pt-0.5'>✓ Palomita</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Marca al alumno como <strong>presente</strong> (asistió a clases).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider pt-0.5'>✗ Equis</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Marca al alumno como <strong>falta</strong> (no asistió).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider pt-0.5'>🕐 Reloj</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Marca al alumno como <strong>retardo</strong> (llegó fuera de tiempo).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider pt-0.5'>📄 Hoja</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Marca al alumno con <strong>justificación</strong> (faltó pero presentó justificante).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider pt-0.5'>🏠 Casa</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Marca al alumno con <strong>permiso</strong> o trabajo en casa.</span>
+                </div>
+            </div>
+
+            {$important('En la parte superior derecha existe un botón <strong>\"Todos presentes\"</strong>. Este es un atajo que sirve para marcar a <strong>todos los alumnos como asistidos</strong> de un solo clic.')}
+
+            {$img('asistencia/botonAsistidosTodos.png', 'Botón Todos presentes para marcar asistencia masiva')}
+
+            {$img('asistencia/alumnosAsistidos.png', 'Tabla de alumnos con los íconos de acción para marcar asistencia')}
+
+            <h2 id='escaner'>2. Escáner de credenciales</h2>
+            <p>La plataforma también permite marcar asistencia mediante un escáner de credenciales QR:</p>
+
+            {$step(1, 'En la parte superior derecha, presione el botón <strong>\"Escáner\"</strong>. Esto abrirá el apartado del escáner.')}
+
+            {$img('asistencia/botonEscaner.png', 'Botón Escáner para abrir el lector de credenciales')}
+
+            {$step(2, 'Pase la credencial del alumno por el escáner conectado. La asistencia se registrará automáticamente.')}
+
+            {$img('asistencia/apartadoEscaner.png', 'Apartado del escáner listo para leer credenciales')}
+
+            {$important('Para que funcione el escáner, deberá tener el <strong>dispositivo lector conectado previamente</strong>. Si el lente no capta bien la imagen, use el botón <strong>\"Re-enfocar escáner\"</strong> para volver a enfocar.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use \"Todos presentes\" como punto de partida</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si la mayoría de alumnos asistió, marque \"Todos presentes\" primero y luego ajuste individualmente las faltas y retardos. Esto ahorra tiempo significativo.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Registre la asistencia a primera hora</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Marcar la asistencia al inicio del día permite que los padres reciban las notificaciones a tiempo y estén al tanto de la situación de sus hijos.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Aproveche el escáner para agilizar</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si cuenta con escáner y las credenciales están generadas, el registro de asistencia es automático y mucho más rápido que el método manual.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+    public function getExportContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Exportar Datos</strong> permite generar archivos Excel con información del sistema. Se pueden exportar listas de maestros, padres, alumnos y asistencias, con opciones de filtrado por ciclo y grupo.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con permisos de <strong>Administrador</strong> en la plataforma.</li>
+                <li>Tener un ciclo escolar activo con datos registrados.</li>
+            </ul>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Exportar Datos\"</strong> que se encuentra en el menú lateral izquierdo.')}
+
+            <h2 id='maestros'>1. Exportar Maestros y Administradores</h2>
+            <p>Permite exportar la lista de maestros y administradores del sistema en un archivo Excel.</p>
+
+            {$img('exportarDatos/cuadroExportarMaestros.png', 'Cuadro de exportación de maestros y administradores')}
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Generar nuevas contraseñas</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Opción para <strong>rotar contraseñas</strong> como protocolo de seguridad. Las nuevas contraseñas se incluirán en el Excel generado.</span>
+                </div>
+            </div>
+
+            {$important('En caso de usar la opción de generar contraseñas, deberá <strong>notificar a los maestros y administradores</strong> del plantel del respectivo cambio.')}
+
+            {$img('exportarDatos/excelMaestros.png', 'Vista del archivo Excel exportado con los datos de maestros')}
+
+            <h2 id='padres'>2. Exportar Padres y Tutores</h2>
+            <p>Permite exportar la lista de padres y tutores del sistema en un archivo Excel.</p>
+
+            {$img('exportarDatos/cuadroExportarPadres.png', 'Cuadro de exportación de padres y tutores')}
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Generar nuevas contraseñas</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Opción para <strong>rotar contraseñas</strong> como protocolo de seguridad.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Ciclo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el ciclo escolar de donde desea exportar.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el grupo específico para filtrar la exportación.</span>
+                </div>
+            </div>
+
+            {$important('En caso de usar la opción de generar contraseñas, deberá <strong>notificar a los padres y tutores</strong> de los alumnos del respectivo cambio.')}
+
+            {$img('exportarDatos/excelPadres.png', 'Vista del archivo Excel exportado con los datos de padres y tutores')}
+
+            <h2 id='alumnos'>3. Exportar Alumnos</h2>
+            <p>Permite exportar la lista de alumnos del sistema en un archivo Excel.</p>
+
+            {$img('exportarDatos/cuadroExportarAlumnos.png', 'Cuadro de exportación de alumnos')}
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Ciclo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el ciclo escolar de donde desea exportar.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el grupo específico para filtrar la exportación.</span>
+                </div>
+            </div>
+
+            {$important('Los datos de alumnos son <strong>sensibles</strong>. Procure no compartir la información con personas sin autorización.')}
+
+            {$img('exportarDatos/excelAlumnos.png', 'Vista del archivo Excel exportado con los datos de alumnos')}
+
+            <h2 id='asistencias'>4. Exportar Asistencias</h2>
+            <p>Permite exportar el registro de asistencias de los alumnos en un archivo Excel.</p>
+
+            {$img('exportarDatos/cuadroExportarAsistencias.png', 'Cuadro de exportación de asistencias')}
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Ciclo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el ciclo escolar.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el grupo específico.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Mes</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el mes del que desea exportar asistencias.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Año</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Seleccione el año correspondiente.</span>
+                </div>
+            </div>
+
+            <p>En el Excel de asistencias, los registros se representan con la siguiente simbología:</p>
+
+            <div class='not-prose my-4 ml-4 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider pt-0.5'>. (Punto)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica que el alumno <strong>asistió</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider pt-0.5'>| (Línea)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica que el alumno <strong>faltó</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider pt-0.5'>+ (Cruz)</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica que el alumno tuvo <strong>retardo</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider pt-0.5'>J</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica <strong>justificación</strong>.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider pt-0.5'>TC</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Indica <strong>trabajo en casa</strong>.</span>
+                </div>
+            </div>
+
+            {$img('exportarDatos/excelAsistencia.png', 'Vista del archivo Excel exportado con los registros de asistencia')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Rote contraseñas periódicamente</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use la opción de generar nuevas contraseñas al exportar maestros o padres como protocolo de seguridad. No olvide notificar a los usuarios afectados.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Exporte antes de las juntas de consejo</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Las listas en Excel son ideales para presentar estadísticas en juntas de consejo técnico o reuniones con directivos.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Proteja los datos sensibles</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Los archivos exportados contienen información personal. Almacene los Excel de forma segura y no los comparta con personas sin autorización.</p>
                     </div>
                 </div>
             </div>
@@ -2474,6 +3111,7 @@ new class extends Component {
                 <x-tutorial-card icon="calendar" title="Generar Citatorios" description="Coordina reuniones presenciales con padres de familia." name="tutorial-d-citations" />
                 <x-tutorial-card icon="megaphone" title="Publicar Avisos" description="Comunícate de forma masiva con padres de tus grupos." name="tutorial-d-notices" />
                 <x-tutorial-card icon="user-group" title="Asignar Servicio" description="Asigna actividades de servicio comunitario por reportes acumulados." name="tutorial-d-community" />
+                <x-tutorial-card icon="clipboard-document-check" title="Control de Asistencia" description="Marca asistencia diaria de alumnos de forma manual o con escáner." name="tutorial-d-attendance" />
             </div>
             @endif
 
@@ -2495,7 +3133,7 @@ new class extends Component {
             @if($tab === 'config')
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <x-tutorial-card icon="device-phone-mobile" title="Instalar Aplicación" description="Cómo instalar la app en Android o iOS (PWA)." name="tutorial-c-install" />
-                <x-tutorial-card icon="bell-alert" title="Notificaciones" description="Activa las alertas push para no perderte nada." name="tutorial-c-notifications" />
+                <x-tutorial-card icon="bell-alert" title="Notificaciones" description="Activa las notificaciones push para recibir alertas al instante." name="tutorial-c-notifications" />
             </div>
             @endif
         </div>
