@@ -37,6 +37,7 @@ new class extends Component {
     // Signatures Modal
     public bool $showSignaturesModal = false;
     public ?string $viewingSignaturesNoticeId = null;
+    public bool $viewingNoticeRequiresAuth = false;
     public array $signatureStats = [];
     public $signedList = [];
     public $pendingList = [];
@@ -217,6 +218,7 @@ new class extends Component {
         $this->authorize('teacher-or-admin');
         $notice = Notice::with(['signatures.parent', 'signatures.student'])->findOrFail($id);
         $this->viewingSignaturesNoticeId = $notice->id;
+        $this->viewingNoticeRequiresAuth = $notice->requires_authorization;
         
         $stats = $notice->getSignatureStats();
         $this->signatureStats = $stats;
@@ -845,7 +847,11 @@ new class extends Component {
                                             <flux:text size="xs" class="text-zinc-500">{{ $item['date'] }}</flux:text>
                                             @if($item['authorized'] !== null)
                                                 <flux:badge size="xs" color="{{ $item['authorized'] ? 'green' : 'red' }}" class="mt-1">
-                                                    {{ $item['authorized'] ? 'Autorizado' : 'No Autorizado' }}
+                                                    @if($viewingNoticeRequiresAuth)
+                                                        {{ $item['authorized'] ? 'Autorizado' : 'No Autorizado' }}
+                                                    @else
+                                                        Firmado
+                                                    @endif
                                                 </flux:badge>
                                             @endif
                                         </div>
