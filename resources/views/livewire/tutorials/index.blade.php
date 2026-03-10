@@ -140,7 +140,8 @@ new class extends Component {
                 ['id' => 'asignar', 'title' => '1. Asignar servicio'],
                 ['id' => 'buscar', 'title' => '2. Buscar servicios'],
                 ['id' => 'firmar', 'title' => '3. Firmar servicios'],
-                ['id' => 'borrar', 'title' => '4. Borrar servicios'],
+                ['id' => 'editar', 'title' => '4. Editar servicio'],
+                ['id' => 'borrar', 'title' => '5. Borrar servicio'],
                 ['id' => 'beneficios', 'title' => 'Tips de experto'],
             ];
         }
@@ -180,7 +181,8 @@ new class extends Component {
                 ['id' => 'requisitos', 'title' => 'Requisitos previos'],
                 ['id' => 'programar', 'title' => '1. Programar examen'],
                 ['id' => 'buscar', 'title' => '2. Buscar exámenes'],
-                ['id' => 'borrar', 'title' => '3. Borrar examen'],
+                ['id' => 'editar', 'title' => '3. Editar examen'],
+                ['id' => 'borrar', 'title' => '4. Borrar examen'],
                 ['id' => 'beneficios', 'title' => 'Tips de experto'],
             ];
         }
@@ -222,7 +224,9 @@ new class extends Component {
                 ['id' => 'requisitos', 'title' => 'Requisitos previos'],
                 ['id' => 'crear', 'title' => '1. Crear reporte'],
                 ['id' => 'buscar', 'title' => '2. Buscar reportes'],
-                ['id' => 'borrar', 'title' => '3. Borrar reporte'],
+                ['id' => 'atajo', 'title' => '3. Asignar citatorios/servicios'],
+                ['id' => 'editar', 'title' => '4. Editar reporte'],
+                ['id' => 'borrar', 'title' => '5. Borrar reporte'],
                 ['id' => 'beneficios', 'title' => 'Tips de experto'],
             ];
         }
@@ -1249,7 +1253,7 @@ new class extends Component {
             </div>";
 
         return "
-            <p id='intro'>El apartado de <strong>Servicio Comunitario</strong> permite asignar, dar seguimiento y gestionar las actividades reparatorias asignadas a los alumnos. Estas actividades se generan como consecuencia de reportes acumulados y buscan la reflexión y reparación del daño por parte del estudiante.</p>
+            <p id='intro'>El apartado de <strong>Servicio Comunitario</strong> permite asignar, buscar, firmar, editar y eliminar las actividades reparatorias asignadas a los alumnos. Estas actividades se generan como consecuencia de reportes acumulados y buscan la reflexión y reparación del daño por parte del estudiante.</p>
 
             {$img('servicioComunitario/menu.png', 'Vista general del apartado de Servicio Comunitario en el menú lateral')}
 
@@ -1315,19 +1319,22 @@ new class extends Component {
                 </div>
                 <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
                     <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Filtrar por Estado</span>
-                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre los servicios por su estado actual: <strong>Pendientes</strong>, <strong>Completados</strong> o <strong>No asistió</strong>.</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtre los servicios por su estado actual: <strong>Pendientes</strong>, <strong>Completados</strong> o <strong>No asistió</strong>. El estado depende de la firma asignada (ver sección Firmar).</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Solo ciclo activo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Switch que permite visualizar los servicios comunitarios generados en el ciclo activo. De lo contrario, muestra todos los servicios registrados hasta la fecha.</span>
                 </div>
             </div>
 
             {$img('servicioComunitario/campoBusqueda.png', 'Resultado al buscar un servicio por nombre de alumno')}
             {$img('servicioComunitario/campoEstados.png', 'Resultado al filtrar servicios por estado')}
+            {$img('servicioComunitario/switchMostrarServiciosCiclo.png', 'Switch para mostrar solo servicios del ciclo activo')}
 
             <h2 id='firmar'>3. Firmar servicios comunitarios</h2>
             <p>Una vez que el alumno ha cumplido (o no) con la actividad asignada, deberá registrar el resultado:</p>
 
             {$step(1, 'En la tabla de servicios comunitarios, ubique el registro correspondiente.')}
-
-            {$img('servicioComunitario/tablaServiciosPorFirmar.png', 'Tabla de servicios con los botones de acción para firmar')}
 
             {$step(2, 'En la columna de <strong>\"Acciones\"</strong>, visualizará dos botones:')}
 
@@ -1344,7 +1351,28 @@ new class extends Component {
 
             {$img('servicioComunitario/servicioFirmado.png', 'Servicio comunitario firmado con el estado actualizado')}
 
-            <h2 id='borrar'>4. Borrar servicios comunitarios</h2>
+            <h2 id='editar'>4. Editar servicio comunitario</h2>
+            <p>Para modificar los datos de un servicio comunitario existente:</p>
+
+            {$step(1, 'En la tabla de servicios comunitarios, localice el registro a editar.')}
+
+            {$img('servicioComunitario/servicioAEditar.png', 'Servicio en la tabla con el ícono de lápiz para editar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Lápiz\"</strong> del registro. Esto abrirá el recuadro de edición con la información actual del servicio.')}
+
+            {$img('servicioComunitario/modalEditarServicio.png', 'Modal de edición con los datos actuales del servicio comunitario')}
+
+            {$step(3, 'Modifique los campos que necesite. Cuenta con los mismos campos que al asignar: Buscar Alumno, Actividad, Instrucciones Adicionales y Fecha de Cumplimiento.')}
+
+            {$important('No se pueden asignar servicios comunitarios los <strong>domingos</strong>. Asegúrese de seleccionar una fecha válida.')}
+
+            {$img('servicioComunitario/modalEditarServicioNuevaInformacion.png', 'Modal de edición con la nueva información ingresada')}
+
+            {$step(4, 'Presione el botón <strong>\"Actualizar Servicio\"</strong>. Los cambios se verán reflejados en la tabla.')}
+
+            {$img('servicioComunitario/servicioEditado.png', 'Servicio comunitario actualizado correctamente en la tabla')}
+
+            <h2 id='borrar'>5. Borrar servicio comunitario</h2>
             <p>Para eliminar un servicio comunitario registrado:</p>
 
             {$step(1, 'En la tabla de servicios comunitarios, localice el registro a eliminar.')}
@@ -1380,6 +1408,13 @@ new class extends Component {
                     <div>
                         <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use los filtros para dar seguimiento</p>
                         <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Filtre por estado <strong>\"Pendientes\"</strong> para identificar rápidamente los servicios que aún no han sido firmados y requieren atención.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>4</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Edite antes de la fecha de cumplimiento</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si necesita cambiar la actividad o la fecha, edite el servicio antes de que llegue la fecha de cumplimiento para mantener la comunicación clara con el alumno y sus padres.</p>
                     </div>
                 </div>
             </div>
@@ -1827,7 +1862,7 @@ new class extends Component {
             </div>";
 
         return "
-            <p id='intro'>El apartado de <strong>Exámenes</strong> permite programar, buscar y eliminar evaluaciones para que padres y alumnos puedan visualizar las fechas de sus exámenes. Los exámenes programados también se reflejan en el calendario general de la plataforma.</p>
+            <p id='intro'>El apartado de <strong>Exámenes</strong> permite programar, buscar, editar y eliminar evaluaciones para que padres y alumnos puedan visualizar las fechas de sus exámenes. Los exámenes programados también se reflejan en el calendario general de la plataforma.</p>
 
             {$img('examenes/menu.png', 'Vista general del apartado de Exámenes en el menú lateral')}
 
@@ -1907,7 +1942,27 @@ new class extends Component {
             {$img('examenes/campoFiltradoGrado.png', 'Resultado al filtrar exámenes por grado')}
             {$img('examenes/campoFiltradoSeccion.png', 'Resultado al filtrar exámenes por grupo o sección')}
 
-            <h2 id='borrar'>3. Borrar examen</h2>
+            <h2 id='editar'>3. Editar examen</h2>
+            <p>Para modificar los datos de un examen programado:</p>
+
+            {$step(1, 'En el tablero de exámenes, localice el examen a editar.')}
+
+            {$img('examenes/examenAEditar.png', 'Examen en el tablero listo para ser editado')}
+
+            {$step(2, 'Pase el cursor por encima del examen y presione el ícono de <strong>\"Lápiz\"</strong> del registro. Esto abrirá el recuadro de edición con la información actual del examen.')}
+
+            {$img('examenes/iconoEditarExamen.png', 'Ícono de lápiz visible al pasar el cursor sobre el examen')}
+            {$img('examenes/modalExamenEditarVacio.png', 'Modal de edición con los datos actuales del examen')}
+
+            {$step(3, 'Modifique los campos que necesite. Cuenta con los mismos campos que al programar: Nombre de la Materia, Grado, Grupo, Trimestre y Fecha del Examen.')}
+
+            {$img('examenes/modalExamenEditarLleno.png', 'Modal de edición con la nueva información ingresada')}
+
+            {$step(4, 'Presione el botón <strong>\"Guardar Examen\"</strong>. Los cambios se verán reflejados en el tablero.')}
+
+            {$img('examenes/examenEditado.png', 'Examen modificado correctamente en el tablero')}
+
+            <h2 id='borrar'>4. Borrar examen</h2>
             <p>Para eliminar un examen programado:</p>
 
             {$step(1, 'En el tablero de exámenes, localice el examen a eliminar.')}
@@ -1920,8 +1975,6 @@ new class extends Component {
             {$img('examenes/modalEliminarExamen.png', 'Cuadro de confirmación para eliminar el examen')}
 
             {$step(3, 'Presione el botón <strong>\"Eliminar\"</strong> para confirmar. El examen será eliminado del tablero.')}
-
-            {$img('examenes/tableroExamenesBorrados.png', 'Tablero de exámenes tras eliminar el registro')}
 
             <h2 id='beneficios'>Tips de experto</h2>
             <div class='not-prose my-4 space-y-4'>
@@ -1944,6 +1997,13 @@ new class extends Component {
                     <div>
                         <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Sea específico con el nombre de la materia</p>
                         <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use nombres claros y consistentes para las materias (ej. \"Matemáticas\", \"Español\") para que padres y alumnos identifiquen fácilmente cada evaluación.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>4</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Edite en lugar de borrar y recrear</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si necesita cambiar la fecha o materia de un examen, use la opción de editar en lugar de eliminarlo y crear uno nuevo. Esto mantiene el registro limpio.</p>
                     </div>
                 </div>
             </div>
@@ -2390,7 +2450,7 @@ new class extends Component {
             </div>";
 
         return "
-            <p id='intro'>El apartado de <strong>Reportes</strong> permite crear, buscar y eliminar reportes disciplinarios asignados a los alumnos. Los reportes documentan las infracciones cometidas y notifican a los padres de familia, quienes deberán firmarlos como acuse de recibo.</p>
+            <p id='intro'>El apartado de <strong>Reportes</strong> permite crear, buscar, editar y eliminar reportes disciplinarios asignados a los alumnos. Además, podrá asignar citatorios o servicios comunitarios directamente desde un reporte existente. Los reportes documentan las infracciones cometidas y notifican a los padres de familia, quienes deberán firmarlos como acuse de recibo.</p>
 
             {$img('reportes/menu.png', 'Vista general del apartado de Reportes en el menú lateral')}
 
@@ -2470,13 +2530,55 @@ new class extends Component {
                     <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Filtrar por Gravedad</span>
                     <span class='text-sm text-zinc-600 dark:text-zinc-400'>Muestre reportes por gravedad: <strong>Todas las gravedades</strong>, <strong>Normal</strong> o <strong>Grave</strong>. Los niveles se configuran en Gestionar Tipos.</span>
                 </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Solo mostrar reportes del ciclo activo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Switch que permite visualizar los reportes generados en el ciclo activo. De lo contrario, muestra todos los reportes registrados hasta la fecha.</span>
+                </div>
             </div>
 
             {$img('reportes/campoBusquedaPorNombre.png', 'Resultado al buscar reportes por nombre de alumno')}
             {$img('reportes/campoBusquedaEstado.png', 'Resultado al filtrar reportes por estado')}
             {$img('reportes/campoBusquedaGravedad.png', 'Resultado al filtrar reportes por gravedad')}
+            {$img('reportes/switchVerReportesCicloActivo.png', 'Switch para mostrar solo reportes del ciclo activo')}
 
-            <h2 id='borrar'>3. Borrar reporte</h2>
+            <h2 id='atajo'>3. Asignar citatorios o servicios desde un reporte</h2>
+            <p>Desde la tabla de reportes puede asignar citatorios o servicios comunitarios directamente a un alumno reportado.</p>
+
+            {$step(1, 'En la tabla de reportes, localice el registro al que desea asignar un citatorio o servicio.')}
+
+            {$img('reportes/atajoAsignarCitatorioServicios.png', 'Registro en la tabla de reportes con el ícono de tres puntos')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Tres Puntos\"</strong> del registro. Esto abrirá un cuadro con las opciones disponibles.')}
+
+            {$img('reportes/cuadroOpcionesCitatorioServicios.png', 'Cuadro con las opciones para asignar citatorio o servicio comunitario')}
+
+            {$step(3, 'Seleccione la opción deseada. Será redirigido al apartado correspondiente para el llenado de información según el tipo de acción.')}
+
+            {$img('reportes/generarCitatorio.png', 'Redirección al apartado de Citatorios para asignar al alumno')}
+            {$img('reportes/generarServicio.png', 'Redirección al apartado de Servicio Comunitario para asignar al alumno')}
+
+            <h2 id='editar'>4. Editar reporte</h2>
+            <p>Para modificar los datos de un reporte existente:</p>
+
+            {$step(1, 'En la tabla de reportes, localice el registro a editar.')}
+
+            {$img('reportes/registroAEditar.png', 'Reporte en la tabla con el ícono de lápiz para editar')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Lápiz\"</strong> del registro. Esto abrirá el recuadro de edición con la información actual del reporte.')}
+
+            {$img('reportes/modalEditar.png', 'Modal de edición con los datos actuales del reporte')}
+
+            {$step(3, 'Modifique los campos que necesite. Cuenta con los mismos campos que al crear: Buscar Alumno, Fecha, Hora, Infracción, Asunto/Materia y Descripción de los Hechos.')}
+
+            {$important('Al buscar un alumno, asegúrese de <strong>seleccionarlo haciendo clic en su nombre</strong>. De lo contrario, el registro presentará un error.')}
+
+            {$img('reportes/modalEditarNuevaInformacion.png', 'Modal de edición con la nueva información ingresada')}
+
+            {$step(4, 'Presione el botón <strong>\"Guardar Reporte\"</strong>. Los cambios se verán reflejados en la tabla.')}
+
+            {$img('reportes/registroEditado.png', 'Reporte actualizado correctamente en la tabla')}
+
+            <h2 id='borrar'>5. Borrar reporte</h2>
             <p>Para eliminar un reporte disciplinario:</p>
 
             {$step(1, 'En la tabla de reportes, localice el registro a eliminar.')}
@@ -2509,6 +2611,13 @@ new class extends Component {
                 </div>
                 <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
                     <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Asigne citatorios o servicios directamente</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use el ícono de <strong>\"Tres Puntos\"</strong> en la tabla para asignar citatorios o servicios comunitarios sin perder el contexto del reporte original.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>4</div>
                     <div>
                         <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Seleccione la infracción correcta</p>
                         <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>El tipo de infracción determina la gravedad del reporte. Asegúrese de seleccionar la falta que corresponda al evento para mantener la consistencia en los registros.</p>
