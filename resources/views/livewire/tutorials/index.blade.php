@@ -46,7 +46,7 @@ new class extends Component {
             'tutorial-a-promote' => 'Guía para Promover Alumnos de Ciclo',
             'tutorial-a-report-types' => 'Gestión de Tipos de Reportes',
             'tutorial-c-install' => 'Cómo Instalar la Aplicación (PWA)',
-            'tutorial-c-notifications' => 'Activar Notificaciones Push',
+            'tutorial-c-notifications' => 'Configuración de Notificaciones Push',
         ][$name] ?? 'Tutorial';
     }
 
@@ -208,6 +208,9 @@ new class extends Component {
                 ['id' => 'buscar', 'title' => '3. Buscar alumnos'],
                 ['id' => 'editar', 'title' => '4. Editar alumno'],
                 ['id' => 'borrar', 'title' => '5. Borrar alumno'],
+                ['id' => 'credencial', 'title' => '6. Generar credencial'],
+                ['id' => 'historial', 'title' => '7. Ver historial'],
+                ['id' => 'atajo', 'title' => '8. Atajos rápidos'],
                 ['id' => 'beneficios', 'title' => 'Tips de experto'],
             ];
         }
@@ -220,6 +223,16 @@ new class extends Component {
                 ['id' => 'crear', 'title' => '1. Crear reporte'],
                 ['id' => 'buscar', 'title' => '2. Buscar reportes'],
                 ['id' => 'borrar', 'title' => '3. Borrar reporte'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for notifications tutorial
+        if ($name === 'tutorial-c-notifications') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'activar', 'title' => '1. Activar notificaciones'],
                 ['id' => 'beneficios', 'title' => 'Tips de experto'],
             ];
         }
@@ -373,12 +386,7 @@ new class extends Component {
                 'custom' => true,
             ],
             'tutorial-c-notifications' => [
-                'desc' => 'Activa las notificaciones push para recibir alertas al instante sobre reportes, citatorios y avisos.',
-                'req' => 'Un navegador moderno (Chrome, Safari, Edge) con soporte para Service Workers.',
-                'steps' => '<li>Ve a tu perfil (abajo a la izquierda).</li><li>Selecciona "Configuración" en el menú desplegable.</li><li>Haz clic en la pestaña "Notificaciones".</li><li>Presiona el botón "Activar" y concede los permisos en tu navegador.</li>',
-                'tip' => 'Si activas las notificaciones pero no las recibes, revisa que tu sistema operativo (Windows/Android/iOS) no esté en modo "No molestar".',
-                'edit' => '',
-                'delete' => ''
+                'custom' => true,
             ],
         ][$name] ?? [
             'desc' => "Esta guía te ayudará a dominar la sección de <strong>{$title}</strong>.",
@@ -403,6 +411,7 @@ new class extends Component {
             if ($name === 'tutorial-a-report-types') return $this->getReportTypesContent();
             if ($name === 'tutorial-a-inscribe') return $this->getStudentsContent();
             if ($name === 'tutorial-d-create-report') return $this->getReportsContent();
+            if ($name === 'tutorial-c-notifications') return $this->getNotificationsContent();
         }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
@@ -2105,7 +2114,7 @@ new class extends Component {
             </div>";
 
         return "
-            <p id='intro'>El apartado de <strong>Alumnos</strong> permite inscribir, buscar, editar, eliminar y vincular padres de familia a los alumnos registrados en el sistema. Es el módulo central para la gestión del alumnado de la institución.</p>
+            <p id='intro'>El apartado de <strong>Alumnos</strong> permite inscribir, buscar, editar, eliminar y vincular padres de familia a los alumnos registrados en el sistema. Además, podrá generar credenciales, consultar el historial disciplinario y asignar reportes, citatorios o servicios comunitarios de forma rápida.</p>
 
             {$img('alumnos/menu.png', 'Vista general del apartado de Alumnos en el menú lateral')}
 
@@ -2134,8 +2143,16 @@ new class extends Component {
                     <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>obligatorio</strong>. Coloque el nombre completo del alumno.</span>
                 </div>
                 <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>CURP</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Coloque la CURP del alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
                     <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Turno</span>
                     <span class='text-sm text-zinc-600 dark:text-zinc-400'>Por defecto <strong>Matutino</strong>. Puede cambiarse a Vespertino y viceversa.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Foto del Alumno</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Campo <strong>opcional</strong>. Suba la foto del alumno para posteriormente generar la credencial.</span>
                 </div>
                 <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
                     <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo / Grado</span>
@@ -2224,7 +2241,7 @@ new class extends Component {
 
             {$img('alumnos/modalEdicionAlumno.png', 'Modal de edición con los datos actuales del alumno')}
 
-            {$step(3, 'Modifique los campos que necesite. Cuenta con los mismos campos que al inscribir: Nombre, Turno, Grupo/Grado, Dirección, Teléfonos, Contactos y Padres de Familia.')}
+            {$step(3, 'Modifique los campos que necesite. Cuenta con los mismos campos que al inscribir: Nombre, CURP, Turno, Foto, Grupo/Grado, Dirección, Teléfonos, Contactos y Padres de Familia.')}
 
             {$img('alumnos/modalEdicionAlumnoNuevaInformacion.png', 'Modal de edición con la nueva información ingresada')}
 
@@ -2249,6 +2266,70 @@ new class extends Component {
 
             {$img('alumnos/alumnoEliminado.png', 'Alumno eliminado correctamente de la tabla')}
 
+            <h2 id='credencial'>6. Generar credencial del alumno</h2>
+            <p>La plataforma permite generar credenciales de identificación con código QR para cada alumno.</p>
+
+            {$step(1, 'En la tabla de alumnos, localice el registro al que desea generar su credencial.')}
+
+            {$img('alumnos/alumnoGenerarCredencial.png', 'Alumno en la tabla con el ícono de credencial')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Credencial\"</strong> del registro. Esto abrirá un recuadro donde podrá escalar la imagen de la foto y configurar la credencial.')}
+
+            {$img('alumnos/cuadroEscalarGenerarPDF.png', 'Recuadro para escalar la foto y generar el PDF de la credencial')}
+
+            {$step(3, 'Una vez configurado, presione el botón <strong>\"Generar PDF\"</strong> para crear el archivo.')}
+
+            {$img('alumnos/credencialFinalAlumno.png', 'Credencial generada en formato PDF con código QR')}
+
+            {$important('La credencial incluye un <strong>código QR</strong> que permite marcar asistencia mediante un escáner. Asegúrese de que la foto del alumno esté cargada previamente.')}
+
+            <h2 id='historial'>7. Ver historial del alumno</h2>
+            <p>Consulte el historial disciplinario completo de un alumno:</p>
+
+            {$step(1, 'En la tabla de alumnos, localice el registro a consultar.')}
+
+            {$step(2, 'Presione el ícono de <strong>\"Ojo\"</strong> del registro. Esto abrirá un recuadro con el historial del alumno.')}
+
+            {$img('alumnos/historialAlumno.png', 'Recuadro con el historial disciplinario del alumno')}
+
+            {$step(3, 'El historial presenta los siguientes indicadores:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 h-5 w-5 rounded-full bg-red-500 mt-0.5'></span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>El símbolo <strong>Rojo</strong> muestra los <strong>reportes</strong> del alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 h-5 w-5 rounded-full bg-green-500 mt-0.5'></span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>El símbolo <strong>Verde</strong> muestra los <strong>servicios comunitarios</strong> del alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 h-5 w-5 rounded-full bg-yellow-500 mt-0.5'></span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>El símbolo <strong>Amarillo</strong> muestra los <strong>citatorios</strong> del alumno.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Solo ciclo activo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Switch que permite visualizar solo los registros del ciclo activo. De lo contrario, muestra todos los registros aplicados al alumno en su instancia en la institución.</span>
+                </div>
+            </div>
+
+            <h2 id='atajo'>8. Atajo para asignar citatorios, servicios y reportes</h2>
+            <p>La plataforma ofrece un atajo rápido para asignar citatorios, servicios comunitarios o reportes directamente desde la tabla de alumnos.</p>
+
+            {$step(1, 'En la tabla de alumnos, localice el registro al que desea asignar una acción.')}
+
+            {$img('alumnos/registroAtajoReportesCitatoriosServicios.png', 'Registro del alumno en la tabla para usar el atajo')}
+
+            {$step(2, 'Presione la <strong>fila del registro</strong>. Esto abrirá un cuadro con las opciones disponibles.')}
+
+            {$img('alumnos/cuadroOpcionesAtajo.png', 'Cuadro con las opciones de atajo: Reporte, Citatorio y Servicio Comunitario')}
+
+            {$step(3, 'Seleccione la opción deseada. Será redirigido al apartado correspondiente con la información del alumno precargada.')}
+
+            {$img('alumnos/cuadroAtajoReporte.png', 'Atajo para asignar un reporte al alumno')}
+            {$img('alumnos/cuadroAtajoCitatorio.png', 'Atajo para asignar un citatorio al alumno')}
+            {$img('alumnos/cuadroAtajoServicio.png', 'Atajo para asignar un servicio comunitario al alumno')}
+
             <h2 id='beneficios'>Tips de experto</h2>
             <div class='not-prose my-4 space-y-4'>
                 <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
@@ -2261,15 +2342,22 @@ new class extends Component {
                 <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
                     <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
                     <div>
-                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use el switch de ciclo activo para mantener orden</p>
-                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Active <strong>\"Solo mostrar inscritos en ciclo actual\"</strong> para trabajar únicamente con alumnos vigentes y evitar confusiones con registros de ciclos anteriores.</p>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use los atajos para agilizar la gestión disciplinaria</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Presione directamente la fila del alumno para asignar reportes, citatorios o servicios sin necesidad de navegar a cada apartado por separado.</p>
                     </div>
                 </div>
                 <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
                     <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
                     <div>
-                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Cree los ciclos y grupos antes de inscribir</p>
-                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Los grados y grupos deben existir en el apartado de Ciclos Escolares antes de poder asignarlos a los alumnos. Planifique la estructura escolar primero.</p>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Suba la foto antes de generar credenciales</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Para que la credencial se genere correctamente, asegúrese de cargar la <strong>Foto del Alumno</strong> al momento de inscribirlo o editarlo.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>4</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Consulte el historial para tomar decisiones informadas</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Use el historial del alumno para ver todos sus reportes, citatorios y servicios comunitarios antes de tomar una decisión disciplinaria.</p>
                     </div>
                 </div>
             </div>
@@ -2429,6 +2517,89 @@ new class extends Component {
             </div>
         ";
     }
+
+    public function getNotificationsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>Las <strong>notificaciones push</strong> permiten que la plataforma le avise al instante sobre reportes, citatorios, avisos y demás eventos importantes, directamente en su navegador o dispositivo móvil. Esta guía le mostrará cómo activarlas.</p>
+
+            {$img('configuracion/menu.png', 'Vista general del apartado de Configuración')}
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con una cuenta activa en la plataforma (cualquier rol).</li>
+                <li>Usar un <strong>navegador moderno</strong> compatible (Chrome, Edge, Safari, Firefox) con soporte para Service Workers.</li>
+                <li>Asegurarse de que el navegador <strong>no esté bloqueando las notificaciones</strong> del sitio.</li>
+            </ul>
+
+            <h2 id='activar'>1. Activar notificaciones</h2>
+            <p>Para habilitar las notificaciones push en su cuenta:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>\"Configuración\"</strong> desde el menú lateral izquierdo o desde su perfil de usuario.')}
+
+            {$img('configuracion/accederConfiguracion.png', 'Acceso al apartado de Configuración desde el menú')}
+
+            {$step(2, 'En el apartado de <strong>Notificaciones</strong>, localice el botón <strong>\"Activar\"</strong>.')}
+
+            {$img('configuracion/notificacionesPendiente.png', 'Botón para activar las notificaciones push')}
+
+            {$step(3, 'Presione el botón <strong>\"Activar\"</strong>. El navegador mostrará un mensaje solicitando permiso para recibir notificaciones.')}
+
+            {$important('Cuando el navegador le solicite permiso, presione <strong>\"Permitir\"</strong>. Si selecciona \"Bloquear\", deberá cambiar el permiso manualmente desde la configuración del navegador.')}
+
+            {$step(4, 'Una vez concedido el permiso, las notificaciones quedarán activadas. Verá una confirmación en pantalla.')}
+
+            {$img('configuracion/notificacionesActivadas.png', 'Notificaciones push activadas correctamente')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Revise el modo \"No molestar\"</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si activó las notificaciones pero no las recibe, verifique que su sistema operativo (Windows, Android o iOS) no esté en modo <strong>\"No molestar\"</strong> o <strong>\"Concentración\"</strong>.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active en todos sus dispositivos</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Las notificaciones se activan por navegador. Si usa la plataforma en su computadora y en su celular, active las notificaciones en <strong>ambos dispositivos</strong> para no perderse ninguna alerta.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>3</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Desbloquee las notificaciones si las rechazó</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Si bloqueó el permiso por error, vaya a la configuración de su navegador → sitio de la plataforma → permisos → <strong>Notificaciones</strong> y cámbielo a \"Permitir\".</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
 }; ?>
 
 @section('title', 'Guía Escolar: Tutoriales y Ayuda Digital')
@@ -2495,7 +2666,7 @@ new class extends Component {
             @if($tab === 'config')
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <x-tutorial-card icon="device-phone-mobile" title="Instalar Aplicación" description="Cómo instalar la app en Android o iOS (PWA)." name="tutorial-c-install" />
-                <x-tutorial-card icon="bell-alert" title="Notificaciones" description="Activa las alertas push para no perderte nada." name="tutorial-c-notifications" />
+                <x-tutorial-card icon="bell-alert" title="Notificaciones" description="Activa las notificaciones push para recibir alertas al instante." name="tutorial-c-notifications" />
             </div>
             @endif
         </div>
