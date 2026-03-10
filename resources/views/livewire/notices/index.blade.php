@@ -228,7 +228,7 @@ new class extends Component {
             'student_name' => $s->student->name,
             'parent_name' => $s->parent->name,
             'date' => $s->signed_at->format('d/m/Y H:i'),
-            'authorized' => $s->authorized,
+            'authorized' => $notice->requires_authorization ? $s->authorized : null,
         ])->toArray();
         
         // Get pending list
@@ -529,11 +529,11 @@ new class extends Component {
                                             </flux:text>
                                         </div>
                                         <div class="flex flex-col sm:flex-row gap-3">
-                                            <flux:button variant="primary" icon="{{ $notice->type === 'TRABAJO_EN_CASA' ? 'finger-print' : 'check' }}" class="flex-1 py-3" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', true)">
+                                            <flux:button variant="primary" icon="{{ $notice->type === 'TRABAJO_EN_CASA' ? 'finger-print' : 'check' }}" class="flex-1 py-3" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', true)" wire:confirm="¿Está seguro de realizar esta acción?">
                                                 {{ $notice->type === 'TRABAJO_EN_CASA' ? 'Firmar de Conformidad' : 'Autorizar Participación' }}
                                             </flux:button>
                                             @if($notice->type !== 'TRABAJO_EN_CASA')
-                                                <flux:button variant="filled" color="red" icon="x-mark" class="flex-1 py-3" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', false)">
+                                                <flux:button variant="filled" color="red" icon="x-mark" class="flex-1 py-3" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', false)" wire:confirm="¿Está seguro de NO autorizar esta actividad?">
                                                     No Autorizar
                                                 </flux:button>
                                             @endif
@@ -542,7 +542,7 @@ new class extends Component {
                                 @else
                                     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                                         <flux:text size="sm" class="text-zinc-500 font-medium">Por favor valide la recepción de este comunicado:</flux:text>
-                                        <flux:button variant="primary" icon="finger-print" class="w-full sm:w-auto px-10 shadow-lg shadow-blue-500/30" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}')">
+                                        <flux:button variant="primary" icon="finger-print" class="w-full sm:w-auto px-10 shadow-lg shadow-blue-500/30" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}')" wire:confirm="¿Desea registrar su firma de enterado?">
                                             Confirmar de Enterado
                                         </flux:button>
                                     </div>
@@ -559,7 +559,7 @@ new class extends Component {
                                                     Respuesta: {{ $signature->authorized ? 'AUTORIZADO' : 'NO AUTORIZADO' }}
                                                 </flux:text>
                                             @else
-                                                <flux:text size="sm" class="font-bold text-green-800 dark:text-green-200">ESTADO: ENTERADO</flux:text>
+                                                <flux:text size="sm" class="font-bold text-green-800 dark:text-green-200">ESTADO: FIRMADO</flux:text>
                                             @endif
                                             <flux:text size="xs" class="text-green-700/60 dark:text-green-400/60">Registrado el {{ $signature->signed_at->format('d/m/Y H:i') }}</flux:text>
                                         </div>
@@ -636,7 +636,7 @@ new class extends Component {
                                                         {{ $signature->authorized ? 'Autorizado' : 'No Autorizado' }}
                                                     </flux:badge>
                                                 @else
-                                                    <flux:badge size="sm" color="green" icon="check-badge">Enterado</flux:badge>
+                                                    <flux:badge size="sm" color="green" icon="check-badge">Firmado  </flux:badge>
                                                 @endif
                                                 <span class="text-[9px] text-zinc-400">{{ $signature->signed_at->format('d/m/Y H:i') }}</span>
                                             </div>
@@ -646,9 +646,20 @@ new class extends Component {
                                     </td>
                                     <td class="py-4 px-2 text-right">
                                         @if(!$signature)
-                                            <flux:button variant="primary" size="sm" icon="finger-print" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', true)">
-                                                Firmar
-                                            </flux:button>
+                                            <div class="flex flex-col sm:flex-row justify-end gap-2">
+                                                @if($notice->requires_authorization)
+                                                    <flux:button variant="primary" size="sm" icon="check" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', true)" wire:confirm="¿Está seguro de autorizar esta actividad?">
+                                                        Autorizar
+                                                    </flux:button>
+                                                    <flux:button variant="filled" color="red" size="sm" icon="x-mark" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', false)" wire:confirm="¿Está seguro de NO autorizar esta actividad?">
+                                                        No Autorizar
+                                                    </flux:button>
+                                                @else
+                                                    <flux:button variant="primary" size="sm" icon="finger-print" wire:click="signNotice('{{ $notice->id }}', '{{ $student->id }}', true)" wire:confirm="¿Desea registrar su firma de enterado?">
+                                                        Firmar
+                                                    </flux:button>
+                                                @endif
+                                            </div>
                                         @endif
                                     </td>
                                 </tr>
@@ -679,7 +690,7 @@ new class extends Component {
                 </header>
 
                 <div class="space-y-4">
-                    <flux:input wire:model="title" label="Título del Aviso" placeholder="Ej: Suspensión por consejo técnico, Festival de primavera..." />
+                    <flux:input wire:model="title" label="Título del Aviso" placeholder="Ej: Suspensión por consejo técnico, Festival de primavera..." autofocus />
                     
                     <div class="grid grid-cols-2 gap-4">
                         <flux:select wire:model.live="type" label="Tipo de Aviso">
@@ -852,6 +863,10 @@ new class extends Component {
                                                     @else
                                                         Firmado
                                                     @endif
+                                                </flux:badge>
+                                            @else
+                                                <flux:badge size="xs" color="green" class="mt-1">
+                                                    Firmado
                                                 </flux:badge>
                                             @endif
                                         </div>

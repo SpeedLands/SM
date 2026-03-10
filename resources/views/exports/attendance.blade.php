@@ -41,12 +41,10 @@
                 @foreach($daysInMonth as $day)
                     @php
                         $dateString = $day->format('Y-m-d');
-                        $isNonWorking = !in_array($dateString, $workingDays);
-                        $bgColor = $isNonWorking ? 'background-color: #E2E8F0;' : '';
                         $attendance = $attendances[$student->id][$dateString] ?? null;
                         $symbol = $attendance ? ($statusSymbols[$attendance->status] ?? $attendance->status) : '';
                     @endphp
-                    <td style="border: 1px solid #000000; text-align: center; {{ $bgColor }}">
+                    <td style="border: 1px solid #000000; text-align: center;">
                         {{ $symbol }}
                     </td>
                 @endforeach

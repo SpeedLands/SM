@@ -397,6 +397,7 @@ new class extends Component {
                     wire:model="userName" 
                     placeholder="Juan Pérez" 
                     class="uppercase"
+                    autofocus
                     x-on:input="
                         let start = $el.selectionStart;
                         let end = $el.selectionEnd;

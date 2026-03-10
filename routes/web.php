@@ -41,6 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Attendance System
     Volt::route('asistencia', 'attendance.index')->name('attendance.index');
     Volt::route('asistencia/escanear', 'attendance.scanner')->name('attendance.scanner');
+    Volt::route('escaneo-rapido', 'global-scanner')->name('global-scanner');
 
     Route::post('toggle-view', function () {
         $user = auth()->user();
@@ -55,7 +56,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // If switching TO parent view, and we are on a restricted route, redirect to dashboard
         if ($new === 'parent') {
-            $restrictedRoutes = ['users.index', 'cycles.index', 'infractions.index'];
+            $restrictedRoutes = [
+                'users.index',
+                'cycles.index',
+                'infractions.index',
+                'students.index',
+                'students.promote',
+                'students.credential',
+                'students.credential.bulk',
+                'calendar.index',
+                'attendance.index',
+                'attendance.scanner',
+                'data-importer',
+                'data-exporter',
+                'export.teachers',
+                'export.parents',
+                'export.students',
+                'export.attendance',
+                'settings.attendance',
+            ];
             $currentRouteName = request()->header('Referer') ? app('router')->getRoutes()->match(app('request')->create(request()->header('Referer')))->getName() : null;
 
             if (in_array($currentRouteName, $restrictedRoutes)) {

@@ -319,7 +319,7 @@
                 // Global listener for 'notify' event from Livewire
                 window.addEventListener('notify', (event) => {
                     const data = event.detail[0] || event.detail;
-                    window.dispatchEvent(new CustomEvent('flux-toast', {
+                    window.dispatchEvent(new CustomEvent('system-toast', {
                         detail: {
                             title: data.title || 'Aviso',
                             body: data.message || data.body || '',
@@ -424,6 +424,9 @@
         <div 
             x-data="{ 
                 toasts: [],
+                init() {
+                    // Try to catch any delayed flashes
+                },
                 add(toast) {
                     toast.id = Date.now() + Math.random();
                     this.toasts.push(toast);
@@ -433,7 +436,7 @@
                     this.toasts = this.toasts.filter(t => t.id !== id);
                 }
             }"
-            @flux-toast.window="add($event.detail)"
+            @system-toast.window="add($event.detail)"
             class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col gap-3 w-full max-w-sm pointer-events-none"
         >
             <template x-for="toast in toasts" :key="toast.id">

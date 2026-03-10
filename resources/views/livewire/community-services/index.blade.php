@@ -259,7 +259,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="space-y-6">
+<div class="space-y-6" x-data="{ showFilters: false }">
     <div class="flex items-center justify-between">
         <div>
             <flux:heading size="xl" level="1">Servicio Comunitario</flux:heading>
@@ -301,11 +301,11 @@ new class extends Component {
             </flux:badge> 
         @endif
         @if($onlyActiveCycle) <flux:badge variant="solid" color="zinc" class="shrink-0">Ciclo Activo</flux:badge> @endif
-        <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="$refs.filterPanel.classList.toggle('hidden')" />
+        <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="showFilters = !showFilters" />
     </div>
 
     <!-- Filters -->
-    <div x-ref="filterPanel" class="hidden sm:block p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm transition-all mb-6">
+    <div x-show="showFilters" class="sm:block! p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm transition-all mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <flux:field class="md:col-span-2">
                 <flux:label>Búsqueda</flux:label>
@@ -602,7 +602,7 @@ new class extends Component {
 
             <div class="space-y-4">
                 <div class="relative">
-                    <flux:input wire:model.live.debounce.300ms="studentSearch" label="Buscar Alumno" icon="user" placeholder="Nombre..." />
+                    <flux:input wire:model.live.debounce.300ms="studentSearch" label="Buscar Alumno" icon="user" placeholder="Nombre..." autofocus />
                     @if(count($studentResults) > 0)
                         <div class="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden">
                             @foreach($studentResults as $student)
