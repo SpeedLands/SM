@@ -45,7 +45,8 @@ new class extends Component {
             'tutorial-a-export' => 'Exportación de Listas y Reportes',
             'tutorial-a-promote' => 'Guía para Promover Alumnos de Ciclo',
             'tutorial-a-report-types' => 'Gestión de Tipos de Reportes',
-            'tutorial-c-install' => 'Cómo Instalar la Aplicación (PWA)',
+            'tutorial-c-install-android' => 'Instalación de la Aplicación en Android',
+            'tutorial-c-install-ios' => 'Instalación de la Aplicación en iOS',
             'tutorial-c-notifications' => 'Configuración de Notificaciones Push',
             'tutorial-d-attendance' => 'Control de Asistencia de Alumnos',
         ][$name] ?? 'Tutorial';
@@ -307,6 +308,26 @@ new class extends Component {
             ];
         }
 
+        // Custom sections for Android install tutorial
+        if ($name === 'tutorial-c-install-android') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'instalar', 'title' => '1. Proceso de instalación'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for iOS install tutorial
+        if ($name === 'tutorial-c-install-ios') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'instalar', 'title' => '1. Proceso de instalación'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
         // Custom sections for notifications tutorial
         if ($name === 'tutorial-c-notifications') {
             return [
@@ -358,13 +379,11 @@ new class extends Component {
             'tutorial-d-create-report' => [
                 'custom' => true,
             ],
-            'tutorial-c-install' => [
-                'desc' => 'Instala la aplicación en tu celular para un acceso rápido y directo sin usar el navegador.',
-                'req' => 'Navegador Chrome (Android) o Safari (iOS).',
-                'steps' => '<li>Abre el menú del navegador (tres puntos o flecha).</li><li>Selecciona "Instalar Aplicación" o "Añadir a pantalla de inicio".</li><li>Confirma la instalación.</li>',
-                'tip' => 'La App instalada consume menos datos y carga más rápido.',
-                'edit' => '',
-                'delete' => ''
+            'tutorial-c-install-android' => [
+                'custom' => true,
+            ],
+            'tutorial-c-install-ios' => [
+                'custom' => true,
             ],
             'tutorial-d-exams' => [
                 'desc' => 'Programa las fechas de evaluación para que los padres puedan organizar los horarios de sus hijos.',
@@ -456,6 +475,8 @@ new class extends Component {
             if ($name === 'tutorial-a-inscribe') return $this->getStudentsContent();
             if ($name === 'tutorial-d-create-report') return $this->getReportsContent();
             if ($name === 'tutorial-c-notifications') return $this->getNotificationsContent();
+            if ($name === 'tutorial-c-install-android') return $this->getInstallAndroidContent();
+            if ($name === 'tutorial-c-install-ios') return $this->getInstallIosContent();
             if ($name === 'tutorial-d-attendance') return $this->getAttendanceContent();
             if ($name === 'tutorial-a-export') return $this->getExportContent();
             if ($name === 'tutorial-p-reports') return $this->getParentReportsContent();
@@ -3456,6 +3477,171 @@ new class extends Component {
             </div>
         ";
     }
+    public function getInstallAndroidContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>Esta guía le mostrará cómo instalar la aplicación de gestión escolar en su dispositivo <strong>Android</strong>. La aplicación funciona como una app nativa instalada directamente desde el navegador, sin necesidad de tiendas de aplicaciones.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con un dispositivo <strong>Android</strong>.</li>
+                <li>Tener un navegador web (de preferencia <strong>Google Chrome</strong>).</li>
+            </ul>
+
+            <h2 id='instalar'>1. Proceso de instalación</h2>
+            <p>Para instalar la aplicación en su dispositivo Android, siga los siguientes pasos:</p>
+
+            {$step(1, 'Acceda al siguiente enlace y cópielo en su navegador de preferencia. Al acceder, se visualizará una pantalla informativa sobre la aplicación junto con un recuadro color turquesa que indica la instalación. Presione en <strong>"Instalar"</strong>.')}
+
+            {$img('descargarAppAndroid/Paso1.png', 'Pantalla informativa de la aplicación con botón de Instalar')}
+
+            {$step(2, 'Aparecerá un recuadro donde se solicita el permiso de instalación. Presione el botón de <strong>"Instalar"</strong> para confirmar.')}
+
+            {$img('descargarAppAndroid/Paso2.png', 'Recuadro de permiso de instalación')}
+
+            {$step(3, 'Seguido de ello aparecerá un recuadro donde se solicita el permiso de instalación. Favor de realizar esa operación presionando el botón de <strong>"Instalar"</strong>.')}
+
+            {$img('descargarAppAndroid/Paso3.png', 'Confirmación del permiso de instalación')}
+
+            {$step(4, 'Una vez realizada la operación de instalación, aparecerá un recuadro indicando que se agregue la app a la pantalla de inicio de su celular. Añada la aplicación pulsando <strong>"Añadir a pantalla de inicio"</strong>.')}
+
+            {$img('descargarAppAndroid/Paso4.png', 'Opción de añadir la aplicación a la pantalla de inicio')}
+
+            {$step(5, 'Finalmente visualizará la aplicación en la pantalla de inicio de su celular. Desde allí podrá acceder a la aplicación de igual manera ha como lo haría en el navegador.')}
+
+            {$img('descargarAppAndroid/Paso5.png', 'Aplicación instalada en la pantalla de inicio del dispositivo')}
+
+            {$important('La aplicación instalada funciona igual que en el navegador, pero con acceso directo desde su pantalla de inicio.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>La app consume menos datos</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>La aplicación instalada consume menos datos y carga más rápido que acceder directamente desde el navegador.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones después de instalar</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Una vez instalada la aplicación, active las notificaciones para recibir alertas de reportes, avisos, citatorios y exámenes.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getInstallIosContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>Esta guía le mostrará cómo instalar la aplicación de gestión escolar en su dispositivo <strong>iOS</strong> (iPhone o iPad). El proceso se realiza a través del navegador <strong>Safari</strong>.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con un dispositivo <strong>iPhone</strong> o <strong>iPad</strong>.</li>
+                <li>Utilizar el navegador <strong>Safari</strong> (obligatorio para iOS).</li>
+            </ul>
+
+            <h2 id='instalar'>1. Proceso de instalación</h2>
+            <p>Para instalar la aplicación en su dispositivo iOS, siga los siguientes pasos:</p>
+
+            {$step(1, 'Acceda al enlace de la aplicación en el navegador <strong>Safari</strong>. Se visualizará una pantalla informativa sobre la aplicación.')}
+
+            {$img('descargarAppIOS/Paso1.png', 'Pantalla informativa de la aplicación en Safari')}
+
+            {$step(2, 'Para iniciar el proceso de instalación, presione los <strong>3 puntitos</strong> que se encuentran en la parte inferior derecha. Esto abrirá un cuadro con múltiples opciones donde deberá presionar la opción de <strong>"Compartir"</strong>.')}
+
+            {$img('descargarAppIOS/Paso2.png', 'Menú de opciones con el botón Compartir')}
+
+            {$step(3, 'Una vez presionado el botón de "Compartir", se abrirá un cuadro con información de la aplicación, herramientas de comunicación, contactos, etc. Presione el botón de <strong>"Más"</strong>.')}
+
+            {$img('descargarAppIOS/Paso3.png', 'Cuadro de compartir con el botón Más')}
+
+            {$step(4, 'Se abrirá un cuadro con múltiples opciones. Presione el botón de <strong>"Agregar a Inicio"</strong>.')}
+
+            {$img('descargarAppIOS/Paso4.png', 'Opciones disponibles con Agregar a Inicio')}
+
+            {$step(5, 'Se abrirá un cuadro de personalización donde podrá cambiar el nombre a la app (o mantener el nombre por defecto). También tendrá la opción de <strong>"Abrir como app web"</strong>. Favor de mantener esta opción habilitada.')}
+
+            {$img('descargarAppIOS/Paso5.png', 'Cuadro de personalización con opción Abrir como app web habilitada')}
+
+            {$img('descargarAppIOS/Paso6.png', 'Confirmación de la personalización de la aplicación')}
+
+            {$step(6, 'Finalmente visualizará la aplicación en la pantalla de inicio de su celular, o también podrá verla a través de la herramienta de búsqueda de aplicaciones.')}
+
+            {$img('descargarAppIOS/Paso7.png', 'Aplicación visible en la pantalla de inicio del iPhone')}
+
+            {$img('descargarAppIOS/Paso8.png', 'Aplicación visible en la búsqueda de aplicaciones')}
+
+            {$important('Es obligatorio usar el navegador <strong>Safari</strong> para la instalación en iOS. Otros navegadores como Chrome no permiten añadir aplicaciones a la pantalla de inicio en dispositivos Apple. Además, mantenga la opción "Abrir como app web" habilitada para una mejor experiencia.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use Safari exclusivamente</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>En iOS, solo Safari permite instalar aplicaciones web como apps nativas. Chrome y otros navegadores no tienen esta funcionalidad.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones después de instalar</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Una vez instalada la aplicación, active las notificaciones para recibir alertas de reportes, avisos, citatorios y exámenes.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
 }; ?>
 
 @section('title', 'Guía Escolar: Tutoriales y Ayuda Digital')
@@ -3522,7 +3708,8 @@ new class extends Component {
 
             @if($tab === 'config')
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="device-phone-mobile" title="Instalar Aplicación" description="Cómo instalar la app en Android o iOS (PWA)." name="tutorial-c-install" />
+                <x-tutorial-card icon="device-phone-mobile" title="Instalar en Android" description="Cómo instalar la aplicación en dispositivos Android." name="tutorial-c-install-android" />
+                <x-tutorial-card icon="device-phone-mobile" title="Instalar en iOS" description="Cómo instalar la aplicación en iPhone y iPad." name="tutorial-c-install-ios" />
                 <x-tutorial-card icon="bell-alert" title="Notificaciones" description="Activa las notificaciones push para recibir alertas al instante." name="tutorial-c-notifications" />
             </div>
             @endif
