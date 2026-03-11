@@ -186,6 +186,57 @@ new class extends Component {
             ];
         }
 
+        // Custom sections for parent reports tutorial
+        if ($name === 'tutorial-p-reports') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'firmar', 'title' => '1. Firmar reportes'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for parent notices tutorial
+        if ($name === 'tutorial-p-notices') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'enterado', 'title' => '1. Firmar de enterado'],
+                ['id' => 'autorizacion', 'title' => '2. Avisos con autorización'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for parent citations tutorial
+        if ($name === 'tutorial-p-citations') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'firmar', 'title' => '1. Firmar citatorios'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for parent exams tutorial
+        if ($name === 'tutorial-p-exams') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'consultar', 'title' => '1. Consultar exámenes'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for parent community service tutorial
+        if ($name === 'tutorial-p-community') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'firmar', 'title' => '1. Firmar servicio comunitario'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
         // Custom sections for export tutorial
         if ($name === 'tutorial-a-export') {
             return [
@@ -290,53 +341,19 @@ new class extends Component {
         
         $specifics = [
             'tutorial-p-reports' => [
-                'desc' => 'Como padre de familia, es vital que estés al tanto del desempeño y comportamiento de tu hijo.',
-                'req' => 'Tener una cuenta activa vinculada a uno o más estudiantes.',
-                'steps' => '<li>Accede a "Reportes" en el dashboard.</li><li>Selecciona al alumno si tienes más de uno.</li><li>Haz clic en "Firmar de Enterado" en los reportes color ámbar.</li>',
-                'tip' => 'La firma digital tiene validez institucional para trámites académicos.'
+                'custom' => true,
             ],
             'tutorial-p-notices' => [
-                'desc' => 'Gestiona autorizaciones para viajes escolares y eventos especiales de forma digital.',
-                'req' => 'Notificaciones push habilitadas en tu dispositivo.',
-                'steps' => '<li>Revisa la bandeja de "Avisos".</li><li>Lee los detalles del permiso.</li><li>Selecciona "Autorizar" o "Denegar" según corresponda.</li>',
-                'tip' => 'Las autorizaciones tienen fecha límite; asegúrate de responder a tiempo.',
-                'edit' => 'Las respuestas a autorizaciones no se pueden editar una vez confirmadas.',
-                'delete' => 'Los avisos solo pueden ser eliminados por el personal docente o administrativo.'
-            ],
-            'tutorial-p-reports' => [
-                'desc' => 'Como padre de familia, es vital que estés al tanto del desempeño y comportamiento de tu hijo.',
-                'req' => 'Tener una cuenta activa vinculada a uno o más estudiantes.',
-                'steps' => '<li>Accede a "Reportes" en el dashboard.</li><li>Selecciona al alumno si tienes más de uno.</li><li>Haz clic en "Firmar de Enterado" en los reportes color ámbar.</li>',
-                'tip' => 'La firma digital tiene validez institucional para trámites académicos.',
-                'edit' => '', 'delete' => ''
-            ],
-            'tutorial-p-notices' => [
-                'desc' => 'Gestiona autorizaciones para viajes escolares y eventos especiales de forma digital.',
-                'req' => 'Notificaciones push habilitadas en tu dispositivo.',
-                'steps' => '<li>Revisa la bandeja de "Avisos".</li><li>Lee los detalles del permiso.</li><li>Selecciona "Autorizar" o "Denegar" según corresponda.</li>',
-                'tip' => 'Las autorizaciones tienen fecha límite; asegúrate de responder a tiempo.',
-                'edit' => '', 'delete' => ''
+                'custom' => true,
             ],
             'tutorial-p-citations' => [
-                'desc' => 'Confirma tu asistencia a reuniones presenciales con el personal docente.',
-                'req' => 'Recibir un citatorio activo en el panel.',
-                'steps' => '<li>Ingresa a "Citatorios".</li><li>Verifica el motivo, fecha y hora.</li><li>Haz clic en "Confirmar Enterado".</li>',
-                'tip' => 'Acudir a los citatorios mejora el seguimiento educativo de tus hijos.',
-                'edit' => '', 'delete' => ''
+                'custom' => true,
             ],
             'tutorial-p-exams' => [
-                'desc' => 'Consulta las fechas de evaluación para que puedas apoyar a tu hijo en su preparación.',
-                'req' => 'Tener alumnos inscritos en el ciclo actual.',
-                'steps' => '<li>Ve a "Exámenes" en el menú lateral.</li><li>Filtra por trimestre para ver las fechas próximas.</li><li>Consulta el temario si el docente lo ha adjuntado.</li>',
-                'tip' => 'Revisar el calendario evita sorpresas de último momento en las evaluaciones.',
-                'edit' => '', 'delete' => ''
+                'custom' => true,
             ],
             'tutorial-p-community' => [
-                'desc' => 'Seguimiento de las actividades de servicio comunitario asignadas por reportes acumulados.',
-                'req' => 'Tener un alumno con 3 o más reportes en el ciclo.',
-                'steps' => '<li>Ingresa a "Servicio Comunitario".</li><li>Revisa la actividad asignada y la fecha de cumplimiento.</li><li>Firma de enterado para iniciar el proceso.</li>',
-                'tip' => 'El servicio comunitario busca la reparación del daño y la reflexión del alumno.',
-                'edit' => '', 'delete' => ''
+                'custom' => true,
             ],
             'tutorial-d-create-report' => [
                 'custom' => true,
@@ -441,6 +458,11 @@ new class extends Component {
             if ($name === 'tutorial-c-notifications') return $this->getNotificationsContent();
             if ($name === 'tutorial-d-attendance') return $this->getAttendanceContent();
             if ($name === 'tutorial-a-export') return $this->getExportContent();
+            if ($name === 'tutorial-p-reports') return $this->getParentReportsContent();
+            if ($name === 'tutorial-p-notices') return $this->getParentNoticesContent();
+            if ($name === 'tutorial-p-citations') return $this->getParentCitationsContent();
+            if ($name === 'tutorial-p-exams') return $this->getParentExamsContent();
+            if ($name === 'tutorial-p-community') return $this->getParentCommunityContent();
         }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
@@ -3061,6 +3083,374 @@ new class extends Component {
                     <div>
                         <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Proteja los datos sensibles</p>
                         <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Los archivos exportados contienen información personal. Almacene los Excel de forma segura y no los comparta con personas sin autorización.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+    public function getParentReportsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Reportes</strong> le permite visualizar todos los reportes disciplinarios aplicados a sus hijos/tutorados. Desde aquí podrá consultar el historial de reportes y firmar de enterado para indicar que ha sido informado.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Tener una cuenta activa de <strong>Padre/Tutor</strong> vinculada a uno o más estudiantes.</li>
+                <li>Haber iniciado sesión en la plataforma.</li>
+            </ul>
+
+            <h2 id='firmar'>1. Firmar reportes</h2>
+            <p>Para firmar un reporte y confirmar que ha sido enterado, siga los siguientes pasos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>"Reportes"</strong> en el menú lateral. Allí se visualizarán todos los reportes aplicados a sus hijos/tutorados.')}
+
+            {$step(2, 'Para realizar la acción de firmar, tendrá que desplazar la tabla de reportes hasta ver visible el botón de <strong>"Firmar"</strong>.')}
+
+            {$img('reportes/antesFirmar.png', 'Vista de la tabla de reportes con el botón Firmar visible')}
+
+            {$step(3, 'Presione el botón de <strong>"Firmar"</strong> para indicar que fue enterado del reporte.')}
+
+            {$img('reportes/despuesFirmar.png', 'Reporte firmado exitosamente')}
+
+            {$important('La firma digital tiene validez institucional. Una vez firmado, no es posible revertir la acción.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Revise los reportes constantemente</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Mantenerse al tanto de los reportes le permite dar seguimiento al comportamiento de su hijo/tutorado en la escuela.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Con las notificaciones activadas, recibirá alertas cada vez que se aplique un nuevo reporte a su hijo/tutorado.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getParentNoticesContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Avisos</strong> le permite visualizar todos los avisos emitidos por parte de la secundaria a sus hijos/tutorados. Existen dos tipos de avisos: los que solo requieren firma de enterado, y los que requieren autorización del padre/madre/tutor para una actividad.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Tener una cuenta activa de <strong>Padre/Tutor</strong> vinculada a uno o más estudiantes.</li>
+                <li>Haber iniciado sesión en la plataforma.</li>
+            </ul>
+
+            <h2 id='enterado'>1. Firmar de enterado</h2>
+            <p>Para los avisos que solo requieren que usted confirme haber sido informado, siga los siguientes pasos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>"Avisos"</strong> en el menú lateral. Allí se visualizarán todos los avisos emitidos por la secundaria.')}
+
+            {$step(2, 'Presione el botón de <strong>"Firmar"</strong> para indicar que fue enterado del aviso.')}
+
+            {$img('avisos/firmarAntesEnterado.png', 'Vista del aviso con el botón Firmar disponible')}
+
+            {$img('avisos/firmarDespuesEnterado.png', 'Aviso firmado de enterado exitosamente')}
+
+            <h2 id='autorizacion'>2. Avisos con autorización</h2>
+            <p>Existen avisos donde se requiere autorización del padre/madre/tutor para una actividad emitida por parte de la secundaria. En estos casos deberá indicar si autoriza o no la actividad.</p>
+
+            {$step(1, 'Al visualizar un aviso que requiere autorización, verá las opciones de <strong>"Autorizar"</strong> y <strong>"No Autorizar"</strong>.')}
+
+            {$img('avisos/firmarAntesAutorizacion.png', 'Aviso que requiere autorización con opciones visibles')}
+
+            {$step(2, 'Seleccione la opción que corresponda. Independientemente de la opción que elija, se indicará que fue enterado del aviso.')}
+
+            {$img('avisos/firmarAutorizadoNoAutorizado.png', 'Opciones de Autorizado y No Autorizado')}
+
+            {$img('avisos/firmarDespuesAutorizacion.png', 'Aviso con autorización firmado exitosamente')}
+
+            {$important('Independientemente de si autoriza o no, la firma indica que fue enterado del aviso. Las respuestas a autorizaciones no se pueden modificar una vez confirmadas.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Firme los avisos a tiempo</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Algunos avisos con autorización pueden tener fecha límite. Revise el apartado de avisos frecuentemente para no perder ninguno.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Con las notificaciones activadas, recibirá alertas cada vez que se emita un nuevo aviso por parte de la secundaria.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getParentCitationsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Citatorios</strong> le permite visualizar todos los citatorios aplicados a sus hijos/tutorados. Un citatorio es una cita agendada por la secundaria para que usted acuda a una reunión presencial con el personal docente.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Tener una cuenta activa de <strong>Padre/Tutor</strong> vinculada a uno o más estudiantes.</li>
+                <li>Haber iniciado sesión en la plataforma.</li>
+            </ul>
+
+            <h2 id='firmar'>1. Firmar citatorios</h2>
+            <p>Para firmar un citatorio y confirmar que acudirá a la cita agendada, siga los siguientes pasos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>"Citatorios"</strong> en el menú lateral. Allí se visualizarán todos los citatorios aplicados a sus hijos/tutorados.')}
+
+            {$step(2, 'Presione el botón de <strong>"Firmar"</strong> para indicar que fue enterado. Con esta acción usted confirma que acudirá a la secundaria a la cita agendada.')}
+
+            {$img('citatorios/firmarAntes.png', 'Vista del citatorio con el botón Firmar disponible')}
+
+            {$img('citatorios/firmarDespues.png', 'Citatorio firmado exitosamente')}
+
+            {$important('Al firmar un citatorio, usted confirma que acudirá a la secundaria en la fecha y hora indicada. Es importante asistir a los citatorios para el seguimiento educativo de sus hijos.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Firme a tiempo</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Firmar los citatorios con anticipación permite a la escuela organizar las reuniones de manera eficiente.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Acudir mejora el seguimiento</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Acudir a los citatorios mejora el seguimiento educativo y disciplinario de sus hijos/tutorados.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getParentExamsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Exámenes</strong> le permite consultar el calendario de evaluaciones programadas para sus hijos/tutorados. Puede filtrar los exámenes por trimestre para ver las fechas próximas y organizar los horarios de estudio.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Tener una cuenta activa de <strong>Padre/Tutor</strong> vinculada a uno o más estudiantes.</li>
+                <li>Tener alumnos inscritos en el ciclo escolar actual.</li>
+            </ul>
+
+            <h2 id='consultar'>1. Consultar exámenes</h2>
+            <p>Para consultar los exámenes agendados para sus hijos/tutorados, siga los siguientes pasos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>"Exámenes"</strong> en el menú lateral. Allí se visualizarán todos los exámenes agendados a sus hijos/tutorados.')}
+
+            {$step(2, 'Para filtrar los exámenes, tendrá que presionar el icono de <strong>"Filtro"</strong> para desplegar los distintos campos para filtrar los exámenes.')}
+
+            {$img('examenes/antesFiltro.png', 'Vista del apartado de exámenes con el icono de filtro visible')}
+
+            {$step(3, 'Se desplegará un conjunto de opciones para filtrar exámenes. Estas son las funcionalidades:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Trimestre</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtra los exámenes aplicados en los distintos trimestres del ciclo escolar activo.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtra los exámenes aplicados en los distintos grados.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtra los exámenes aplicados en los distintos grupos.</span>
+                </div>
+            </div>
+
+            {$img('examenes/despuesFiltro.png', 'Vista de los filtros desplegados con opciones de Trimestre, Grado y Grupo')}
+
+            {$important('El calendario de exámenes se actualiza automáticamente cuando los docentes programan nuevas evaluaciones. Revise frecuentemente para mantenerse informado.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Revise el calendario con anticipación</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Revisar el calendario de evaluaciones con anticipación le permite ayudar a su hijo/tutorado a prepararse adecuadamente para los exámenes.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Con las notificaciones activadas, recibirá alertas cuando se agende un nuevo examen para sus hijos/tutorados.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getParentCommunityContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Servicio Comunitario</strong> le permite dar seguimiento a las actividades reparatorias asignadas a sus hijos/tutorados. El servicio comunitario se asigna como medida correctiva y busca la reparación del daño y la reflexión del alumno.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Tener una cuenta activa de <strong>Padre/Tutor</strong> vinculada a uno o más estudiantes.</li>
+                <li>Haber iniciado sesión en la plataforma.</li>
+            </ul>
+
+            <h2 id='firmar'>1. Firmar servicio comunitario</h2>
+            <p>Para firmar de enterado un servicio comunitario asignado, siga los siguientes pasos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>"Servicio Comunitario"</strong> en el menú lateral. Allí se visualizarán todos los servicios comunitarios asignados a sus hijos/tutorados.')}
+
+            {$step(2, 'Revise la actividad asignada y la fecha de cumplimiento.')}
+
+            {$step(3, 'Presione el botón de <strong>"Firmar"</strong> para indicar que fue enterado del servicio comunitario.')}
+
+            {$img('servicioComunitario/firmarAntes.png', 'Vista del servicio comunitario con el botón Firmar disponible')}
+
+            {$img('servicioComunitario/firmarDespues.png', 'Servicio comunitario firmado exitosamente')}
+
+            {$important('El servicio comunitario busca la reparación del daño y la reflexión del alumno. Es importante estar al tanto de la actividad asignada y su fecha de cumplimiento.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Apoye a su hijo en el cumplimiento</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>El servicio comunitario es una oportunidad de aprendizaje. Acompañe a su hijo/tutorado en el proceso para que sea una experiencia formativa.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Con las notificaciones activadas, recibirá alertas cuando se asigne un nuevo servicio comunitario a su hijo/tutorado.</p>
                     </div>
                 </div>
             </div>
