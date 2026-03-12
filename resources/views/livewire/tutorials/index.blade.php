@@ -45,7 +45,8 @@ new class extends Component {
             'tutorial-a-export' => 'Exportación de Listas y Reportes',
             'tutorial-a-promote' => 'Guía para Promover Alumnos de Ciclo',
             'tutorial-a-report-types' => 'Gestión de Tipos de Reportes',
-            'tutorial-c-install' => 'Cómo Instalar la Aplicación (PWA)',
+            'tutorial-c-install-android' => 'Instalación de la Aplicación en Android',
+            'tutorial-c-install-ios' => 'Instalación de la Aplicación en iOS',
             'tutorial-c-notifications' => 'Configuración de Notificaciones Push',
             'tutorial-d-attendance' => 'Control de Asistencia de Alumnos',
         ][$name] ?? 'Tutorial';
@@ -53,9 +54,12 @@ new class extends Component {
 
     public function getCategory($name)
     {
-        if (str_starts_with($name, 'tutorial-p')) return 'Padres';
-        if (str_starts_with($name, 'tutorial-d')) return 'Docentes';
-        if (str_starts_with($name, 'tutorial-a')) return 'Administración';
+        if (str_starts_with($name, 'tutorial-p'))
+            return 'Padres';
+        if (str_starts_with($name, 'tutorial-d'))
+            return 'Docentes';
+        if (str_starts_with($name, 'tutorial-a'))
+            return 'Administración';
         return 'Configuración';
     }
 
@@ -186,6 +190,57 @@ new class extends Component {
             ];
         }
 
+        // Custom sections for parent reports tutorial
+        if ($name === 'tutorial-p-reports') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'firmar', 'title' => '1. Firmar reportes'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for parent notices tutorial
+        if ($name === 'tutorial-p-notices') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'enterado', 'title' => '1. Firmar de enterado'],
+                ['id' => 'autorizacion', 'title' => '2. Avisos con autorización'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for parent citations tutorial
+        if ($name === 'tutorial-p-citations') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'firmar', 'title' => '1. Firmar citatorios'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for parent exams tutorial
+        if ($name === 'tutorial-p-exams') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'consultar', 'title' => '1. Consultar exámenes'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for parent community service tutorial
+        if ($name === 'tutorial-p-community') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'firmar', 'title' => '1. Firmar servicio comunitario'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
         // Custom sections for export tutorial
         if ($name === 'tutorial-a-export') {
             return [
@@ -256,6 +311,26 @@ new class extends Component {
             ];
         }
 
+        // Custom sections for Android install tutorial
+        if ($name === 'tutorial-c-install-android') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'instalar', 'title' => '1. Proceso de instalación'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
+        // Custom sections for iOS install tutorial
+        if ($name === 'tutorial-c-install-ios') {
+            return [
+                ['id' => 'intro', 'title' => 'Introducción'],
+                ['id' => 'requisitos', 'title' => 'Requisitos previos'],
+                ['id' => 'instalar', 'title' => '1. Proceso de instalación'],
+                ['id' => 'beneficios', 'title' => 'Tips de experto'],
+            ];
+        }
+
         // Custom sections for notifications tutorial
         if ($name === 'tutorial-c-notifications') {
             return [
@@ -287,67 +362,31 @@ new class extends Component {
     {
         $title = $this->getTitle($name);
         $category = $this->getCategory($name);
-        
+
         $specifics = [
             'tutorial-p-reports' => [
-                'desc' => 'Como padre de familia, es vital que estés al tanto del desempeño y comportamiento de tu hijo.',
-                'req' => 'Tener una cuenta activa vinculada a uno o más estudiantes.',
-                'steps' => '<li>Accede a "Reportes" en el dashboard.</li><li>Selecciona al alumno si tienes más de uno.</li><li>Haz clic en "Firmar de Enterado" en los reportes color ámbar.</li>',
-                'tip' => 'La firma digital tiene validez institucional para trámites académicos.'
+                'custom' => true,
             ],
             'tutorial-p-notices' => [
-                'desc' => 'Gestiona autorizaciones para viajes escolares y eventos especiales de forma digital.',
-                'req' => 'Notificaciones push habilitadas en tu dispositivo.',
-                'steps' => '<li>Revisa la bandeja de "Avisos".</li><li>Lee los detalles del permiso.</li><li>Selecciona "Autorizar" o "Denegar" según corresponda.</li>',
-                'tip' => 'Las autorizaciones tienen fecha límite; asegúrate de responder a tiempo.',
-                'edit' => 'Las respuestas a autorizaciones no se pueden editar una vez confirmadas.',
-                'delete' => 'Los avisos solo pueden ser eliminados por el personal docente o administrativo.'
-            ],
-            'tutorial-p-reports' => [
-                'desc' => 'Como padre de familia, es vital que estés al tanto del desempeño y comportamiento de tu hijo.',
-                'req' => 'Tener una cuenta activa vinculada a uno o más estudiantes.',
-                'steps' => '<li>Accede a "Reportes" en el dashboard.</li><li>Selecciona al alumno si tienes más de uno.</li><li>Haz clic en "Firmar de Enterado" en los reportes color ámbar.</li>',
-                'tip' => 'La firma digital tiene validez institucional para trámites académicos.',
-                'edit' => '', 'delete' => ''
-            ],
-            'tutorial-p-notices' => [
-                'desc' => 'Gestiona autorizaciones para viajes escolares y eventos especiales de forma digital.',
-                'req' => 'Notificaciones push habilitadas en tu dispositivo.',
-                'steps' => '<li>Revisa la bandeja de "Avisos".</li><li>Lee los detalles del permiso.</li><li>Selecciona "Autorizar" o "Denegar" según corresponda.</li>',
-                'tip' => 'Las autorizaciones tienen fecha límite; asegúrate de responder a tiempo.',
-                'edit' => '', 'delete' => ''
+                'custom' => true,
             ],
             'tutorial-p-citations' => [
-                'desc' => 'Confirma tu asistencia a reuniones presenciales con el personal docente.',
-                'req' => 'Recibir un citatorio activo en el panel.',
-                'steps' => '<li>Ingresa a "Citatorios".</li><li>Verifica el motivo, fecha y hora.</li><li>Haz clic en "Confirmar Enterado".</li>',
-                'tip' => 'Acudir a los citatorios mejora el seguimiento educativo de tus hijos.',
-                'edit' => '', 'delete' => ''
+                'custom' => true,
             ],
             'tutorial-p-exams' => [
-                'desc' => 'Consulta las fechas de evaluación para que puedas apoyar a tu hijo en su preparación.',
-                'req' => 'Tener alumnos inscritos en el ciclo actual.',
-                'steps' => '<li>Ve a "Exámenes" en el menú lateral.</li><li>Filtra por trimestre para ver las fechas próximas.</li><li>Consulta el temario si el docente lo ha adjuntado.</li>',
-                'tip' => 'Revisar el calendario evita sorpresas de último momento en las evaluaciones.',
-                'edit' => '', 'delete' => ''
+                'custom' => true,
             ],
             'tutorial-p-community' => [
-                'desc' => 'Seguimiento de las actividades de servicio comunitario asignadas por reportes acumulados.',
-                'req' => 'Tener un alumno con 3 o más reportes en el ciclo.',
-                'steps' => '<li>Ingresa a "Servicio Comunitario".</li><li>Revisa la actividad asignada y la fecha de cumplimiento.</li><li>Firma de enterado para iniciar el proceso.</li>',
-                'tip' => 'El servicio comunitario busca la reparación del daño y la reflexión del alumno.',
-                'edit' => '', 'delete' => ''
+                'custom' => true,
             ],
             'tutorial-d-create-report' => [
                 'custom' => true,
             ],
-            'tutorial-c-install' => [
-                'desc' => 'Instala la aplicación en tu celular para un acceso rápido y directo sin usar el navegador.',
-                'req' => 'Navegador Chrome (Android) o Safari (iOS).',
-                'steps' => '<li>Abre el menú del navegador (tres puntos o flecha).</li><li>Selecciona "Instalar Aplicación" o "Añadir a pantalla de inicio".</li><li>Confirma la instalación.</li>',
-                'tip' => 'La App instalada consume menos datos y carga más rápido.',
-                'edit' => '',
-                'delete' => ''
+            'tutorial-c-install-android' => [
+                'custom' => true,
+            ],
+            'tutorial-c-install-ios' => [
+                'custom' => true,
             ],
             'tutorial-d-exams' => [
                 'desc' => 'Programa las fechas de evaluación para que los padres puedan organizar los horarios de sus hijos.',
@@ -426,21 +465,50 @@ new class extends Component {
 
         // Custom full-page content
         if (!empty($specifics['custom'])) {
-            if ($name === 'tutorial-a-users') return $this->getUserManagementContent();
-            if ($name === 'tutorial-a-regulations') return $this->getRegulationContent();
-            if ($name === 'tutorial-a-cycles') return $this->getCyclesContent();
-            if ($name === 'tutorial-a-promote') return $this->getPromoteContent();
-            if ($name === 'tutorial-a-import') return $this->getImportContent();
-            if ($name === 'tutorial-d-community') return $this->getCommunityServiceContent();
-            if ($name === 'tutorial-d-notices') return $this->getNoticesContent();
-            if ($name === 'tutorial-d-citations') return $this->getCitationsContent();
-            if ($name === 'tutorial-d-exams') return $this->getExamsContent();
-            if ($name === 'tutorial-a-report-types') return $this->getReportTypesContent();
-            if ($name === 'tutorial-a-inscribe') return $this->getStudentsContent();
-            if ($name === 'tutorial-d-create-report') return $this->getReportsContent();
-            if ($name === 'tutorial-c-notifications') return $this->getNotificationsContent();
-            if ($name === 'tutorial-d-attendance') return $this->getAttendanceContent();
-            if ($name === 'tutorial-a-export') return $this->getExportContent();
+            if ($name === 'tutorial-a-users')
+                return $this->getUserManagementContent();
+            if ($name === 'tutorial-a-regulations')
+                return $this->getRegulationContent();
+            if ($name === 'tutorial-a-cycles')
+                return $this->getCyclesContent();
+            if ($name === 'tutorial-a-promote')
+                return $this->getPromoteContent();
+            if ($name === 'tutorial-a-import')
+                return $this->getImportContent();
+            if ($name === 'tutorial-d-community')
+                return $this->getCommunityServiceContent();
+            if ($name === 'tutorial-d-notices')
+                return $this->getNoticesContent();
+            if ($name === 'tutorial-d-citations')
+                return $this->getCitationsContent();
+            if ($name === 'tutorial-d-exams')
+                return $this->getExamsContent();
+            if ($name === 'tutorial-a-report-types')
+                return $this->getReportTypesContent();
+            if ($name === 'tutorial-a-inscribe')
+                return $this->getStudentsContent();
+            if ($name === 'tutorial-d-create-report')
+                return $this->getReportsContent();
+            if ($name === 'tutorial-c-notifications')
+                return $this->getNotificationsContent();
+            if ($name === 'tutorial-c-install-android')
+                return $this->getInstallAndroidContent();
+            if ($name === 'tutorial-c-install-ios')
+                return $this->getInstallIosContent();
+            if ($name === 'tutorial-d-attendance')
+                return $this->getAttendanceContent();
+            if ($name === 'tutorial-a-export')
+                return $this->getExportContent();
+            if ($name === 'tutorial-p-reports')
+                return $this->getParentReportsContent();
+            if ($name === 'tutorial-p-notices')
+                return $this->getParentNoticesContent();
+            if ($name === 'tutorial-p-citations')
+                return $this->getParentCitationsContent();
+            if ($name === 'tutorial-p-exams')
+                return $this->getParentExamsContent();
+            if ($name === 'tutorial-p-community')
+                return $this->getParentCommunityContent();
         }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
@@ -3066,6 +3134,539 @@ new class extends Component {
             </div>
         ";
     }
+    public function getParentReportsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Reportes</strong> le permite visualizar todos los reportes disciplinarios aplicados a sus hijos/tutorados. Desde aquí podrá consultar el historial de reportes y firmar de enterado para indicar que ha sido informado.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Tener una cuenta activa de <strong>Padre/Tutor</strong> vinculada a uno o más estudiantes.</li>
+                <li>Haber iniciado sesión en la plataforma.</li>
+            </ul>
+
+            <h2 id='firmar'>1. Firmar reportes</h2>
+            <p>Para firmar un reporte y confirmar que ha sido enterado, siga los siguientes pasos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>"Reportes"</strong> en el menú lateral. Allí se visualizarán todos los reportes aplicados a sus hijos/tutorados.')}
+
+            {$step(2, 'Para realizar la acción de firmar, tendrá que desplazar la tabla de reportes hasta ver visible el botón de <strong>"Firmar"</strong>.')}
+
+            {$img('reportes/antesFirmar.png', 'Vista de la tabla de reportes con el botón Firmar visible')}
+
+            {$step(3, 'Presione el botón de <strong>"Firmar"</strong> para indicar que fue enterado del reporte.')}
+
+            {$img('reportes/despuesFirmar.png', 'Reporte firmado exitosamente')}
+
+            {$important('La firma digital tiene validez institucional. Una vez firmado, no es posible revertir la acción.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Revise los reportes constantemente</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Mantenerse al tanto de los reportes le permite dar seguimiento al comportamiento de su hijo/tutorado en la escuela.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Con las notificaciones activadas, recibirá alertas cada vez que se aplique un nuevo reporte a su hijo/tutorado.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getParentNoticesContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Avisos</strong> le permite visualizar todos los avisos emitidos por parte de la secundaria a sus hijos/tutorados. Existen dos tipos de avisos: los que solo requieren firma de enterado, y los que requieren autorización del padre/madre/tutor para una actividad.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Tener una cuenta activa de <strong>Padre/Tutor</strong> vinculada a uno o más estudiantes.</li>
+                <li>Haber iniciado sesión en la plataforma.</li>
+            </ul>
+
+            <h2 id='enterado'>1. Firmar de enterado</h2>
+            <p>Para los avisos que solo requieren que usted confirme haber sido informado, siga los siguientes pasos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>"Avisos"</strong> en el menú lateral. Allí se visualizarán todos los avisos emitidos por la secundaria.')}
+
+            {$step(2, 'Presione el botón de <strong>"Firmar"</strong> para indicar que fue enterado del aviso.')}
+
+            {$img('avisos/firmarAntesEnterado.png', 'Vista del aviso con el botón Firmar disponible')}
+
+            {$img('avisos/firmarDespuesEnterado.png', 'Aviso firmado de enterado exitosamente')}
+
+            <h2 id='autorizacion'>2. Avisos con autorización</h2>
+            <p>Existen avisos donde se requiere autorización del padre/madre/tutor para una actividad emitida por parte de la secundaria. En estos casos deberá indicar si autoriza o no la actividad.</p>
+
+            {$step(1, 'Al visualizar un aviso que requiere autorización, verá las opciones de <strong>"Autorizar"</strong> y <strong>"No Autorizar"</strong>.')}
+
+            {$img('avisos/firmarAntesAutorizacion.png', 'Aviso que requiere autorización con opciones visibles')}
+
+            {$step(2, 'Seleccione la opción que corresponda. Independientemente de la opción que elija, se indicará que fue enterado del aviso.')}
+
+            {$img('avisos/firmarAutorizadoNoAutorizado.png', 'Opciones de Autorizado y No Autorizado')}
+
+            {$img('avisos/firmarDespuesAutorizacion.png', 'Aviso con autorización firmado exitosamente')}
+
+            {$important('Independientemente de si autoriza o no, la firma indica que fue enterado del aviso. Las respuestas a autorizaciones no se pueden modificar una vez confirmadas.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Firme los avisos a tiempo</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Algunos avisos con autorización pueden tener fecha límite. Revise el apartado de avisos frecuentemente para no perder ninguno.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Con las notificaciones activadas, recibirá alertas cada vez que se emita un nuevo aviso por parte de la secundaria.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getParentCitationsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Citatorios</strong> le permite visualizar todos los citatorios aplicados a sus hijos/tutorados. Un citatorio es una cita agendada por la secundaria para que usted acuda a una reunión presencial con el personal docente.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Tener una cuenta activa de <strong>Padre/Tutor</strong> vinculada a uno o más estudiantes.</li>
+                <li>Haber iniciado sesión en la plataforma.</li>
+            </ul>
+
+            <h2 id='firmar'>1. Firmar citatorios</h2>
+            <p>Para firmar un citatorio y confirmar que acudirá a la cita agendada, siga los siguientes pasos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>"Citatorios"</strong> en el menú lateral. Allí se visualizarán todos los citatorios aplicados a sus hijos/tutorados.')}
+
+            {$step(2, 'Presione el botón de <strong>"Firmar"</strong> para indicar que fue enterado. Con esta acción usted confirma que acudirá a la secundaria a la cita agendada.')}
+
+            {$img('citatorios/firmarAntes.png', 'Vista del citatorio con el botón Firmar disponible')}
+
+            {$img('citatorios/firmarDespues.png', 'Citatorio firmado exitosamente')}
+
+            {$important('Al firmar un citatorio, usted confirma que acudirá a la secundaria en la fecha y hora indicada. Es importante asistir a los citatorios para el seguimiento educativo de sus hijos.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Firme a tiempo</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Firmar los citatorios con anticipación permite a la escuela organizar las reuniones de manera eficiente.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Acudir mejora el seguimiento</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Acudir a los citatorios mejora el seguimiento educativo y disciplinario de sus hijos/tutorados.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getParentExamsContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Exámenes</strong> le permite consultar el calendario de evaluaciones programadas para sus hijos/tutorados. Puede filtrar los exámenes por trimestre para ver las fechas próximas y organizar los horarios de estudio.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Tener una cuenta activa de <strong>Padre/Tutor</strong> vinculada a uno o más estudiantes.</li>
+                <li>Tener alumnos inscritos en el ciclo escolar actual.</li>
+            </ul>
+
+            <h2 id='consultar'>1. Consultar exámenes</h2>
+            <p>Para consultar los exámenes agendados para sus hijos/tutorados, siga los siguientes pasos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>"Exámenes"</strong> en el menú lateral. Allí se visualizarán todos los exámenes agendados a sus hijos/tutorados.')}
+
+            {$step(2, 'Para filtrar los exámenes, tendrá que presionar el icono de <strong>"Filtro"</strong> para desplegar los distintos campos para filtrar los exámenes.')}
+
+            {$img('examenes/antesFiltro.png', 'Vista del apartado de exámenes con el icono de filtro visible')}
+
+            {$step(3, 'Se desplegará un conjunto de opciones para filtrar exámenes. Estas son las funcionalidades:')}
+
+            <div class='not-prose my-4 ml-12 space-y-3'>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Trimestre</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtra los exámenes aplicados en los distintos trimestres del ciclo escolar activo.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grado</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtra los exámenes aplicados en los distintos grados.</span>
+                </div>
+                <div class='flex gap-3 items-start p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800'>
+                    <span class='shrink-0 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider pt-0.5'>Grupo</span>
+                    <span class='text-sm text-zinc-600 dark:text-zinc-400'>Filtra los exámenes aplicados en los distintos grupos.</span>
+                </div>
+            </div>
+
+            {$img('examenes/despuesFiltro.png', 'Vista de los filtros desplegados con opciones de Trimestre, Grado y Grupo')}
+
+            {$important('El calendario de exámenes se actualiza automáticamente cuando los docentes programan nuevas evaluaciones. Revise frecuentemente para mantenerse informado.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Revise el calendario con anticipación</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Revisar el calendario de evaluaciones con anticipación le permite ayudar a su hijo/tutorado a prepararse adecuadamente para los exámenes.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Con las notificaciones activadas, recibirá alertas cuando se agende un nuevo examen para sus hijos/tutorados.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getParentCommunityContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>El apartado de <strong>Servicio Comunitario</strong> le permite dar seguimiento a las actividades reparatorias asignadas a sus hijos/tutorados. El servicio comunitario se asigna como medida correctiva y busca la reparación del daño y la reflexión del alumno.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Tener una cuenta activa de <strong>Padre/Tutor</strong> vinculada a uno o más estudiantes.</li>
+                <li>Haber iniciado sesión en la plataforma.</li>
+            </ul>
+
+            <h2 id='firmar'>1. Firmar servicio comunitario</h2>
+            <p>Para firmar de enterado un servicio comunitario asignado, siga los siguientes pasos:</p>
+
+            {$step(1, 'Diríjase al apartado de <strong>"Servicio Comunitario"</strong> en el menú lateral. Allí se visualizarán todos los servicios comunitarios asignados a sus hijos/tutorados.')}
+
+            {$step(2, 'Revise la actividad asignada y la fecha de cumplimiento.')}
+
+            {$step(3, 'Presione el botón de <strong>"Firmar"</strong> para indicar que fue enterado del servicio comunitario.')}
+
+            {$img('servicioComunitario/firmarAntes.png', 'Vista del servicio comunitario con el botón Firmar disponible')}
+
+            {$img('servicioComunitario/firmarDespues.png', 'Servicio comunitario firmado exitosamente')}
+
+            {$important('El servicio comunitario busca la reparación del daño y la reflexión del alumno. Es importante estar al tanto de la actividad asignada y su fecha de cumplimiento.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Apoye a su hijo en el cumplimiento</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>El servicio comunitario es una oportunidad de aprendizaje. Acompañe a su hijo/tutorado en el proceso para que sea una experiencia formativa.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Con las notificaciones activadas, recibirá alertas cuando se asigne un nuevo servicio comunitario a su hijo/tutorado.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+    public function getInstallAndroidContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>Esta guía le mostrará cómo instalar la aplicación de gestión escolar en su dispositivo <strong>Android</strong>. La aplicación funciona como una app nativa instalada directamente desde el navegador, sin necesidad de tiendas de aplicaciones.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con un dispositivo <strong>Android</strong>.</li>
+                <li>Tener un navegador web (de preferencia <strong>Google Chrome</strong>).</li>
+            </ul>
+
+            <h2 id='instalar'>1. Proceso de instalación</h2>
+            <p>Para instalar la aplicación en su dispositivo Android, siga los siguientes pasos:</p>
+
+            {$step(1, 'Acceda al siguiente enlace y cópielo en su navegador de preferencia. Al acceder, se visualizará una pantalla informativa sobre la aplicación junto con un recuadro color turquesa que indica la instalación. Presione en <strong>"Instalar"</strong>.')}
+
+            {$img('descargarAppAndroid/Paso1.png', 'Pantalla informativa de la aplicación con botón de Instalar')}
+
+            {$step(2, 'Aparecerá un recuadro donde se solicita el permiso de instalación. Presione el botón de <strong>"Instalar"</strong> para confirmar.')}
+
+            {$img('descargarAppAndroid/Paso2.png', 'Recuadro de permiso de instalación')}
+
+            {$step(3, 'Seguido de ello aparecerá un recuadro donde se solicita el permiso de instalación. Favor de realizar esa operación presionando el botón de <strong>"Instalar"</strong>.')}
+
+            {$img('descargarAppAndroid/Paso3.png', 'Confirmación del permiso de instalación')}
+
+            {$step(4, 'Una vez realizada la operación de instalación, aparecerá un recuadro indicando que se agregue la app a la pantalla de inicio de su celular. Añada la aplicación pulsando <strong>"Añadir a pantalla de inicio"</strong>.')}
+
+            {$img('descargarAppAndroid/Paso4.png', 'Opción de añadir la aplicación a la pantalla de inicio')}
+
+            {$step(5, 'Finalmente visualizará la aplicación en la pantalla de inicio de su celular. Desde allí podrá acceder a la aplicación de igual manera ha como lo haría en el navegador.')}
+
+            {$img('descargarAppAndroid/Paso5.png', 'Aplicación instalada en la pantalla de inicio del dispositivo')}
+
+            {$important('La aplicación instalada funciona igual que en el navegador, pero con acceso directo desde su pantalla de inicio.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>La app consume menos datos</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>La aplicación instalada consume menos datos y carga más rápido que acceder directamente desde el navegador.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones después de instalar</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Una vez instalada la aplicación, active las notificaciones para recibir alertas de reportes, avisos, citatorios y exámenes.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
+
+    public function getInstallIosContent(): string
+    {
+        $important = fn(string $text) => "
+            <div class='not-prose my-6 flex gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40'>
+                <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 font-bold text-lg'>!</div>
+                <div>
+                    <p class='text-sm font-bold text-amber-900 dark:text-amber-100 mb-1'>Importante</p>
+                    <p class='text-sm text-amber-800/80 dark:text-amber-300/80'>{$text}</p>
+                </div>
+            </div>";
+
+        $step = fn(int $num, string $text) => "
+            <div class='not-prose my-4 flex gap-4 items-start'>
+                <div class='shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-sm'>{$num}</div>
+                <div class='text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1'>{$text}</div>
+            </div>";
+
+        $img = fn(string $src, string $alt) => "
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/{$src}' alt='{$alt}' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>{$alt}</p>
+                </div>
+            </div>";
+
+        return "
+            <p id='intro'>Esta guía le mostrará cómo instalar la aplicación de gestión escolar en su dispositivo <strong>iOS</strong> (iPhone o iPad). El proceso se realiza a través del navegador <strong>Safari</strong>.</p>
+
+            <h2 id='requisitos'>Requisitos previos</h2>
+            <ul>
+                <li>Contar con un dispositivo <strong>iPhone</strong> o <strong>iPad</strong>.</li>
+                <li>Utilizar el navegador <strong>Safari</strong> (obligatorio para iOS).</li>
+            </ul>
+
+            <h2 id='instalar'>1. Proceso de instalación</h2>
+            <p>Para instalar la aplicación en su dispositivo iOS, siga los siguientes pasos:</p>
+
+            {$step(1, 'Acceda al enlace de la aplicación en el navegador <strong>Safari</strong>. Se visualizará una pantalla informativa sobre la aplicación.')}
+
+            {$img('descargarAppIOS/Paso1.png', 'Pantalla informativa de la aplicación en Safari')}
+
+            {$step(2, 'Para iniciar el proceso de instalación, presione los <strong>3 puntitos</strong> que se encuentran en la parte inferior derecha. Esto abrirá un cuadro con múltiples opciones donde deberá presionar la opción de <strong>"Compartir"</strong>.')}
+
+            {$img('descargarAppIOS/Paso2.png', 'Menú de opciones con el botón Compartir')}
+
+            {$step(3, 'Una vez presionado el botón de "Compartir", se abrirá un cuadro con información de la aplicación, herramientas de comunicación, contactos, etc. Presione el botón de <strong>"Más"</strong>.')}
+
+            {$img('descargarAppIOS/Paso3.png', 'Cuadro de compartir con el botón Más')}
+
+            {$step(4, 'Se abrirá un cuadro con múltiples opciones. Presione el botón de <strong>"Agregar a Inicio"</strong>.')}
+
+            {$img('descargarAppIOS/Paso4.png', 'Opciones disponibles con Agregar a Inicio')}
+
+            {$step(5, 'Se abrirá un cuadro de personalización donde podrá cambiar el nombre a la app (o mantener el nombre por defecto). También tendrá la opción de <strong>"Abrir como app web"</strong>. Favor de mantener esta opción habilitada.')}
+
+            {$img('descargarAppIOS/Paso5.png', 'Cuadro de personalización con opción Abrir como app web habilitada')}
+
+            {$img('descargarAppIOS/Paso6.png', 'Confirmación de la personalización de la aplicación')}
+
+            {$step(6, 'Finalmente visualizará la aplicación en la pantalla de inicio de su celular, o también podrá verla a través de la herramienta de búsqueda de aplicaciones.')}
+
+            {$img('descargarAppIOS/Paso7.png', 'Aplicación visible en la pantalla de inicio del iPhone')}
+
+            {$img('descargarAppIOS/Paso8.png', 'Aplicación visible en la búsqueda de aplicaciones')}
+
+            {$important('Es obligatorio usar el navegador <strong>Safari</strong> para la instalación en iOS. Otros navegadores como Chrome no permiten añadir aplicaciones a la pantalla de inicio en dispositivos Apple. Además, mantenga la opción "Abrir como app web" habilitada para una mejor experiencia.')}
+
+            <h2 id='beneficios'>Tips de experto</h2>
+            <div class='not-prose my-4 space-y-4'>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>1</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Use Safari exclusivamente</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>En iOS, solo Safari permite instalar aplicaciones web como apps nativas. Chrome y otros navegadores no tienen esta funcionalidad.</p>
+                    </div>
+                </div>
+                <div class='p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex gap-4'>
+                    <div class='shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold text-xl'>2</div>
+                    <div>
+                        <p class='text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1'>Active las notificaciones después de instalar</p>
+                        <p class='text-sm text-indigo-800/80 dark:text-indigo-300/80'>Una vez instalada la aplicación, active las notificaciones para recibir alertas de reportes, avisos, citatorios y exámenes.</p>
+                    </div>
+                </div>
+            </div>
+        ";
+    }
 }; ?>
 
 @section('title', 'Guía Escolar: Tutoriales y Ayuda Digital')
@@ -3075,98 +3676,131 @@ new class extends Component {
     @if(!$selectedTutorial)
         <div class="flex flex-col gap-2">
             <flux:heading size="xl" level="1">Centro de Ayuda y Tutoriales</flux:heading>
-            <flux:text class="text-zinc-500 dark:text-zinc-400">Guía definitiva para dominar todas las funcionalidades de la plataforma escolar.</flux:text>
+            <flux:text class="text-zinc-500 dark:text-zinc-400">Guía definitiva para dominar todas las funcionalidades de la
+                plataforma escolar.</flux:text>
         </div>
 
         <flux:separator />
 
         {{-- Tabs Navigation --}}
         <div class="flex flex-wrap gap-2 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 w-fit">
-            <flux:button :variant="$tab === 'parents' ? 'primary' : 'ghost'" wire:click="setTab('parents')" icon="users" size="sm">Padres</flux:button>
+            <flux:button :variant="$tab === 'parents' ? 'primary' : 'ghost'" wire:click="setTab('parents')" icon="users"
+                size="sm">Padres</flux:button>
             @if(auth()->user()->isViewStaff())
-                <flux:button :variant="$tab === 'teachers' ? 'primary' : 'ghost'" wire:click="setTab('teachers')" icon="academic-cap" size="sm">Docentes</flux:button>
+                <flux:button :variant="$tab === 'teachers' ? 'primary' : 'ghost'" wire:click="setTab('teachers')"
+                    icon="academic-cap" size="sm">Docentes</flux:button>
                 @can('admin-only')
-                    <flux:button :variant="$tab === 'admin' ? 'primary' : 'ghost'" wire:click="setTab('admin')" icon="shield-check" size="sm">Admin</flux:button>
+                    <flux:button :variant="$tab === 'admin' ? 'primary' : 'ghost'" wire:click="setTab('admin')" icon="shield-check"
+                        size="sm">Admin</flux:button>
                 @endcan
             @endif
-            <flux:button :variant="$tab === 'config' ? 'primary' : 'ghost'" wire:click="setTab('config')" icon="cog-6-tooth" size="sm">Configuración</flux:button>
+            <flux:button :variant="$tab === 'config' ? 'primary' : 'ghost'" wire:click="setTab('config')" icon="cog-6-tooth"
+                size="sm">Configuración</flux:button>
         </div>
 
         {{-- Grid view --}}
         <div class="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
             @if($tab === 'parents')
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="document-text" title="Ver y Firmar Reportes" description="Consulta el historial disciplinario y firma de enterado." name="tutorial-p-reports" />
-                <x-tutorial-card icon="megaphone" title="Avisos y Autorizaciones" description="Mantente al día con los eventos y firma permisos digitales." name="tutorial-p-notices" />
-                <x-tutorial-card icon="calendar-days" title="Atender Citatorios" description="Confirma asistencia a reuniones con el personal docente." name="tutorial-p-citations" />
-                <x-tutorial-card icon="book-open" title="Calendario de Exámenes" description="Consulta las fechas de evaluación de todos tus hijos." name="tutorial-p-exams" />
-                <x-tutorial-card icon="heart" title="Servicio Comunitario" description="Seguimiento de actividades reparatorias asignadas." name="tutorial-p-community" />
-            </div>
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <x-tutorial-card icon="document-text" title="Ver y Firmar Reportes"
+                        description="Consulta el historial disciplinario y firma de enterado." name="tutorial-p-reports" />
+                    <x-tutorial-card icon="megaphone" title="Avisos y Autorizaciones"
+                        description="Mantente al día con los eventos y firma permisos digitales." name="tutorial-p-notices" />
+                    <x-tutorial-card icon="calendar-days" title="Atender Citatorios"
+                        description="Confirma asistencia a reuniones con el personal docente." name="tutorial-p-citations" />
+                    <x-tutorial-card icon="book-open" title="Calendario de Exámenes"
+                        description="Consulta las fechas de evaluación de todos tus hijos." name="tutorial-p-exams" />
+                    <x-tutorial-card icon="heart" title="Servicio Comunitario"
+                        description="Seguimiento de actividades reparatorias asignadas." name="tutorial-p-community" />
+                </div>
             @endif
 
             @if($tab === 'teachers')
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="pencil-square" title="Gestionar Reportes" description="Crea, busca y elimina reportes disciplinarios de alumnos." name="tutorial-d-create-report" />
-                <x-tutorial-card icon="clipboard-document-list" title="Programar Evaluaciones" description="Agenda exámenes para que padres y alumnos los visualicen." name="tutorial-d-exams" />
-                <x-tutorial-card icon="calendar" title="Generar Citatorios" description="Coordina reuniones presenciales con padres de familia." name="tutorial-d-citations" />
-                <x-tutorial-card icon="megaphone" title="Publicar Avisos" description="Comunícate de forma masiva con padres de tus grupos." name="tutorial-d-notices" />
-                <x-tutorial-card icon="user-group" title="Asignar Servicio" description="Asigna actividades de servicio comunitario por reportes acumulados." name="tutorial-d-community" />
-                <x-tutorial-card icon="clipboard-document-check" title="Control de Asistencia" description="Marca asistencia diaria de alumnos de forma manual o con escáner." name="tutorial-d-attendance" />
-            </div>
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <x-tutorial-card icon="pencil-square" title="Gestionar Reportes"
+                        description="Crea, busca y elimina reportes disciplinarios de alumnos."
+                        name="tutorial-d-create-report" />
+                    <x-tutorial-card icon="clipboard-document-list" title="Programar Evaluaciones"
+                        description="Agenda exámenes para que padres y alumnos los visualicen." name="tutorial-d-exams" />
+                    <x-tutorial-card icon="calendar" title="Generar Citatorios"
+                        description="Coordina reuniones presenciales con padres de familia." name="tutorial-d-citations" />
+                    <x-tutorial-card icon="megaphone" title="Publicar Avisos"
+                        description="Comunícate de forma masiva con padres de tus grupos." name="tutorial-d-notices" />
+                    <x-tutorial-card icon="user-group" title="Asignar Servicio"
+                        description="Asigna actividades de servicio comunitario por reportes acumulados."
+                        name="tutorial-d-community" />
+                    <x-tutorial-card icon="clipboard-document-check" title="Control de Asistencia"
+                        description="Marca asistencia diaria de alumnos de forma manual o con escáner."
+                        name="tutorial-d-attendance" />
+                </div>
             @endif
 
             @can('admin-only')
-            @if($tab === 'admin')
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="users" title="Gestión de Usuarios" description="Administra cuentas, restablece contraseñas y permisos." name="tutorial-a-users" />
-                <x-tutorial-card icon="arrow-path" title="Control de Ciclos" description="Configura periodos escolares y activa el ciclo vigente." name="tutorial-a-cycles" />
-                <x-tutorial-card icon="document-duplicate" title="Editar Reglamento" description="Actualiza la normativa institucional en tiempo real." name="tutorial-a-regulations" />
-                <x-tutorial-card icon="user-plus" title="Gestión de Alumnos" description="Inscribe, busca, edita y vincula padres a tus alumnos." name="tutorial-a-inscribe" />
-                <x-tutorial-card icon="cloud-arrow-down" title="Importación Masiva" description="Carga masiva de datos mediante archivos Excel/CSV." name="tutorial-a-import" />
-                <x-tutorial-card icon="cloud-arrow-up" title="Exportación de Datos" description="Genera respaldos y listas en formatos exportables." name="tutorial-a-export" />
-                <x-tutorial-card icon="arrow-up-circle" title="Promover Alumnos" description="Cambia de grupo o ciclo a los alumnos de forma masiva." name="tutorial-a-promote" />
-                <x-tutorial-card icon="tag" title="Tipos de Reportes" description="Gestiona los tipos de infracciones y su nivel de gravedad." name="tutorial-a-report-types" />
-            </div>
-            @endif
+                @if($tab === 'admin')
+                    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <x-tutorial-card icon="users" title="Gestión de Usuarios"
+                            description="Administra cuentas, restablece contraseñas y permisos." name="tutorial-a-users" />
+                        <x-tutorial-card icon="arrow-path" title="Control de Ciclos"
+                            description="Configura periodos escolares y activa el ciclo vigente." name="tutorial-a-cycles" />
+                        <x-tutorial-card icon="document-duplicate" title="Editar Reglamento"
+                            description="Actualiza la normativa institucional en tiempo real." name="tutorial-a-regulations" />
+                        <x-tutorial-card icon="user-plus" title="Gestión de Alumnos"
+                            description="Inscribe, busca, edita y vincula padres a tus alumnos." name="tutorial-a-inscribe" />
+                        <x-tutorial-card icon="cloud-arrow-down" title="Importación Masiva"
+                            description="Carga masiva de datos mediante archivos Excel/CSV." name="tutorial-a-import" />
+                        <x-tutorial-card icon="cloud-arrow-up" title="Exportación de Datos"
+                            description="Genera respaldos y listas en formatos exportables." name="tutorial-a-export" />
+                        <x-tutorial-card icon="arrow-up-circle" title="Promover Alumnos"
+                            description="Cambia de grupo o ciclo a los alumnos de forma masiva." name="tutorial-a-promote" />
+                        <x-tutorial-card icon="tag" title="Tipos de Reportes"
+                            description="Gestiona los tipos de infracciones y su nivel de gravedad."
+                            name="tutorial-a-report-types" />
+                    </div>
+                @endif
             @endcan
 
             @if($tab === 'config')
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="device-phone-mobile" title="Instalar Aplicación" description="Cómo instalar la app en Android o iOS (PWA)." name="tutorial-c-install" />
-                <x-tutorial-card icon="bell-alert" title="Notificaciones" description="Activa las notificaciones push para recibir alertas al instante." name="tutorial-c-notifications" />
-            </div>
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <x-tutorial-card icon="device-phone-mobile" title="Instalar en Android"
+                        description="Cómo instalar la aplicación en dispositivos Android." name="tutorial-c-install-android" />
+                    <x-tutorial-card icon="device-phone-mobile" title="Instalar en iOS"
+                        description="Cómo instalar la aplicación en iPhone y iPad." name="tutorial-c-install-ios" />
+                    <x-tutorial-card icon="bell-alert" title="Notificaciones"
+                        description="Activa las notificaciones push para recibir alertas al instante."
+                        name="tutorial-c-notifications" />
+                </div>
             @endif
         </div>
     @else
         {{-- Article view (Hostinger Style) --}}
-        <div class="animate-in fade-in slide-in-from-left-4 duration-500"
-            x-data="{
-                activeSection: '',
-                init() {
-                    const ids = @js(collect($this->getSections($selectedTutorial))->pluck('id')->toArray());
-                    const observer = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                this.activeSection = entry.target.id;
+        <div class="animate-in fade-in slide-in-from-left-4 duration-500" x-data="{
+                    activeSection: '',
+                    init() {
+                        const ids = @js(collect($this->getSections($selectedTutorial))->pluck('id')->toArray());
+                        const observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting) {
+                                    this.activeSection = entry.target.id;
+                                }
+                            });
+                        }, { rootMargin: '-10% 0px -70% 0px' });
+                        this.$nextTick(() => {
+                            ids.forEach(id => {
+                                const el = document.getElementById(id);
+                                if (el) observer.observe(el);
+                            });
+                        });
+                        const lastId = ids[ids.length - 1];
+                        const self = this;
+                        window.addEventListener('scroll', () => {
+                            if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 50)) {
+                                self.activeSection = lastId;
                             }
                         });
-                    }, { rootMargin: '-10% 0px -70% 0px' });
-                    this.$nextTick(() => {
-                        ids.forEach(id => {
-                            const el = document.getElementById(id);
-                            if (el) observer.observe(el);
-                        });
-                    });
-                    const lastId = ids[ids.length - 1];
-                    const self = this;
-                    window.addEventListener('scroll', () => {
-                        if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 50)) {
-                            self.activeSection = lastId;
-                        }
-                    });
-                }
-            }">
-            <button wire:click="back" class="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white mb-6 group transition-colors">
+                    }
+                }">
+            <button wire:click="back"
+                class="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white mb-6 group transition-colors">
                 <flux:icon icon="arrow-left" variant="micro" class="group-hover:-translate-x-1 transition-transform" />
                 <span class="text-sm font-medium">Volver a tutoriales</span>
             </button>
@@ -3175,20 +3809,20 @@ new class extends Component {
                 {{-- Sidebar TOC (Desktop) --}}
                 <aside class="hidden lg:block w-72 shrink-0">
                     <div class="sticky top-6">
-                        <flux:heading size="sm" class="uppercase tracking-widest text-zinc-400 mb-4 px-2">En este artículo</flux:heading>
+                        <flux:heading size="sm" class="uppercase tracking-widest text-zinc-400 mb-4 px-2">En este artículo
+                        </flux:heading>
                         <nav class="space-y-1">
                             @foreach($this->getSections($selectedTutorial) as $section)
                                 <a href="#{{ $section['id'] }}"
                                     class="flex items-center justify-between group px-3 py-2 rounded-lg transition-all duration-200"
                                     :class="activeSection === '{{ $section['id'] }}'
-                                        ? 'bg-indigo-50 dark:bg-indigo-900/30 border-l-2 border-indigo-500'
-                                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 border-l-2 border-transparent'">
+                                                ? 'bg-indigo-50 dark:bg-indigo-900/30 border-l-2 border-indigo-500'
+                                                : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 border-l-2 border-transparent'">
                                     <span class="text-sm transition-colors duration-200"
                                         :class="activeSection === '{{ $section['id'] }}'
-                                            ? 'text-indigo-600 dark:text-indigo-400 font-semibold'
-                                            : 'text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'">{{ $section['title'] }}</span>
-                                    <flux:icon icon="chevron-right" variant="micro"
-                                        class="transition-colors duration-200"
+                                                    ? 'text-indigo-600 dark:text-indigo-400 font-semibold'
+                                                    : 'text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'">{{ $section['title'] }}</span>
+                                    <flux:icon icon="chevron-right" variant="micro" class="transition-colors duration-200"
                                         ::class="activeSection === '{{ $section['id'] }}' ? 'text-indigo-500' : 'text-zinc-300 group-hover:text-indigo-600'" />
                                 </a>
                             @endforeach
@@ -3199,7 +3833,8 @@ new class extends Component {
                 {{-- Mobile TOC Trigger --}}
                 <div class="lg:hidden fixed bottom-6 right-6 z-50">
                     <flux:modal.trigger name="mobile-toc">
-                        <flux:button variant="primary" icon="list-bullet" class="shadow-2xl shadow-indigo-500/50 rounded-full h-14 w-40">
+                        <flux:button variant="primary" icon="list-bullet"
+                            class="shadow-2xl shadow-indigo-500/50 rounded-full h-14 w-40">
                             En este artículo
                         </flux:button>
                     </flux:modal.trigger>
@@ -3211,10 +3846,9 @@ new class extends Component {
                         <nav class="space-y-2">
                             @foreach($this->getSections($selectedTutorial) as $section)
                                 <a href="#{{ $section['id'] }}" x-on:click="$dispatch('close-modal', { name: 'mobile-toc' })"
-                                    class="flex items-center justify-between p-3 rounded-xl border transition-colors"
-                                    :class="activeSection === '{{ $section['id'] }}'
-                                        ? 'border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30'
-                                        : 'border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50'">
+                                    class="flex items-center justify-between p-3 rounded-xl border transition-colors" :class="activeSection === '{{ $section['id'] }}'
+                                                ? 'border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30'
+                                                : 'border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50'">
                                     <span class="text-sm font-medium"
                                         :class="activeSection === '{{ $section['id'] }}' ? 'text-indigo-600 dark:text-indigo-400' : ''">{{ $section['title'] }}</span>
                                     <flux:icon icon="chevron-right" variant="micro"
@@ -3229,18 +3863,24 @@ new class extends Component {
                 <article class="flex-1 max-w-4xl">
                     {{-- Article Header --}}
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <flux:badge size="sm" color="indigo" inset="left" class="uppercase tracking-tighter">{{ $this->getCategory($selectedTutorial) }}</flux:badge>
-                        <flux:badge size="sm" variant="outline" class="uppercase tracking-tighter">Guía Paso a Paso</flux:badge>
+                        <flux:badge size="sm" color="indigo" inset="left" class="uppercase tracking-tighter">
+                            {{ $this->getCategory($selectedTutorial) }}</flux:badge>
+                        <flux:badge size="sm" variant="outline" class="uppercase tracking-tighter">Guía Paso a Paso
+                        </flux:badge>
                     </div>
 
                     <flux:heading size="3xl" level="1" class="mb-6">{{ $this->getTitle($selectedTutorial) }}</flux:heading>
 
                     <div class="flex items-center gap-6 mb-12 py-6 border-y border-zinc-100 dark:border-zinc-800">
                         <div class="flex items-center gap-2">
-                            <div class="h-8 w-8 rounded-full bg-linear-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-[10px] text-white font-black shadow-sm">SM</div>
-                            <span class="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-tighter">Equipo de Soporte SM</span>
+                            <div
+                                class="h-8 w-8 rounded-full bg-linear-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-[10px] text-white font-black shadow-sm">
+                                SM</div>
+                            <span class="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-tighter">Equipo
+                                de Soporte SM</span>
                         </div>
-                        <div class="text-xs text-zinc-400 font-medium uppercase tracking-widest">{{ now()->format('d M, Y') }}</div>
+                        <div class="text-xs text-zinc-400 font-medium uppercase tracking-widest">
+                            {{ now()->format('d M, Y') }}</div>
                         <div class="text-xs text-zinc-400 font-medium flex items-center gap-1.5 uppercase tracking-widest">
                             <flux:icon icon="clock" variant="micro" class="text-zinc-300" />
                             Lectura de {{ $this->getReadTime($selectedTutorial) }} min
@@ -3248,7 +3888,8 @@ new class extends Component {
                     </div>
 
                     {{-- Main Content (Rendered from a separate method/component for cleanliness) --}}
-                    <div class="prose prose-indigo dark:prose-invert max-w-none prose-h2:text-2xl prose-h2:font-black prose-h2:mt-24 prose-h2:mb-10 prose-h2:pt-12 prose-h2:border-t prose-h2:border-zinc-100 dark:prose-h2:border-zinc-800 prose-p:text-zinc-600 dark:prose-p:text-zinc-400 prose-p:leading-relaxed prose-li:text-zinc-600 dark:prose-li:text-zinc-400">
+                    <div
+                        class="prose prose-indigo dark:prose-invert max-w-none prose-h2:text-2xl prose-h2:font-black prose-h2:mt-24 prose-h2:mb-10 prose-h2:pt-12 prose-h2:border-t prose-h2:border-zinc-100 dark:prose-h2:border-zinc-800 prose-p:text-zinc-600 dark:prose-p:text-zinc-400 prose-p:leading-relaxed prose-li:text-zinc-600 dark:prose-li:text-zinc-400">
                         {!! $this->getContent($selectedTutorial) !!}
                     </div>
                 </article>
@@ -3257,9 +3898,22 @@ new class extends Component {
     @endif
 
     <style>
-        .wrap-break-word { word-break: break-all; }
-        aside.sticky { height: calc(100vh - 3rem); }
-        article h2 { scroll-margin-top: 5rem; }
-        article h2:first-of-type { border-top: none !important; padding-top: 0 !important; margin-top: 2rem !important; }
+        .wrap-break-word {
+            word-break: break-all;
+        }
+
+        aside.sticky {
+            height: calc(100vh - 3rem);
+        }
+
+        article h2 {
+            scroll-margin-top: 5rem;
+        }
+
+        article h2:first-of-type {
+            border-top: none !important;
+            padding-top: 0 !important;
+            margin-top: 2rem !important;
+        }
     </style>
 </div>

@@ -123,7 +123,7 @@ class ParentsExport extends StringValueBinder implements FromCollection, ShouldA
         if ($this->groupId) {
             $group = ClassGroup::find($this->groupId);
 
-            return $group ? "{$group->grade}{$group->section}" : 'Padres';
+            return $group ? trim(str_replace(['º', '°'], '', $group->grade)).trim($group->section) : 'Padres';
         }
 
         return 'Padres';

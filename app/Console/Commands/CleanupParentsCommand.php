@@ -53,19 +53,37 @@ class CleanupParentsCommand extends Command
                 $reader->setReadDataOnly(true);
                 $ss = $reader->load($file);
 
-                $sheetNamePadres = 'Padres '.str_replace('.xlsx', '', $filename);
-                $padresSheet = $ss->getSheetByName($sheetNamePadres);
-                if (! $padresSheet) {
-                    $padresSheet = $ss->getSheet(0);
+                $sheetNames = $ss->getSheetNames();
+                $foundInFile = 0;
+
+                foreach ($sheetNames as $name) {
+                    $sheet = $ss->getSheetByName($name);
+                    $highestRow = $sheet->getHighestRow();
+                    $highestColumn = $sheet->getHighestColumn();
+
+                    // Solo escaneamos las primeras 10 columnas por eficiencia,
+                    // ya que el correo suele estar al principio (Col B)
+                    $maxCol = 'J';
+                    if ($highestColumn < $maxCol) {
+                        $maxCol = $highestColumn;
+                    }
+
+                    for ($row = 1; $row <= $highestRow; $row++) {
+                        for ($col = 'A'; $col <= $maxCol; $col++) {
+                            $value = trim((string) $sheet->getCell($col.$row)->getValue());
+
+                            if (str_ends_with(mb_strtolower($value, 'UTF-8'), '@escuela.edu.mx')) {
+                                $validEmails[] = mb_strtolower($value, 'UTF-8');
+                                $foundInFile++;
+                            }
+                        }
+                    }
                 }
 
-                $highestRow = $padresSheet->getHighestRow();
-                for ($row = 2; $row <= $highestRow; $row++) {
-                    // El correo siempre está en la columna B
-                    $email = trim((string) $padresSheet->getCell('B'.$row)->getValue());
-                    if (str_contains($email, '@')) {
-                        $validEmails[] = mb_strtolower($email, 'UTF-8');
-                    }
+                if ($foundInFile === 0) {
+                    $this->warn("No se encontraron correos @escuela.edu.mx en $filename.");
+                } else {
+                    $this->line("   - Se encontraron $foundInFile correos en este archivo.");
                 }
 
                 $ss->disconnectWorksheets();
