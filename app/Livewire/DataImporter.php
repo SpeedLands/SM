@@ -11,8 +11,11 @@ class DataImporter extends Component
 {
     use WithFileUploads;
 
-    #[Validate('required|file|mimes:xlsx,xls')]
+    #[Validate('nullable|file|mimes:xlsx,xls')]
     public $file;
+
+    #[Validate('nullable|file|mimes:xlsx,xls')]
+    public $parentFile;
 
     public function mount(): void
     {
@@ -24,12 +27,20 @@ class DataImporter extends Component
 
     public $sheets = [];
 
+    public $parentFileSheets = [];
+
     // Configuration
     public $importType = 'TEACHERS'; // TEACHERS, PARENTS, STUDENTS
 
     public $targetSheetIndex = null;
 
     public $parentSheetIndex = null;
+
+    public $columnMapping = [];
+
+    public $parentColumnMapping = [];
+
+    public $isSimulation = false;
 
     // Results
     public $stats = [];
@@ -38,35 +49,99 @@ class DataImporter extends Component
 
     public function updatedFile()
     {
-        $this->validate();
+        $this->validateOnly('file');
+        $this->analyze();
+    }
+
+    public function updatedParentFile()
+    {
+        $this->validateOnly('parentFile');
         $this->analyze();
     }
 
     public function analyze()
     {
+        if (! $this->file) {
+            return;
+        }
+
         try {
             $service = new ExcelImportService;
             $this->sheets = $service->getSheetsInfo($this->file);
+
+            if ($this->parentFile) {
+                $this->parentFileSheets = $service->getSheetsInfo($this->parentFile);
+            }
+
+            // Initialize mapping with defaults
+            $this->initMapping();
+
             $this->step = 2;
         } catch (\Exception $e) {
             $this->addError('file', 'Error al analizar el archivo: '.$e->getMessage());
         }
     }
 
+    private function initMapping()
+    {
+        $mappings = $this->columnMappings;
+        $this->columnMapping = [];
+
+        foreach ($mappings as $m) {
+            $this->columnMapping[$m['field']] = $m['index'];
+        }
+
+        $service = new ExcelImportService;
+        $parentMappings = $service->getColumnMappings('PARENTS');
+        $this->parentColumnMapping = [];
+        foreach ($parentMappings as $m) {
+            $this->parentColumnMapping[$m['field']] = $m['index'];
+        }
+    }
+
     public function updatePreview()
     {
-        if ($this->targetSheetIndex === null) {
+        if ($this->targetSheetIndex === null || ! is_numeric($this->targetSheetIndex)) {
             return;
         }
 
         // Find sheet info
         $sheet = collect($this->sheets)->firstWhere('index', (int) $this->targetSheetIndex);
-        $this->previewData = $sheet['preview'] ?? [];
+        if ($sheet) {
+            $this->previewData = $sheet['preview'] ?? [];
+        }
     }
 
     public function updatedTargetSheetIndex()
     {
         $this->updatePreview();
+
+        if ($this->targetSheetIndex !== null && is_numeric($this->targetSheetIndex)) {
+            $sheet = collect($this->sheets)->firstWhere('index', (int) $this->targetSheetIndex);
+            if ($sheet && isset($sheet['header'])) {
+                $service = app(ExcelImportService::class);
+                $this->columnMapping = $service->guessMapping($sheet['header'], $this->importType);
+            }
+        }
+    }
+
+    public function updatedParentSheetIndex()
+    {
+        if ($this->parentSheetIndex !== null && is_numeric($this->parentSheetIndex)) {
+            $parentSource = $this->parentFile ? $this->parentFileSheets : $this->sheets;
+            $sheet = collect($parentSource)->firstWhere('index', (int) $this->parentSheetIndex);
+            if ($sheet && isset($sheet['header'])) {
+                $service = app(ExcelImportService::class);
+                $this->parentColumnMapping = $service->guessMapping($sheet['header'], 'PARENTS');
+            }
+        }
+    }
+
+    public function updatedImportType()
+    {
+        if ($this->targetSheetIndex !== null && is_numeric($this->targetSheetIndex)) {
+            $this->updatedTargetSheetIndex();
+        }
     }
 
     public function getColumnMappingsProperty()
@@ -74,6 +149,13 @@ class DataImporter extends Component
         $service = new ExcelImportService;
 
         return $service->getColumnMappings($this->importType);
+    }
+
+    public function getParentColumnMappingsProperty()
+    {
+        $service = new ExcelImportService;
+
+        return $service->getColumnMappings('PARENTS');
     }
 
     public function import()
@@ -84,13 +166,35 @@ class DataImporter extends Component
             'parentSheetIndex' => 'nullable|integer|different:targetSheetIndex',
         ]);
 
+        // Timeout Prevention: Limit row counts
+        $mainSheetInfo = collect($this->sheets)->firstWhere('index', (int) $this->targetSheetIndex);
+        if ($mainSheetInfo && $mainSheetInfo['rows_count'] > 61) { // 60 data rows + 1 header
+            $this->addError('import', "El archivo principal tiene {$mainSheetInfo['rows_count']} filas. Para evitar que el servidor se sature, el límite es de 60 registros por subida (generalmente un grupo a la vez).");
+
+            return;
+        }
+
+        if ($this->parentSheetIndex !== null && $this->parentSheetIndex !== '') {
+            $parentSource = $this->parentFile ? $this->parentFileSheets : $this->sheets;
+            $parentSheetInfo = collect($parentSource)->firstWhere('index', (int) $this->parentSheetIndex);
+            if ($parentSheetInfo && $parentSheetInfo['rows_count'] > 121) { // 120 data rows + 1 header
+                $this->addError('import', "El archivo de padres tiene {$parentSheetInfo['rows_count']} filas. El límite es de 120 registros para evitar que la página marque error de tiempo de espera.");
+
+                return;
+            }
+        }
+
         try {
             $service = new ExcelImportService;
             $this->stats = $service->import(
-                $this->file,
-                $this->importType,
-                (int) $this->targetSheetIndex,
-                $this->parentSheetIndex !== '' ? (int) $this->parentSheetIndex : null
+                file: $this->file,
+                type: $this->importType,
+                sheetIndex: (int) $this->targetSheetIndex,
+                parentSheetIndex: (is_numeric($this->parentSheetIndex) && $this->parentSheetIndex !== '') ? (int) $this->parentSheetIndex : null,
+                columnMapping: $this->columnMapping,
+                parentFile: $this->parentFile,
+                dryRun: $this->isSimulation,
+                parentColumnMapping: $this->parentColumnMapping
             );
 
             $this->step = 4;
@@ -103,7 +207,7 @@ class DataImporter extends Component
 
     public function resetImport()
     {
-        $this->reset(['file', 'step', 'sheets', 'importType', 'targetSheetIndex', 'parentSheetIndex', 'stats', 'previewData']);
+        $this->reset(['file', 'parentFile', 'step', 'sheets', 'parentFileSheets', 'importType', 'targetSheetIndex', 'parentSheetIndex', 'stats', 'previewData', 'isSimulation']);
     }
 
     public function render()

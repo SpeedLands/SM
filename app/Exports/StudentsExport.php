@@ -48,7 +48,7 @@ class StudentsExport extends StringValueBinder implements FromCollection, Should
             ->map(fn (Student $student) => [
                 'name' => $student->name,
                 'turn' => $student->turn,
-                'group' => "{$student->grade} {$student->group_name}",
+                'group' => trim(str_replace(['º', '°'], '', $student->grade)).trim($student->group_name),
                 'address' => $student->pii?->address_encrypted ?? '',
                 'phone' => $student->pii?->contact_phone_encrypted ?? '',
                 'other_contact' => $student->pii?->other_contact_encrypted ?? '',
@@ -73,7 +73,7 @@ class StudentsExport extends StringValueBinder implements FromCollection, Should
         if ($this->groupId) {
             $group = ClassGroup::find($this->groupId);
 
-            return $group ? "{$group->grade}{$group->section}" : 'Alumnos';
+            return $group ? trim(str_replace(['º', '°'], '', $group->grade)).trim($group->section) : 'Alumnos';
         }
 
         return 'Alumnos';

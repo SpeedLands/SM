@@ -1,0 +1,5413 @@
+[
+    {
+        "name": "AGUILA VASQUEZ EDGAR",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 331,
+        "prod_row": 2
+    },
+    {
+        "name": "AGUIRRE CHAVEZ AURELIO",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 332,
+        "prod_row": 3
+    },
+    {
+        "name": "BARBOZA OLALDE ANGEL RAFAEL",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 333,
+        "prod_row": 4
+    },
+    {
+        "name": "BUENO MARTINEZ MATEO ALEJANDRO",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 334,
+        "prod_row": 5
+    },
+    {
+        "name": "CASAS MOTA ALEJANDRO DAMIAN",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 335,
+        "prod_row": 6
+    },
+    {
+        "name": "CEDILLO CAMPOS JOSE LUIS",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 336,
+        "prod_row": 7
+    },
+    {
+        "name": "COLIN FUENTES VICTORIA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 337,
+        "prod_row": 8
+    },
+    {
+        "name": "CORDOBA RUIZ ERIKA YULISSA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 338,
+        "prod_row": 9
+    },
+    {
+        "name": "DELGADO CRUZ KENDRA YAMILI",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 339,
+        "prod_row": 10
+    },
+    {
+        "name": "ESQUIVEL SOLIS PAULA ELIZABETH",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 340,
+        "prod_row": 11
+    },
+    {
+        "name": "FLORES JACOBO ALVARO",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 341,
+        "prod_row": 12
+    },
+    {
+        "name": "GARCIA ARREOLA NEYMA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 342,
+        "prod_row": 13
+    },
+    {
+        "name": "GARCIA MU\u00d1OZ JOSUE ALEXIS",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 343,
+        "prod_row": 14
+    },
+    {
+        "name": "GLORIA GAMBOA NAYDELIN MADAI",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 344,
+        "prod_row": 15
+    },
+    {
+        "name": "GONZALEZ SOLIS NAYSA NIKOLE",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 345,
+        "prod_row": 16
+    },
+    {
+        "name": "GUERRERO GOMEZ REBECA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 346,
+        "prod_row": 17
+    },
+    {
+        "name": "HERNANDEZ HERNANDEZ ANEL",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 347,
+        "prod_row": 18
+    },
+    {
+        "name": "JURADO MARTINEZ MARIAN CLAUDETT",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 348,
+        "prod_row": 19
+    },
+    {
+        "name": "LOPEZ HERNANDEZ JUAN ALBERTO",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 349,
+        "prod_row": 20
+    },
+    {
+        "name": "MARES CASTA\u00d1EDA DAVID ALEXEI",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 350,
+        "prod_row": 21
+    },
+    {
+        "name": "MARTINEZ GARCIA ROGELIO ISAAC",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 351,
+        "prod_row": 22
+    },
+    {
+        "name": "MARTINEZ PARGAS RENATA SOFIA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 352,
+        "prod_row": 23
+    },
+    {
+        "name": "MAYORA RODRIGUEZ VALERIA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 353,
+        "prod_row": 24
+    },
+    {
+        "name": "MENDOZA RAMIREZ PERLA SOFIA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 354,
+        "prod_row": 25
+    },
+    {
+        "name": "MORENO CASTA\u00d1EDA MAURICIO",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 355,
+        "prod_row": 26
+    },
+    {
+        "name": "OLVERA HERNANDEZ BYRON",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 356,
+        "prod_row": 27
+    },
+    {
+        "name": "PE\u00d1A VARA PAULINA ALEJANDRA",
+        "prod_group": "1A",
+        "orig_group": "VESPERTINO",
+        "orig_row": 66,
+        "prod_row": 28
+    },
+    {
+        "name": "PEREZ GALINDO AMANDA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 357,
+        "prod_row": 29
+    },
+    {
+        "name": "PUENTE CHAIRES DAMIAN",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 358,
+        "prod_row": 30
+    },
+    {
+        "name": "RAMIREZ RODRIGUEZ ERIK",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 359,
+        "prod_row": 31
+    },
+    {
+        "name": "REYNA RESENDIZ DIEGO",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 360,
+        "prod_row": 32
+    },
+    {
+        "name": "RODRIGUEZ RODRIGUEZ ANALIA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 361,
+        "prod_row": 33
+    },
+    {
+        "name": "RODRIGUEZ VILLARREAL VERONICA GISSEL",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 362,
+        "prod_row": 34
+    },
+    {
+        "name": "ROLDAN GONZALEZ ARLETH",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 363,
+        "prod_row": 35
+    },
+    {
+        "name": "SALAS MARTINEZ LISSA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 364,
+        "prod_row": 36
+    },
+    {
+        "name": "SANCHEZ MALDONADO LUIS FERNANDO",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 365,
+        "prod_row": 37
+    },
+    {
+        "name": "SERRATO ESQUIVEL ELISA ANALI",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 366,
+        "prod_row": 38
+    },
+    {
+        "name": "TAVARES SANCHEZ ALESSANDRA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 367,
+        "prod_row": 39
+    },
+    {
+        "name": "VALADEZ MORALES ESTEBAN ELI",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 368,
+        "prod_row": 40
+    },
+    {
+        "name": "VELA MARTINEZ ROMEO SEBASTIAN",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 369,
+        "prod_row": 41
+    },
+    {
+        "name": "ZAPATA RESENDIZ BRIANA ISABELLA",
+        "prod_group": "1A",
+        "orig_group": "MATUTINO",
+        "orig_row": 370,
+        "prod_row": 42
+    },
+    {
+        "name": "AGUILAR PONCE FERNANDA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 371,
+        "prod_row": 43
+    },
+    {
+        "name": "AHEDO SOLIS SOFIA EMIRETH",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 372,
+        "prod_row": 44
+    },
+    {
+        "name": "AVALOS GARCIA ANDREA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 373,
+        "prod_row": 45
+    },
+    {
+        "name": "BASURTO TREVI\u00d1O GABRIELA ISABEL",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 374,
+        "prod_row": 46
+    },
+    {
+        "name": "CALDERA RODRIGUEZ SAID URIEL",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 375,
+        "prod_row": 47
+    },
+    {
+        "name": "CASTA\u00d1EDA GALARZA GAEL",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 376,
+        "prod_row": 48
+    },
+    {
+        "name": "CHAVARRIA AVILA KEILA ANALIA AU",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 377,
+        "prod_row": 49
+    },
+    {
+        "name": "CONTRERAS GUTIERREZ SOFIA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 378,
+        "prod_row": 50
+    },
+    {
+        "name": "CORONADO MARTINEZ GIBRAN",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 379,
+        "prod_row": 51
+    },
+    {
+        "name": "DUE\u00d1EZ MORENO CESAR DAMIAN",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 380,
+        "prod_row": 52
+    },
+    {
+        "name": "ESTRADA SOLIS ALLISON XIMENA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 381,
+        "prod_row": 53
+    },
+    {
+        "name": "GALLARDOTORRES IKER RICARDO",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 382,
+        "prod_row": 54
+    },
+    {
+        "name": "GARCIA CADENA ADRIAN",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 383,
+        "prod_row": 55
+    },
+    {
+        "name": "GARCIA PEREZ ANGELA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 384,
+        "prod_row": 56
+    },
+    {
+        "name": "GARCIA RIVAS GENESIS VALENTINA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 385,
+        "prod_row": 57
+    },
+    {
+        "name": "GLORIA MARTINEZ SANDRA JACQUELINE",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 386,
+        "prod_row": 58
+    },
+    {
+        "name": "GUADALAJARA MARTINEZ LEONEL",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 387,
+        "prod_row": 59
+    },
+    {
+        "name": "GUTIERREZ ENRIQUEZ RENATA ALESSANDRA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 388,
+        "prod_row": 60
+    },
+    {
+        "name": "HORTA BARRERA ANGELA KATHERINE",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 389,
+        "prod_row": 61
+    },
+    {
+        "name": "JUVERA AYALA SOFIA DALENA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 390,
+        "prod_row": 62
+    },
+    {
+        "name": "LUCIO GONZALEZ DAVID RUBEN",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 391,
+        "prod_row": 63
+    },
+    {
+        "name": "MARIN PEREZ YUDITH ITZEL",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 392,
+        "prod_row": 64
+    },
+    {
+        "name": "MARTINEZ ROSAS LETICIA NOEMI",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 393,
+        "prod_row": 65
+    },
+    {
+        "name": "MONSIVAIS RODRIGUEZ VALENTINA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 394,
+        "prod_row": 66
+    },
+    {
+        "name": "MORENO ESCOBEDO MAXIMILIANO",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 395,
+        "prod_row": 67
+    },
+    {
+        "name": "O\u00d1ATE SALINAS NAOMI ALEJANDRA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 396,
+        "prod_row": 68
+    },
+    {
+        "name": "PALAFOX JOFIEL ELI",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 397,
+        "prod_row": 69
+    },
+    {
+        "name": "PUENTE GOMEZ MATEO ALESSANDRO",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 398,
+        "prod_row": 70
+    },
+    {
+        "name": "RAMIREZ ROCHA JAIME JOSE",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 399,
+        "prod_row": 71
+    },
+    {
+        "name": "RIVERA CORTEZ ROSE VICTORIA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 400,
+        "prod_row": 72
+    },
+    {
+        "name": "RODRIGUEZ ROMERO JAVIER ALEJANDRO",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 401,
+        "prod_row": 73
+    },
+    {
+        "name": "ROQUE SALAZAR ALEXA ABIGAIL",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 402,
+        "prod_row": 74
+    },
+    {
+        "name": "SALAZAR GONZALEZ ADRIANA GUADALUPE",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 403,
+        "prod_row": 75
+    },
+    {
+        "name": "SANCHEZ ARITZA SANTIAGO TDA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 404,
+        "prod_row": 76
+    },
+    {
+        "name": "SANCHEZ SILVA SAHARA MAYELA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 405,
+        "prod_row": 77
+    },
+    {
+        "name": "SIERRA TREVI\u00d1O LEONEL",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 406,
+        "prod_row": 78
+    },
+    {
+        "name": "TOLEDO RUIZ ATENAS",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 407,
+        "prod_row": 79
+    },
+    {
+        "name": "VIELMA MATEO",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 408,
+        "prod_row": 80
+    },
+    {
+        "name": "ZAVALA ALANIS ANA VICTORIA",
+        "prod_group": "1B",
+        "orig_group": "MATUTINO",
+        "orig_row": 409,
+        "prod_row": 81
+    },
+    {
+        "name": "AGUILAR RAMOS RAUL IDAM",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 410,
+        "prod_row": 82
+    },
+    {
+        "name": "ALFONSOVARGAS OSCAR",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 411,
+        "prod_row": 83
+    },
+    {
+        "name": "BECERRIL BALBOA ALESSANRO RAFAEL",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 412,
+        "prod_row": 84
+    },
+    {
+        "name": "CALDERON GARCIA JAIRO ARMANDO",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 413,
+        "prod_row": 85
+    },
+    {
+        "name": "CASTELLANO HERNANDEZ EDUARDO LEONEL",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 414,
+        "prod_row": 86
+    },
+    {
+        "name": "CHAVEZ MU\u00d1OZ CARLOS SANTIAGO",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 415,
+        "prod_row": 87
+    },
+    {
+        "name": "CONTRERAS GARZA LYNDA MONSERRAT",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 416,
+        "prod_row": 88
+    },
+    {
+        "name": "CONTRERAS RUIZ SANTIAGO",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 417,
+        "prod_row": 89
+    },
+    {
+        "name": "COVARRUBIAS GUTIERREZ ERNESTO REY",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 418,
+        "prod_row": 90
+    },
+    {
+        "name": "DURAN ALFONSO HAIDEE",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 419,
+        "prod_row": 91
+    },
+    {
+        "name": "FELIX CORDERO ALEXIA TERESA",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 420,
+        "prod_row": 92
+    },
+    {
+        "name": "GALVAN GUZMAN JOSE ARMANDO",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 421,
+        "prod_row": 93
+    },
+    {
+        "name": "GARCIA CHAVEZ VANESSA ALEJANDRA",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 422,
+        "prod_row": 94
+    },
+    {
+        "name": "GARCIA REYNA HUGO MATEO",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 423,
+        "prod_row": 95
+    },
+    {
+        "name": "GOMEZ GARCIA NAHUM EZER",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 424,
+        "prod_row": 96
+    },
+    {
+        "name": "GONZALEZ MIROLA XIMENA CAROLINA",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 425,
+        "prod_row": 97
+    },
+    {
+        "name": "GUADALAJARA RIVERA ISAAC ALEJANDRO",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 426,
+        "prod_row": 98
+    },
+    {
+        "name": "IBARRA BERLANGA ROMINA",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 427,
+        "prod_row": 99
+    },
+    {
+        "name": "LEAL JRJUAN GUILLERMO",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 428,
+        "prod_row": 100
+    },
+    {
+        "name": "LIMON DIAZ ROMINA NICOLE",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 429,
+        "prod_row": 101
+    },
+    {
+        "name": "MACIAS REQUENES CRISTIAN EMANUEL",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 430,
+        "prod_row": 102
+    },
+    {
+        "name": "MARTINEZ MOLINA DOMINIC ALEJANDRO",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 431,
+        "prod_row": 103
+    },
+    {
+        "name": "MARTINEZ SORIANO CHERRY ISABELA",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 432,
+        "prod_row": 104
+    },
+    {
+        "name": "MENCHACA CONTRERAS ARMANDO DANIEL",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 433,
+        "prod_row": 105
+    },
+    {
+        "name": "MORALES CAMACHO KEILA ANELISSE",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 434,
+        "prod_row": 106
+    },
+    {
+        "name": "MUZQUIZ ELIZALDE JOSHUA",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 435,
+        "prod_row": 107
+    },
+    {
+        "name": "ORTEGON PI\u00d1A GRETEL",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 436,
+        "prod_row": 108
+    },
+    {
+        "name": "PALOMO SAUCEDO FERNANDA",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 437,
+        "prod_row": 109
+    },
+    {
+        "name": "PEREZ VIELMA RAFAEL",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 438,
+        "prod_row": 110
+    },
+    {
+        "name": "RAMIREZ GONZALEZ JENNIFER DENISS",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 439,
+        "prod_row": 111
+    },
+    {
+        "name": "RODRIGUEZ GALVAN ADRIANA",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 440,
+        "prod_row": 112
+    },
+    {
+        "name": "RODRIGUEZ GUERRA XIMENA",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 441,
+        "prod_row": 113
+    },
+    {
+        "name": "RODRIGUEZ SOLIS JAVIER EMILIANO",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 442,
+        "prod_row": 114
+    },
+    {
+        "name": "SALINAS JARAMILLO FHEDRA VALENTINA",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 443,
+        "prod_row": 115
+    },
+    {
+        "name": "SANTIAGO MARTINEZ PATRICIO ISAAC",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 444,
+        "prod_row": 116
+    },
+    {
+        "name": "SILLER GARCIA ALICIA YIREH",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 445,
+        "prod_row": 117
+    },
+    {
+        "name": "TORRES TREVI\u00d1O HECTOR ADRIAN",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 446,
+        "prod_row": 118
+    },
+    {
+        "name": "VAZQUEZ CASTILLO RODRIGO ALDEBARAN",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 447,
+        "prod_row": 119
+    },
+    {
+        "name": "VILLANUEVA RODRIGUEZ HUGO ISAAC",
+        "prod_group": "1C",
+        "orig_group": "MATUTINO",
+        "orig_row": 448,
+        "prod_row": 120
+    },
+    {
+        "name": "AGUILAR SIERRA DAPHNE",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 449,
+        "prod_row": 121
+    },
+    {
+        "name": "ARRIOLA GALVAN KEVIN ELIAS",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 450,
+        "prod_row": 122
+    },
+    {
+        "name": "BUENO LOERA KIMBERLY NAOMI",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 451,
+        "prod_row": 123
+    },
+    {
+        "name": "CARDENAS RAMOS STEFFANY LUCIA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 452,
+        "prod_row": 124
+    },
+    {
+        "name": "CASTILLO OCHOA DAVID ENRIQUE",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 453,
+        "prod_row": 125
+    },
+    {
+        "name": "CHAVEZ FACUSSE HANIA ISABEL",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 454,
+        "prod_row": 126
+    },
+    {
+        "name": "CHAVEZ RODRIGUEZ ZAHAIR ANTONIO",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 455,
+        "prod_row": 127
+    },
+    {
+        "name": "CORDERO GARCIA RENATA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 456,
+        "prod_row": 128
+    },
+    {
+        "name": "DIAZ RAMOS AARON EMMANUEL",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 457,
+        "prod_row": 129
+    },
+    {
+        "name": "ESPARZA AGUIRRE MARCO TULIO",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 458,
+        "prod_row": 130
+    },
+    {
+        "name": "FERRAEZ CANTU JORGE MARIO",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 459,
+        "prod_row": 131
+    },
+    {
+        "name": "GARCIA MARTINEZ ALEXANDRO",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 460,
+        "prod_row": 132
+    },
+    {
+        "name": "GONZALEZ AVILA REGINA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 461,
+        "prod_row": 133
+    },
+    {
+        "name": "GUERRERO CORONADO LAYLA SOFIA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 462,
+        "prod_row": 134
+    },
+    {
+        "name": "HERNANDEZ GUERRERO KITZIA CITLALY",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 463,
+        "prod_row": 135
+    },
+    {
+        "name": "JUAREZ LOBATO MARILU",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 464,
+        "prod_row": 136
+    },
+    {
+        "name": "LOMBRA\u00d1A CHANONA SANTIAGO",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 465,
+        "prod_row": 137
+    },
+    {
+        "name": "MALDONADO MARTINEZ JAVIER",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 466,
+        "prod_row": 138
+    },
+    {
+        "name": "MARTINEZ MARTINEZ DANA CAMILA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 467,
+        "prod_row": 139
+    },
+    {
+        "name": "MARTINEZ SORIANO ROMEO ANTONIO",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 468,
+        "prod_row": 140
+    },
+    {
+        "name": "MENDOZA JACINTO ALEXA SOFIA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 469,
+        "prod_row": 141
+    },
+    {
+        "name": "MORALES TALAMANTES HECTOR ISSAC",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 470,
+        "prod_row": 142
+    },
+    {
+        "name": "OCAMPO LOPEZ RODRIGO",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 471,
+        "prod_row": 143
+    },
+    {
+        "name": "ORTIZ HANNA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 472,
+        "prod_row": 144
+    },
+    {
+        "name": "PERALES JIMENEZ ANA SOFIA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 473,
+        "prod_row": 145
+    },
+    {
+        "name": "PEREZ SILLER TADEO SEBASTIAN",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 474,
+        "prod_row": 146
+    },
+    {
+        "name": "PINEDA INFANTE NATALIA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 475,
+        "prod_row": 147
+    },
+    {
+        "name": "RAMIREZ GONZALEZ VICTOR MANUEL",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 476,
+        "prod_row": 148
+    },
+    {
+        "name": "REA MACIAS MIRANDA REGINA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 477,
+        "prod_row": 149
+    },
+    {
+        "name": "RELLSTAB GONZALEZ ALEPH ENOC",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 478,
+        "prod_row": 150
+    },
+    {
+        "name": "RODRIGUEZ IBARRA ANA FATIMA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 479,
+        "prod_row": 151
+    },
+    {
+        "name": "RODRIGUEZ VALDES VIOLETTA ISABELLA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 480,
+        "prod_row": 152
+    },
+    {
+        "name": "SAENZ SALAZAR MAXIMO",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 481,
+        "prod_row": 153
+    },
+    {
+        "name": "SANTILLAN LOPEZ MATEO",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 482,
+        "prod_row": 154
+    },
+    {
+        "name": "SERRATO ESQUIVEL ERICK ALEJANDRO",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 483,
+        "prod_row": 155
+    },
+    {
+        "name": "TAPIA GALLEGOS DANIA CAMILA",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 484,
+        "prod_row": 156
+    },
+    {
+        "name": "TREVI\u00d1O GOMEZ ROXANNA NICOLE",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 485,
+        "prod_row": 157
+    },
+    {
+        "name": "VILLARREAL GAUNA DYLAN MATEO",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 486,
+        "prod_row": 158
+    },
+    {
+        "name": "VIRGEN GRIMALDO NICOLE MONSERRAT",
+        "prod_group": "1D",
+        "orig_group": "MATUTINO",
+        "orig_row": 487,
+        "prod_row": 159
+    },
+    {
+        "name": "ACEVES COVARRUBIAS AMERICA VALERIA",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 2,
+        "prod_row": 160
+    },
+    {
+        "name": "ALVIZO MARTINEZ JUAN CARLOS",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 3,
+        "prod_row": 161
+    },
+    {
+        "name": "BALTAZAR RAMON ROGELIO",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 4,
+        "prod_row": 162
+    },
+    {
+        "name": "CABRERA DEL RIO MIDDEL ALEXANDRA",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 5,
+        "prod_row": 163
+    },
+    {
+        "name": "CERVANTES MARQUEZ ROMINA AYLIN",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 6,
+        "prod_row": 164
+    },
+    {
+        "name": "CHAVEZ FACUSSE HANIA ISABEL",
+        "prod_group": "1G",
+        "orig_group": "MATUTINO",
+        "orig_row": 454,
+        "prod_row": 165
+    },
+    {
+        "name": "CRUZ LARA ELIAS CRISTOBAL",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 8,
+        "prod_row": 166
+    },
+    {
+        "name": "ESCOBEDO VILLAZANA GABRIEL",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 9,
+        "prod_row": 167
+    },
+    {
+        "name": "FARIAS LOPEZ ESTEFANIA",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 10,
+        "prod_row": 168
+    },
+    {
+        "name": "FRANCO ARCE GENESIS",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 11,
+        "prod_row": 169
+    },
+    {
+        "name": "GARCIA ALVARADO VALERIA",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 12,
+        "prod_row": 170
+    },
+    {
+        "name": "GOMEZ SALINAS VICTORIA SIMONNE",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 13,
+        "prod_row": 171
+    },
+    {
+        "name": "GONZALEZ ARANDA ASHLEY MONSERRAT",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 14,
+        "prod_row": 172
+    },
+    {
+        "name": "HERNANDEZ CALAMACO ERICK ELIAS",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 15,
+        "prod_row": 173
+    },
+    {
+        "name": "HERNANDEZ MORENO ABRIL YOSETH",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 16,
+        "prod_row": 174
+    },
+    {
+        "name": "LANDA VELAZQUEZ DANIELA LIZBETH",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 17,
+        "prod_row": 175
+    },
+    {
+        "name": "LEDEZMA LUCIO ELIUD EDUARDO",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 18,
+        "prod_row": 176
+    },
+    {
+        "name": "LIRA HERRERA DANIEL MATEO",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 19,
+        "prod_row": 177
+    },
+    {
+        "name": "MACIAS RANGEL EMILY ROSY",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 20,
+        "prod_row": 178
+    },
+    {
+        "name": "MARTINEZ FLORES MADELINE YISEL",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 21,
+        "prod_row": 179
+    },
+    {
+        "name": "MARTINEZ FLORES REGINA LIZETH",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 36,
+        "prod_row": 180
+    },
+    {
+        "name": "MELENDEZ SILVA MATHIAS VALENTIN",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 22,
+        "prod_row": 181
+    },
+    {
+        "name": "MOLINA MORALES ALEXA LUYANA",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 23,
+        "prod_row": 182
+    },
+    {
+        "name": "MONTALVO DURAN ARELY SARAY",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 24,
+        "prod_row": 183
+    },
+    {
+        "name": "MORENO MARTINEZ DAPHNE SOPHIA",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 25,
+        "prod_row": 184
+    },
+    {
+        "name": "OCURA VARGAS SAUL ALAN",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 26,
+        "prod_row": 185
+    },
+    {
+        "name": "PACHECO CASTORENA ALVARO",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 27,
+        "prod_row": 186
+    },
+    {
+        "name": "PATI\u00d1O GARCIA JHONATAN SANTIAGO",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 28,
+        "prod_row": 187
+    },
+    {
+        "name": "RAMOS VAZQUEZ KEVIN OZIEL",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 29,
+        "prod_row": 188
+    },
+    {
+        "name": "RODRIGUEZ ALVAREZ JESUS EDUARDO",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 30,
+        "prod_row": 189
+    },
+    {
+        "name": "RODRIGUEZ PEREZ DANTHE GAEL",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 31,
+        "prod_row": 190
+    },
+    {
+        "name": "RODRIGUEZ SANCHEZ MARIANA DANAE",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 32,
+        "prod_row": 191
+    },
+    {
+        "name": "ROMERO RIVERA KAREN AIRAM",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 33,
+        "prod_row": 192
+    },
+    {
+        "name": "SANCHEZ LOPEZ JUAN ALVARO",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 34,
+        "prod_row": 193
+    },
+    {
+        "name": "TRUJILLO ARZOLA JESUS MISAEL",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 35,
+        "prod_row": 194
+    },
+    {
+        "name": "VALADEZ CAVAZOS ANA ALICIA",
+        "prod_group": "1G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 37,
+        "prod_row": 195
+    },
+    {
+        "name": "AGUERO PILOTZI FRANCISCO MIGUEL",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 38,
+        "prod_row": 196
+    },
+    {
+        "name": "AMARO TIERRABLANCA YASSARI VIRIDIANA",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 39,
+        "prod_row": 197
+    },
+    {
+        "name": "BARRIENTOS ROMERO KARLA KARINA",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 40,
+        "prod_row": 198
+    },
+    {
+        "name": "BARRON VILLASE\u00d1OR IKER ALEJANDRO",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 41,
+        "prod_row": 199
+    },
+    {
+        "name": "CANIZALES QUINTANILLA MOISES SEBASTIAN",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 42,
+        "prod_row": 200
+    },
+    {
+        "name": "CERVANTES RODRIGUEZ JENNIFER",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 43,
+        "prod_row": 201
+    },
+    {
+        "name": "DE LA CRUZ HERNANDEZ NICOL",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 44,
+        "prod_row": 202
+    },
+    {
+        "name": "DOMINGUEZ TURRUBIATE ITZEL KAILANY",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 45,
+        "prod_row": 203
+    },
+    {
+        "name": "ESPARZA DE LA ROSA JOSUE ANSELMO",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 46,
+        "prod_row": 204
+    },
+    {
+        "name": "FRAIRE NAVARRO DEREK CRISTOPHER",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 47,
+        "prod_row": 205
+    },
+    {
+        "name": "GARDEA ZU\u00d1IGA LENIN JAFET",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 48,
+        "prod_row": 206
+    },
+    {
+        "name": "GARZA HERNANDEZ JESUS NEFTALI",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 49,
+        "prod_row": 207
+    },
+    {
+        "name": "GUADALAJARA RODRIGUEZ JUAN ERNESTO",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 50,
+        "prod_row": 208
+    },
+    {
+        "name": "GUERRA GONZALEZ KIMBERLY",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 51,
+        "prod_row": 209
+    },
+    {
+        "name": "HERNANDEZ CALVILLO EMILY ITZEL",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 52,
+        "prod_row": 210
+    },
+    {
+        "name": "HERNANDEZ GUTIERREZ IVANNA",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 53,
+        "prod_row": 211
+    },
+    {
+        "name": "LARA FLORES RICARDO ISAU",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 54,
+        "prod_row": 212
+    },
+    {
+        "name": "LOMBRA\u00d1A CENTENO FRANCISCO DANIEL",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 55,
+        "prod_row": 213
+    },
+    {
+        "name": "LOPEZ CORONADO MELANY JANEY",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 56,
+        "prod_row": 214
+    },
+    {
+        "name": "LOPEZ POSADAS MAURICIO",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 57,
+        "prod_row": 215
+    },
+    {
+        "name": "LURIA TORRES ALLISON ELIZA",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 58,
+        "prod_row": 216
+    },
+    {
+        "name": "MALDONADO APARICIO JUAN GERARDO",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 59,
+        "prod_row": 217
+    },
+    {
+        "name": "MENCHACA CAZARES VANESSA",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 60,
+        "prod_row": 218
+    },
+    {
+        "name": "MONCADA RAMIREZ XIMENA",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 61,
+        "prod_row": 219
+    },
+    {
+        "name": "MONTALVO GOMEZ DIEGO ISRAEL",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 62,
+        "prod_row": 220
+    },
+    {
+        "name": "MU\u00d1OZ ANTONIO SANTIAGO",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 63,
+        "prod_row": 221
+    },
+    {
+        "name": "ONTIVEROS RIVAS DAYSHA NIKOLE",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 64,
+        "prod_row": 222
+    },
+    {
+        "name": "PALACIOS RODRIGUEZ ABRIL AIDE",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 65,
+        "prod_row": 223
+    },
+    {
+        "name": "RODRIGUEZ ALVAREZ MIGUEL ANGEL",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 67,
+        "prod_row": 224
+    },
+    {
+        "name": "RODRIGUEZ SOLAR ANGEL ALEXIS",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 68,
+        "prod_row": 225
+    },
+    {
+        "name": "ROSALES GONZALEZ LUIS FERNANDO",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 69,
+        "prod_row": 226
+    },
+    {
+        "name": "SANCHEZ GARZA JONATHAN ALEJANDRO",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 75,
+        "prod_row": 227
+    },
+    {
+        "name": "SERRANO PEREZ AMERICA JIMENA",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 76,
+        "prod_row": 228
+    },
+    {
+        "name": "SERRANO SOLIS DAYANNA JAQUELINE",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 70,
+        "prod_row": 229
+    },
+    {
+        "name": "VAZQUEZ CORONADO MARIA JOSE",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 71,
+        "prod_row": 230
+    },
+    {
+        "name": "VELASQUEZ REYNA IAN EDUARDO",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 72,
+        "prod_row": 231
+    },
+    {
+        "name": "VILLANUEVA MARTINEZ VIRGINIA EVANGELIQUE",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 73,
+        "prod_row": 232
+    },
+    {
+        "name": "ZAMORA GONZALEZ MAITE",
+        "prod_group": "1H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 74,
+        "prod_row": 233
+    },
+    {
+        "name": "AGUILAR GAYTAN ANGEL GABRIEL",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 77,
+        "prod_row": 234
+    },
+    {
+        "name": "BUSTOS MARTINEZ VICTORIA AYLIN",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 78,
+        "prod_row": 235
+    },
+    {
+        "name": "CASTILLO GARCIA MIA ANELENA",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 79,
+        "prod_row": 236
+    },
+    {
+        "name": "CHAVEZ GARCIA MARIA FERNANDA",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 80,
+        "prod_row": 237
+    },
+    {
+        "name": "CORDERO PEREZ LIZBETH JAQUELINE",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 81,
+        "prod_row": 238
+    },
+    {
+        "name": "CORONADO ALVARADO MONICA ANGELY",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 82,
+        "prod_row": 239
+    },
+    {
+        "name": "DE LA ROSA PARRA BRANDON AMADEO",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 83,
+        "prod_row": 240
+    },
+    {
+        "name": "ENRIQUEZ FLORES DYLAND",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 84,
+        "prod_row": 241
+    },
+    {
+        "name": "ESPINOZA SANCHEZ SARAH LINETT",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 85,
+        "prod_row": 242
+    },
+    {
+        "name": "FRANCO SANCHEZ JEHU ABRAHAM",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 86,
+        "prod_row": 243
+    },
+    {
+        "name": "GARAY CORTINA DYLAN ELI",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 87,
+        "prod_row": 244
+    },
+    {
+        "name": "GASPAR REBOLLOSO CARLOS RAUL",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 88,
+        "prod_row": 245
+    },
+    {
+        "name": "GERVACIO HERNANDEZ ELIAS",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 89,
+        "prod_row": 246
+    },
+    {
+        "name": "GONZALEZ RAMIREZ JESUS FRANCISCO",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 90,
+        "prod_row": 247
+    },
+    {
+        "name": "HERNANDEZ DOMINGUEZ PAOLA ANAHI",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 91,
+        "prod_row": 248
+    },
+    {
+        "name": "HERNANDEZ MORENO YAMILETH GUADALUPE",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 92,
+        "prod_row": 249
+    },
+    {
+        "name": "HUITRON RODRIGUEZ VALERIA MARGARITA",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 93,
+        "prod_row": 250
+    },
+    {
+        "name": "LUCIANO REYNA ESTEBAN",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 94,
+        "prod_row": 251
+    },
+    {
+        "name": "MARTINEZ GARCIA JESUS EMMANUEL",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 95,
+        "prod_row": 252
+    },
+    {
+        "name": "MERCADO LUGO MIGUEL ANGEL",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 96,
+        "prod_row": 253
+    },
+    {
+        "name": "MONDRAGON HERNANDEZ MARIAJOSE",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 112,
+        "prod_row": 254
+    },
+    {
+        "name": "MORENO FUENTES KIMBERLY KIABETH",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 97,
+        "prod_row": 255
+    },
+    {
+        "name": "NU\u00d1EZ SOTO LUISA JUDITH",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 98,
+        "prod_row": 256
+    },
+    {
+        "name": "OSORIO VELOZ KENIA RUBI",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 99,
+        "prod_row": 257
+    },
+    {
+        "name": "PAREDES MEDINA JORGE ARIEL",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 100,
+        "prod_row": 258
+    },
+    {
+        "name": "PORTILLO IBARRA GISELLE STEPHANY",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 101,
+        "prod_row": 259
+    },
+    {
+        "name": "PUENTE ORTIZ ANIELA",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 113,
+        "prod_row": 260
+    },
+    {
+        "name": "PUENTE RAMIREZ KAROL MELISSA",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 102,
+        "prod_row": 261
+    },
+    {
+        "name": "RAMOS GALLEGOS INGRID ITZEL",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 103,
+        "prod_row": 262
+    },
+    {
+        "name": "RENDON NAVARRETE MORGGAN JAVIER",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 104,
+        "prod_row": 263
+    },
+    {
+        "name": "RIOS  KATHERINE ALEJANDRA",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 105,
+        "prod_row": 264
+    },
+    {
+        "name": "RODRIGUEZ GUTIERREZ RENATA",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 106,
+        "prod_row": 265
+    },
+    {
+        "name": "ROMERO GLORIA IKER ELIAS",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 107,
+        "prod_row": 266
+    },
+    {
+        "name": "RUIZ ANGUIANO DYLAN ANTONIO",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 108,
+        "prod_row": 267
+    },
+    {
+        "name": "SOSA CASTILLO JORGE OSVALDO",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 114,
+        "prod_row": 268
+    },
+    {
+        "name": "SOTELO DURAN GABRIELA",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 109,
+        "prod_row": 269
+    },
+    {
+        "name": "SUAREZ CARRIZALES JATZIRI",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 110,
+        "prod_row": 270
+    },
+    {
+        "name": "VERA CHAVEZ BRISSA YORLETH",
+        "prod_group": "1I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 111,
+        "prod_row": 271
+    },
+    {
+        "name": "ADAN RODRIGUEZ ANA VICTORIA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 605,
+        "prod_row": 272
+    },
+    {
+        "name": "ARCE CASTILLON SERGIO ALFONSO",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 606,
+        "prod_row": 273
+    },
+    {
+        "name": "ARVIZU GUTIERREZ ALEJANDRA CAROLINA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 607,
+        "prod_row": 274
+    },
+    {
+        "name": "BARRIENTOS PARRA LAILA ARACELY",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 608,
+        "prod_row": 275
+    },
+    {
+        "name": "BRISE\u00d1O RUIZ JORGE FRANCISCO",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 609,
+        "prod_row": 276
+    },
+    {
+        "name": "CASTREJON QUI\u00d1ONES LEIDA JHOANA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 610,
+        "prod_row": 277
+    },
+    {
+        "name": "CHAVEZ DELGADO ABRIL",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 611,
+        "prod_row": 278
+    },
+    {
+        "name": "COBOS VILLARREAL VICTOR AAR\u00d3N",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 612,
+        "prod_row": 279
+    },
+    {
+        "name": "DE LEON AMAYA ERSY ALEJANDRA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 613,
+        "prod_row": 280
+    },
+    {
+        "name": "DURAN ALFONSO EMILIA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 614,
+        "prod_row": 281
+    },
+    {
+        "name": "ESPARZA AGUIRRE DINA SOFIA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 615,
+        "prod_row": 282
+    },
+    {
+        "name": "ESQUIVEL RAMIREZ LILIANA LIZBETH",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 616,
+        "prod_row": 283
+    },
+    {
+        "name": "FRANCO RICO JOSE GUADALUPE",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 617,
+        "prod_row": 284
+    },
+    {
+        "name": "GARCIA HERNANDEZ ALISSON NATASHA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 618,
+        "prod_row": 285
+    },
+    {
+        "name": "GARZA ZARAGOZA AYELEN",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 619,
+        "prod_row": 286
+    },
+    {
+        "name": "GOMEZ RODRIGUEZ XIMENA ALEJANDRA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 620,
+        "prod_row": 287
+    },
+    {
+        "name": "HERNANDEZ LUCIO IVAN ANTONIO",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 621,
+        "prod_row": 288
+    },
+    {
+        "name": "HERNANDEZ TOVAR ALISSON MARIA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 622,
+        "prod_row": 289
+    },
+    {
+        "name": "LEIJA VILLALLOBOS MAXIMILIANO",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 623,
+        "prod_row": 290
+    },
+    {
+        "name": "LOPEZ MEJIA KEVIN ABRAHAM",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 624,
+        "prod_row": 291
+    },
+    {
+        "name": "MACIAS MONTERO LUIS FERNANDO",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 625,
+        "prod_row": 292
+    },
+    {
+        "name": "MARTINEZ FLORES DIEGO EMMANUEL",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 626,
+        "prod_row": 293
+    },
+    {
+        "name": "MARTINEZ LOPEZ JULIA EVANGELINA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 627,
+        "prod_row": 294
+    },
+    {
+        "name": "MELQUIADES BERNABE CAMILA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 628,
+        "prod_row": 295
+    },
+    {
+        "name": "MONSIVAIS RODRIGUEZ JORGE LUIS",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 630,
+        "prod_row": 296
+    },
+    {
+        "name": "MONSIVAIS TORRES ROMINA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 629,
+        "prod_row": 297
+    },
+    {
+        "name": "OLIVO CARRILLO ORLANDO",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 631,
+        "prod_row": 298
+    },
+    {
+        "name": "QUINTERO ESCOBEDO RAFAEL",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 632,
+        "prod_row": 299
+    },
+    {
+        "name": "RAMOS PAREDES FRANCISCO JAVIER",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 633,
+        "prod_row": 300
+    },
+    {
+        "name": "RODRIGUEZ AGUILAR ESTRELLA CRISTAL",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 634,
+        "prod_row": 301
+    },
+    {
+        "name": "RODRIGUEZ PINEDA CESIA SOFIA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 635,
+        "prod_row": 302
+    },
+    {
+        "name": "RUIZ FERMIN ROGELIO ARTURO",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 636,
+        "prod_row": 303
+    },
+    {
+        "name": "SALAZAR MACHADO FERNANDO ALEXSANDER",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 637,
+        "prod_row": 304
+    },
+    {
+        "name": "SALDIVAR DAVILA ROBERTO SEBASTIAN",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 638,
+        "prod_row": 305
+    },
+    {
+        "name": "SILVA MEDINA NANCY FARIVA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 639,
+        "prod_row": 306
+    },
+    {
+        "name": "TOVAR IBARRA LAILA",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 640,
+        "prod_row": 307
+    },
+    {
+        "name": "VALDES VILLARREAL LUIS FERNANDO",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 641,
+        "prod_row": 308
+    },
+    {
+        "name": "VENEGAS BERNAL DINORAH",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 642,
+        "prod_row": 309
+    },
+    {
+        "name": "ZU\u00d1IGA MARTINEZ MATEO SEBASTIAN",
+        "prod_group": "2A",
+        "orig_group": "MATUTINO",
+        "orig_row": 643,
+        "prod_row": 310
+    },
+    {
+        "name": "AGUDELO HERNANDEZ LEONARDO RAFAEL",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 566,
+        "prod_row": 311
+    },
+    {
+        "name": "ARREDONDO HERRERA SILVANA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 567,
+        "prod_row": 312
+    },
+    {
+        "name": "BASTIDA SERRATO VICTOR JAVIER",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 568,
+        "prod_row": 313
+    },
+    {
+        "name": "CALDERILLA PRESAS VICTORIA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 569,
+        "prod_row": 314
+    },
+    {
+        "name": "CASTILLO CASTILLO SEBASTIAN",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 570,
+        "prod_row": 315
+    },
+    {
+        "name": "CAVAZOS GARZA KAREN SOFIA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 571,
+        "prod_row": 316
+    },
+    {
+        "name": "CHAVEZ LOPEZ ANDREA CAROLINA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 572,
+        "prod_row": 317
+    },
+    {
+        "name": "CONTRERAS RUIZ KEVIN YAEL",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 573,
+        "prod_row": 318
+    },
+    {
+        "name": "DELGADO GARCIA VICTOR ANGEL",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 574,
+        "prod_row": 319
+    },
+    {
+        "name": "EFREN MALACARA DULCE MARIA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 575,
+        "prod_row": 320
+    },
+    {
+        "name": "ESPARZA AGUIIRE REGINA ALFAIDE \/ VISUAL",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 576,
+        "prod_row": 321
+    },
+    {
+        "name": "FERNANDEZ LIRA MELISA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 577,
+        "prod_row": 322
+    },
+    {
+        "name": "GALINDO MORALES EMILIANO",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 578,
+        "prod_row": 323
+    },
+    {
+        "name": "GARCIA GARCIA MARIA ANAILIL",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 579,
+        "prod_row": 324
+    },
+    {
+        "name": "GOMEZ ALEMAN SOFIA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 580,
+        "prod_row": 325
+    },
+    {
+        "name": "GUADALAJARA RIVERA CARLOS ABRAHAM",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 581,
+        "prod_row": 326
+    },
+    {
+        "name": "HERNANDEZ LOPEZ AXEL \/ TDAH",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 582,
+        "prod_row": 327
+    },
+    {
+        "name": "HERRERA HERNANDEZ SOFIA LIZBETH",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 583,
+        "prod_row": 328
+    },
+    {
+        "name": "LIMON CEDILLO EDUARDO EMMANUEL",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 584,
+        "prod_row": 329
+    },
+    {
+        "name": "LOPEZ TIRADO ARIANA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 585,
+        "prod_row": 330
+    },
+    {
+        "name": "MAGALLANES HERNANDEZ SANTIAGO SAULO MARIO",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 586,
+        "prod_row": 331
+    },
+    {
+        "name": "MARTINEZ ROSAS DEBANHI",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 587,
+        "prod_row": 332
+    },
+    {
+        "name": "MINGS FIGEROA ERICK DARIAN",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 588,
+        "prod_row": 333
+    },
+    {
+        "name": "MORENO IGLESIAS MARIA FERNANDA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 589,
+        "prod_row": 334
+    },
+    {
+        "name": "ONTIVEROS LERMA LEONEL ARMANDO",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 590,
+        "prod_row": 335
+    },
+    {
+        "name": "RAMIREZ MENDEZ RODRIGO",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 591,
+        "prod_row": 336
+    },
+    {
+        "name": "RAMOS TUN MATEO DAVID",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 592,
+        "prod_row": 337
+    },
+    {
+        "name": "RODRIGUEZ ARELLANO JARED DARIO",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 593,
+        "prod_row": 338
+    },
+    {
+        "name": "RODRIGUEZ HERNANDEZ EDUARDO",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 594,
+        "prod_row": 339
+    },
+    {
+        "name": "RODRIGUEZ RODRIGUEZ REGINA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 595,
+        "prod_row": 340
+    },
+    {
+        "name": "SAENZ SALAZAR JESUS ENRIQUE",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 596,
+        "prod_row": 341
+    },
+    {
+        "name": "SALAZAR SANCHEZ SERGIO GUADALUPE",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 597,
+        "prod_row": 342
+    },
+    {
+        "name": "SANCHEZ ALEJANDRO JUAN EDUARDO \/ AUTISMO",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 598,
+        "prod_row": 343
+    },
+    {
+        "name": "SOLIS GOMEZ ITZAE NIKTEE",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 599,
+        "prod_row": 344
+    },
+    {
+        "name": "TORRES GONZALEZ JONATHAN EMANUEL",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 600,
+        "prod_row": 345
+    },
+    {
+        "name": "TOVAR RAMON LAYLA SOFIA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 601,
+        "prod_row": 346
+    },
+    {
+        "name": "VALDEZ CASTILLO DIBANHI JIMENA",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 602,
+        "prod_row": 347
+    },
+    {
+        "name": "VILLANUEVA NAVARRETE SEBASTIAN",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 603,
+        "prod_row": 348
+    },
+    {
+        "name": "ZU\u00d1IGA MORUA YOSELIN ELIZABETH",
+        "prod_group": "2B",
+        "orig_group": "MATUTINO",
+        "orig_row": 604,
+        "prod_row": 349
+    },
+    {
+        "name": "AGUIRRE CHAVEZ BARBARA SOFIA",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 528,
+        "prod_row": 350
+    },
+    {
+        "name": "ARREOLA CEPEDA KEREN FERNANDA",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 529,
+        "prod_row": 351
+    },
+    {
+        "name": "BELTRAN MU\u00d1OZ HASSIVE GUADALUPE",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 530,
+        "prod_row": 352
+    },
+    {
+        "name": "CARDENAS RAMOS AARON ARTURO",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 531,
+        "prod_row": 353
+    },
+    {
+        "name": "CASTILLO MARIN ITZEL ABIGAIL",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 532,
+        "prod_row": 354
+    },
+    {
+        "name": "CORDOVA SANCHEZ ARNULFO",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 533,
+        "prod_row": 355
+    },
+    {
+        "name": "DELGADO ROJAS MARCO",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 534,
+        "prod_row": 356
+    },
+    {
+        "name": "ELGUEZABAL HERNANDEZ REGINA ABIGAIL",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 535,
+        "prod_row": 357
+    },
+    {
+        "name": "ELIZONDO MARQUEZ JOSE MARIN",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 536,
+        "prod_row": 358
+    },
+    {
+        "name": "ESPARZA SIERRA LIAM MAURICIO",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 537,
+        "prod_row": 359
+    },
+    {
+        "name": "FLORES GONZALEZ GILBERTO",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 538,
+        "prod_row": 360
+    },
+    {
+        "name": "GARCIA CASTA\u00d1EDA KARELY",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 539,
+        "prod_row": 361
+    },
+    {
+        "name": "GARCIA GUERECA CESAR ALEJANDRO",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 540,
+        "prod_row": 362
+    },
+    {
+        "name": "GOMEZ MARTINEZ RENATHA ROCIO",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 541,
+        "prod_row": 363
+    },
+    {
+        "name": "GUERRERO ZAMAGO NATALIA MELISA",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 542,
+        "prod_row": 364
+    },
+    {
+        "name": "HERNANDEZ MARTINEZ LUCIA AILIN",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 543,
+        "prod_row": 365
+    },
+    {
+        "name": "I\u00d1IGUEZ URIARTE ROGELIO",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 544,
+        "prod_row": 366
+    },
+    {
+        "name": "LOPEZ AVALOS RAUL",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 545,
+        "prod_row": 367
+    },
+    {
+        "name": "LOPEZ DE LOS SANTOS SOFIA",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 546,
+        "prod_row": 368
+    },
+    {
+        "name": "LOZA NAVA XIMENA ALEJANDRA",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 547,
+        "prod_row": 369
+    },
+    {
+        "name": "MALDONADO PINALES ISABELLA",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 548,
+        "prod_row": 370
+    },
+    {
+        "name": "MATA FERNANDEZ DANA XIMENA",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 549,
+        "prod_row": 371
+    },
+    {
+        "name": "MIRANDA VELAZQUEZ ARLET ABIGAIL",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 550,
+        "prod_row": 372
+    },
+    {
+        "name": "MUNGUIA VELAZQUEZ CARLOS EMMANUEL",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 551,
+        "prod_row": 373
+    },
+    {
+        "name": "PALOMO BELTRAN SERGIO DAMIAN",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 552,
+        "prod_row": 374
+    },
+    {
+        "name": "RAMOS CARREON AMERICA RENATA",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 553,
+        "prod_row": 375
+    },
+    {
+        "name": "REZA CABALLERO JOSEALAN",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 554,
+        "prod_row": 376
+    },
+    {
+        "name": "RODRIGUEZ CURA SANTIAGO",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 555,
+        "prod_row": 377
+    },
+    {
+        "name": "RODRIGUEZ LUNA DEMIAN BLADIMIR",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 556,
+        "prod_row": 378
+    },
+    {
+        "name": "RODRIGUEZ PEREZ GIBRAN",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 557,
+        "prod_row": 379
+    },
+    {
+        "name": "ROMAN MARTINEZ ROMINA",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 558,
+        "prod_row": 380
+    },
+    {
+        "name": "SALDA\u00d1A CARREON ESPERANZA ANAYELI",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 559,
+        "prod_row": 381
+    },
+    {
+        "name": "SANCHEZ GUTIERREZ ANGEL AMIR",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 560,
+        "prod_row": 382
+    },
+    {
+        "name": "SOTO ESCARE\u00d1O MARIAJOSE",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 561,
+        "prod_row": 383
+    },
+    {
+        "name": "TORRES DE LEON SOPHIA CHANEL",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 562,
+        "prod_row": 384
+    },
+    {
+        "name": "TREJO MEDINA VALERIA MAYLIN",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 563,
+        "prod_row": 385
+    },
+    {
+        "name": "VALDEZ HERNANDEZ DAMIAN",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 564,
+        "prod_row": 386
+    },
+    {
+        "name": "ZAMBRANO MORENO IKER JOEL",
+        "prod_group": "2C",
+        "orig_group": "MATUTINO",
+        "orig_row": 565,
+        "prod_row": 387
+    },
+    {
+        "name": "AGUI\u00d1AGA GONZALEZ NAHOMI GERALDINE",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 488,
+        "prod_row": 388
+    },
+    {
+        "name": "AMBROCIO SANCHEZ ANGEL YAIR",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 489,
+        "prod_row": 389
+    },
+    {
+        "name": "ARRIETA BASS JOSE EDUARDO",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 490,
+        "prod_row": 390
+    },
+    {
+        "name": "BERNAL HERRERA GABRIELA RICARDO",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 491,
+        "prod_row": 391
+    },
+    {
+        "name": "BOSQUES MARTINEZ DANNA ISABELA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 493,
+        "prod_row": 392
+    },
+    {
+        "name": "BRETADO DELGADO JENNYFER ABIGAIL",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 492,
+        "prod_row": 393
+    },
+    {
+        "name": "CASTA\u00d1EDA PE\u00d1A ANNIA YERUTI",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 494,
+        "prod_row": 394
+    },
+    {
+        "name": "CASTILLO VERASTEGUI OSVALDO",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 495,
+        "prod_row": 395
+    },
+    {
+        "name": "CHAIREZ CRUZ QUETZALLI ELIZABETH",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 496,
+        "prod_row": 396
+    },
+    {
+        "name": "COLIN FUENTES STEFANY ALEXANDRA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 497,
+        "prod_row": 397
+    },
+    {
+        "name": "CRUZ LOPEZ ALEXA ZOE",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 498,
+        "prod_row": 398
+    },
+    {
+        "name": "DIAZ GONZALEZ CARLOS JULIAN",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 499,
+        "prod_row": 399
+    },
+    {
+        "name": "ESCOBEDO IBARRA DANIEL",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 500,
+        "prod_row": 400
+    },
+    {
+        "name": "ESPINOZA AVALOS EDUARDO",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 501,
+        "prod_row": 401
+    },
+    {
+        "name": "FRAGA AGUILAR CAMILA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 502,
+        "prod_row": 402
+    },
+    {
+        "name": "GARCIA ESQUIVEL REGINA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 503,
+        "prod_row": 403
+    },
+    {
+        "name": "GARCIA GARCIA TAMARA LIZETH",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 504,
+        "prod_row": 404
+    },
+    {
+        "name": "GARCIA VAZQUEZ JOSE ELIEL",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 505,
+        "prod_row": 405
+    },
+    {
+        "name": "HEREDIA MENDOZA IKER BENJAMIN",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 506,
+        "prod_row": 406
+    },
+    {
+        "name": "HERNANDEZ HERNANDEZ CAMILA ANDREA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 507,
+        "prod_row": 407
+    },
+    {
+        "name": "HERNANDEZ SANCHEZ BRISEIDA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 508,
+        "prod_row": 408
+    },
+    {
+        "name": "ISBA ROQUE SAMANTHA\/ ASMA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 509,
+        "prod_row": 409
+    },
+    {
+        "name": "LOPEZ GARDUZA ELI EMILIANO\/ TEA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 510,
+        "prod_row": 410
+    },
+    {
+        "name": "LUCIO SOTO FATIMA MAETHZIN",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 511,
+        "prod_row": 411
+    },
+    {
+        "name": "MARIN PEREZ RUBEN EDUARDO",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 512,
+        "prod_row": 412
+    },
+    {
+        "name": "MAZUKA ESCOBEDO ANGEL RENE",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 513,
+        "prod_row": 413
+    },
+    {
+        "name": "MEDINA FLORES ALISON XIMENA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 514,
+        "prod_row": 414
+    },
+    {
+        "name": "MONREAL CARRILLO DAMIAN",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 515,
+        "prod_row": 415
+    },
+    {
+        "name": "PUENTE GOMEZ CHRISTOPHER ZAID",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 516,
+        "prod_row": 416
+    },
+    {
+        "name": "RAMOS HERNANDEZ ASHLEY",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 517,
+        "prod_row": 417
+    },
+    {
+        "name": "RIVERA LOPEZ ROGELIO ALEXANDER",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 518,
+        "prod_row": 418
+    },
+    {
+        "name": "RODRIGUEZ GARCIA MIA FERNANDA SOLEDAD",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 519,
+        "prod_row": 419
+    },
+    {
+        "name": "RODRIGUEZ MONCADA JOSE ROGELIO",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 520,
+        "prod_row": 420
+    },
+    {
+        "name": "RODRIGUEZ NEIRA MARIANA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 521,
+        "prod_row": 421
+    },
+    {
+        "name": "RUEDA PERALES ANGEL RAUL",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 522,
+        "prod_row": 422
+    },
+    {
+        "name": "SALAZAR ESQUIVEL AMANDA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 523,
+        "prod_row": 423
+    },
+    {
+        "name": "SALDA\u00d1A GUTIERREZ FABIOLA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 524,
+        "prod_row": 424
+    },
+    {
+        "name": "TAVAREZ MARTINEZ MARIA ALEJANDRA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 525,
+        "prod_row": 425
+    },
+    {
+        "name": "TORRES ALEXIA SCARLET",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 526,
+        "prod_row": 426
+    },
+    {
+        "name": "VALDES GONZALEZ RENATA",
+        "prod_group": "2D",
+        "orig_group": "MATUTINO",
+        "orig_row": 527,
+        "prod_row": 427
+    },
+    {
+        "name": "ALVARADO GONZALEZ ISAAC GERARDO",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 291,
+        "prod_row": 428
+    },
+    {
+        "name": "ARAIZA TORRES ADAYAN MICHEL",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 293,
+        "prod_row": 429
+    },
+    {
+        "name": "ARCE PI\u00d1A AXEL EDUARDO",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 292,
+        "prod_row": 430
+    },
+    {
+        "name": "BARRERA CHARLES MARIA JOSE",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 295,
+        "prod_row": 432
+    },
+    {
+        "name": "BOCANEGRA MARTINEZ KAMILA DESIREE",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 296,
+        "prod_row": 433
+    },
+    {
+        "name": "CAMACHO ARANA CRISTOPHER",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 297,
+        "prod_row": 434
+    },
+    {
+        "name": "CASTILLO GUTIERREZ CALEB ESAU",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 298,
+        "prod_row": 435
+    },
+    {
+        "name": "CEBALLOS HERRERA JOSE DE JESUS",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 299,
+        "prod_row": 436
+    },
+    {
+        "name": "CORONA GARCIA BRISSA SAULETH",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 300,
+        "prod_row": 437
+    },
+    {
+        "name": "COVARRUBIAS DOMINGUEZ ASHLEY DENISSE",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 301,
+        "prod_row": 438
+    },
+    {
+        "name": "DE LA GARZA FLORES RICARDO EMMANUEL",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 302,
+        "prod_row": 439
+    },
+    {
+        "name": "ELIAS JIMENEZ SANTIAGO",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 303,
+        "prod_row": 440
+    },
+    {
+        "name": "FRANCO SANCHEZ YASMIN MONTSERRAT",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 305,
+        "prod_row": 441
+    },
+    {
+        "name": "GAMEZ SOLIS KLEVER SANTIAGO",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 306,
+        "prod_row": 442
+    },
+    {
+        "name": "GARCIA RAMOS DARWIN GAEL",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 309,
+        "prod_row": 445
+    },
+    {
+        "name": "GUERRERO MARTINEZ ANGEL ABEEL",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 310,
+        "prod_row": 446
+    },
+    {
+        "name": "HERNANDEZ GARNICA AXEL FERNANDO",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 311,
+        "prod_row": 447
+    },
+    {
+        "name": "HERNANDEZ GUEVARA CARLOS FRANCISCO",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 312,
+        "prod_row": 448
+    },
+    {
+        "name": "HERRERA MEJIA ELIZABETH GUADALUPE",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 313,
+        "prod_row": 449
+    },
+    {
+        "name": "IBARRA GONZALEZ GABRIEL ALBERTO",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 314,
+        "prod_row": 450
+    },
+    {
+        "name": "JAYASI CASTRO GERARDO CALEB",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 315,
+        "prod_row": 451
+    },
+    {
+        "name": "LOMBARDO MARTINEZ CAMILA",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 316,
+        "prod_row": 452
+    },
+    {
+        "name": "MARTINEZ HERNANDEZ YEI YOSHUA DOMINIC",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 172,
+        "prod_row": 453
+    },
+    {
+        "name": "MONTES AIRAM",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 317,
+        "prod_row": 454
+    },
+    {
+        "name": "NAVARRETE AVALOS VICTORIA SARAHI",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 318,
+        "prod_row": 455
+    },
+    {
+        "name": "PACHECO CASTORENA HECTOR",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 319,
+        "prod_row": 456
+    },
+    {
+        "name": "PEREZ SALAIS BERTHA GABRIELA",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 320,
+        "prod_row": 457
+    },
+    {
+        "name": "PUENTE RAM\u00cdREZ NATALIA",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 321,
+        "prod_row": 458
+    },
+    {
+        "name": "RAMOS GALLEGOS BRITNEY MICHELLE",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 322,
+        "prod_row": 459
+    },
+    {
+        "name": "RUEDAS CARDENAS NANCY GISSELLE",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 323,
+        "prod_row": 460
+    },
+    {
+        "name": "VALADEZ MORALES LUIS ANGEL",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 324,
+        "prod_row": 461
+    },
+    {
+        "name": "VEGA RAMIREZ SOFIA",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 326,
+        "prod_row": 462
+    },
+    {
+        "name": "VELEZ CONSTANCIO DAVID RAYMUNDO",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 327,
+        "prod_row": 463
+    },
+    {
+        "name": "ZAMARRON CASTILLO KARIME ABIGAIL",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 328,
+        "prod_row": 464
+    },
+    {
+        "name": "ZAPATA MONREAL KENNIA",
+        "prod_group": "2G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 329,
+        "prod_row": 465
+    },
+    {
+        "name": "AGUERO PILOTZI ISABELLA NICOLE",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 115,
+        "prod_row": 466
+    },
+    {
+        "name": "AGUILAR MENCHACA CARLOS",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 116,
+        "prod_row": 467
+    },
+    {
+        "name": "ALEMAN RIVAS JAZLY YANILEN",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 117,
+        "prod_row": 468
+    },
+    {
+        "name": "ALONSO CAZARES ERIK ALEJANDRO",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 118,
+        "prod_row": 469
+    },
+    {
+        "name": "AREVALO HERNANDEZ ALEXA BRIGIT",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 119,
+        "prod_row": 470
+    },
+    {
+        "name": "BORJAS CERDA MELANIE RENATTA",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 120,
+        "prod_row": 471
+    },
+    {
+        "name": "CAPORAL QUIRINO VANESSA DANIELA",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 121,
+        "prod_row": 472
+    },
+    {
+        "name": "CASTILLO HERRERA KARLA NAOMI",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 122,
+        "prod_row": 473
+    },
+    {
+        "name": "CASTILLO RIOJAS OLIVER ADRIEL",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 123,
+        "prod_row": 474
+    },
+    {
+        "name": "CORONADO RODRIGUEZ JABNEEL",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 124,
+        "prod_row": 475
+    },
+    {
+        "name": "CRUZ GUERRA ICKER GAEL",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 125,
+        "prod_row": 476
+    },
+    {
+        "name": "DE LUNA MU\u00d1OZ ANDREA GERALDINE",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 126,
+        "prod_row": 477
+    },
+    {
+        "name": "DURON RAMON ZOE",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 127,
+        "prod_row": 478
+    },
+    {
+        "name": "GALAVIZ GRIMALDO JOSE GERARDO",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 128,
+        "prod_row": 479
+    },
+    {
+        "name": "GARCIA ALEJANDRO REGINA",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 129,
+        "prod_row": 480
+    },
+    {
+        "name": "GARCIA IBARRA KARLA NICOLE",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 130,
+        "prod_row": 481
+    },
+    {
+        "name": "GARCIA LARA GEORGINA",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 131,
+        "prod_row": 482
+    },
+    {
+        "name": "GARCIA VELAZQUEZ MATEO",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 132,
+        "prod_row": 483
+    },
+    {
+        "name": "GONZALEZ MONTOYA ALEXA",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 133,
+        "prod_row": 484
+    },
+    {
+        "name": "GONZALEZ VILLANUEVA EMILLY SOFIA",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 151,
+        "prod_row": 485
+    },
+    {
+        "name": "HERNANDEZ CALAMACO ARATH ELI",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 134,
+        "prod_row": 486
+    },
+    {
+        "name": "HERNANDEZ RODRIGUEZ IAN",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 135,
+        "prod_row": 487
+    },
+    {
+        "name": "HERRERA SILOS XIMENA ELIZABETH",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 152,
+        "prod_row": 488
+    },
+    {
+        "name": "IBARRA PE\u00d1A AMBAR NICOLE",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 136,
+        "prod_row": 489
+    },
+    {
+        "name": "MARTINEZ RUIZ JENELLY AMAYTE",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 137,
+        "prod_row": 490
+    },
+    {
+        "name": "MERCADO MOLINA AXEL ALEJANDRO",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 138,
+        "prod_row": 491
+    },
+    {
+        "name": "MU\u00d1OZ CARRIZALES XIMENA MONSERRATH",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 139,
+        "prod_row": 492
+    },
+    {
+        "name": "PONCE IBA\u00d1EZ IRENE ENID",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 140,
+        "prod_row": 493
+    },
+    {
+        "name": "RAMIREZ VELOZ HECTOR ADRIAN",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 141,
+        "prod_row": 494
+    },
+    {
+        "name": "RAMOS MACHUCA DYLAN SANTIAGO",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 142,
+        "prod_row": 495
+    },
+    {
+        "name": "ROBLES VILLARREAL GRETTEL",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 143,
+        "prod_row": 496
+    },
+    {
+        "name": "RODRIGUEZ JUAREZ RICARDO ANTONIO",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 144,
+        "prod_row": 497
+    },
+    {
+        "name": "ROSALES HERRERA ILSE FERNANDA",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 145,
+        "prod_row": 498
+    },
+    {
+        "name": "RUIZ FERNANDEZ GUERRA ALAN LEONEL",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 146,
+        "prod_row": 499
+    },
+    {
+        "name": "SALINAS ROSALES BRAYAN",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 147,
+        "prod_row": 500
+    },
+    {
+        "name": "SANCHEZ GONZALEZ JOSE GERARDO",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 148,
+        "prod_row": 501
+    },
+    {
+        "name": "TAPIA DIAZ EDGAR GADYEL",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 149,
+        "prod_row": 502
+    },
+    {
+        "name": "URA MENCHACA PAULINA",
+        "prod_group": "2H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 150,
+        "prod_row": 503
+    },
+    {
+        "name": "AGUILAR VAZQUEZ DAYANA NATALY",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 153,
+        "prod_row": 504
+    },
+    {
+        "name": "ALVARADO SOTO VIOLETA MONSERRAT",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 154,
+        "prod_row": 505
+    },
+    {
+        "name": "ALVARADO ZARAGOZA CESAR ALEJANDRO",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 155,
+        "prod_row": 506
+    },
+    {
+        "name": "BERNAL HERRERA GABRIEL RICARDO",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 156,
+        "prod_row": 507
+    },
+    {
+        "name": "CANTERA SALCEDO OSCAR MANUEL",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 157,
+        "prod_row": 508
+    },
+    {
+        "name": "CHARLES RODRIGUEZ SOPHIE ISABELLA",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 160,
+        "prod_row": 509
+    },
+    {
+        "name": "CORONADO RODRIGUEZ JABDIEL",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 158,
+        "prod_row": 510
+    },
+    {
+        "name": "CUENCA RODRIGUEZ MARIA FERNANDA",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 159,
+        "prod_row": 511
+    },
+    {
+        "name": "DE LA CRUZ JARRA ALFONSO",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 161,
+        "prod_row": 512
+    },
+    {
+        "name": "ESCOBEDO BARRON CARLOS ENRIQUE",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 162,
+        "prod_row": 513
+    },
+    {
+        "name": "FALCON HERNANDEZ ANGIE",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 163,
+        "prod_row": 514
+    },
+    {
+        "name": "GARCIA CAMARA ANETTE  MONSERRAT",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 165,
+        "prod_row": 515
+    },
+    {
+        "name": "GARCIA MARTINEZ FERNANDA ELIZABETH",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 166,
+        "prod_row": 516
+    },
+    {
+        "name": "GAYTAN SERRATO NATHALY",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 167,
+        "prod_row": 517
+    },
+    {
+        "name": "GONZALEZ  DYLAN",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 168,
+        "prod_row": 518
+    },
+    {
+        "name": "HUERTA NAVARRO JUAN CARLOS",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 169,
+        "prod_row": 519
+    },
+    {
+        "name": "JASSO MEDELLIN CRISTIAN TADEO",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 170,
+        "prod_row": 520
+    },
+    {
+        "name": "MACIAS ROCHA YARELDI KRISTAL",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 171,
+        "prod_row": 521
+    },
+    {
+        "name": "MARTINEZ CERVANTES YANETH",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 173,
+        "prod_row": 522
+    },
+    {
+        "name": "MARTINEZ HERNANDEZ YEI YOSHUA DOMINIC",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 172,
+        "prod_row": 523
+    },
+    {
+        "name": "MARTINEZ RODRIGUEZ YARITZI MARISOL",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 174,
+        "prod_row": 524
+    },
+    {
+        "name": "MELCHOR SANCHEZ ESTEPHANY AZENETH",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 175,
+        "prod_row": 525
+    },
+    {
+        "name": "MONREAL DE LOS REYES JUAN PABLO",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 176,
+        "prod_row": 526
+    },
+    {
+        "name": "MONTA\u00d1O VAQUERA KENDRA  AYLIN",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 177,
+        "prod_row": 527
+    },
+    {
+        "name": "MORALES RETA IKER ALBERTO",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 178,
+        "prod_row": 528
+    },
+    {
+        "name": "ORTIZ IBARRA AMY FERNANDA",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 179,
+        "prod_row": 529
+    },
+    {
+        "name": "RAMIREZ MORALES OBED IRAM",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 180,
+        "prod_row": 530
+    },
+    {
+        "name": "RAMOS JUAREZ GABRIEL",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 181,
+        "prod_row": 531
+    },
+    {
+        "name": "RAMOS MANCHA JOEY",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 182,
+        "prod_row": 532
+    },
+    {
+        "name": "RODRIGUEZ CERNA LIA MONSERRATH",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 183,
+        "prod_row": 533
+    },
+    {
+        "name": "RUIZ DE LUNA SEBASTIAN",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 184,
+        "prod_row": 534
+    },
+    {
+        "name": "SALAZAR DUQUE JESUS ANTONIO",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 185,
+        "prod_row": 535
+    },
+    {
+        "name": "SERVIN PECINA KEVIN GAEL",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 186,
+        "prod_row": 536
+    },
+    {
+        "name": "TELLEZ  FATIMA",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 187,
+        "prod_row": 537
+    },
+    {
+        "name": "TREVI\u00d1O LOPEZ EMMANUEL",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 188,
+        "prod_row": 538
+    },
+    {
+        "name": "VAZQUEZ HINOSTROSA BRIANNA JAZMIN",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 189,
+        "prod_row": 539
+    },
+    {
+        "name": "VENEGAS HERNANDEZ ANA FERNANDA",
+        "prod_group": "2I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 190,
+        "prod_row": 540
+    },
+    {
+        "name": "AGUILAR RAMIREZ XIMENA GUADALUPE",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 683,
+        "prod_row": 541
+    },
+    {
+        "name": "ALMAGUER HERNANDEZ SAID EMANUEL",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 684,
+        "prod_row": 542
+    },
+    {
+        "name": "BARBOZA MERINO VICTOR ALEJANDRO",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 685,
+        "prod_row": 543
+    },
+    {
+        "name": "BARRIENTOS ALVARADO ALEXIS RAMON",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 686,
+        "prod_row": 544
+    },
+    {
+        "name": "BERNAL RAMIREZ ELSA WENDOLYN",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 687,
+        "prod_row": 545
+    },
+    {
+        "name": "BRAVO ROJAS BRIANNA DANAE",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 688,
+        "prod_row": 546
+    },
+    {
+        "name": "CASTILLO MORENO CHELSY BELLA",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 689,
+        "prod_row": 547
+    },
+    {
+        "name": "DIAZ DE LUNA JORGE ARTURO",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 690,
+        "prod_row": 548
+    },
+    {
+        "name": "DOMINGUEZ MENDEZ ANA GUADALUPE",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 691,
+        "prod_row": 549
+    },
+    {
+        "name": "DURAN RODRIGUEZ AXEL IVAN",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 692,
+        "prod_row": 550
+    },
+    {
+        "name": "FERNANDEZ RIOS EMANUEL",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 693,
+        "prod_row": 551
+    },
+    {
+        "name": "FRAGA AGUILAR FERNANDO EMILIANO",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 694,
+        "prod_row": 552
+    },
+    {
+        "name": "GARCIA DE SANTIAGO CARLOS DANIEL",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 695,
+        "prod_row": 553
+    },
+    {
+        "name": "GONZALEZ RUBIO GISELLE",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 696,
+        "prod_row": 554
+    },
+    {
+        "name": "GUERRERO RIVAS ROMINA",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 698,
+        "prod_row": 555
+    },
+    {
+        "name": "GUILLEN PICAZO MARVIN FRANCISCO",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 697,
+        "prod_row": 556
+    },
+    {
+        "name": "HERNANDEZ GARCIA FRANCISCO DANIEL",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 699,
+        "prod_row": 557
+    },
+    {
+        "name": "HERRERA HERNANDEZ VANESSA",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 700,
+        "prod_row": 558
+    },
+    {
+        "name": "IBARRA LOPEZ ALEX DIEGO",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 701,
+        "prod_row": 559
+    },
+    {
+        "name": "LIRA ESTRADA JESUS MARIO",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 702,
+        "prod_row": 560
+    },
+    {
+        "name": "LUNA MENDOZA MELANY JULIETTE",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 703,
+        "prod_row": 561
+    },
+    {
+        "name": "MARTINEZ IBARRA CONSTANZA GABRIELA",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 704,
+        "prod_row": 562
+    },
+    {
+        "name": "MARTINEZ MENDEZ AYLIN MARIELA",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 705,
+        "prod_row": 563
+    },
+    {
+        "name": "MARTINEZ PRADO ISAAC ARMANDO",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 706,
+        "prod_row": 564
+    },
+    {
+        "name": "MARTINEZ TOVAR LESLIE MICHEL",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 707,
+        "prod_row": 565
+    },
+    {
+        "name": "MATINEZ SOTO EMILIANO",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 708,
+        "prod_row": 566
+    },
+    {
+        "name": "MENDOZA SAUCEDO ARELY LIZETH",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 709,
+        "prod_row": 567
+    },
+    {
+        "name": "MORALES MOYEDA MAXIMILIANO",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 710,
+        "prod_row": 568
+    },
+    {
+        "name": "MU\u00d1OZ REVELES FERNANDO EMANUEL",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 711,
+        "prod_row": 569
+    },
+    {
+        "name": "PALOMEQUE CAUDILLO IVANNA",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 712,
+        "prod_row": 570
+    },
+    {
+        "name": "PARRA DE LA CRUZ DIEGO ADRIAN",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 713,
+        "prod_row": 571
+    },
+    {
+        "name": "PRADO GAUNA EMILIANO",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 714,
+        "prod_row": 572
+    },
+    {
+        "name": "RIVERA CADENA ALICIA CELESTE",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 715,
+        "prod_row": 573
+    },
+    {
+        "name": "RODRIGUEZ ALVAREZ DIVANY LIZETH",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 716,
+        "prod_row": 574
+    },
+    {
+        "name": "ROJAS PEREZ ALIHA ALEJANDRA",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 717,
+        "prod_row": 575
+    },
+    {
+        "name": "SALAZAR LOPEZ NATALY GABRIEL",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 718,
+        "prod_row": 576
+    },
+    {
+        "name": "SANCHEZ ALCARAZ CARLOS HUMBERTO",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 719,
+        "prod_row": 577
+    },
+    {
+        "name": "SEVILLA RAMIREZ MATTHEW DYLAN",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 720,
+        "prod_row": 578
+    },
+    {
+        "name": "VAQUERA GONZALEZ SAEL SALVADOR",
+        "prod_group": "3A",
+        "orig_group": "MATUTINO",
+        "orig_row": 721,
+        "prod_row": 579
+    },
+    {
+        "name": "AGUIRRE CHAVEZ ANYELINA RUBI",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 644,
+        "prod_row": 580
+    },
+    {
+        "name": "ALMANZA VASQUEZ JOSE MARTIN",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 645,
+        "prod_row": 581
+    },
+    {
+        "name": "BAENA DIAZ CESAR SANTIAGO ",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 646,
+        "prod_row": 582
+    },
+    {
+        "name": "BERNABE LAZARO NATALIA SIMONE",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 647,
+        "prod_row": 583
+    },
+    {
+        "name": "BERNABE OVALLE JUSTIN OSIEL",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 648,
+        "prod_row": 584
+    },
+    {
+        "name": "CALDERON GARCIA CAMILA",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 649,
+        "prod_row": 585
+    },
+    {
+        "name": "DIAZ ORTIZ OSCAR DANIEL",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 650,
+        "prod_row": 586
+    },
+    {
+        "name": "FLORES OSORIA MIA JACKELINE",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 651,
+        "prod_row": 587
+    },
+    {
+        "name": "GALINDO LIRA MYA NOEMI",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 652,
+        "prod_row": 588
+    },
+    {
+        "name": "GARCIA CADENA EDGAR EFRAIN",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 653,
+        "prod_row": 589
+    },
+    {
+        "name": "GARCIA MARTINEZ RAUL ENRIQUE",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 654,
+        "prod_row": 590
+    },
+    {
+        "name": "HEREDIA GARCIA ALAN",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 655,
+        "prod_row": 591
+    },
+    {
+        "name": "HERNANDEZ CHAVEZ JAIME",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 656,
+        "prod_row": 592
+    },
+    {
+        "name": "HERNANDEZ MORENO CARLOS IVAN",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 657,
+        "prod_row": 593
+    },
+    {
+        "name": "JORDAN FONSECA REGINA",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 658,
+        "prod_row": 594
+    },
+    {
+        "name": "MARTINEZ CEDILLO JACKELINE",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 659,
+        "prod_row": 595
+    },
+    {
+        "name": "MARTINEZ DE LA ROSA PABLO",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 660,
+        "prod_row": 596
+    },
+    {
+        "name": "MARTINEZ PARGAS LUIS CARLOS",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 661,
+        "prod_row": 597
+    },
+    {
+        "name": "MARTINEZ SERRANO ZOE",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 662,
+        "prod_row": 598
+    },
+    {
+        "name": "MATSUMOTO ROMERO ANTONIO ALFONSO",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 663,
+        "prod_row": 599
+    },
+    {
+        "name": "MENDEZ RAMIREZ MIRANDA",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 664,
+        "prod_row": 600
+    },
+    {
+        "name": "MONTA\u00d1O GONZALEZ GERARDO",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 665,
+        "prod_row": 601
+    },
+    {
+        "name": "NAVA BELTRAN GAEL",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 666,
+        "prod_row": 602
+    },
+    {
+        "name": "NOLASCO RODRIGUEZ MARIJOSE",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 667,
+        "prod_row": 603
+    },
+    {
+        "name": "PEREZ GALINDO SEBASTIAN ",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 668,
+        "prod_row": 604
+    },
+    {
+        "name": "QUIROZ GUERRA ALMARY KRISDELY",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 669,
+        "prod_row": 605
+    },
+    {
+        "name": "RIOS CASTILLO GADIEL ALEXANDER",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 670,
+        "prod_row": 606
+    },
+    {
+        "name": "ROCHA SANTANA MARISOL",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 671,
+        "prod_row": 607
+    },
+    {
+        "name": "RODRIGUEZ OLVERA DEVANY ELIETH",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 672,
+        "prod_row": 608
+    },
+    {
+        "name": "SALAS DIAZ KAMILA ABIGAIL",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 673,
+        "prod_row": 609
+    },
+    {
+        "name": "SALINAS MARTINEZ GUILLERMO",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 674,
+        "prod_row": 610
+    },
+    {
+        "name": "SANCHEZ ARIZTA REGINA",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 675,
+        "prod_row": 611
+    },
+    {
+        "name": "SANTILLAN LOPEZ CARLOS FERNANDO",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 676,
+        "prod_row": 612
+    },
+    {
+        "name": "SAUCEDO ELGUEZABAL HEBER JOSUE",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 677,
+        "prod_row": 613
+    },
+    {
+        "name": "TALAMANTES RODRIGUEZ KEVIN ALEXIS ",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 678,
+        "prod_row": 614
+    },
+    {
+        "name": "VALENZUELA RANGEL ADRIAN EMILIANO",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 679,
+        "prod_row": 615
+    },
+    {
+        "name": "VAZQUEZ CASTILLO DOMINIC",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 680,
+        "prod_row": 616
+    },
+    {
+        "name": "ZAMORA HERNANDEZ LUNA",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 681,
+        "prod_row": 617
+    },
+    {
+        "name": "ZAPATA GOMEZ CARLOS YAHIR",
+        "prod_group": "3B",
+        "orig_group": "MATUTINO",
+        "orig_row": 682,
+        "prod_row": 618
+    },
+    {
+        "name": "BARRIENTOS GONZALEZ DANNA LIZBETH",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 722,
+        "prod_row": 619
+    },
+    {
+        "name": "BARRON FERNANDEZ JOSE EDUARDO",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 723,
+        "prod_row": 620
+    },
+    {
+        "name": "CAMARENA PEREZ ANGELA YAZMIN",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 724,
+        "prod_row": 621
+    },
+    {
+        "name": "CAMPOS ESCOBEDO URIEL",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 726,
+        "prod_row": 622
+    },
+    {
+        "name": "CARDOZA HERNANDEZ ALAN ELIHU",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 725,
+        "prod_row": 623
+    },
+    {
+        "name": "CASTRO MORALES OMAR",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 727,
+        "prod_row": 624
+    },
+    {
+        "name": "CAUDILLO ARENAS MELANY",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 728,
+        "prod_row": 625
+    },
+    {
+        "name": "CHAVEZ GOCOBACHI ROBERTO CARLOS",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 729,
+        "prod_row": 626
+    },
+    {
+        "name": "CHIO ORTEGA ROMINA INES",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 730,
+        "prod_row": 627
+    },
+    {
+        "name": "CONDE MALDONADO MATIAS ALEJANDRO",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 731,
+        "prod_row": 628
+    },
+    {
+        "name": "DE LA CRUZ GONZALEZ BARBARA ",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 732,
+        "prod_row": 629
+    },
+    {
+        "name": "DELGADO PEREZ KIMBERLI DAYANA",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 733,
+        "prod_row": 630
+    },
+    {
+        "name": "DELGADO TREJO LUIS CARLOS",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 734,
+        "prod_row": 631
+    },
+    {
+        "name": "DURAN CAUICH RENATTA",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 735,
+        "prod_row": 632
+    },
+    {
+        "name": "ESTRADA NU\u00d1EZ DANIELA",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 736,
+        "prod_row": 633
+    },
+    {
+        "name": "FERNANDEZ LIRA RODRIGO SAID",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 737,
+        "prod_row": 634
+    },
+    {
+        "name": "FLORES GONZALEZ DANIEL ALEJANDRO",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 738,
+        "prod_row": 635
+    },
+    {
+        "name": "FLORES GUTIERREZ EMILIANO AZAEL",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 739,
+        "prod_row": 636
+    },
+    {
+        "name": "GALINDO CORREA ARON ISAAC",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 740,
+        "prod_row": 637
+    },
+    {
+        "name": "GARCIA ARREOLA NARELY NATALY",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 741,
+        "prod_row": 638
+    },
+    {
+        "name": "GOMEZ ALEMAN ELIAS",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 742,
+        "prod_row": 639
+    },
+    {
+        "name": "GOMEZ IBARRA CARLOS ANDRES",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 743,
+        "prod_row": 640
+    },
+    {
+        "name": "GONZALEZ RODRIGUEZ ANA FERNANDA",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 744,
+        "prod_row": 641
+    },
+    {
+        "name": "GONZALEZ SEGURA DIEGO JAZAEL",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 745,
+        "prod_row": 642
+    },
+    {
+        "name": "LOPEZ RODRIGUEZ SOFIA VICTORIA",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 746,
+        "prod_row": 643
+    },
+    {
+        "name": "LUVIANO HERRERA SONIA SOLANCH",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 747,
+        "prod_row": 644
+    },
+    {
+        "name": "MARTINEZ CORDOVA IAN ANTONIO",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 748,
+        "prod_row": 645
+    },
+    {
+        "name": "MARTINEZ RAMIREZ ESTEFANY GUADALUPE",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 749,
+        "prod_row": 646
+    },
+    {
+        "name": "MENESES MEDRANO JERENI ABIGAIL",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 750,
+        "prod_row": 647
+    },
+    {
+        "name": "MONTERO LOPEZ VICTOR SAMUEL",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 751,
+        "prod_row": 648
+    },
+    {
+        "name": "PANTOJA ARAIZA ERICK ALONSO",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 752,
+        "prod_row": 649
+    },
+    {
+        "name": "PONCE HERNANDEZ ANGEL ISAAC",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 753,
+        "prod_row": 650
+    },
+    {
+        "name": "PONCE YEPES MARIA CELESTE",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 754,
+        "prod_row": 651
+    },
+    {
+        "name": "RAMON ZAMORA JESUS ABRAHAM",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 755,
+        "prod_row": 652
+    },
+    {
+        "name": "ROSIS CASTA\u00d1EDA CHANTAL CHANEL",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 756,
+        "prod_row": 653
+    },
+    {
+        "name": "RUIZ VILLARREAL ERICK ALEJANDRO",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 757,
+        "prod_row": 654
+    },
+    {
+        "name": "TOLEDO ACOSTA JOSE",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 758,
+        "prod_row": 655
+    },
+    {
+        "name": "VIELMA CANO JOSE BENJAMIN",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 759,
+        "prod_row": 656
+    },
+    {
+        "name": "VILLARREAL GAUNA DIEGO FERNANDO",
+        "prod_group": "3C",
+        "orig_group": "MATUTINO",
+        "orig_row": 760,
+        "prod_row": 657
+    },
+    {
+        "name": "ALVARADO ROMERO JORGE ANTONIO",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 761,
+        "prod_row": 658
+    },
+    {
+        "name": "BARAJAS ROLON ALAN LEONEL",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 762,
+        "prod_row": 659
+    },
+    {
+        "name": "CASTILLO CARRIZAL EVELYN",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 764,
+        "prod_row": 661
+    },
+    {
+        "name": "CASTILLO CASTILLO ANALLELY CAROLINA",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 765,
+        "prod_row": 662
+    },
+    {
+        "name": "CASTRO RAMIREZ ALEK",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 766,
+        "prod_row": 663
+    },
+    {
+        "name": "CHAVEZ CONTRERAS NAHOMY",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 767,
+        "prod_row": 664
+    },
+    {
+        "name": "CONTRERAS AYALA GUILLERMO",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 768,
+        "prod_row": 665
+    },
+    {
+        "name": "DE LA GARZA FRAIRE AYMAR SCARLETH",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 769,
+        "prod_row": 666
+    },
+    {
+        "name": "DE LEON RUIZ DOMINIC SANTIAGO",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 771,
+        "prod_row": 668
+    },
+    {
+        "name": "DURAN BRIONES KIMBERLY MICHELLE",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 772,
+        "prod_row": 669
+    },
+    {
+        "name": "ELIZALDE ALTAMIRANO IKER EMMANUEL",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 773,
+        "prod_row": 670
+    },
+    {
+        "name": "ELIZONDO ESPINOZA IGNACIO",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 774,
+        "prod_row": 671
+    },
+    {
+        "name": "FLORES MORALES ALEXIS",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 775,
+        "prod_row": 672
+    },
+    {
+        "name": "FRAIRE RUIZ JORGE ENRIQUE",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 776,
+        "prod_row": 673
+    },
+    {
+        "name": "GALLEGOS HERNANDEZ ICKER ",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 777,
+        "prod_row": 674
+    },
+    {
+        "name": "GOMEZ GODINEZ FRANCISCO",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 778,
+        "prod_row": 675
+    },
+    {
+        "name": "GONZALEZ TORRES ANA LILIA",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 780,
+        "prod_row": 677
+    },
+    {
+        "name": "HERNANDEZ MENDEZ ALEX HUMBERTO",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 781,
+        "prod_row": 678
+    },
+    {
+        "name": "HERRERA CARDOSO ERNESTO ADRIAN",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 782,
+        "prod_row": 679
+    },
+    {
+        "name": "IRACHETA FERNANDEZ ANA NICOLE",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 783,
+        "prod_row": 680
+    },
+    {
+        "name": "JIMENEZ MARTINEZ NOELIA NOEMI",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 784,
+        "prod_row": 681
+    },
+    {
+        "name": "MARTINEZ CRUZ YARETZI",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 785,
+        "prod_row": 682
+    },
+    {
+        "name": "MARTINEZ DURAN JORGE JOSUE",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 786,
+        "prod_row": 683
+    },
+    {
+        "name": "MARTINEZ GARCIA NICHOLAS",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 787,
+        "prod_row": 684
+    },
+    {
+        "name": "OLVERA HERNANDEZ LUIS ANGEL",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 788,
+        "prod_row": 685
+    },
+    {
+        "name": "PEREZ ANDRADE TIANA REGINA",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 789,
+        "prod_row": 686
+    },
+    {
+        "name": "RAMON PARGAS EIMY ANDREA",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 791,
+        "prod_row": 688
+    },
+    {
+        "name": "RAMOS SALCEDO INGRID GISSELLE",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 792,
+        "prod_row": 689
+    },
+    {
+        "name": "RIVERA DE LA GARZA ANGELICA",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 793,
+        "prod_row": 690
+    },
+    {
+        "name": "SANCHEZ SILVA PEDRO MATIAS",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 794,
+        "prod_row": 691
+    },
+    {
+        "name": "SANCHEZ VALDEZ CAMILA MONSERRATH",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 795,
+        "prod_row": 692
+    },
+    {
+        "name": "SANDOVAL JIMENEZ JIMENA",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 796,
+        "prod_row": 693
+    },
+    {
+        "name": "TAPIA ESCOBEDO IRIS VIOLETA",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 797,
+        "prod_row": 694
+    },
+    {
+        "name": "TRUJILLO BERMUDEZ ALEXIS",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 798,
+        "prod_row": 695
+    },
+    {
+        "name": "VALDEZ CASTILLO ESTEBAN ELI",
+        "prod_group": "3D",
+        "orig_group": "MATUTINO",
+        "orig_row": 799,
+        "prod_row": 696
+    },
+    {
+        "name": "ARRIAGA GUAJARDO DHARIANNA EDITH",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 258,
+        "prod_row": 697
+    },
+    {
+        "name": "BARRON CABALLERO BAYRON FERNANDO",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 259,
+        "prod_row": 698
+    },
+    {
+        "name": "CHUEY JONATHAN DHARIUS",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 261,
+        "prod_row": 700
+    },
+    {
+        "name": "CORPUS HERNANDEZ RAUL DE JESUS",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 262,
+        "prod_row": 701
+    },
+    {
+        "name": "FALCON HERNANDEZ JONATHAN",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 264,
+        "prod_row": 702
+    },
+    {
+        "name": "GARCIA ORTEGA DILAN JARED",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 266,
+        "prod_row": 704
+    },
+    {
+        "name": "GONZALEZ VILLANUEVA LYA MIRANDA",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 267,
+        "prod_row": 705
+    },
+    {
+        "name": "GUAJARDO DIAZ RACHEL EDELINE",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 268,
+        "prod_row": 706
+    },
+    {
+        "name": "GUERRA RUIZ KALEB RENE",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 269,
+        "prod_row": 707
+    },
+    {
+        "name": "HERRERA ORTIZ ASAEL OSVALDO",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 270,
+        "prod_row": 708
+    },
+    {
+        "name": "HERRERA VALDEZ JUAN DANIEL",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 271,
+        "prod_row": 709
+    },
+    {
+        "name": "MACIAS IBARRA ANDREA",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 272,
+        "prod_row": 710
+    },
+    {
+        "name": "MATA MARTINEZ HECTOR GABRIEL",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 273,
+        "prod_row": 711
+    },
+    {
+        "name": "MONTES MEDINA DUSTIN",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 275,
+        "prod_row": 712
+    },
+    {
+        "name": "MU\u00d1OZ PEREZ ALEXIS DAMIAN",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 277,
+        "prod_row": 714
+    },
+    {
+        "name": "ONTIVEROS CARRILLO MALILLANY",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 278,
+        "prod_row": 715
+    },
+    {
+        "name": "PEREZ SILOS KASANDRA",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 279,
+        "prod_row": 716
+    },
+    {
+        "name": "REYNA CAMPOS NATHALY",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 281,
+        "prod_row": 717
+    },
+    {
+        "name": "RODRIGUEZ RODRIGUEZ LAYLA ELIZABETH",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 282,
+        "prod_row": 718
+    },
+    {
+        "name": "ROJAS PI\u00d1A EDGAR RODOLFO",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 283,
+        "prod_row": 719
+    },
+    {
+        "name": "SALINAS RODRIGUEZ DANNA SOFIA",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 284,
+        "prod_row": 720
+    },
+    {
+        "name": "SANCHEZ PEREZ PERLA GABRIELA",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 285,
+        "prod_row": 721
+    },
+    {
+        "name": "SOLIS SAUCEDO KEYLA ABIGAIL",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 286,
+        "prod_row": 722
+    },
+    {
+        "name": "SUAREZ AGUIRRE JAVIER NATANAEL",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 287,
+        "prod_row": 723
+    },
+    {
+        "name": "URDIALES MEDINA TADEO SANTIAGO",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 288,
+        "prod_row": 724
+    },
+    {
+        "name": "VALADEZ CAVAZOS SAUL SEBASTIAN",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 289,
+        "prod_row": 725
+    },
+    {
+        "name": "ZAMORA GONZALEZ GISELA ITZEL",
+        "prod_group": "3G",
+        "orig_group": "VESPERTINO",
+        "orig_row": 290,
+        "prod_row": 726
+    },
+    {
+        "name": "ALEMAN RIVERA DOMINIK MANUEL",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 225,
+        "prod_row": 727
+    },
+    {
+        "name": "ALFARO EXIGA SAMANTHA",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 226,
+        "prod_row": 728
+    },
+    {
+        "name": "ARENAS SAUCEDO BRAYAN JOSE",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 228,
+        "prod_row": 730
+    },
+    {
+        "name": "CARRILLO PE\u00d1A ALFONSO ABDIEL",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 229,
+        "prod_row": 731
+    },
+    {
+        "name": "CASTILLO VILLA ALLISON SARAHI",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 230,
+        "prod_row": 732
+    },
+    {
+        "name": "CENICEROS ESQUIVEL JAVIER ALEJANDRO",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 231,
+        "prod_row": 733
+    },
+    {
+        "name": "CHAVARRIA SALINAS JOSE ANTONIO",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 232,
+        "prod_row": 734
+    },
+    {
+        "name": "DE LOS SANTOS OCHOA PATRICK GIOVANY",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 233,
+        "prod_row": 735
+    },
+    {
+        "name": "DIAZ REYES KARLA",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 234,
+        "prod_row": 736
+    },
+    {
+        "name": "ESCALERA AGUILAR DEBANHI KRISTELL",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 235,
+        "prod_row": 737
+    },
+    {
+        "name": "ESCOBEDO STEPHANY VANESA",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 236,
+        "prod_row": 738
+    },
+    {
+        "name": "FERMIN SALAZAR CAMILA",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 237,
+        "prod_row": 739
+    },
+    {
+        "name": "FRANCO VALLEJO GENESIS ANDREA VICTORIA",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 238,
+        "prod_row": 740
+    },
+    {
+        "name": "GALICIA SAUCEDO BRUNO RAPHAEL",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 240,
+        "prod_row": 741
+    },
+    {
+        "name": "GARCIA NAVARRETE SANTIAGO DANIEL",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 239,
+        "prod_row": 742
+    },
+    {
+        "name": "HUERTA SALAZAR JUAN DAVID",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 241,
+        "prod_row": 743
+    },
+    {
+        "name": "IZQUIERDO CORTINA IZMAEL",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 242,
+        "prod_row": 744
+    },
+    {
+        "name": "LOMBRA\u00d1A PUENTE DARIELA MAYTE",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 243,
+        "prod_row": 745
+    },
+    {
+        "name": "LOPEZ LOPEZ LIZETH",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 244,
+        "prod_row": 746
+    },
+    {
+        "name": "MALDONADO APARICIO CHRISTIAN JAHIR",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 245,
+        "prod_row": 747
+    },
+    {
+        "name": "MARTINEZ ELIZONDO KEVIN",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 246,
+        "prod_row": 748
+    },
+    {
+        "name": "MARTINEZ ESTRADA DEMI DANIELA",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 247,
+        "prod_row": 749
+    },
+    {
+        "name": "MERCADO MOLINA MARCO ANTONIO",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 249,
+        "prod_row": 751
+    },
+    {
+        "name": "MORALES MANCHA FERNANDO",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 250,
+        "prod_row": 752
+    },
+    {
+        "name": "PALOMEQUE VARGAS OMAR ALONSO",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 251,
+        "prod_row": 753
+    },
+    {
+        "name": "RODRIGUEZ GONZALEZ AMERICA VALENTINA",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 252,
+        "prod_row": 754
+    },
+    {
+        "name": "ROMERO RAMOS NAYELY CATALINA",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 253,
+        "prod_row": 755
+    },
+    {
+        "name": "VAZQUEZ GUZMAN KAROL",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 254,
+        "prod_row": 756
+    },
+    {
+        "name": "VAZQUEZ LOPEZ GILBERTO MIGUEL",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 255,
+        "prod_row": 757
+    },
+    {
+        "name": "VELA ZACARIAS ERICK",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 256,
+        "prod_row": 758
+    },
+    {
+        "name": "ZAMORA GONZALEZ DAAIANA",
+        "prod_group": "3H",
+        "orig_group": "VESPERTINO",
+        "orig_row": 257,
+        "prod_row": 759
+    },
+    {
+        "name": "ACOSTA RODRIGUEZ NICOLE GUADALUPE",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 191,
+        "prod_row": 760
+    },
+    {
+        "name": "AGUILAR SANCHEZ REGINA SARAI",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 192,
+        "prod_row": 761
+    },
+    {
+        "name": "CASTILLO GUTIERREZ RODOLFO EMANUEL",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 193,
+        "prod_row": 762
+    },
+    {
+        "name": "CHAVEZ FACIO BRANDON RAUL",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 194,
+        "prod_row": 763
+    },
+    {
+        "name": "CHAVEZ PADUA LITZI NAHARI",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 195,
+        "prod_row": 764
+    },
+    {
+        "name": "CRUZ GUERRA YEDANY RENATA",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 197,
+        "prod_row": 766
+    },
+    {
+        "name": "DOMINGUEZ CARREON ROBERTO GAEL",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 198,
+        "prod_row": 767
+    },
+    {
+        "name": "ENRIQUEZ BENAVIDES CARLOS ISAAC",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 199,
+        "prod_row": 768
+    },
+    {
+        "name": "ESPARZA DE LA ROSA ROSA ESMERALDA",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 200,
+        "prod_row": 769
+    },
+    {
+        "name": "FERNANDEZ DE LA CRUZ EMMANUEL ALEJANDRO",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 201,
+        "prod_row": 770
+    },
+    {
+        "name": "FERNANDEZ RETA RENATA",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 202,
+        "prod_row": 771
+    },
+    {
+        "name": "FUENTES BENAVENTE YURIDIA MARICRUZ",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 203,
+        "prod_row": 772
+    },
+    {
+        "name": "GARZA GUERRERO ANGELLA MONIQUE",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 204,
+        "prod_row": 773
+    },
+    {
+        "name": "GONZALEZ ELIZALDE NATALIA MONSERRAT",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 205,
+        "prod_row": 774
+    },
+    {
+        "name": "HUERTA NAVARRO WENDY DAIANA",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 208,
+        "prod_row": 777
+    },
+    {
+        "name": "MARTINEZ TORRES CRISTIAN LEONEL",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 211,
+        "prod_row": 780
+    },
+    {
+        "name": "MONTERO FERNANDEZ WENDY NATALY",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 212,
+        "prod_row": 781
+    },
+    {
+        "name": "MURILLO SAUCEDO JESUS SAMUEL",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 213,
+        "prod_row": 782
+    },
+    {
+        "name": "NAVARRO RAMIREZ XIMENA",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 214,
+        "prod_row": 783
+    },
+    {
+        "name": "ONTIVEROS VAZQUEZ MAYTE XIMENA",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 215,
+        "prod_row": 784
+    },
+    {
+        "name": "PALOS ROBLES MIGUEL ANGEL",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 216,
+        "prod_row": 785
+    },
+    {
+        "name": "PEREZ MARTINEZ IKKER YADIEL",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 217,
+        "prod_row": 786
+    },
+    {
+        "name": "REYNA MORAYMA",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 219,
+        "prod_row": 788
+    },
+    {
+        "name": "ROMO SALINAS MIA SOFIA",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 220,
+        "prod_row": 789
+    },
+    {
+        "name": "RUIZ RAMOS HECTOR FRANCISCO",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 222,
+        "prod_row": 791
+    },
+    {
+        "name": "RUIZ VALADEZ JOSE CARLOS",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 223,
+        "prod_row": 792
+    },
+    {
+        "name": "VAZQUEZ GUZMAN AARON",
+        "prod_group": "3I",
+        "orig_group": "VESPERTINO",
+        "orig_row": 224,
+        "prod_row": 793
+    }
+]

@@ -54,9 +54,12 @@ new class extends Component {
 
     public function getCategory($name)
     {
-        if (str_starts_with($name, 'tutorial-p')) return 'Padres';
-        if (str_starts_with($name, 'tutorial-d')) return 'Docentes';
-        if (str_starts_with($name, 'tutorial-a')) return 'Administración';
+        if (str_starts_with($name, 'tutorial-p'))
+            return 'Padres';
+        if (str_starts_with($name, 'tutorial-d'))
+            return 'Docentes';
+        if (str_starts_with($name, 'tutorial-a'))
+            return 'Administración';
         return 'Configuración';
     }
 
@@ -359,7 +362,7 @@ new class extends Component {
     {
         $title = $this->getTitle($name);
         $category = $this->getCategory($name);
-        
+
         $specifics = [
             'tutorial-p-reports' => [
                 'custom' => true,
@@ -462,28 +465,50 @@ new class extends Component {
 
         // Custom full-page content
         if (!empty($specifics['custom'])) {
-            if ($name === 'tutorial-a-users') return $this->getUserManagementContent();
-            if ($name === 'tutorial-a-regulations') return $this->getRegulationContent();
-            if ($name === 'tutorial-a-cycles') return $this->getCyclesContent();
-            if ($name === 'tutorial-a-promote') return $this->getPromoteContent();
-            if ($name === 'tutorial-a-import') return $this->getImportContent();
-            if ($name === 'tutorial-d-community') return $this->getCommunityServiceContent();
-            if ($name === 'tutorial-d-notices') return $this->getNoticesContent();
-            if ($name === 'tutorial-d-citations') return $this->getCitationsContent();
-            if ($name === 'tutorial-d-exams') return $this->getExamsContent();
-            if ($name === 'tutorial-a-report-types') return $this->getReportTypesContent();
-            if ($name === 'tutorial-a-inscribe') return $this->getStudentsContent();
-            if ($name === 'tutorial-d-create-report') return $this->getReportsContent();
-            if ($name === 'tutorial-c-notifications') return $this->getNotificationsContent();
-            if ($name === 'tutorial-c-install-android') return $this->getInstallAndroidContent();
-            if ($name === 'tutorial-c-install-ios') return $this->getInstallIosContent();
-            if ($name === 'tutorial-d-attendance') return $this->getAttendanceContent();
-            if ($name === 'tutorial-a-export') return $this->getExportContent();
-            if ($name === 'tutorial-p-reports') return $this->getParentReportsContent();
-            if ($name === 'tutorial-p-notices') return $this->getParentNoticesContent();
-            if ($name === 'tutorial-p-citations') return $this->getParentCitationsContent();
-            if ($name === 'tutorial-p-exams') return $this->getParentExamsContent();
-            if ($name === 'tutorial-p-community') return $this->getParentCommunityContent();
+            if ($name === 'tutorial-a-users')
+                return $this->getUserManagementContent();
+            if ($name === 'tutorial-a-regulations')
+                return $this->getRegulationContent();
+            if ($name === 'tutorial-a-cycles')
+                return $this->getCyclesContent();
+            if ($name === 'tutorial-a-promote')
+                return $this->getPromoteContent();
+            if ($name === 'tutorial-a-import')
+                return $this->getImportContent();
+            if ($name === 'tutorial-d-community')
+                return $this->getCommunityServiceContent();
+            if ($name === 'tutorial-d-notices')
+                return $this->getNoticesContent();
+            if ($name === 'tutorial-d-citations')
+                return $this->getCitationsContent();
+            if ($name === 'tutorial-d-exams')
+                return $this->getExamsContent();
+            if ($name === 'tutorial-a-report-types')
+                return $this->getReportTypesContent();
+            if ($name === 'tutorial-a-inscribe')
+                return $this->getStudentsContent();
+            if ($name === 'tutorial-d-create-report')
+                return $this->getReportsContent();
+            if ($name === 'tutorial-c-notifications')
+                return $this->getNotificationsContent();
+            if ($name === 'tutorial-c-install-android')
+                return $this->getInstallAndroidContent();
+            if ($name === 'tutorial-c-install-ios')
+                return $this->getInstallIosContent();
+            if ($name === 'tutorial-d-attendance')
+                return $this->getAttendanceContent();
+            if ($name === 'tutorial-a-export')
+                return $this->getExportContent();
+            if ($name === 'tutorial-p-reports')
+                return $this->getParentReportsContent();
+            if ($name === 'tutorial-p-notices')
+                return $this->getParentNoticesContent();
+            if ($name === 'tutorial-p-citations')
+                return $this->getParentCitationsContent();
+            if ($name === 'tutorial-p-exams')
+                return $this->getParentExamsContent();
+            if ($name === 'tutorial-p-community')
+                return $this->getParentCommunityContent();
         }
 
         $crudHtml = ($specifics['edit'] ?? '') . ($specifics['delete'] ?? '');
@@ -3651,99 +3676,131 @@ new class extends Component {
     @if(!$selectedTutorial)
         <div class="flex flex-col gap-2">
             <flux:heading size="xl" level="1">Centro de Ayuda y Tutoriales</flux:heading>
-            <flux:text class="text-zinc-500 dark:text-zinc-400">Guía definitiva para dominar todas las funcionalidades de la plataforma escolar.</flux:text>
+            <flux:text class="text-zinc-500 dark:text-zinc-400">Guía definitiva para dominar todas las funcionalidades de la
+                plataforma escolar.</flux:text>
         </div>
 
         <flux:separator />
 
         {{-- Tabs Navigation --}}
         <div class="flex flex-wrap gap-2 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 w-fit">
-            <flux:button :variant="$tab === 'parents' ? 'primary' : 'ghost'" wire:click="setTab('parents')" icon="users" size="sm">Padres</flux:button>
+            <flux:button :variant="$tab === 'parents' ? 'primary' : 'ghost'" wire:click="setTab('parents')" icon="users"
+                size="sm">Padres</flux:button>
             @if(auth()->user()->isViewStaff())
-                <flux:button :variant="$tab === 'teachers' ? 'primary' : 'ghost'" wire:click="setTab('teachers')" icon="academic-cap" size="sm">Docentes</flux:button>
+                <flux:button :variant="$tab === 'teachers' ? 'primary' : 'ghost'" wire:click="setTab('teachers')"
+                    icon="academic-cap" size="sm">Docentes</flux:button>
                 @can('admin-only')
-                    <flux:button :variant="$tab === 'admin' ? 'primary' : 'ghost'" wire:click="setTab('admin')" icon="shield-check" size="sm">Admin</flux:button>
+                    <flux:button :variant="$tab === 'admin' ? 'primary' : 'ghost'" wire:click="setTab('admin')" icon="shield-check"
+                        size="sm">Admin</flux:button>
                 @endcan
             @endif
-            <flux:button :variant="$tab === 'config' ? 'primary' : 'ghost'" wire:click="setTab('config')" icon="cog-6-tooth" size="sm">Configuración</flux:button>
+            <flux:button :variant="$tab === 'config' ? 'primary' : 'ghost'" wire:click="setTab('config')" icon="cog-6-tooth"
+                size="sm">Configuración</flux:button>
         </div>
 
         {{-- Grid view --}}
         <div class="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
             @if($tab === 'parents')
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="document-text" title="Ver y Firmar Reportes" description="Consulta el historial disciplinario y firma de enterado." name="tutorial-p-reports" />
-                <x-tutorial-card icon="megaphone" title="Avisos y Autorizaciones" description="Mantente al día con los eventos y firma permisos digitales." name="tutorial-p-notices" />
-                <x-tutorial-card icon="calendar-days" title="Atender Citatorios" description="Confirma asistencia a reuniones con el personal docente." name="tutorial-p-citations" />
-                <x-tutorial-card icon="book-open" title="Calendario de Exámenes" description="Consulta las fechas de evaluación de todos tus hijos." name="tutorial-p-exams" />
-                <x-tutorial-card icon="heart" title="Servicio Comunitario" description="Seguimiento de actividades reparatorias asignadas." name="tutorial-p-community" />
-            </div>
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <x-tutorial-card icon="document-text" title="Ver y Firmar Reportes"
+                        description="Consulta el historial disciplinario y firma de enterado." name="tutorial-p-reports" />
+                    <x-tutorial-card icon="megaphone" title="Avisos y Autorizaciones"
+                        description="Mantente al día con los eventos y firma permisos digitales." name="tutorial-p-notices" />
+                    <x-tutorial-card icon="calendar-days" title="Atender Citatorios"
+                        description="Confirma asistencia a reuniones con el personal docente." name="tutorial-p-citations" />
+                    <x-tutorial-card icon="book-open" title="Calendario de Exámenes"
+                        description="Consulta las fechas de evaluación de todos tus hijos." name="tutorial-p-exams" />
+                    <x-tutorial-card icon="heart" title="Servicio Comunitario"
+                        description="Seguimiento de actividades reparatorias asignadas." name="tutorial-p-community" />
+                </div>
             @endif
 
             @if($tab === 'teachers')
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="pencil-square" title="Gestionar Reportes" description="Crea, busca y elimina reportes disciplinarios de alumnos." name="tutorial-d-create-report" />
-                <x-tutorial-card icon="clipboard-document-list" title="Programar Evaluaciones" description="Agenda exámenes para que padres y alumnos los visualicen." name="tutorial-d-exams" />
-                <x-tutorial-card icon="calendar" title="Generar Citatorios" description="Coordina reuniones presenciales con padres de familia." name="tutorial-d-citations" />
-                <x-tutorial-card icon="megaphone" title="Publicar Avisos" description="Comunícate de forma masiva con padres de tus grupos." name="tutorial-d-notices" />
-                <x-tutorial-card icon="user-group" title="Asignar Servicio" description="Asigna actividades de servicio comunitario por reportes acumulados." name="tutorial-d-community" />
-                <x-tutorial-card icon="clipboard-document-check" title="Control de Asistencia" description="Marca asistencia diaria de alumnos de forma manual o con escáner." name="tutorial-d-attendance" />
-            </div>
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <x-tutorial-card icon="pencil-square" title="Gestionar Reportes"
+                        description="Crea, busca y elimina reportes disciplinarios de alumnos."
+                        name="tutorial-d-create-report" />
+                    <x-tutorial-card icon="clipboard-document-list" title="Programar Evaluaciones"
+                        description="Agenda exámenes para que padres y alumnos los visualicen." name="tutorial-d-exams" />
+                    <x-tutorial-card icon="calendar" title="Generar Citatorios"
+                        description="Coordina reuniones presenciales con padres de familia." name="tutorial-d-citations" />
+                    <x-tutorial-card icon="megaphone" title="Publicar Avisos"
+                        description="Comunícate de forma masiva con padres de tus grupos." name="tutorial-d-notices" />
+                    <x-tutorial-card icon="user-group" title="Asignar Servicio"
+                        description="Asigna actividades de servicio comunitario por reportes acumulados."
+                        name="tutorial-d-community" />
+                    <x-tutorial-card icon="clipboard-document-check" title="Control de Asistencia"
+                        description="Marca asistencia diaria de alumnos de forma manual o con escáner."
+                        name="tutorial-d-attendance" />
+                </div>
             @endif
 
             @can('admin-only')
-            @if($tab === 'admin')
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="users" title="Gestión de Usuarios" description="Administra cuentas, restablece contraseñas y permisos." name="tutorial-a-users" />
-                <x-tutorial-card icon="arrow-path" title="Control de Ciclos" description="Configura periodos escolares y activa el ciclo vigente." name="tutorial-a-cycles" />
-                <x-tutorial-card icon="document-duplicate" title="Editar Reglamento" description="Actualiza la normativa institucional en tiempo real." name="tutorial-a-regulations" />
-                <x-tutorial-card icon="user-plus" title="Gestión de Alumnos" description="Inscribe, busca, edita y vincula padres a tus alumnos." name="tutorial-a-inscribe" />
-                <x-tutorial-card icon="cloud-arrow-down" title="Importación Masiva" description="Carga masiva de datos mediante archivos Excel/CSV." name="tutorial-a-import" />
-                <x-tutorial-card icon="cloud-arrow-up" title="Exportación de Datos" description="Genera respaldos y listas en formatos exportables." name="tutorial-a-export" />
-                <x-tutorial-card icon="arrow-up-circle" title="Promover Alumnos" description="Cambia de grupo o ciclo a los alumnos de forma masiva." name="tutorial-a-promote" />
-                <x-tutorial-card icon="tag" title="Tipos de Reportes" description="Gestiona los tipos de infracciones y su nivel de gravedad." name="tutorial-a-report-types" />
-            </div>
-            @endif
+                @if($tab === 'admin')
+                    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <x-tutorial-card icon="users" title="Gestión de Usuarios"
+                            description="Administra cuentas, restablece contraseñas y permisos." name="tutorial-a-users" />
+                        <x-tutorial-card icon="arrow-path" title="Control de Ciclos"
+                            description="Configura periodos escolares y activa el ciclo vigente." name="tutorial-a-cycles" />
+                        <x-tutorial-card icon="document-duplicate" title="Editar Reglamento"
+                            description="Actualiza la normativa institucional en tiempo real." name="tutorial-a-regulations" />
+                        <x-tutorial-card icon="user-plus" title="Gestión de Alumnos"
+                            description="Inscribe, busca, edita y vincula padres a tus alumnos." name="tutorial-a-inscribe" />
+                        <x-tutorial-card icon="cloud-arrow-down" title="Importación Masiva"
+                            description="Carga masiva de datos mediante archivos Excel/CSV." name="tutorial-a-import" />
+                        <x-tutorial-card icon="cloud-arrow-up" title="Exportación de Datos"
+                            description="Genera respaldos y listas en formatos exportables." name="tutorial-a-export" />
+                        <x-tutorial-card icon="arrow-up-circle" title="Promover Alumnos"
+                            description="Cambia de grupo o ciclo a los alumnos de forma masiva." name="tutorial-a-promote" />
+                        <x-tutorial-card icon="tag" title="Tipos de Reportes"
+                            description="Gestiona los tipos de infracciones y su nivel de gravedad."
+                            name="tutorial-a-report-types" />
+                    </div>
+                @endif
             @endcan
 
             @if($tab === 'config')
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <x-tutorial-card icon="device-phone-mobile" title="Instalar en Android" description="Cómo instalar la aplicación en dispositivos Android." name="tutorial-c-install-android" />
-                <x-tutorial-card icon="device-phone-mobile" title="Instalar en iOS" description="Cómo instalar la aplicación en iPhone y iPad." name="tutorial-c-install-ios" />
-                <x-tutorial-card icon="bell-alert" title="Notificaciones" description="Activa las notificaciones push para recibir alertas al instante." name="tutorial-c-notifications" />
-            </div>
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <x-tutorial-card icon="device-phone-mobile" title="Instalar en Android"
+                        description="Cómo instalar la aplicación en dispositivos Android." name="tutorial-c-install-android" />
+                    <x-tutorial-card icon="device-phone-mobile" title="Instalar en iOS"
+                        description="Cómo instalar la aplicación en iPhone y iPad." name="tutorial-c-install-ios" />
+                    <x-tutorial-card icon="bell-alert" title="Notificaciones"
+                        description="Activa las notificaciones push para recibir alertas al instante."
+                        name="tutorial-c-notifications" />
+                </div>
             @endif
         </div>
     @else
         {{-- Article view (Hostinger Style) --}}
-        <div class="animate-in fade-in slide-in-from-left-4 duration-500"
-            x-data="{
-                activeSection: '',
-                init() {
-                    const ids = @js(collect($this->getSections($selectedTutorial))->pluck('id')->toArray());
-                    const observer = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                this.activeSection = entry.target.id;
+        <div class="animate-in fade-in slide-in-from-left-4 duration-500" x-data="{
+                    activeSection: '',
+                    init() {
+                        const ids = @js(collect($this->getSections($selectedTutorial))->pluck('id')->toArray());
+                        const observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting) {
+                                    this.activeSection = entry.target.id;
+                                }
+                            });
+                        }, { rootMargin: '-10% 0px -70% 0px' });
+                        this.$nextTick(() => {
+                            ids.forEach(id => {
+                                const el = document.getElementById(id);
+                                if (el) observer.observe(el);
+                            });
+                        });
+                        const lastId = ids[ids.length - 1];
+                        const self = this;
+                        window.addEventListener('scroll', () => {
+                            if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 50)) {
+                                self.activeSection = lastId;
                             }
                         });
-                    }, { rootMargin: '-10% 0px -70% 0px' });
-                    this.$nextTick(() => {
-                        ids.forEach(id => {
-                            const el = document.getElementById(id);
-                            if (el) observer.observe(el);
-                        });
-                    });
-                    const lastId = ids[ids.length - 1];
-                    const self = this;
-                    window.addEventListener('scroll', () => {
-                        if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 50)) {
-                            self.activeSection = lastId;
-                        }
-                    });
-                }
-            }">
-            <button wire:click="back" class="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white mb-6 group transition-colors">
+                    }
+                }">
+            <button wire:click="back"
+                class="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white mb-6 group transition-colors">
                 <flux:icon icon="arrow-left" variant="micro" class="group-hover:-translate-x-1 transition-transform" />
                 <span class="text-sm font-medium">Volver a tutoriales</span>
             </button>
@@ -3752,20 +3809,20 @@ new class extends Component {
                 {{-- Sidebar TOC (Desktop) --}}
                 <aside class="hidden lg:block w-72 shrink-0">
                     <div class="sticky top-6">
-                        <flux:heading size="sm" class="uppercase tracking-widest text-zinc-400 mb-4 px-2">En este artículo</flux:heading>
+                        <flux:heading size="sm" class="uppercase tracking-widest text-zinc-400 mb-4 px-2">En este artículo
+                        </flux:heading>
                         <nav class="space-y-1">
                             @foreach($this->getSections($selectedTutorial) as $section)
                                 <a href="#{{ $section['id'] }}"
                                     class="flex items-center justify-between group px-3 py-2 rounded-lg transition-all duration-200"
                                     :class="activeSection === '{{ $section['id'] }}'
-                                        ? 'bg-indigo-50 dark:bg-indigo-900/30 border-l-2 border-indigo-500'
-                                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 border-l-2 border-transparent'">
+                                                ? 'bg-indigo-50 dark:bg-indigo-900/30 border-l-2 border-indigo-500'
+                                                : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 border-l-2 border-transparent'">
                                     <span class="text-sm transition-colors duration-200"
                                         :class="activeSection === '{{ $section['id'] }}'
-                                            ? 'text-indigo-600 dark:text-indigo-400 font-semibold'
-                                            : 'text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'">{{ $section['title'] }}</span>
-                                    <flux:icon icon="chevron-right" variant="micro"
-                                        class="transition-colors duration-200"
+                                                    ? 'text-indigo-600 dark:text-indigo-400 font-semibold'
+                                                    : 'text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'">{{ $section['title'] }}</span>
+                                    <flux:icon icon="chevron-right" variant="micro" class="transition-colors duration-200"
                                         ::class="activeSection === '{{ $section['id'] }}' ? 'text-indigo-500' : 'text-zinc-300 group-hover:text-indigo-600'" />
                                 </a>
                             @endforeach
@@ -3776,7 +3833,8 @@ new class extends Component {
                 {{-- Mobile TOC Trigger --}}
                 <div class="lg:hidden fixed bottom-6 right-6 z-50">
                     <flux:modal.trigger name="mobile-toc">
-                        <flux:button variant="primary" icon="list-bullet" class="shadow-2xl shadow-indigo-500/50 rounded-full h-14 w-40">
+                        <flux:button variant="primary" icon="list-bullet"
+                            class="shadow-2xl shadow-indigo-500/50 rounded-full h-14 w-40">
                             En este artículo
                         </flux:button>
                     </flux:modal.trigger>
@@ -3788,10 +3846,9 @@ new class extends Component {
                         <nav class="space-y-2">
                             @foreach($this->getSections($selectedTutorial) as $section)
                                 <a href="#{{ $section['id'] }}" x-on:click="$dispatch('close-modal', { name: 'mobile-toc' })"
-                                    class="flex items-center justify-between p-3 rounded-xl border transition-colors"
-                                    :class="activeSection === '{{ $section['id'] }}'
-                                        ? 'border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30'
-                                        : 'border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50'">
+                                    class="flex items-center justify-between p-3 rounded-xl border transition-colors" :class="activeSection === '{{ $section['id'] }}'
+                                                ? 'border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30'
+                                                : 'border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50'">
                                     <span class="text-sm font-medium"
                                         :class="activeSection === '{{ $section['id'] }}' ? 'text-indigo-600 dark:text-indigo-400' : ''">{{ $section['title'] }}</span>
                                     <flux:icon icon="chevron-right" variant="micro"
@@ -3806,18 +3863,24 @@ new class extends Component {
                 <article class="flex-1 max-w-4xl">
                     {{-- Article Header --}}
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <flux:badge size="sm" color="indigo" inset="left" class="uppercase tracking-tighter">{{ $this->getCategory($selectedTutorial) }}</flux:badge>
-                        <flux:badge size="sm" variant="outline" class="uppercase tracking-tighter">Guía Paso a Paso</flux:badge>
+                        <flux:badge size="sm" color="indigo" inset="left" class="uppercase tracking-tighter">
+                            {{ $this->getCategory($selectedTutorial) }}</flux:badge>
+                        <flux:badge size="sm" variant="outline" class="uppercase tracking-tighter">Guía Paso a Paso
+                        </flux:badge>
                     </div>
 
                     <flux:heading size="3xl" level="1" class="mb-6">{{ $this->getTitle($selectedTutorial) }}</flux:heading>
 
                     <div class="flex items-center gap-6 mb-12 py-6 border-y border-zinc-100 dark:border-zinc-800">
                         <div class="flex items-center gap-2">
-                            <div class="h-8 w-8 rounded-full bg-linear-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-[10px] text-white font-black shadow-sm">SM</div>
-                            <span class="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-tighter">Equipo de Soporte SM</span>
+                            <div
+                                class="h-8 w-8 rounded-full bg-linear-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-[10px] text-white font-black shadow-sm">
+                                SM</div>
+                            <span class="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-tighter">Equipo
+                                de Soporte SM</span>
                         </div>
-                        <div class="text-xs text-zinc-400 font-medium uppercase tracking-widest">{{ now()->format('d M, Y') }}</div>
+                        <div class="text-xs text-zinc-400 font-medium uppercase tracking-widest">
+                            {{ now()->format('d M, Y') }}</div>
                         <div class="text-xs text-zinc-400 font-medium flex items-center gap-1.5 uppercase tracking-widest">
                             <flux:icon icon="clock" variant="micro" class="text-zinc-300" />
                             Lectura de {{ $this->getReadTime($selectedTutorial) }} min
@@ -3825,7 +3888,8 @@ new class extends Component {
                     </div>
 
                     {{-- Main Content (Rendered from a separate method/component for cleanliness) --}}
-                    <div class="prose prose-indigo dark:prose-invert max-w-none prose-h2:text-2xl prose-h2:font-black prose-h2:mt-24 prose-h2:mb-10 prose-h2:pt-12 prose-h2:border-t prose-h2:border-zinc-100 dark:prose-h2:border-zinc-800 prose-p:text-zinc-600 dark:prose-p:text-zinc-400 prose-p:leading-relaxed prose-li:text-zinc-600 dark:prose-li:text-zinc-400">
+                    <div
+                        class="prose prose-indigo dark:prose-invert max-w-none prose-h2:text-2xl prose-h2:font-black prose-h2:mt-24 prose-h2:mb-10 prose-h2:pt-12 prose-h2:border-t prose-h2:border-zinc-100 dark:prose-h2:border-zinc-800 prose-p:text-zinc-600 dark:prose-p:text-zinc-400 prose-p:leading-relaxed prose-li:text-zinc-600 dark:prose-li:text-zinc-400">
                         {!! $this->getContent($selectedTutorial) !!}
                     </div>
                 </article>
@@ -3834,9 +3898,22 @@ new class extends Component {
     @endif
 
     <style>
-        .wrap-break-word { word-break: break-all; }
-        aside.sticky { height: calc(100vh - 3rem); }
-        article h2 { scroll-margin-top: 5rem; }
-        article h2:first-of-type { border-top: none !important; padding-top: 0 !important; margin-top: 2rem !important; }
+        .wrap-break-word {
+            word-break: break-all;
+        }
+
+        aside.sticky {
+            height: calc(100vh - 3rem);
+        }
+
+        article h2 {
+            scroll-margin-top: 5rem;
+        }
+
+        article h2:first-of-type {
+            border-top: none !important;
+            padding-top: 0 !important;
+            margin-top: 2rem !important;
+        }
     </style>
 </div>

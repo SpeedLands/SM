@@ -85,10 +85,68 @@ class ExcelImportService
     }
 
     /**
+     * Guess column mapping based on headers.
+     */
+    public function guessMapping(array $headers, string $type): array
+    {
+        $headers = array_map(fn ($h) => mb_strtolower(trim((string) $h), 'UTF-8'), $headers);
+        $mappings = $this->getColumnMappings($type);
+        $guessed = [];
+
+        $synonyms = [
+            'name' => ['nombre', 'alumno', 'estudiante', 'nombre del alumno', 'nombre completo', 'parent', 'padre', 'madre', 'tutor'],
+            'email' => ['correo', 'email', 'e-mail', 'correo electrónico', 'usuario'],
+            'password' => ['password', 'contraseña', 'clave', 'pass'],
+            'role' => ['rol', 'tipo', 'nivel'],
+            'phone' => ['teléfono', 'telefono', 'celular', 'móvil', 'movil', 'tel'],
+            'occupation' => ['ocupación', 'ocupacion', 'trabajo', 'oficio'],
+            'turn' => ['turno', 'horario'],
+            'group' => ['grado/grupo', 'grado', 'grupo', 'sección', 'seccion', 'aula'],
+            'address' => ['dirección', 'direccion', 'domicilio', 'calle'],
+            'other_contact' => ['otro contacto', 'contacto alternativo', 'referencia'],
+            'curp' => ['curp', 'clave curp'],
+        ];
+
+        foreach ($mappings as $mapping) {
+            $field = $mapping['field'];
+            $fieldSynonyms = $synonyms[$field] ?? [$field];
+
+            $found = false;
+            foreach ($headers as $idx => $header) {
+                if (empty($header)) {
+                    continue;
+                }
+
+                foreach ($fieldSynonyms as $synonym) {
+                    if (str_contains($header, $synonym) || str_contains($synonym, $header)) {
+                        $guessed[$field] = $idx;
+                        $found = true;
+                        break 2;
+                    }
+                }
+            }
+
+            if (! $found) {
+                $guessed[$field] = $mapping['index']; // Fallback to default index
+            }
+        }
+
+        return $guessed;
+    }
+
+    /**
      * Import data based on type and sheet.
      */
-    public function import(UploadedFile $file, string $type, int $sheetIndex, ?int $parentSheetIndex = null): array
-    {
+    public function import(
+        UploadedFile $file,
+        string $type,
+        int $sheetIndex,
+        ?int $parentSheetIndex = null,
+        array $columnMapping = [],
+        ?UploadedFile $parentFile = null,
+        bool $dryRun = false,
+        array $parentColumnMapping = []
+    ): array {
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
         $sheetNames = $spreadsheet->getSheetNames();
         $sheetName = $sheetNames[$sheetIndex] ?? '';
@@ -109,19 +167,53 @@ class ExcelImportService
         }
 
         $rows = collect($sheets[$sheetIndex]);
+
+        // Handle separate parent file if provided
+        $parentRows = null;
+        if ($parentFile) {
+            $parentSpreadsheet = Excel::toArray(new class implements \Maatwebsite\Excel\Concerns\ToArray
+            {
+                public function array(array $array)
+                {
+                    return $array;
+                }
+            }, $parentFile);
+
+            if (isset($parentSpreadsheet[$parentSheetIndex ?? 0])) {
+                $parentRows = collect($parentSpreadsheet[$parentSheetIndex ?? 0]);
+            }
+        } elseif ($parentSheetIndex !== null) {
+            $parentRows = collect($sheets[$parentSheetIndex]);
+        }
+
         // Increase execution time limit to 5 minutes for bulk imports
         set_time_limit(300);
 
         // Remove header
         $header = $rows->shift();
+        if ($parentRows && ! $parentFile) {
+            $parentRows->shift();
+        } elseif ($parentRows && $parentFile) {
+            $parentRows->shift();
+        }
 
-        return DB::transaction(function () use ($rows, $type, $sheets, $parentSheetIndex, $context) {
-            $stats = match ($type) {
-                'TEACHERS' => $this->importTeachers($rows),
-                'PARENTS' => $this->importParents($rows, $context['grade'], $context['section']),
-                'STUDENTS' => $this->importStudents($rows, $parentSheetIndex !== null ? collect($sheets[$parentSheetIndex]) : null, $context['grade'], $context['section']),
-                default => throw new \Exception("Invalid import type: {$type}"),
-            };
+        if ($parentSheetIndex !== null && $sheetIndex === $parentSheetIndex) {
+            throw new \Exception('No puedes seleccionar la misma hoja para alumnos y padres.');
+        }
+
+        if ($dryRun) {
+            DB::beginTransaction();
+        }
+
+        try {
+            $stats = DB::transaction(function () use ($rows, $type, $parentRows, $context, $columnMapping, $parentColumnMapping) {
+                return match ($type) {
+                    'TEACHERS' => $this->importTeachers($rows, $columnMapping),
+                    'PARENTS' => $this->importParents($rows, $context['grade'], $context['section'], $columnMapping),
+                    'STUDENTS' => $this->importStudents($rows, $parentRows, $context['grade'], $context['section'], $columnMapping, $parentColumnMapping),
+                    default => throw new \Exception("Invalid import type: {$type}"),
+                };
+            });
 
             // Post-import: Check for students missing parents in the active cycle
             if (($type === 'STUDENTS' || $type === 'PARENTS') && isset($stats['touched_student_ids'])) {
@@ -131,21 +223,51 @@ class ExcelImportService
                 );
             }
 
+            if ($dryRun) {
+                DB::rollBack();
+                $stats['is_simulation'] = true;
+                $stats['notifications']['warnings'][] = [
+                    'message' => 'ESTA ES UNA SIMULACIÓN. No se han guardado cambios permanentes.',
+                ];
+            }
+
             return $stats;
-        });
+        } catch (\Exception $e) {
+            if ($dryRun) {
+                DB::rollBack();
+            }
+            throw $e;
+        }
     }
 
     /**
      * Parse grade and section from sheet name (e.g. "3A", "3A MATUTINO", "TERCERO A")
      */
-    private function extractGradeAndSection(string $sheetName): array
+    public function extractGradeAndSection(string $sheetName): array
     {
         $grade = '1º'; // Default
         $section = 'A'; // Default (Valid group)
 
-        if (preg_match('/(\d+)([A-Z])/i', $sheetName, $matches)) {
-            $grade = $matches[1].'º';
-            $section = strtoupper($matches[2]);
+        // Normalize: remove accents, uppercase
+        $normalized = strtoupper($this->stripAccents($sheetName));
+
+        // Map ordinal words to numbers
+        $search = ['PRIMERO', 'SEGUNDO', 'TERCERO', 'CUARTO', 'QUINTO', 'SEXTO'];
+        $replace = ['1', '2', '3', '4', '5', '6'];
+        $normalized = str_replace($search, $replace, $normalized);
+
+        // Step 1: Find the first continuous sequence of digits
+        if (preg_match('/(\d+)/', $normalized, $numMatches, PREG_OFFSET_CAPTURE)) {
+            $gradeNum = $numMatches[0][0];
+            $grade = $gradeNum.'º';
+            $offset = $numMatches[0][1] + strlen($gradeNum);
+            $after = substr($normalized, $offset);
+
+            // Step 2: Find the first single isolated letter after the number
+            // Skips noise like "GRADO", "ERO", "°", "º", etc. by looking for a \bWordBoundary\b
+            if (preg_match('/(?:[^A-Z]|\b[A-Z]{2,}\b)*\b([A-Z])\b/i', $after, $letterMatches)) {
+                $section = strtoupper($letterMatches[1]);
+            }
         }
 
         return [
@@ -196,25 +318,27 @@ class ExcelImportService
         return $items;
     }
 
-    protected function importTeachers(Collection $rows): array
+    protected function importTeachers(Collection $rows, array $columnMapping): array
     {
-        $stats = ['created' => 0, 'updated' => 0, 'errors' => 0];
+        $stats = ['created' => 0, 'updated' => 0, 'total' => 0, 'errors' => 0];
 
         foreach ($rows as $row) {
             try {
-                // Excel Structure: Nombre | Correo | Contraseña | Rol
-                // Index: 0, 1, 2, 3
+                $emailIdx = $columnMapping['email'] ?? 1;
+                $nameIdx = $columnMapping['name'] ?? 0;
+                $passwordIdx = $columnMapping['password'] ?? 2;
+                $roleIdx = $columnMapping['role'] ?? 3;
 
-                $email = $this->sanitizeEmail($row[1] ?? '');
+                $email = $this->sanitizeEmail($row[$emailIdx] ?? '');
 
                 // Silent skip for headers or empty rows
                 if (empty($email) || in_array(strtolower($email), ['correo', 'email', 'e-mail'])) {
                     continue;
                 }
 
-                $name = $row[0] ?? null;
-                $password = $row[2] ?? null;
-                $roleLabel = $row[3] ?? '';
+                $name = $row[$nameIdx] ?? null;
+                $password = $row[$passwordIdx] ?? null;
+                $roleLabel = $row[$roleIdx] ?? '';
 
                 if (! $name || strtolower(trim($name)) === 'nombre') {
                     continue;
@@ -263,7 +387,7 @@ class ExcelImportService
         return $stats;
     }
 
-    public function importParents(Collection $rows, string $currentGrade, string $currentSection): array
+    public function importParents(Collection $rows, string $currentGrade, string $currentSection, array $columnMapping): array
     {
         $report = [
             'summary' => [
@@ -284,17 +408,28 @@ class ExcelImportService
             ],
         ];
 
+        $emailIdx = $columnMapping['email'] ?? 1;
+        $nameIdx = $columnMapping['name'] ?? 0;
+        $phoneIdx = $columnMapping['phone'] ?? 2;
+        $passwordIdx = $columnMapping['password'] ?? 3;
+        $occupationIdx = $columnMapping['occupation'] ?? 5;
+
         // Step 1: Group by email
         $parentsByEmail = [];
         foreach ($rows as $index => $row) {
-            $email = $this->sanitizeEmail($row[1] ?? '');
+            $email = $this->sanitizeEmail($row[$emailIdx] ?? '');
 
             // Silent skip for headers or empty rows
-            if (empty($email) || in_array(strtolower($email), ['correo', 'email', 'e-mail', 'mail'])) {
+            if (empty($email) || in_array(strtolower($email), ['correo', 'email', 'e-mail', 'mail', 'turno', 'grado', 'grupo', 'direccion'])) {
                 continue;
             }
 
             if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                // If it looks like a header (e.g. contains words but no @), just skip without error
+                if (! str_contains($email, '@') && strlen($email) > 2) {
+                    continue;
+                }
+
                 $report['notifications']['errors'][] = [
                     'type' => 'invalid_email',
                     'message' => 'Email inválido',
@@ -312,11 +447,11 @@ class ExcelImportService
 
             $parentsByEmail[$email][] = [
                 'row_index' => $index,
-                'name' => $row[0] ?? null,
+                'name' => $row[$nameIdx] ?? null,
                 'email' => $email,
-                'phone' => $row[2] ?? null,
-                'password' => $row[3] ?? null,
-                'occupation' => $row[5] ?? null,
+                'phone' => $this->sanitizePhone($row[$phoneIdx] ?? null),
+                'password' => $row[$passwordIdx] ?? null,
+                'occupation' => $row[$occupationIdx] ?? null,
             ];
         }
 
@@ -466,11 +601,16 @@ class ExcelImportService
                         'action' => 'Perfil protegido. Alumnos vinculados correctamente.',
                     ];
                 } else {
-                    $user->update([
-                        'name' => $concatenatedName,
-                        'phone' => $phone,
-                        'occupation' => $occupation,
-                    ]);
+                    $user->name = $concatenatedName;
+                    
+                    if (!empty($phone)) {
+                        $user->phone = $phone;
+                    }
+                    if (!empty($occupation)) {
+                        $user->occupation = $occupation;
+                    }
+                    
+                    $user->save();
 
                     // Optimization: Direct update without redundant check to save time
                     if ($password) {
@@ -519,7 +659,7 @@ class ExcelImportService
      */
     private function findStudentInGroupWithDetails(string $studentName, string $grade, string $section): array
     {
-        // 1. Exact match
+        // 1. Exact match in specific group
         $student = Student::where('name', $studentName)
             ->where('grade', $grade)
             ->where('group_name', $section)
@@ -529,7 +669,13 @@ class ExcelImportService
             return ['student' => $student, 'method' => 'exact', 'similarity' => 100];
         }
 
-        // 2. Partial match (LIKE)
+        // 2. Exact match globally (Fallback if sheet name was incorrectly parsed)
+        $student = Student::where('name', $studentName)->first();
+        if ($student) {
+            return ['student' => $student, 'method' => 'exact_global', 'similarity' => 100];
+        }
+
+        // 3. Partial match (LIKE) in specific group
         $student = Student::where('name', 'LIKE', "%{$studentName}%")
             ->where('grade', $grade)
             ->where('group_name', $section)
@@ -539,15 +685,29 @@ class ExcelImportService
             return ['student' => $student, 'method' => 'like', 'similarity' => 95];
         }
 
-        // 3. Fuzzy matching (85% similarity threshold)
-        $candidates = Student::where('grade', $grade)
-            ->where('group_name', $section)
-            ->get();
+        // 4. Partial match (LIKE) globally
+        $student = Student::where('name', 'LIKE', "%{$studentName}%")->first();
+        if ($student) {
+            return ['student' => $student, 'method' => 'like_global', 'similarity' => 95];
+        }
+
+        // 5. Fuzzy matching globally (85% similarity threshold)
+        // Global search because typos are common and the grade/section context might be wrong.
+        static $allStudentsCache = null;
+        if ($allStudentsCache === null) {
+            $allStudentsCache = Student::all(); // Load once per import session
+        }
+        $candidates = $allStudentsCache;
 
         $bestMatch = null;
         $bestSimilarity = 0;
 
         foreach ($candidates as $candidate) {
+            // Optimization: skip obviously different lengths
+            if (abs(strlen($studentName) - strlen($candidate->name)) > 15) {
+                continue;
+            }
+
             similar_text(strtoupper($studentName), strtoupper($candidate->name), $similarity);
             if ($similarity > $bestSimilarity && $similarity >= 85) {
                 $bestMatch = $candidate;
@@ -562,10 +722,10 @@ class ExcelImportService
         return ['student' => null, 'method' => 'none', 'similarity' => 0];
     }
 
-    public function importStudents(Collection $rows, ?Collection $parentRows = null, string $currentGrade = '1º', string $currentSection = 'A'): array
+    public function importStudents(Collection $rows, ?Collection $parentRows = null, string $currentGrade = '1º', string $currentSection = 'A', array $columnMapping = [], array $parentColumnMapping = []): array
     {
         // Guard: detect if user accidentally swapped sheets (parents sheet selected as students)
-        $this->assertNotParentsSheet($rows);
+        $this->assertNotParentsSheet($rows, $columnMapping);
 
         $activeCycle = Cycle::where('is_active', true)->firstOrFail();
         $report = [
@@ -582,19 +742,45 @@ class ExcelImportService
             'touched_student_ids' => [],
         ];
 
-        // Find or Create ClassGroup once
-        $group = ClassGroup::firstOrCreate([
-            'cycle_id' => $activeCycle->id,
-            'grade' => $currentGrade,
-            'section' => $currentSection,
-        ]);
+        $nameIdx = $columnMapping['name'] ?? 0;
+        $turnIdx = $columnMapping['turn'] ?? 1;
+        $groupIdx = $columnMapping['group'] ?? null;
+        $addressIdx = $columnMapping['address'] ?? 3;
+        $phoneIdx = $columnMapping['phone'] ?? 4;
+        $otherIdx = $columnMapping['other_contact'] ?? 5;
+        $curpIdx = $columnMapping['curp'] ?? 6;
+
+        // Cache for ClassGroups to avoid redundant queries in mixed sheets
+        $groupCache = [];
+        $getGroup = function ($grade, $section) use (&$groupCache, $activeCycle) {
+            $key = "{$grade}-{$section}";
+            if (! isset($groupCache[$key])) {
+                $groupCache[$key] = ClassGroup::firstOrCreate([
+                    'cycle_id' => $activeCycle->id,
+                    'grade' => $grade,
+                    'section' => $section,
+                ]);
+            }
+
+            return $groupCache[$key];
+        };
 
         foreach ($rows as $index => $row) {
             try {
-                // Excel Structure: Nombre | Turno | Grado / Grupo | Dirección | Teléfono | Otro Contacto | CURP
-                $name = trim((string) ($row[0] ?? ''));
-                $turn = $row[1] ?? 'MATUTINO';
-                $curp = isset($row[6]) ? trim((string) $row[6]) : null;
+                $name = trim((string) ($row[$nameIdx] ?? ''));
+                $turn = $row[$turnIdx] ?? 'MATUTINO';
+                $curp = isset($row[$curpIdx]) ? trim((string) $row[$curpIdx]) : null;
+
+                // Handle dynamic grade/section if a column is mapped
+                $rowGrade = $currentGrade;
+                $rowSection = $currentSection;
+                if ($groupIdx !== null && isset($row[$groupIdx])) {
+                    $parsed = $this->extractGradeAndSection((string) $row[$groupIdx]);
+                    $rowGrade = $parsed['grade'];
+                    $rowSection = $parsed['section'];
+                }
+
+                $group = $getGroup($rowGrade, $rowSection);
 
                 // Silent skip for headers or empty rows
                 if (empty($name) || in_array(strtolower($name), ['nombre', 'estudiante', 'alumno'])) {
@@ -602,28 +788,46 @@ class ExcelImportService
                 }
 
                 // Create/Update Student - Identified by Name + Grade + Section to prevent overwriting homonyms in different groups
-                $student = Student::updateOrCreate(
-                    [
-                        'name' => $name,
-                        'grade' => $currentGrade,
-                        'group_name' => $currentSection,
-                    ],
-                    [
-                        'curp' => $curp ? strtoupper($curp) : null,
-                        'birth_date' => '2010-01-01', // Default
-                        'turn' => $this->normalizeTurn($turn),
-                    ]
-                );
+                $student = Student::firstOrNew([
+                    'name' => $name,
+                    'grade' => $rowGrade,
+                    'group_name' => $rowSection,
+                ]);
+
+                if ($curp) {
+                    $student->curp = strtoupper($curp);
+                }
+
+                if ($turn) {
+                    $student->turn = $this->normalizeTurn($turn);
+                }
+
+                if (! $student->exists && ! $student->birth_date) {
+                    $student->birth_date = '2010-01-01'; // Default
+                }
+
+                $wasRecentlyCreated = ! $student->exists;
+                $student->save();
 
                 // Handle PII data
-                $student->pii()->updateOrCreate(
-                    ['student_id' => $student->id],
-                    [
-                        'address_encrypted' => $row[3] ?? null,
-                        'contact_phone_encrypted' => $row[4] ?? null,
-                        'other_contact_encrypted' => $row[5] ?? null,
-                    ]
-                );
+                $pii = $student->pii()->firstOrNew(['student_id' => $student->id]);
+                
+                $address = trim((string) ($row[$addressIdx] ?? ''));
+                if ($address !== '') {
+                    $pii->address_encrypted = $address;
+                }
+
+                $cleanPhone = $this->sanitizePhone($row[$phoneIdx] ?? null);
+                if ($cleanPhone !== null) {
+                    $pii->contact_phone_encrypted = $cleanPhone;
+                }
+
+                $cleanOther = $this->sanitizePhone($row[$otherIdx] ?? null);
+                if ($cleanOther !== null) {
+                    $pii->other_contact_encrypted = $cleanOther;
+                }
+
+                $pii->save();
 
                 // Association
                 StudentCycleAssociation::updateOrCreate(
@@ -637,7 +841,7 @@ class ExcelImportService
                     ]
                 );
 
-                if ($student->wasRecentlyCreated) {
+                if ($wasRecentlyCreated) {
                     $report['summary']['students']['created']++;
                 } else {
                     $report['summary']['students']['updated']++;
@@ -655,9 +859,13 @@ class ExcelImportService
             }
         }
 
+        // Use the last row's grade/section for parents if it was populated from the file
+        $finalGrade = $rowGrade ?? $currentGrade;
+        $finalSection = $rowSection ?? $currentSection;
+
         // If parent rows provided (e.g. from another sheet or below), process them
         if ($parentRows && $parentRows->count() > 0) {
-            $parentReport = $this->importParents($parentRows, $currentGrade, $currentSection);
+            $parentReport = $this->importParents($parentRows, $finalGrade, $finalSection, ! empty($parentColumnMapping) ? $parentColumnMapping : $columnMapping);
 
             // Merge results
             $report['summary']['parents'] = $parentReport['summary']['parents'];
@@ -666,6 +874,13 @@ class ExcelImportService
             $report['notifications']['warnings'] = array_merge($report['notifications']['warnings'], $parentReport['notifications']['warnings']);
             $report['notifications']['errors'] = array_merge($report['notifications']['errors'], $parentReport['notifications']['errors']);
             $report['details'] = $parentReport['details'];
+        }
+
+        // If parents weren't processed but we still want the sheet name output correctly
+        if (! isset($report['details']['sheet_name'])) {
+            $report['details'] = [
+                'sheet_name' => "{$finalGrade} {$finalSection}",
+            ];
         }
 
         return $report;
@@ -736,13 +951,14 @@ class ExcelImportService
      * Throw an exception if the rows look like a parents sheet (names follow "Padre de X" pattern).
      * This protects against the user accidentally swapping the student and parent sheets.
      */
-    private function assertNotParentsSheet(Collection $rows): void
+    private function assertNotParentsSheet(Collection $rows, array $columnMapping = []): void
     {
+        $nameIdx = $columnMapping['name'] ?? 0;
         $sample = $rows->take(10);
         $parentLikeCount = 0;
 
         foreach ($sample as $row) {
-            $name = trim((string) ($row[0] ?? ''));
+            $name = trim((string) ($row[$nameIdx] ?? ''));
             if (preg_match('/^(Padre|Madre|Tutor|Papa|Mama|Abuelo|Abuela)\s+de\s+/i', $name)) {
                 $parentLikeCount++;
             }
@@ -780,9 +996,29 @@ class ExcelImportService
 
         $email = trim((string) $email);
 
-        $search = ['ñ', 'Ñ', 'á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú'];
-        $replace = ['n', 'n', 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+        return strtolower($this->stripAccents($email));
+    }
 
-        return str_replace($search, $replace, $email);
+    /**
+     * Sanitize phone numbers. Returns null if the value clearly isn't a phone number.
+     */
+    protected function sanitizePhone($phone): ?string
+    {
+        if (empty($phone)) {
+            return null;
+        }
+
+        $phone = trim((string) $phone);
+
+        // If it contains a word (e.g. "PADRE", "NO TIENE", "N/A"), reject it.
+        // We look for 3 or more consecutive letters.
+        if (preg_match('/[a-zA-Z]{3,}/', $phone)) {
+            return null;
+        }
+
+        // Keep only numbers, plus, minus, parenthesis and spaces
+        $clean = preg_replace('/[^0-9\+\-\(\)\s]/', '', $phone);
+
+        return trim($clean) === '' ? null : trim($clean);
     }
 }
