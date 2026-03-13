@@ -418,6 +418,9 @@ new class extends Component {
                             <div class="text-[10px] font-bold uppercase text-zinc-400 mb-1">Asunto: {{ $report->subject }}</div>
                         @endif
                         <div class="line-clamp-2 italic text-zinc-500">{{ $report->description }}</div>
+                        @if($report->teacher)
+                            <div class="text-[10px] text-zinc-400 mt-1">Generado por: {{ $report->teacher->name }}</div>
+                        @endif
                     </div>
 
                     <div class="flex justify-end gap-1 pt-3 border-t border-zinc-100 dark:border-zinc-800">
@@ -470,6 +473,9 @@ new class extends Component {
                                     <div class="text-xs font-semibold uppercase mt-1 whitespace-normal">Asunto: {{ $report->subject }}</div>
                                 @endif
                                 <div class="text-xs text-zinc-500 whitespace-normal line-clamp-2 italic">{{ $report->description }}</div>
+                                @if($report->teacher)
+                                    <div class="text-[10px] text-zinc-400">Generado por: {{ $report->teacher->name }}</div>
+                                @endif
                             </td>
                             <td class="py-4 px-2 text-center">
                                 @if($report->status === 'SIGNED')
@@ -550,6 +556,10 @@ new class extends Component {
                         "{{ $report->description }}"
                     </div>
 
+                    @if($report->teacher)
+                        <flux:text size="sm" class="text-zinc-500 italic mt-4">Registrado por: Prof(a). {{ $report->teacher->name }}</flux:text>
+                    @endif
+
                     <div class="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800">
                         @if($report->status !== 'SIGNED')
                             <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -619,6 +629,9 @@ new class extends Component {
                                     <div class="text-xs font-semibold uppercase mt-1 whitespace-normal">Asunto: {{ $report->subject }}</div>
                                 @endif
                                 <div class="text-xs text-zinc-500 whitespace-normal line-clamp-2 italic">{{ $report->description }}</div>
+                                @if($report->teacher)
+                                    <div class="text-[10px] text-zinc-400">Generado por: {{ $report->teacher->name }}</div>
+                                @endif
                             </td>
                             <td class="py-4 px-2 text-center">
                                 @if($report->status === 'SIGNED')

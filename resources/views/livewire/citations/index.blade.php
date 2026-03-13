@@ -276,6 +276,9 @@ new class extends Component {
                     <div class="mb-4 bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300">
                         <flux:text size="xs" class="font-bold uppercase text-[9px] text-zinc-400 mb-1">Motivo:</flux:text>
                         <div class="line-clamp-2">{{ $citation->reason }}</div>
+                        @if($citation->teacher)
+                            <div class="text-[10px] text-zinc-400 mt-1">Generado por: {{ $citation->teacher->name }}</div>
+                        @endif
                     </div>
 
                     <div class="flex justify-between items-center mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">

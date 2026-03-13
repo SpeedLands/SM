@@ -349,6 +349,9 @@ new class extends Component {
                         <flux:text size="xs" class="font-bold uppercase text-[9px] text-zinc-400 mb-1">Actividad:</flux:text>
                         <div class="font-medium mb-1">{{ $service->activity }}</div>
                         <div class="line-clamp-2 italic text-zinc-500">{{ $service->description }}</div>
+                        @if($service->assignedBy)
+                            <div class="text-[10px] text-zinc-400 mt-1">Asignado por: {{ $service->assignedBy->name }}</div>
+                        @endif
                     </div>
 
                     <div class="flex justify-between items-center mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
@@ -408,6 +411,9 @@ new class extends Component {
                             <td class="py-4 px-2">
                                 <div class="font-medium">{{ $service->activity }}</div>
                                 <div class="text-xs text-zinc-500 line-clamp-1 italic">{{ $service->description }}</div>
+                                @if($service->assignedBy)
+                                    <div class="text-[10px] text-zinc-400">Asignado por: {{ $service->assignedBy->name }}</div>
+                                @endif
                             </td>
                             <td class="py-4 px-2 text-center">
                                 @if($service->status === 'PENDING')

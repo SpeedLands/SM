@@ -130,6 +130,7 @@ new class extends Component {
             $exam->update($data);
             $message = 'Examen actualizado correctamente.';
         } else {
+            $data['created_by'] = auth()->id();
             $exam = ExamSchedule::create($data);
             $message = 'Examen programado correctamente.';
 
@@ -185,7 +186,7 @@ new class extends Component {
         $activeCycle = Cycle::where('is_active', true)->first();
         $isStaff = auth()->user()->isViewStaff();
         
-        $query = ExamSchedule::query()
+        $query = ExamSchedule::with('creator')
             ->when(auth()->user()->isParent(), function ($q) {
                 $students = auth()->user()->students;
                 $grades = $students->pluck('grade')->unique();
@@ -311,6 +312,9 @@ new class extends Component {
                                 </div>
                                 <flux:text size="xs" class="text-zinc-500">{{ $exam->exam_date->format('H:i') == '00:00' ? '' : $exam->exam_date->format('H:i').' hrs' }}</flux:text>
                             </div>
+                            @if($exam->creator)
+                                <div class="mt-2 text-[10px] text-zinc-400">Programado por: {{ $exam->creator->name }}</div>
+                            @endif
                         </div>
                     @endforeach
                 </div>
