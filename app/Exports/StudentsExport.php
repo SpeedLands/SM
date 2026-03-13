@@ -18,6 +18,7 @@ class StudentsExport extends StringValueBinder implements FromCollection, Should
     public function __construct(
         private readonly ?string $groupId = null,
         private readonly ?string $cycleId = null,
+        private readonly bool $includeParents = false,
     ) {}
 
     public function collection()
@@ -73,7 +74,13 @@ class StudentsExport extends StringValueBinder implements FromCollection, Should
         if ($this->groupId) {
             $group = ClassGroup::find($this->groupId);
 
-            return $group ? trim(str_replace(['º', '°'], '', $group->grade)).trim($group->section) : 'Alumnos';
+            if ($group) {
+                $groupLabel = trim(str_replace(['º', '°'], '', $group->grade)).trim($group->section);
+
+                return $this->includeParents ? "ALUMNOS_{$groupLabel}" : $groupLabel;
+            }
+
+            return 'Alumnos';
         }
 
         return 'Alumnos';

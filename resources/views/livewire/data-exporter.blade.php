@@ -13,6 +13,8 @@ new #[Layout('components.layouts.app')] class extends Component {
     public ?string $parentGroupId = null;
     public bool $generatePasswords = false;
     public bool $generateTeacherPasswords = false;
+    public bool $includeParents = false;
+    public bool $generateStudentParentPasswords = false;
     public ?string $attendanceCycleId = null;
     public ?string $attendanceGroupId = null;
     public int $attendanceMonth;
@@ -88,6 +90,14 @@ new #[Layout('components.layouts.app')] class extends Component {
     public function updatedCycleId(): void
     {
         $this->groupId = null;
+        $this->includeParents = false;
+        $this->generateStudentParentPasswords = false;
+    }
+
+    public function updatedGroupId(): void
+    {
+        $this->includeParents = false;
+        $this->generateStudentParentPasswords = false;
     }
     
     public function updatedParentCycleId(): void
@@ -211,6 +221,20 @@ new #[Layout('components.layouts.app')] class extends Component {
                             @endforeach
                         </flux:select>
                     </div>
+                    @if ($groupId)
+                        <flux:switch 
+                            wire:model.live="includeParents" 
+                            label="Incluir padres de familia" 
+                            description="Agrega una hoja adicional con los padres vinculados al grupo." 
+                        />
+                        @if ($includeParents)
+                            <flux:checkbox 
+                                wire:model.live="generateStudentParentPasswords" 
+                                label="Generar nuevas contraseñas para padres" 
+                                description="Asignará una contraseña aleatoria a cada padre exportado." 
+                            />
+                        @endif
+                    @endif
                     <flux:text size="sm" class="flex items-center gap-2">
                             <flux:icon name="information-circle" variant="micro" />
                             Los datos sensibles (PII) se exportarán desencriptados.
@@ -220,7 +244,7 @@ new #[Layout('components.layouts.app')] class extends Component {
                 <div class="mt-auto pt-4 border-t border-zinc-100 dark:border-zinc-800">
                     <flux:button
                         as="a"
-                        :href="route('export.students', ['cycle_id' => $cycleId, 'group_id' => $groupId])"
+                        :href="route('export.students', ['cycle_id' => $cycleId, 'group_id' => $groupId, 'include_parents' => $includeParents, 'generate_passwords' => $generateStudentParentPasswords])"
                         variant="primary"
                         icon="document-arrow-down"
                         class="w-full"
