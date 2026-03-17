@@ -2,12 +2,12 @@
  * CurpCache - IndexedDB-based local cache for student CURP lookups.
  * Pre-loads all CURPs on scanner pages to enable instant client-side validation
  * and reduce server round-trips during QR scanning.
+ * Cache is destroyed on page leave for security.
  */
 const CurpCache = {
     DB_NAME: 'sm_curp_cache',
     STORE_NAME: 'students',
     DB_VERSION: 1,
-    CACHE_DURATION: 60 * 60 * 1000, // 1 hour
 
     _db: null,
 
@@ -60,12 +60,7 @@ const CurpCache = {
                 store.put(student);
             }
 
-            tx.oncomplete = () => {
-                localStorage.setItem('curp_cache_ts', Date.now().toString());
-                localStorage.setItem('curp_cache_count', students.length.toString());
-                resolve(students.length);
-            };
-
+            tx.oncomplete = () => resolve(students.length);
             tx.onerror = () => reject(tx.error);
         });
     },
@@ -87,38 +82,33 @@ const CurpCache = {
     },
 
     /**
-     * Check if the cache is still fresh (within CACHE_DURATION).
-     */
-    isFresh() {
-        const ts = localStorage.getItem('curp_cache_ts');
-        if (!ts) return false;
-        return (Date.now() - parseInt(ts)) < this.CACHE_DURATION;
-    },
-
-    /**
-     * Get the number of cached CURPs.
-     */
-    getCount() {
-        return parseInt(localStorage.getItem('curp_cache_count') || '0');
-    },
-
-    /**
-     * Initialize the cache: open DB and populate if stale.
-     * Returns the number of cached CURPs.
+     * Initialize the cache: always fetches fresh data on page load.
      */
     async init(apiUrl) {
-        await this._open();
-        if (!this.isFresh()) {
-            return await this.populate(apiUrl);
-        }
-        return this.getCount();
+        return await this.populate(apiUrl);
     },
 
     /**
-     * Force-refresh the cache regardless of freshness.
+     * Force-refresh the cache.
      */
     async refresh(apiUrl) {
         return await this.populate(apiUrl);
+    },
+
+    /**
+     * Destroy the cache: close DB, delete database, clear references.
+     */
+    async destroy() {
+        if (this._db) {
+            this._db.close();
+            this._db = null;
+        }
+        return new Promise((resolve) => {
+            const request = indexedDB.deleteDatabase(this.DB_NAME);
+            request.onsuccess = () => resolve();
+            request.onerror = () => resolve(); // resolve even on error
+            request.onblocked = () => resolve();
+        });
     },
 };
 

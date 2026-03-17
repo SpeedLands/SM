@@ -221,6 +221,13 @@ new class extends Component {
             async init() {
                 this.setupFocus();
                 await this.loadCache();
+
+                // Clean up cache when navigating away
+                document.addEventListener('livewire:navigating', () => {
+                    if (typeof CurpCache !== 'undefined') {
+                        CurpCache.destroy().catch(() => {});
+                    }
+                });
             },
 
             async loadCache() {

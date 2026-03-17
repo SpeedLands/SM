@@ -55,6 +55,53 @@ Route::middleware(['auth', 'verified'])->group(function () {
         );
     })->name('api.curps');
 
+    // API: Background attendance recording (fire-and-forget from scanner)
+    Route::post('api/attendance', function (\Illuminate\Http\Request $request) {
+        \Illuminate\Support\Facades\Gate::authorize('teacher-or-admin');
+
+        $request->validate([
+            'curp' => 'required|string|max:18',
+        ]);
+
+        $curp = trim(strtoupper($request->input('curp')));
+        $student = \App\Models\Student::where('curp', $curp)->first();
+
+        if (!$student) {
+            return response()->json(['status' => 'error', 'message' => 'CURP no encontrado'], 404);
+        }
+
+        $today = \Illuminate\Support\Carbon::today()->toDateString();
+        $now = \Illuminate\Support\Carbon::now();
+        $status = 'PRESENTE';
+        $graceMinutes = (int) \App\Models\Setting::get('attendance.grace_minutes', 10);
+
+        if ($student->turn === 'MATUTINO') {
+            $entryTime = \App\Models\Setting::get('attendance.matutino_entry_time', '07:30');
+            $threshold = \Illuminate\Support\Carbon::createFromFormat('H:i', $entryTime)->addMinutes($graceMinutes);
+            if ($now->greaterThan($threshold)) {
+                $status = 'RETARDO';
+            }
+        } elseif ($student->turn === 'VESPERTINO') {
+            $entryTime = \App\Models\Setting::get('attendance.vespertino_entry_time', '13:30');
+            $threshold = \Illuminate\Support\Carbon::createFromFormat('H:i', $entryTime)->addMinutes($graceMinutes);
+            if ($now->greaterThan($threshold)) {
+                $status = 'RETARDO';
+            }
+        }
+
+        $attendance = \App\Models\Attendance::updateOrCreate(
+            ['student_id' => $student->id, 'date' => $today],
+            ['entry_time' => $now->format('H:i:s'), 'status' => $status]
+        );
+
+        return response()->json([
+            'status' => $status,
+            'duplicate' => !$attendance->wasRecentlyCreated,
+            'entry_time' => $now->format('H:i:s'),
+            'student_name' => $student->name,
+        ]);
+    })->name('api.attendance');
+
     Route::post('toggle-view', function () {
         $user = auth()->user();
         if (! $user->hasStudents()) {

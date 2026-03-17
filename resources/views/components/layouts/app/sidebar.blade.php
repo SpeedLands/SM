@@ -471,6 +471,20 @@
 
         <!-- Swipe Gesture for Sidebar (Mobile) -->
         <script>
+            // Clean up CURP IndexedDB cache when not on scanner pages (security: CURPs are PII)
+            (function() {
+                var scannerPaths = ['/asistencia/escanear', '/escaneo-rapido'];
+                function cleanCurpCacheIfNeeded() {
+                    if (scannerPaths.indexOf(window.location.pathname) === -1) {
+                        try { indexedDB.deleteDatabase('sm_curp_cache'); } catch(e) {}
+                    }
+                }
+                cleanCurpCacheIfNeeded();
+                document.addEventListener('livewire:navigated', cleanCurpCacheIfNeeded);
+            })();
+        </script>
+
+        <script>
             (function() {
                 let touchStartX = 0;
                 let touchEndX = 0;
