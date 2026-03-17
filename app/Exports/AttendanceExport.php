@@ -43,18 +43,15 @@ class AttendanceExport implements FromView, WithStyles
             ->get();
 
         $attendances = [];
+        $workingDays = [];
         foreach ($attendancesQuery as $att) {
-            $attendances[$att->student_id][$att->date->format('Y-m-d')] = $att;
-        }
+            $dateStr = $att->date->format('Y-m-d');
+            $attendances[$att->student_id][$dateStr] = $att;
 
-        // Identify "working days" (days with at least one record in the group)
-        $workingDays = Attendance::whereIn('student_id', $students->pluck('id'))
-            ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
-            ->select('date')
-            ->distinct()
-            ->pluck('date')
-            ->map(fn ($date) => Carbon::parse($date)->format('Y-m-d'))
-            ->toArray();
+            if (! in_array($dateStr, $workingDays)) {
+                $workingDays[] = $dateStr;
+            }
+        }
 
         $statusSymbols = [
             'PRESENTE' => '.',

@@ -27,6 +27,7 @@ new class extends Component {
     public array $selectedStudents = [];
     public float $scale = 1.0;
     public bool $bulkMode = false;
+    public bool $showScaleHelp = false;
 
     public function exitBulkMode(): void
     {
@@ -1145,8 +1146,13 @@ new class extends Component {
                 <div class="flex items-center gap-4 grow w-full">
                     <div class="flex flex-col grow min-w-0">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-[10px] text-zinc-500 uppercase font-black">Escala</span>
-                            <span class="text-xs font-mono" x-text="Math.round($wire.scale * 100) + '%'"></span>
+                            <div class="flex items-center gap-1">
+                                <span class="text-[10px] text-zinc-500 uppercase font-black">Escala</span>
+                                <button type="button" x-on:click="$flux.modal('scale-help-modal').show()" class="text-zinc-500 hover:text-white transition-colors">
+                                    <flux:icon name="information-circle" variant="micro" class="size-3" />
+                                </button>
+                            </div>
+                            <span class="text-xs font-mono text-zinc-400" x-text="Math.round($wire.scale * 100) + '% (' + ($wire.scale * 9.8).toFixed(1) + 'x' + ($wire.scale * 6.7).toFixed(1) + ' cm)'"></span>
                         </div>
                         <input type="range" wire:model.live="scale" min="0.5" max="2.0" step="0.1" class="w-full h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
                     </div>
@@ -1185,6 +1191,63 @@ new class extends Component {
             @endforeach
             <input type="hidden" name="scale" value="{{ $scale }}">
         </form>
+
+        <!-- Scale Help Modal -->
+        <flux:modal name="scale-help-modal" class="w-full max-w-md">
+            <div class="space-y-6">
+                <header>
+                    <flux:heading size="lg">Guía de Medidas (Centímetros)</flux:heading>
+                    <flux:text>Referencia de tamaño final según la escala de impresión seleccionada.</flux:text>
+                </header>
+
+                <div class="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-zinc-50 dark:bg-zinc-800 text-zinc-500 uppercase text-[10px] font-bold">
+                            <tr>
+                                <th class="px-4 py-2">Escala</th>
+                                <th class="px-4 py-2">Alto (cm)</th>
+                                <th class="px-4 py-2">Ancho (cm)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                            @php
+                                $measurements = [
+                                    ['s' => '200%', 'h' => '19.6', 'w' => '13.4'],
+                                    ['s' => '190%', 'h' => '18.62', 'w' => '12.73'],
+                                    ['s' => '180%', 'h' => '17.64', 'w' => '12.06'],
+                                    ['s' => '170%', 'h' => '16.66', 'w' => '11.39'],
+                                    ['s' => '160%', 'h' => '15.68', 'w' => '10.72'],
+                                    ['s' => '150%', 'h' => '14.7', 'w' => '10.05'],
+                                    ['s' => '140%', 'h' => '13.72', 'w' => '9.38'],
+                                    ['s' => '130%', 'h' => '12.74', 'w' => '8.71'],
+                                    ['s' => '120%', 'h' => '11.76', 'w' => '8.04'],
+                                    ['s' => '110%', 'h' => '10.78', 'w' => '7.37'],
+                                    ['s' => '100%', 'h' => '9.8', 'w' => '6.7'],
+                                    ['s' => '90%', 'h' => '8.82', 'w' => '6.03'],
+                                    ['s' => '80%', 'h' => '7.84', 'w' => '5.36'],
+                                    ['s' => '70%', 'h' => '6.86', 'w' => '4.69'],
+                                    ['s' => '60%', 'h' => '5.88', 'w' => '4.02'],
+                                    ['s' => '50%', 'h' => '4.9', 'w' => '3.35'],
+                                ];
+                            @endphp
+                            @foreach($measurements as $m)
+                                <tr @class(['bg-blue-50/50 dark:bg-blue-900/10 font-bold' => $m['s'] === '100%'])>
+                                    <td class="px-4 py-1.5">{{ $m['s'] }}</td>
+                                    <td class="px-4 py-1.5">{{ $m['h'] }} cm</td>
+                                    <td class="px-4 py-1.5">{{ $m['w'] }} cm</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-end">
+                    <flux:modal.close>
+                        <flux:button variant="ghost">Cerrar</flux:button>
+                    </flux:modal.close>
+                </div>
+            </div>
+        </flux:modal>
     @endif
 </div>
 

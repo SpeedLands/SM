@@ -21,6 +21,7 @@ class ParentsExport extends StringValueBinder implements FromCollection, ShouldA
         private readonly ?string $groupId = null,
         private readonly ?string $cycleId = null,
         private readonly bool $generatePasswords = false,
+        private readonly bool $includeWithStudents = false,
     ) {}
 
     public function collection()
@@ -123,7 +124,13 @@ class ParentsExport extends StringValueBinder implements FromCollection, ShouldA
         if ($this->groupId) {
             $group = ClassGroup::find($this->groupId);
 
-            return $group ? trim(str_replace(['º', '°'], '', $group->grade)).trim($group->section) : 'Padres';
+            if ($group) {
+                $groupLabel = trim(str_replace(['º', '°'], '', $group->grade)).trim($group->section);
+
+                return $this->includeWithStudents ? "PADRES DE FAMILIA_{$groupLabel}" : $groupLabel;
+            }
+
+            return 'Padres';
         }
 
         return 'Padres';

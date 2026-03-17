@@ -103,7 +103,7 @@ new class extends Component {
         ], [
             'title.required' => 'El título del aviso es obligatorio.',
             'content.required' => 'El contenido o mensaje del aviso es obligatorio.',
-            'targetStudentId.required_if' => 'Debe seleccionar un alumno para este aviso.',
+            'targetStudentId.required_if' => 'Debe seleccionar un alumno.',
             'eventDate.required_if' => 'La fecha de inicio es obligatoria para trabajo en casa.',
             'endDate.required_if' => 'La fecha de término es obligatoria para trabajo en casa.',
             'endDate.after_or_equal' => 'La fecha de término debe ser igual o posterior a la de inicio.',
@@ -729,6 +729,8 @@ new class extends Component {
                                     Alumno seleccionado correctamente.
                                 </div>
                             @endif
+
+                            <flux:error name="targetStudentId" />
                         </div>
                     @endif
 

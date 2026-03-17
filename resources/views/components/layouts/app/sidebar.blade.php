@@ -18,18 +18,19 @@
                 $hasDualRole = ($user->isAdmin() || $user->isTeacher()) && $user->hasStudents();
 
                 if ($isViewParent) {
-                    $reportsCount = $user->getUnsignedReportsCount();
-                    $servicesCount = $user->getUnsignedCommunityServicesCount();
-                    $noticesCount = $user->getUnsignedNoticesCount();
-                    $citationsCount = $user->getUnsignedCitationsCount();
-                    $totalPending = $reportsCount + $servicesCount + $noticesCount + $citationsCount;
+                    $pendingCounts = $user->getPendingNotificationsSummary();
+                    $reportsCount = $pendingCounts['reports'];
+                    $servicesCount = $pendingCounts['services'];
+                    $noticesCount = $pendingCounts['notices'];
+                    $citationsCount = $pendingCounts['citations'];
+                    $totalPending = $pendingCounts['total'];
                 }
             @endphp
 
             <livewire:layout.navigation />
 
             @if($hasDualRole)
-                <div class="px-3 py-4 mt-auto">
+                <div class="px-3 py-2 mt-auto">
                     <form action="{{ route('toggle-view') }}" method="POST">
                         @csrf
                         <flux:button type="submit" variant="filled" icon="{{ $isViewParent ? 'briefcase' : 'user-group' }}" class="w-full justify-start text-xs font-bold uppercase tracking-wider shadow-sm transition-all active:scale-95">
@@ -290,6 +291,16 @@
 
                 window.addEventListener('load', initDateInputs);
                 document.addEventListener('livewire:navigated', initDateInputs);
+
+                // Security: Clean up CURP cache when not on scanner pages
+                const scannerPaths = ['{{ route("attendance.scanner", [], false) }}', '{{ route("global-scanner", [], false) }}'];
+                function cleanCurpCache() {
+                    if (!scannerPaths.includes(window.location.pathname)) {
+                        try { indexedDB.deleteDatabase('sm_curp_cache'); } catch(e) {}
+                    }
+                }
+                cleanCurpCache();
+                document.addEventListener('livewire:navigated', cleanCurpCache);
             });
         </script>
 

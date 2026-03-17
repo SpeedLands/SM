@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\AttendanceExport;
 use App\Exports\ParentsExport;
 use App\Exports\StudentsExport;
+use App\Exports\StudentsWithParentsExport;
 use App\Exports\TeachersExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -40,8 +41,14 @@ class ExportController extends Controller
 
         $groupId = $request->query('group_id');
         $cycleId = $request->query('cycle_id');
+        $includeParents = $request->boolean('include_parents');
+        $generatePasswords = $request->boolean('generate_passwords');
 
         $filename = 'alumnos_'.now()->format('Y-m-d').'.xlsx';
+
+        if ($includeParents && $groupId) {
+            return Excel::download(new StudentsWithParentsExport($groupId, $cycleId, $generatePasswords), $filename);
+        }
 
         return Excel::download(new StudentsExport($groupId, $cycleId), $filename);
     }

@@ -25,7 +25,7 @@ new class extends Component {
     public string $period = '1';
     public string $subject = '';
     public string $examDate = '';
-    
+
     protected array $daysOfWeek = [
         1 => 'Lunes',
         2 => 'Martes',
@@ -71,7 +71,7 @@ new class extends Component {
     public function editExam(string $id): void
     {
         if (!auth()->user()->isViewStaff()) abort(403);
-        
+
         $exam = ExamSchedule::findOrFail($id);
         $this->editingExamId = $id;
         $this->subject = $exam->subject;
@@ -79,7 +79,7 @@ new class extends Component {
         $this->groupName = $exam->group_name;
         $this->period = $exam->period;
         $this->examDate = Carbon::parse($exam->exam_date)->format('Y-m-d');
-        
+
         $this->showCreateModal = true;
     }
 
@@ -109,7 +109,7 @@ new class extends Component {
 
         $date = \Carbon\Carbon::parse($this->examDate);
         $dayNum = $date->dayOfWeekIso; // 1 (Mon) to 7 (Sun)
-        
+
         if ($dayNum > 5) {
             $this->dispatch('notify', ['message' => 'Los exámenes deben ser en días hábiles (Lunes a Viernes).', 'variant' => 'danger']);
             return;
@@ -130,22 +130,23 @@ new class extends Component {
             $exam->update($data);
             $message = 'Examen actualizado correctamente.';
         } else {
+            $data['created_by'] = auth()->id();
             $exam = ExamSchedule::create($data);
             $message = 'Examen programado correctamente.';
 
             // Notify parents of this grade and group
             $students = Student::where('grade', $this->grade)
-                ->whereHas('currentCycleAssociation', function($q) use ($activeCycle) {
+                ->whereHas('currentCycleAssociation', function ($q) use ($activeCycle) {
                     $q->where('cycle_id', $activeCycle->id)
-                      ->whereHas('group', function($sq) {
-                          $sq->where('section', $this->groupName);
-                      });
+                        ->whereHas('group', function ($sq) {
+                            $sq->where('section', $this->groupName);
+                        });
                 })
                 ->with('parents')
                 ->get();
-            
+
             $parents = $students->flatMap(fn($s) => $s->parents)->unique('id');
-            
+
             if ($parents->isNotEmpty()) {
                 \App\Jobs\SendBulkFcmNotifications::dispatch(
                     $parents->pluck('id')->toArray(),
@@ -184,15 +185,15 @@ new class extends Component {
     {
         $activeCycle = Cycle::where('is_active', true)->first();
         $isStaff = auth()->user()->isViewStaff();
-        
-        $query = ExamSchedule::query()
+
+        $query = ExamSchedule::with('creator')
             ->when(auth()->user()->isParent(), function ($q) {
                 $students = auth()->user()->students;
                 $grades = $students->pluck('grade')->unique();
                 $groups = $students->pluck('group_name')->unique();
-                
+
                 $q->whereIn('grade', $grades)
-                  ->whereIn('group_name', $groups);
+                    ->whereIn('group_name', $groups);
             })
             ->when($activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
             ->when($this->periodFilter, fn($q) => $q->where('period', $this->periodFilter))
@@ -227,7 +228,7 @@ new class extends Component {
             <flux:text class="text-zinc-500">Programación de evaluaciones por trimestre.</flux:text>
         </div>
         @if($isStaff)
-            <flux:button variant="primary" icon="plus" wire:click="openCreateModal">Programar Examen</flux:button>
+        <flux:button variant="primary" icon="plus" wire:click="openCreateModal">Programar Examen</flux:button>
         @endif
     </div>
 
@@ -251,23 +252,23 @@ new class extends Component {
                     <option value="3">3º Trimestre</option>
                 </flux:select>
             </flux:field>
-     
+
             <flux:field>
                 <flux:label>Grado</flux:label>
                 <flux:select wire:model.live="gradeFilter">
                     <option value="">Todos los grados</option>
                     @foreach($availableGroups->pluck('grade')->unique() as $grade)
-                        <option value="{{ $grade }}">{{ $grade }} Grado</option>
+                    <option value="{{ $grade }}">{{ $grade }} Grado</option>
                     @endforeach
                 </flux:select>
             </flux:field>
-    
+
             <flux:field>
                 <flux:label>Grupo / Sección</flux:label>
                 <flux:select wire:model.live="groupFilter">
                     <option value="">Todos los grupos</option>
                     @foreach($availableGroups->pluck('section')->unique() as $section)
-                        <option value="{{ $section }}">Grupo "{{ $section }}"</option>
+                    <option value="{{ $section }}">Grupo "{{ $section }}"</option>
                     @endforeach
                 </flux:select>
             </flux:field>
@@ -275,63 +276,66 @@ new class extends Component {
     </div>
 
     @if($exams->isEmpty())
-        <div class="py-20 text-center border border-dashed rounded-3xl border-zinc-300 dark:border-zinc-700">
-            <flux:icon icon="academic-cap" class="mx-auto text-zinc-300 mb-4" size="xl" />
-            <flux:heading size="md" class="text-zinc-300">No hay exámenes programados</flux:heading>
-            <flux:text>Seleccione otros filtros o contacte a la administración.</flux:text>
-        </div>
+    <div class="py-20 text-center border border-dashed rounded-3xl border-zinc-300 dark:border-zinc-700">
+        <flux:icon icon="academic-cap" class="mx-auto text-zinc-300 mb-4" size="xl" />
+        <flux:heading size="md" class="text-zinc-300">No hay exámenes programados</flux:heading>
+        <flux:text>Seleccione otros filtros o contacte a la administración.</flux:text>
+    </div>
     @else
-        <!-- Exam Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($exams->groupBy(fn($e) => $e->exam_date->format('Y-m-d')) as $date => $dayExams)
-                <div class="space-y-3">
-                    <div class="flex items-center gap-2 px-1">
-                        <flux:badge color="blue" size="sm" inset="left">{{ \Carbon\Carbon::parse($date)->isoFormat('dddd') }}</flux:badge>
-                        <flux:text size="sm" class="font-bold">{{ \Carbon\Carbon::parse($date)->isoFormat('D [de] MMMM') }}</flux:text>
+    <!-- Exam Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach($exams->groupBy(fn($e) => $e->exam_date->format('Y-m-d')) as $date => $dayExams)
+        <div class="space-y-3">
+            <div class="flex items-center gap-2 px-1">
+                <flux:badge color="blue" size="sm" inset="left">{{ \Carbon\Carbon::parse($date)->isoFormat('dddd') }}</flux:badge>
+                <flux:text size="sm" class="font-bold">{{ \Carbon\Carbon::parse($date)->isoFormat('D [de] MMMM') }}</flux:text>
+            </div>
+
+            @foreach($dayExams as $exam)
+            <div wire:key="exam-{{ $exam->id }}" class="p-4 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm relative group transition-all hover:border-blue-300 hover:shadow-md">
+                <div class="flex justify-between items-start mb-2">
+                    <flux:badge size="xs" color="purple" variant="outline">{{ $exam->period }}º Trimestre</flux:badge>
+                    @if($isStaff)
+                    <div class="flex gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                        <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editExam('{{ $exam->id }}')" title="Editar examen" />
+                        <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="confirmDelete('{{ $exam->id }}')" title="Eliminar examen" />
                     </div>
-
-                    @foreach($dayExams as $exam)
-                        <div wire:key="exam-{{ $exam->id }}" class="p-4 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm relative group transition-all hover:border-blue-300 hover:shadow-md">
-                            <div class="flex justify-between items-start mb-2">
-                                <flux:badge size="xs" color="purple" variant="outline">{{ $exam->period }}º Trimestre</flux:badge>
-                                @if($isStaff)
-                                    <div class="flex gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                                        <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editExam('{{ $exam->id }}')" title="Editar examen" />
-                                        <flux:button variant="ghost" size="sm" icon="trash" color="red" wire:click="confirmDelete('{{ $exam->id }}')" title="Eliminar examen" />
-                                    </div>
-                                @endif
-                            </div>
-
-                            <flux:heading level="4" size="md" class="truncate" title="{{ $exam->subject }}">{{ $exam->subject }}</flux:heading>
-                            
-                            <div class="mt-3 flex items-center justify-between">
-                                <div class="flex items-center gap-1.5">
-                                    <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                                    <flux:text size="sm" class="font-medium">{{ $exam->grade }}"{{ $exam->group_name }}"</flux:text>
-                                </div>
-                                <flux:text size="xs" class="text-zinc-500">{{ $exam->exam_date->format('H:i') == '00:00' ? '' : $exam->exam_date->format('H:i').' hrs' }}</flux:text>
-                            </div>
-                        </div>
-                    @endforeach
+                    @endif
                 </div>
+
+                <flux:heading level="4" size="md" class="truncate" title="{{ $exam->subject }}">{{ $exam->subject }}</flux:heading>
+
+                <div class="mt-3 flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <flux:text size="sm" class="font-medium">{{ $exam->grade }}"{{ $exam->group_name }}"</flux:text>
+                    </div>
+                    <flux:text size="xs" class="text-zinc-500">{{ $exam->exam_date->format('H:i') == '00:00' ? '' : $exam->exam_date->format('H:i').' hrs' }}</flux:text>
+                </div>
+                @if($exam->creator)
+                <div class="mt-2 text-[10px] text-zinc-400">Programado por: {{ $exam->creator->name }}</div>
+                @endif
+            </div>
             @endforeach
         </div>
+        @endforeach
+    </div>
 
-        <!-- Delete Confirmation Modal -->
-        <flux:modal name="delete-exam" wire:model="showDeleteModal" class="md:w-96">
-            <div class="space-y-6">
-                <div>
-                    <flux:heading size="lg">¿Eliminar examen?</flux:heading>
-                    <flux:text class="mt-2 text-zinc-500">Esta acción no se puede deshacer. Los alumnos y padres dejarán de ver esta fecha de evaluación.</flux:text>
-                </div>
-
-                <div class="flex gap-2">
-                    <flux:spacer />
-                    <flux:button wire:click="$set('showDeleteModal', false)">Cancelar</flux:button>
-                    <flux:button variant="danger" wire:click="deleteExam">Eliminar</flux:button>
-                </div>
+    <!-- Delete Confirmation Modal -->
+    <flux:modal name="delete-exam" wire:model="showDeleteModal" class="md:w-96">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">¿Eliminar examen?</flux:heading>
+                <flux:text class="mt-2 text-zinc-500">Esta acción no se puede deshacer. Los alumnos y padres dejarán de ver esta fecha de evaluación.</flux:text>
             </div>
-        </flux:modal>
+
+            <div class="flex gap-2">
+                <flux:spacer />
+                <flux:button wire:click="$set('showDeleteModal', false)">Cancelar</flux:button>
+                <flux:button variant="danger" wire:click="deleteExam">Eliminar</flux:button>
+            </div>
+        </div>
+    </flux:modal>
     @endif
 
     <!-- Create Modal -->
@@ -344,22 +348,22 @@ new class extends Component {
 
             <div class="space-y-4">
                 @if($isWeekend)
-                    <flux:callout variant="danger" icon="exclamation-triangle">
-                        La fecha seleccionada es fin de semana. Los exámenes deben programarse de Lunes a Viernes.
-                    </flux:callout>
+                <flux:callout variant="danger" icon="exclamation-triangle">
+                    La fecha seleccionada es fin de semana. Los exámenes deben programarse de Lunes a Viernes.
+                </flux:callout>
                 @endif
-                
+
                 <flux:input wire:model.live="subject" label="Nombre de la Materia" placeholder="Ej: Matemáticas I, Historia, Geografía..." />
 
                 <div class="grid grid-cols-2 gap-4">
                     <flux:select wire:model="grade" label="Grado">
                         @foreach($availableGroups->pluck('grade')->unique() as $g)
-                            <option value="{{ $g }}">{{ $g }} Grado</option>
+                        <option value="{{ $g }}">{{ $g }} Grado</option>
                         @endforeach
                     </flux:select>
                     <flux:select wire:model="groupName" label="Grupo">
                         @foreach($availableGroups->pluck('section')->unique() as $s)
-                            <option value="{{ $s }}">Sección "{{ $s }}"</option>
+                        <option value="{{ $s }}">Sección "{{ $s }}"</option>
                         @endforeach
                     </flux:select>
                 </div>
@@ -372,7 +376,7 @@ new class extends Component {
                     </flux:select>
                     <flux:input type="date" wire:model.live="examDate" label="Fecha del Examen" />
                 </div>
-                
+
                 <flux:text size="xs" class="text-zinc-500 italic">El día de la semana se calculará automáticamente.</flux:text>
             </div>
 

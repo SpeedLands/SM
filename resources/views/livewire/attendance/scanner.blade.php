@@ -8,20 +8,42 @@ use Illuminate\Support\Carbon;
 
 new class extends Component {
     public string $curp = '';
-    public ?Student $lastStudent = null;
+    public ?array $lastStudent = null;
     public string $statusMessage = '';
     public string $statusColor = 'zinc';
     public string $lastEntryTime = '';
     public string $lastStatus = '';
     public array $recentScans = [];
     public bool $useCamera = false;
+    public bool $isSyncing = false;
+    public int $totalStudents = 0;
+    public int $syncedStudents = 0;
 
     public function mount(): void
     {
         $this->authorize('teacher-or-admin');
+        $this->totalStudents = Student::count();
     }
 
-    public function processScan(): void
+    public function getSyncData(): array
+    {
+        return Student::select('id', 'name', 'curp', 'grade', 'group_name', 'turn')
+            ->get()
+            ->toArray();
+    }
+
+    public function registerAttendance(string $studentId, ?string $time = null): void
+    {
+        $student = Student::find($studentId);
+        if (!$student) {
+            return;
+        }
+
+        $this->curp = $student->curp;
+        $this->processScan($time);
+    }
+
+    public function processScan(?string $manualTime = null): void
     {
         $this->curp = trim(strtoupper($this->curp));
 
@@ -41,8 +63,8 @@ new class extends Component {
             return;
         }
 
-        $today = Carbon::today()->toDateString(); // Force Y-m-d string for SQLite consistency
-        $now = Carbon::now();
+        $today = Carbon::today()->toDateString();
+        $now = $manualTime ? Carbon::parse($manualTime) : Carbon::now();
         $status = 'PRESENTE';
         $graceMinutes = (int) Setting::get('attendance.grace_minutes', 10);
 
@@ -75,7 +97,7 @@ new class extends Component {
                 $this->statusMessage = "Ya se registró asistencia hoy para: $student->name";
                 $this->statusColor = 'amber';
                 $this->lastStatus = 'duplicate';
-                $this->lastStudent = $student;
+                $this->lastStudent = $student->toArray();
                 $this->lastEntryTime = $attendance->entry_time->format('H:i:s');
                 $this->curp = '';
                 $this->dispatch('play-sound', ['type' => 'warning']);
@@ -87,16 +109,16 @@ new class extends Component {
             $this->statusMessage = "Ya se registró asistencia hoy para: $student->name";
             $this->statusColor = 'amber';
             $this->lastStatus = 'duplicate';
-            $this->lastStudent = $student;
+            $this->lastStudent = $student->toArray();
             $this->lastEntryTime = $existing ? $existing->entry_time->format('H:i:s') : $now->format('H:i:s');
             $this->curp = '';
             $this->dispatch('play-sound', ['type' => 'warning']);
             return;
         }
 
-        $this->lastStudent = $student;
+        $this->lastStudent = $student->toArray();
         $this->lastStatus = $status === 'RETARDO' ? 'retardo' : 'success';
-        
+
         $this->statusMessage = $status === 'RETARDO' ? "RETARDO Registrado" : "ASISTENCIA Registrada";
         $this->statusColor = $status === 'RETARDO' ? 'amber' : 'green';
         $this->lastEntryTime = $now->format('H:i:s');
@@ -117,135 +139,177 @@ new class extends Component {
 }; ?>
 
 <div class="max-w-2xl mx-auto py-8 px-4 space-y-6" x-data="scannerComponent()">
-    {{-- html5-qrcode CDN --}}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    {{-- CURP local cache --}}
+    <script src="/js/curp-cache.js"></script>
     {{-- Header --}}
     <div class="flex items-center gap-3">
-        <flux:button :href="route('attendance.index')" icon="arrow-left" variant="subtle" size="sm" title="Volver a asistencia" />
+        <flux:button :href="route('attendance.index')" icon="arrow-left" variant="subtle" size="sm"
+            title="Volver a asistencia" />
         <div class="flex-1">
             <flux:heading size="xl">Escáner de Asistencia</flux:heading>
-            <flux:subheading>Pasa el QR o código de barras por el lector <span x-show="!localUseCamera">o usa la cámara</span></flux:subheading>
+            <flux:subheading>Pasa el QR o código de barras por el lector <span x-show="!localUseCamera">o usa la
+                    cámara</span></flux:subheading>
         </div>
-        <flux:button x-show="!localUseCamera" icon="camera" size="sm" x-on:click="toggleCamera()">Usar Cámara</flux:button>
-        <flux:button x-show="localUseCamera" icon="computer-desktop" size="sm" x-on:click="toggleCamera()" x-cloak>Usar Lector</flux:button>
+        <flux:button x-show="!localUseCamera" icon="camera" size="sm" x-on:click="toggleCamera()">Usar Cámara
+        </flux:button>
+        <flux:button x-show="localUseCamera" icon="computer-desktop" size="sm" x-on:click="toggleCamera()" x-cloak>Usar
+            Lector</flux:button>
+    </div>
+
+    {{-- Cache Status --}}
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-xs">
+            <template x-if="cacheReady">
+                <span class="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+                    <span x-text="cacheCount + ' CURPs en caché'"></span>
+                </span>
+            </template>
+            <template x-if="cacheLoading">
+                <span class="text-zinc-400">Cargando caché de CURPs...</span>
+            </template>
+            <template x-if="!cacheReady && !cacheLoading && cacheError">
+                <span class="text-amber-500">Caché no disponible — modo servidor</span>
+            </template>
+        </div>
+        <button type="button" x-show="cacheReady" x-on:click="refreshCache()" class="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition" title="Actualizar caché">
+            ↻ Actualizar
+        </button>
     </div>
 
     {{-- Scan Area --}}
     <div class="relative" x-show="!localUseCamera">
         {{-- Hidden autofocus input --}}
-        <input
-            autofocus
-            id="scanner-input"
-            type="text"
-            wire:model="curp"
-            wire:keydown.enter="processScan"
-            class="absolute inset-0 opacity-0 cursor-default z-10 w-full h-full"
-            autocomplete="off"
-        />
+        <input autofocus id="scanner-input" type="text" x-model="curpInput" x-on:keydown.enter.prevent="handleScan()"
+            class="absolute inset-0 opacity-0 cursor-default z-10 w-full h-full" autocomplete="off" />
 
         @php
-            $areaConfig = match($lastStatus) {
-                'success'   => ['border' => 'border-green-400 dark:border-green-600', 'bg' => 'bg-green-50 dark:bg-green-950/20', 'icon' => 'check-circle', 'iconColor' => 'text-green-500'],
-                'retardo'   => ['border' => 'border-amber-400 dark:border-amber-600', 'bg' => 'bg-amber-50 dark:bg-amber-950/20', 'icon' => 'clock', 'iconColor' => 'text-amber-500'],
+            $areaConfig = match ($lastStatus) {
+                'success' => ['border' => 'border-green-400 dark:border-green-600', 'bg' => 'bg-green-50 dark:bg-green-950/20', 'icon' => 'check-circle', 'iconColor' => 'text-green-500'],
+                'retardo' => ['border' => 'border-amber-400 dark:border-amber-600', 'bg' => 'bg-amber-50 dark:bg-amber-950/20', 'icon' => 'clock', 'iconColor' => 'text-amber-500'],
                 'duplicate' => ['border' => 'border-amber-300 dark:border-amber-700', 'bg' => 'bg-amber-50/50 dark:bg-amber-950/10', 'icon' => 'information-circle', 'iconColor' => 'text-amber-400'],
-                'error'     => ['border' => 'border-red-400 dark:border-red-600', 'bg' => 'bg-red-50 dark:bg-red-950/20', 'icon' => 'x-circle', 'iconColor' => 'text-red-500'],
-                default     => ['border' => 'border-dashed border-zinc-200 dark:border-zinc-700', 'bg' => 'bg-white dark:bg-zinc-900', 'icon' => 'qr-code', 'iconColor' => 'text-zinc-300 dark:text-zinc-600'],
+                'error' => ['border' => 'border-red-400 dark:border-red-600', 'bg' => 'bg-red-50 dark:bg-red-950/20', 'icon' => 'x-circle', 'iconColor' => 'text-red-500'],
+                default => ['border' => 'border-dashed border-zinc-200 dark:border-zinc-700', 'bg' => 'bg-white dark:bg-zinc-900', 'icon' => 'qr-code', 'iconColor' => 'text-zinc-300 dark:text-zinc-600'],
             };
         @endphp
 
-        <div class="flex flex-col items-center justify-center p-12 {{ $areaConfig['bg'] }} {{ $areaConfig['border'] }} border-4 rounded-3xl transition-all duration-300 {{ !$lastStatus ? 'animate-pulse' : '' }}">
-            <flux:icon
-                :name="$areaConfig['icon']"
-                class="w-20 h-20 mb-4 {{ $areaConfig['iconColor'] }} transition-all duration-300"
-            />
-            <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                {{ $lastStatus ? 'Listo para siguiente lectura' : 'Esperando lectura...' }}
-            </p>
+        <div
+            class="flex flex-col items-center justify-center p-12 {{ $areaConfig['bg'] }} {{ $areaConfig['border'] }} border-4 rounded-3xl transition-all duration-300 {{ !$lastStatus ? 'animate-pulse' : '' }}"
+            :class="{
+                'bg-green-50 dark:bg-green-950/20 border-green-400 dark:border-green-600': lastStatus === 'success',
+                'bg-amber-50 dark:bg-amber-950/20 border-amber-400 dark:border-amber-600': lastStatus === 'retardo',
+                'bg-amber-50/50 dark:bg-amber-950/10 border-amber-300 dark:border-amber-700': lastStatus === 'duplicate',
+                'bg-red-50 dark:bg-red-950/20 border-red-400 dark:border-red-600': lastStatus === 'error',
+                'bg-white dark:bg-zinc-900 border-dashed border-zinc-200 dark:border-zinc-700 animate-pulse': !lastStatus
+            }"
+        >
+            <template x-if="lastStatus === 'success'"><flux:icon name="check-circle" class="w-20 h-20 mb-4 text-green-500" /></template>
+            <template x-if="lastStatus === 'retardo'"><flux:icon name="clock" class="w-20 h-20 mb-4 text-amber-500" /></template>
+            <template x-if="lastStatus === 'duplicate'"><flux:icon name="information-circle" class="w-20 h-20 mb-4 text-amber-400" /></template>
+            <template x-if="lastStatus === 'error'"><flux:icon name="x-circle" class="w-20 h-20 mb-4 text-red-500" /></template>
+            <template x-if="!lastStatus"><flux:icon name="qr-code" class="w-20 h-20 mb-4 text-zinc-300 dark:text-zinc-600" /></template>
+            
+            <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400" x-text="lastStatus ? 'Listo para siguiente lectura' : 'Esperando lectura...'"></p>
         </div>
     </div>
 
     {{-- Camera Area --}}
     <div x-show="localUseCamera" class="space-y-4" x-cloak>
-        <div class="relative max-w-sm mx-auto aspect-square overflow-hidden rounded-3xl border-4 border-zinc-200 dark:border-zinc-700 bg-black" wire:ignore>
+        <div class="relative max-w-sm mx-auto aspect-square overflow-hidden rounded-3xl border-4 border-zinc-200 dark:border-zinc-700 bg-black"
+            wire:ignore>
             {{-- Loading State --}}
-            <div x-show="isStarting" class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900 z-10">
+            <div x-show="isStarting"
+                class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900 z-10">
                 <flux:icon name="camera" class="w-12 h-12 text-zinc-700 animate-pulse mb-4" />
                 <flux:text size="sm" class="text-zinc-500">Iniciando cámara...</flux:text>
             </div>
 
             <div id="reader" class="w-full h-full [&>video]:object-cover [&>video]:w-full [&>video]:h-full"></div>
         </div>
-        
+
         <div class="text-center">
             <flux:text size="sm" class="text-zinc-500">Apunta la cámara al código QR o de barras</flux:text>
         </div>
     </div>
 
     {{-- Feedback Card --}}
-    @if($lastStudent || ($statusMessage && $statusColor === 'red'))
-        <div class="bg-{{ $statusColor }}-50 dark:bg-{{ $statusColor }}-950/20 border border-{{ $statusColor }}-200 dark:border-{{ $statusColor }}-800 rounded-2xl p-5">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-{{ $statusColor }}-100 dark:bg-{{ $statusColor }}-900 rounded-xl flex items-center justify-center shrink-0">
-                    @if($statusColor === 'red')
-                        <flux:icon.x-circle class="w-7 h-7 text-{{ $statusColor }}-600 dark:text-{{ $statusColor }}-400" />
-                    @elseif($statusColor === 'amber')
-                        <flux:icon.clock class="w-7 h-7 text-{{ $statusColor }}-600 dark:text-{{ $statusColor }}-400" />
-                    @else
-                        <flux:icon.check-circle class="w-7 h-7 text-{{ $statusColor }}-600 dark:text-{{ $statusColor }}-400" />
-                    @endif
+    <div x-show="lastStudent || (statusMessage && lastStatus === 'error')" x-cloak
+        class="rounded-2xl p-5 border transition-all duration-300"
+        :class="{
+            'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800': lastStatus === 'success',
+            'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800': lastStatus === 'retardo' || lastStatus === 'duplicate',
+            'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800': lastStatus === 'error',
+        }">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0"
+                :class="{
+                    'bg-green-100 dark:bg-green-900': lastStatus === 'success',
+                    'bg-amber-100 dark:bg-amber-900': lastStatus === 'retardo' || lastStatus === 'duplicate',
+                    'bg-red-100 dark:bg-red-900': lastStatus === 'error',
+                }">
+                <template x-if="lastStatus === 'success'"><flux:icon name="check-circle" class="w-7 h-7 text-green-600 dark:text-green-400" /></template>
+                <template x-if="lastStatus === 'retardo'"><flux:icon name="clock" class="w-7 h-7 text-amber-600 dark:text-amber-400" /></template>
+                <template x-if="lastStatus === 'duplicate'"><flux:icon name="information-circle" class="w-7 h-7 text-amber-600 dark:text-amber-400" /></template>
+                <template x-if="lastStatus === 'error'"><flux:icon name="x-circle" class="w-7 h-7 text-red-600 dark:text-red-400" /></template>
+            </div>
+
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold text-white uppercase"
+                        :class="{
+                            'bg-green-500': lastStatus === 'success',
+                            'bg-amber-500': lastStatus === 'retardo' || lastStatus === 'duplicate',
+                            'bg-red-500': lastStatus === 'error',
+                        }" x-text="statusMessage"></span>
+                    <span x-show="lastEntryTime" class="font-mono text-lg font-bold"
+                        :class="{
+                            'text-green-700 dark:text-green-300': lastStatus === 'success',
+                            'text-amber-700 dark:text-amber-300': lastStatus === 'retardo' || lastStatus === 'duplicate',
+                            'text-red-700 dark:text-red-300': lastStatus === 'error',
+                        }" x-text="lastEntryTime"></span>
                 </div>
 
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between gap-2 mb-1">
-                        <flux:badge color="{{ $statusColor }}" variant="solid" size="sm" class="uppercase font-bold">
-                            {{ $statusMessage }}
-                        </flux:badge>
-                        @if($lastEntryTime)
-                            <span class="font-mono text-lg font-bold text-{{ $statusColor }}-700 dark:text-{{ $statusColor }}-300">
-                                {{ $lastEntryTime }}
-                            </span>
-                        @endif
-                    </div>
-
-                    @if($lastStudent)
-                        <p class="font-bold text-zinc-900 dark:text-white truncate uppercase">{{ $lastStudent->name }}</p>
+                <template x-if="lastStudent">
+                    <div>
+                        <p class="font-bold text-zinc-900 dark:text-white truncate uppercase" x-text="lastStudent.name"></p>
                         <div class="flex gap-2 mt-1">
-                            <flux:badge variant="subtle" size="sm">{{ $lastStudent->grade }} {{ $lastStudent->group_name }}</flux:badge>
-                            <flux:badge variant="subtle" size="sm">{{ $lastStudent->turn }}</flux:badge>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300" x-text="lastStudent.grade + ' ' + lastStudent.group_name"></span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300" x-text="lastStudent.turn"></span>
                         </div>
-                    @else
-                        <p class="text-sm text-red-600 dark:text-red-400">CURP no encontrado en el sistema</p>
-                    @endif
-                </div>
+                    </div>
+                </template>
+                <template x-if="lastStatus === 'error' && !lastStudent">
+                    <p class="text-sm text-red-600 dark:text-red-400">CURP no encontrado en el sistema</p>
+                </template>
             </div>
         </div>
-    @endif
+    </div>
 
     {{-- Recent Scans --}}
-    @if(count($recentScans) > 0)
-        <div>
-            <flux:text variant="subtle" class="text-xs font-medium mb-2 uppercase tracking-wide">Últimos registros</flux:text>
-            <div class="space-y-1.5">
-                @foreach($recentScans as $scan)
-                    <div class="flex items-center justify-between px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-                        <div class="flex items-center gap-3">
-                            <div class="w-2 h-2 rounded-full bg-{{ $scan['color'] }}-500"></div>
-                            <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300 truncate max-w-48">{{ $scan['name'] }}</span>
-                        </div>
-                        <div class="flex items-center gap-2 shrink-0">
-                            <flux:badge color="{{ $scan['color'] }}" size="sm" variant="subtle">{{ $scan['status'] }}</flux:badge>
-                            <span class="font-mono text-xs text-zinc-400">{{ $scan['time'] }}</span>
-                        </div>
+    <div x-show="recentScans.length > 0" x-cloak>
+        <flux:text variant="subtle" class="text-xs font-medium mb-2 uppercase tracking-wide">Últimos registros
+        </flux:text>
+        <div class="space-y-1.5">
+            <template x-for="(scan, i) in recentScans" :key="i">
+                <div
+                    class="flex items-center justify-between px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full" :class="'bg-' + scan.color + '-500'"></div>
+                        <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300 truncate max-w-48" x-text="scan.name"></span>
                     </div>
-                @endforeach
-            </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px]" :class="'bg-' + scan.color + '-100 text-' + scan.color + '-700 dark:bg-' + scan.color + '-900 dark:text-' + scan.color + '-300'" x-text="scan.status"></span>
+                        <span class="font-mono text-xs text-zinc-400" x-text="scan.time"></span>
+                    </div>
+                </div>
+            </template>
         </div>
-    @endif
+    </div>
 
     {{-- Re-focus button --}}
     <div class="text-center" x-show="!localUseCamera">
-        <flux:button variant="subtle" size="sm" icon="cursor-arrow-rays"
-            title="Enfocar cursor para escanear"
+        <flux:button variant="subtle" size="sm" icon="cursor-arrow-rays" title="Enfocar cursor para escanear"
             x-on:click="document.getElementById('scanner-input').focus()">
             Re-enfocar escáner
         </flux:button>
@@ -256,12 +320,52 @@ new class extends Component {
         Alpine.data('scannerComponent', () => ({
             localUseCamera: false,
             html5QrCode: null,
-            lastScan: null,
             scanCooldown: false,
             isStarting: false,
+            curpInput: '',
 
-            init() {
+            // Cache state
+            cacheReady: false,
+            cacheLoading: false,
+            cacheCount: 0,
+            cacheError: false,
+
+            // UI state (Alpine-only)
+            lastStudent: @entangle('lastStudent'),
+            lastStatus: @entangle('lastStatus'),
+            statusMessage: @entangle('statusMessage'),
+            lastEntryTime: @entangle('lastEntryTime'),
+            recentScans: @entangle('recentScans'),
+
+            async init() {
                 this.setupFocus();
+                await this.loadCache();
+            },
+
+            async loadCache() {
+                if (typeof CurpCache === 'undefined') return;
+                this.cacheLoading = true;
+                try {
+                    this.cacheCount = await CurpCache.init('{{ route("api.curps") }}');
+                    this.cacheReady = true;
+                } catch (e) {
+                    console.warn('CURP cache init failed:', e);
+                    this.cacheError = true;
+                }
+                this.cacheLoading = false;
+            },
+
+            async refreshCache() {
+                if (typeof CurpCache === 'undefined') return;
+                this.cacheLoading = true;
+                try {
+                    this.cacheCount = await CurpCache.refresh('{{ route("api.curps") }}');
+                    this.cacheReady = true;
+                    this.cacheError = false;
+                } catch (e) {
+                    console.warn('CURP cache refresh failed:', e);
+                }
+                this.cacheLoading = false;
             },
 
             setupFocus() {
@@ -273,6 +377,66 @@ new class extends Component {
                     if (this.localUseCamera) return;
                     if (e.target !== input) input?.focus();
                 });
+            },
+
+            async handleScan(decodedText) {
+                const curp = (decodedText || this.curpInput || '').trim().toUpperCase();
+                if (!curp) return;
+                if (this.scanCooldown) return;
+
+                this.scanCooldown = true;
+                this.curpInput = '';
+
+                // 1. Instant identification using local cache
+                if (this.cacheReady) {
+                    const cached = await CurpCache.lookup(curp);
+                    if (cached) {
+                        // Instant UI update
+                        this.lastStudent = cached;
+                        this.lastStatus = 'success'; // Default for instant, server will refine
+                        this.statusMessage = 'Identificado';
+                        this.lastEntryTime = new Date().toTimeString().slice(0, 8);
+                        
+                        playLocalSound('success');
+
+                        // Background sync to server
+                        this.registerAttendanceBackground(curp);
+                        
+                        setTimeout(() => { this.scanCooldown = false; }, 1500);
+                        return;
+                    }
+                }
+
+                // 2. Fallback to Livewire for unknown CURPs or if cache fails
+                $wire.curp = curp;
+                await $wire.processScan();
+                setTimeout(() => { this.scanCooldown = false; }, 3000);
+            },
+
+            async registerAttendanceBackground(curp) {
+                try {
+                    const res = await fetch('{{ route("api.attendance") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ curp: curp })
+                    });
+                    const data = await res.json();
+                    
+                    // Refine local status with server data
+                    this.lastStatus = data.duplicate ? 'duplicate' : (data.status === 'RETARDO' ? 'retardo' : 'success');
+                    this.statusMessage = data.duplicate ? 'Ya registrado' : (data.status === 'RETARDO' ? 'RETARDO Registrado' : 'ASISTENCIA Registrada');
+                    this.lastEntryTime = data.entry_time;
+                    
+                    if (data.status === 'RETARDO') playLocalSound('warning');
+
+                    // Sync Livewire state to keep recentScans in sync
+                    $wire.$refresh();
+                } catch (e) {
+                    console.error('Background attendance failed:', e);
+                }
             },
 
             toggleCamera() {
@@ -288,11 +452,11 @@ new class extends Component {
             async startCamera() {
                 this.html5QrCode = new Html5Qrcode("reader");
                 const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-                
+
                 try {
                     await this.html5QrCode.start(
-                        { facingMode: "environment" }, 
-                        config, 
+                        { facingMode: "environment" },
+                        config,
                         (decodedText) => this.onScanSuccess(decodedText)
                     );
                     this.isStarting = false;
@@ -317,46 +481,9 @@ new class extends Component {
 
             onScanSuccess(decodedText) {
                 if (this.scanCooldown) return;
-                
-                this.scanCooldown = true;
-
-                this.lastScan = decodedText;
-                $wire.curp = this.lastScan;
-                $wire.processScan();
-
-                // Cooldown of 3 seconds between scans to avoid double scans
-                setTimeout(() => {
-                    this.scanCooldown = false;
-                }, 3000);
+                this.handleScan(decodedText);
             }
         }));
-
-        Livewire.on('play-sound', (params) => {
-            const type = params[0].type;
-            const sequences = {
-                'success': [[660, 0.15], [880, 0.15]],
-                'error':   [[440, 0.2], [220, 0.3]],
-                'warning': [[520, 0.15], [520, 0.15]],
-            };
-
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            if (ctx.state === 'suspended') ctx.resume();
-
-            sequences[type].forEach(([freq, dur], i) => {
-                setTimeout(() => {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start();
-                    osc.stop(ctx.currentTime + dur);
-                }, i * 200);
-            });
-        });
     </script>
     @endscript
 </div>
