@@ -48,6 +48,8 @@ new class extends Component {
 <div class="max-w-2xl mx-auto py-8 px-4 space-y-6" x-data="globalScannerComponent()">
     {{-- html5-qrcode CDN --}}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    {{-- CURP local cache --}}
+    <script src="/js/curp-cache.js"></script>
 
     {{-- Header --}}
     <div class="flex items-center gap-3">
@@ -60,15 +62,36 @@ new class extends Component {
         <flux:button x-show="localUseCamera" icon="computer-desktop" size="sm" x-on:click="toggleCamera()" x-cloak>Usar Lector</flux:button>
     </div>
 
+    {{-- Cache status --}}
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-xs">
+            <template x-if="cacheReady">
+                <span class="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+                    <span x-text="cacheCount + ' CURPs en caché'"></span>
+                </span>
+            </template>
+            <template x-if="cacheLoading">
+                <span class="text-zinc-400">Cargando caché de CURPs...</span>
+            </template>
+            <template x-if="!cacheReady && !cacheLoading && cacheError">
+                <span class="text-amber-500">Caché no disponible — modo servidor</span>
+            </template>
+        </div>
+        <button type="button" x-show="cacheReady" x-on:click="refreshCache()" class="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition" title="Actualizar caché">
+            ↻ Actualizar
+        </button>
+    </div>
+
     {{-- Scan Area --}}
-    <div x-show="!$wire.student" class="space-y-6">
+    <div x-show="!$wire.student && !localError" class="space-y-6">
         <div class="relative" x-show="!localUseCamera">
             <input
                 autofocus
                 id="scanner-input"
                 type="text"
                 wire:model="curp"
-                wire:keydown.enter="processScan"
+                x-on:keydown.enter.prevent="handleScan()"
                 class="absolute inset-0 opacity-0 cursor-default z-10 w-full h-full"
                 autocomplete="off"
             />
@@ -94,6 +117,15 @@ new class extends Component {
             <div class="text-center">
                 <flux:text size="sm" class="text-zinc-500">Apunta la cámara al código QR del alumno</flux:text>
             </div>
+        </div>
+    </div>
+
+    {{-- Local cache error (no server call needed) --}}
+    <div x-show="localError" x-cloak class="space-y-3">
+        <div class="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-2xl p-5 text-center space-y-3">
+            <svg class="w-12 h-12 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p class="font-bold text-red-800 dark:text-red-200">CURP No encontrado: <span class="font-mono" x-text="localError"></span></p>
+            <button type="button" x-on:click="clearLocalError()" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-600 bg-red-100 dark:bg-red-900 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition">Reintentar</button>
         </div>
     </div>
 
@@ -179,8 +211,80 @@ new class extends Component {
             scanCooldown: false,
             isStarting: false,
 
-            init() {
+            // CURP cache state
+            cacheReady: false,
+            cacheLoading: false,
+            cacheCount: 0,
+            cacheError: false,
+            localError: null,
+
+            async init() {
                 this.setupFocus();
+                await this.loadCache();
+            },
+
+            async loadCache() {
+                if (typeof CurpCache === 'undefined') return;
+                this.cacheLoading = true;
+                try {
+                    this.cacheCount = await CurpCache.init('{{ route("api.curps") }}');
+                    this.cacheReady = true;
+                } catch (e) {
+                    console.warn('CURP cache init failed, using server mode:', e);
+                    this.cacheError = true;
+                }
+                this.cacheLoading = false;
+            },
+
+            async refreshCache() {
+                if (typeof CurpCache === 'undefined') return;
+                this.cacheLoading = true;
+                try {
+                    this.cacheCount = await CurpCache.refresh('{{ route("api.curps") }}');
+                    this.cacheReady = true;
+                    this.cacheError = false;
+                } catch (e) {
+                    console.warn('CURP cache refresh failed:', e);
+                }
+                this.cacheLoading = false;
+            },
+
+            clearLocalError() {
+                this.localError = null;
+                this.$nextTick(() => {
+                    document.getElementById('scanner-input')?.focus();
+                });
+            },
+
+            async handleScan(decodedText) {
+                const curp = (decodedText || $wire.curp || '').trim().toUpperCase();
+                if (!curp) return;
+                if (this.scanCooldown) return;
+
+                this.scanCooldown = true;
+                this.localError = null;
+
+                // Pre-validate with local cache
+                if (this.cacheReady) {
+                    try {
+                        const cached = await CurpCache.lookup(curp);
+                        if (!cached) {
+                            this.localError = curp;
+                            playLocalSound('error');
+                            $wire.set('curp', '');
+                            setTimeout(() => { this.scanCooldown = false; }, 3000);
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('Cache lookup error:', e);
+                    }
+                }
+
+                // Send to server
+                $wire.set('curp', curp);
+                $wire.processScan();
+
+                setTimeout(() => { this.scanCooldown = false; }, 3000);
             },
 
             setupFocus() {
@@ -238,17 +342,10 @@ new class extends Component {
                     }
                 }
             },
+
             onScanSuccess(decodedText) {
                 if (this.scanCooldown) return;
-
-                this.scanCooldown = true;
-                
-                $wire.curp = decodedText;
-                $wire.processScan();
-
-                setTimeout(() => {
-                    this.scanCooldown = false;
-                }, 3000);
+                this.handleScan(decodedText);
             }
         }));
 

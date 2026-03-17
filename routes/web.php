@@ -43,6 +43,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('asistencia/escanear', 'attendance.scanner')->name('attendance.scanner');
     Volt::route('escaneo-rapido', 'global-scanner')->name('global-scanner');
 
+    // API: Bulk CURP data for local scanner cache
+    Route::get('api/curps', function () {
+        \Illuminate\Support\Facades\Gate::authorize('teacher-or-admin');
+
+        return response()->json(
+            \App\Models\Student::select('id', 'curp', 'name', 'grade', 'group_name', 'turn')
+                ->whereNotNull('curp')
+                ->where('curp', '!=', '')
+                ->get()
+        );
+    })->name('api.curps');
+
     Route::post('toggle-view', function () {
         $user = auth()->user();
         if (! $user->hasStudents()) {
