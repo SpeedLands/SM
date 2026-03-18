@@ -1,10 +1,11 @@
 <?php
 
+use Illuminate\Contracts\Console\Kernel;
 use Maatwebsite\Excel\Facades\Excel;
 
 require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 
 $toFind = [
     'CRUZ GARCIA CRISTIAN ALEJANDRO',
@@ -36,6 +37,6 @@ try {
 
     file_put_contents('tmp/extracted_students.json', json_encode($found));
     echo "Saved to tmp/extracted_students.json\n";
-} catch (\Exception $e) {
+} catch (Exception $e) {
     echo 'Error: '.$e->getMessage()."\n";
 }

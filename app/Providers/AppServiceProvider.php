@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use Illuminate\Auth\Events\Login;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,12 +16,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        \Illuminate\Http\Request::macro('hasValidSignature', function ($absolute = true) {
+        Request::macro('hasValidSignature', function ($absolute = true) {
             if (str_contains($this->path(), 'preview-file') || str_contains($this->path(), 'upload-file')) {
                 return true;
             }
 
-            return \Illuminate\Support\Facades\URL::hasValidSignature($this, $absolute);
+            return URL::hasValidSignature($this, $absolute);
         });
     }
 
@@ -25,8 +30,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Support\Facades\Event::listen(
-            \Illuminate\Auth\Events\Login::class,
+        Event::listen(
+            Login::class,
             function ($event) {
                 $event->user->update([
                     'last_login_at' => now(),
@@ -34,15 +39,15 @@ class AppServiceProvider extends ServiceProvider
             }
         );
 
-        \Illuminate\Support\Facades\Gate::define('admin-only', function ($user) {
+        Gate::define('admin-only', function ($user) {
             return $user->isAdmin() && $user->isViewStaff();
         });
 
-        \Illuminate\Support\Facades\Gate::define('teacher-or-admin', function ($user) {
+        Gate::define('teacher-or-admin', function ($user) {
             return ($user->isAdmin() || $user->isTeacher()) && $user->isViewStaff();
         });
 
-        \Illuminate\Support\Facades\Gate::define('parent-only', function ($user) {
+        Gate::define('parent-only', function ($user) {
             return $user->isViewParent();
         });
     }

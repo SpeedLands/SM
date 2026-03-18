@@ -2,10 +2,15 @@
 
 namespace Database\Factories;
 
+use App\Models\Cycle;
+use App\Models\Infraction;
+use App\Models\Report;
+use App\Models\Student;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Report>
+ * @extends Factory<Report>
  */
 class ReportFactory extends Factory
 {
@@ -17,10 +22,10 @@ class ReportFactory extends Factory
     public function definition(): array
     {
         return [
-            'student_id' => \App\Models\Student::factory(),
-            'cycle_id' => \App\Models\Cycle::factory(),
-            'teacher_id' => \App\Models\User::factory(),
-            'infraction_id' => \App\Models\Infraction::factory(),
+            'student_id' => Student::factory(),
+            'cycle_id' => Cycle::factory(),
+            'teacher_id' => User::factory(),
+            'infraction_id' => Infraction::factory(),
             'date' => now(),
             'status' => 'PENDING_SIGNATURE',
         ];

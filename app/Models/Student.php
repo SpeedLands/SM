@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use Database\Factories\StudentFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Storage;
 
 class Student extends Model
 {
-    /** @use HasFactory<\Database\Factories\StudentFactory> */
+    /** @use HasFactory<StudentFactory> */
     use HasFactory, HasUuids;
 
     public $incrementing = false;
@@ -88,11 +91,11 @@ class Student extends Model
         return $this->hasMany(Attendance::class);
     }
 
-    public function photoUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
+    public function photoUrl(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+        return Attribute::make(
             get: fn () => $this->photo_path
-                ? \Illuminate\Support\Facades\Storage::url($this->photo_path)
+                ? Storage::url($this->photo_path)
                 : null
         );
     }

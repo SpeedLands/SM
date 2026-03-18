@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -83,7 +84,7 @@ class FcmService
             // INVALID_ARGUMENT: The token is malformed.
             if ($errorCode === 'UNREGISTERED' || $errorCode === 'INVALID_ARGUMENT') {
                 Log::warning('FCM Token Invalidated: Clearing token for user.', ['token' => $deviceToken]);
-                \App\Models\User::where('fcm_token', $deviceToken)->update(['fcm_token' => null]);
+                User::where('fcm_token', $deviceToken)->update(['fcm_token' => null]);
             }
 
             return false;

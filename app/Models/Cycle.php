@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\CycleFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Cycle extends Model
 {
-    /** @use HasFactory<\Database\Factories\CycleFactory> */
+    /** @use HasFactory<CycleFactory> */
     use HasFactory;
 
     public $timestamps = false; // SQL has no timestamps for this table

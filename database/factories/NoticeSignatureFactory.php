@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\NoticeSignature;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\NoticeSignature>
+ * @extends Factory<NoticeSignature>
  */
 class NoticeSignatureFactory extends Factory
 {

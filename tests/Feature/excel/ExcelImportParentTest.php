@@ -4,9 +4,10 @@ use App\Models\Cycle;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\ExcelImportService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->activeCycle = Cycle::factory()->create(['is_active' => true]);

@@ -2,9 +2,15 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\ClassGroup;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Cycle;
+use App\Models\Infraction;
+use App\Models\Regulation;
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,9 +27,9 @@ class DatabaseSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@escuela.edu.mx'],
             [
-                'id' => \Illuminate\Support\Str::uuid()->toString(),
+                'id' => Str::uuid()->toString(),
                 'name' => 'Admin Sistema',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'password' => Hash::make('password'),
                 'role' => 'ADMIN',
                 'status' => 'ACTIVE',
                 'email_verified_at' => now(),
@@ -31,7 +37,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // 2. Create Active Cycle
-        $cycle = \App\Models\Cycle::firstOrCreate(
+        $cycle = Cycle::firstOrCreate(
             ['name' => '2024-2025'],
             [
                 'start_date' => '2024-08-26',
@@ -41,14 +47,14 @@ class DatabaseSeeder extends Seeder
         );
 
         // 3. Create Sample Group
-        \App\Models\ClassGroup::firstOrCreate(
+        ClassGroup::firstOrCreate(
             [
                 'cycle_id' => $cycle->id,
                 'grade' => '1',
                 'section' => 'A',
             ],
             [
-                'id' => \Illuminate\Support\Str::uuid()->toString(),
+                'id' => Str::uuid()->toString(),
             ]
         );
 
@@ -77,11 +83,11 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($infractions as $infraction) {
-            \App\Models\Infraction::firstOrCreate(['id' => $infraction['id']], $infraction);
+            Infraction::firstOrCreate(['id' => $infraction['id']], $infraction);
         }
 
         // 5. Seeding Regulations
-        \App\Models\Regulation::firstOrCreate(
+        Regulation::firstOrCreate(
             ['id' => 1],
             [
                 'title' => 'Reglamento Escolar General',

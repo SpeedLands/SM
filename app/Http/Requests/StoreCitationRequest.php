@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCitationRequest extends FormRequest
@@ -17,7 +19,7 @@ class StoreCitationRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -29,7 +31,7 @@ class StoreCitationRequest extends FormRequest
                 'date',
                 'after_or_equal:today',
                 function ($attribute, $value, $fail) {
-                    if ($value && \Carbon\Carbon::parse($value)->isWeekend()) {
+                    if ($value && Carbon::parse($value)->isWeekend()) {
                         $fail('No se pueden agendar citatorios en sábados o domingos.');
                     }
                 },

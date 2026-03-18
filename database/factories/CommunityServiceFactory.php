@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\CommunityService;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\CommunityService>
+ * @extends Factory<CommunityService>
  */
 class CommunityServiceFactory extends Factory
 {

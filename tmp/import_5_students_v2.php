@@ -4,10 +4,11 @@ use App\Models\Cycle;
 use App\Models\Student;
 use App\Models\StudentCycleAssociation;
 use Carbon\Carbon;
+use Illuminate\Contracts\Console\Kernel;
 
 require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 
 function getBirthDateFromCurp($curp)
 {
@@ -21,7 +22,7 @@ function getBirthDateFromCurp($curp)
 
     try {
         return Carbon::createFromFormat('Y-m-d', "$year-$mm-$dd");
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         return Carbon::now(); // Fallback
     }
 }

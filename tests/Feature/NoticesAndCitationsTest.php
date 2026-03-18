@@ -1,11 +1,14 @@
 <?php
 
 use App\Models\Citation;
+use App\Models\ClassGroup;
 use App\Models\Cycle;
 use App\Models\Notice;
 use App\Models\NoticeSignature;
 use App\Models\Student;
+use App\Models\StudentCycleAssociation;
 use App\Models\User;
+use Carbon\Carbon;
 use Livewire\Volt\Volt;
 
 test('admins can create notices', function () {
@@ -33,10 +36,10 @@ test('parents can sign notices with authorization', function () {
     $parent->students()->attach($student->id, ['relationship' => 'PADRE']);
 
     // Associate student with cycle
-    \App\Models\StudentCycleAssociation::create([
+    StudentCycleAssociation::create([
         'student_id' => $student->id,
         'cycle_id' => $cycle->id,
-        'class_group_id' => \App\Models\ClassGroup::factory()->create(['cycle_id' => $cycle->id])->id,
+        'class_group_id' => ClassGroup::factory()->create(['cycle_id' => $cycle->id])->id,
     ]);
 
     $notice = Notice::create([
@@ -62,7 +65,7 @@ test('parents can sign notices with authorization', function () {
 });
 
 test('teachers can manage citations', function () {
-    \Carbon\Carbon::setTestNow(\Carbon\Carbon::create(2026, 2, 13, 10, 0, 0)); // A Friday before 2026-02-16.
+    Carbon::setTestNow(Carbon::create(2026, 2, 13, 10, 0, 0)); // A Friday before 2026-02-16.
 
     $teacher = User::factory()->create(['role' => 'TEACHER']);
     $student = Student::factory()->create();
@@ -72,7 +75,7 @@ test('teachers can manage citations', function () {
         ->test('citations.index')
         ->call('selectStudent', $student->id)
         ->set('reason', 'Academic review')
-        ->set('citationDate', \Carbon\Carbon::parse('2026-02-16')->format('Y-m-d'))
+        ->set('citationDate', Carbon::parse('2026-02-16')->format('Y-m-d'))
         ->set('citationTime', '09:00')
         ->call('saveCitation')
         ->assertHasNoErrors();
@@ -86,7 +89,7 @@ test('teachers can manage citations', function () {
         ->call('updateStatus', $citation->id, 'ATTENDED');
 
     expect($citation->refresh()->status)->toBe('ATTENDED');
-    \Carbon\Carbon::setTestNow(); // Reset
+    Carbon::setTestNow(); // Reset
 });
 
 test('citations cannot be scheduled on weekends', function () {
@@ -95,7 +98,7 @@ test('citations cannot be scheduled on weekends', function () {
     Cycle::where('is_active', true)->first() ?: Cycle::factory()->create(['is_active' => true]);
 
     // Find next Saturday
-    $saturday = now()->next(\Carbon\Carbon::SATURDAY)->format('Y-m-d');
+    $saturday = now()->next(Carbon::SATURDAY)->format('Y-m-d');
 
     Volt::actingAs($teacher)
         ->test('citations.index')

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\NoticeSignatureFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class NoticeSignature extends Model
 {
-    /** @use HasFactory<\Database\Factories\NoticeSignatureFactory> */
+    /** @use HasFactory<NoticeSignatureFactory> */
     use HasFactory, HasUuids;
 
     public $timestamps = false;

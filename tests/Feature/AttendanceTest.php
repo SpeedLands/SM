@@ -5,8 +5,10 @@ use App\Models\ClassGroup;
 use App\Models\Cycle;
 use App\Models\Setting;
 use App\Models\Student;
+use App\Models\StudentCycleAssociation;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 beforeEach(function () {
@@ -23,8 +25,8 @@ beforeEach(function () {
     Setting::set('attendance.grace_minutes', '10');
 
     // Ensure route exists for component testing
-    if (! Illuminate\Support\Facades\Route::has('attendance.scanner')) {
-        Illuminate\Support\Facades\Route::get('/asistencia/escanear', function () {})->name('attendance.scanner');
+    if (! Route::has('attendance.scanner')) {
+        Route::get('/asistencia/escanear', function () {})->name('attendance.scanner');
     }
 });
 
@@ -85,7 +87,7 @@ test('admin can manually change attendance status in index', function () {
     $group = ClassGroup::factory()->create(['cycle_id' => $this->cycle->id]);
 
     // Associate student to group
-    \App\Models\StudentCycleAssociation::create([
+    StudentCycleAssociation::create([
         'student_id' => $this->student->id,
         'cycle_id' => $this->cycle->id,
         'class_group_id' => $group->id,

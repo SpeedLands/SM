@@ -1,10 +1,11 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Http\Request;
 
 $user = User::factory()->create(['password' => bcrypt('password')]);
 
-$request = \Illuminate\Http\Request::create('/login', 'POST', [
+$request = Request::create('/login', 'POST', [
     'email' => $user->email,
     'password' => 'password',
 ]);
