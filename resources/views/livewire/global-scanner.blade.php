@@ -52,24 +52,51 @@ new class extends Component {
 <div class="max-w-2xl mx-auto py-8 px-4 space-y-6" x-data="globalScannerComponent()">
     {{-- html5-qrcode CDN --}}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    {{-- CURP local cache --}}
+    {{-- CURP local cache & HID Support --}}
     <script src="/js/curp-cache.js"></script>
+    <script src="/js/hid-scanner.js"></script>
 
-    <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-2 text-xs">
-            <template x-if="cacheReady">
-                <span class="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
-                    <span x-text="cacheCount + ' CURPs (Cache)'"></span>
-                </span>
-            </template>
-            <template x-if="cacheLoading">
-                <span class="text-zinc-400 text-[10px]">Cargando...</span>
-            </template>
+    {{-- Cache & HID Status --}}
+    <div class="flex flex-col gap-2 bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-xs">
+                <template x-if="cacheReady">
+                    <span class="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+                        <span x-text="cacheCount + ' CURPs en caché'"></span>
+                    </span>
+                </template>
+                <template x-if="cacheLoading">
+                    <span class="text-zinc-400 text-[10px]">Cargando...</span>
+                </template>
+            </div>
+            <button type="button" x-on:click="refreshCache()" class="text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition uppercase font-bold tracking-wider">
+                Actualizar Datos
+            </button>
         </div>
-        <button type="button" x-show="cacheReady" x-on:click="refreshCache()" class="text-[10px] text-zinc-400 hover:text-zinc-600" title="Actualizar">
-            Actualizar
-        </button>
+
+        <div class="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-2">
+            <div class="flex items-center gap-2 text-xs">
+                <template x-if="hidConnected">
+                    <span class="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                        <flux:icon name="cpu-chip" class="w-3 h-3" />
+                        <span x-text="hidConnected + (hidConnected === 1 ? ' Escáner Conectado' : ' Escáneres Conectados')"></span>
+                    </span>
+                </template>
+                <template x-if="!hidConnected">
+                    <span class="text-zinc-400 flex items-center gap-1">
+                        <flux:icon name="cpu-chip" class="w-3 h-3 opacity-50" />
+                        <span>Escáner HID Desconectado</span>
+                    </span>
+                </template>
+            </div>
+            <button type="button" x-on:click="connectHID()" class="text-[10px] font-bold uppercase tracking-wider transition" :class="hidConnected ? 'text-blue-600 hover:text-blue-700' : 'text-blue-600 hover:text-blue-700'">
+                <span x-text="hidConnected ? 'Conectar otro' : 'Conectar Escáner'"></span>
+            </button>
+        </div>
+        <template x-if="hidConnected && hidDeviceNames">
+            <div class="text-[10px] text-zinc-400 italic px-1 truncate" x-text="'Dispositivos: ' + hidDeviceNames"></div>
+        </template>
     </div>
 
     {{-- Header --}}
@@ -289,7 +316,7 @@ new class extends Component {
         Alpine.data('globalScannerComponent', () => ({
             localUseCamera: false,
             html5QrCode: null,
-            scanCooldown: false,
+            scanCooldowns: {}, // Map of CURP -> Timestamp
             isStarting: false,
             curpInput: '',
 
@@ -298,6 +325,8 @@ new class extends Component {
             cacheLoading: false,
             cacheCount: 0,
             cacheError: false,
+            hidConnected: 0,
+            hidDeviceNames: '',
 
             // UI state (Alpine-only)
             lastStudent: @entangle('lastStudent'),
@@ -308,6 +337,18 @@ new class extends Component {
             async init() {
                 this.setupFocus();
                 await this.loadCache();
+
+                // HID Listener
+                window.addEventListener('hid-scan', (e) => {
+                    this.handleScan(e.detail.curp);
+                });
+
+                // Auto-connect HID if previously allowed
+                if (typeof HidScanner !== 'undefined') {
+                    if (await HidScanner.autoConnect()) {
+                        this.updateHidStatus();
+                    }
+                }
             },
 
             async loadCache() {
@@ -336,6 +377,11 @@ new class extends Component {
                 this.cacheLoading = false;
             },
 
+            async connectHID() {
+                if (typeof HidScanner === 'undefined') return;
+                this.hidConnected = await HidScanner.connect();
+            },
+
             setupFocus() {
                 const input = document.getElementById('global-scanner-input');
                 document.addEventListener('click', () => {
@@ -349,9 +395,17 @@ new class extends Component {
 
             async handleScan(decodedText) {
                 const curp = (decodedText || this.curpInput || '').trim().toUpperCase();
-                if (!curp || this.scanCooldown) return;
+                if (!curp) return;
 
-                this.scanCooldown = true;
+                // Per-student cooldown: ignore same CURP if scanned within last 5 seconds
+                const now = Date.now();
+                if (this.scanCooldowns[curp] && (now - this.scanCooldowns[curp]) < 5000) {
+                    console.log('Cooldown activo para:', curp);
+                    return;
+                }
+
+                // Set cooldown immediately for this specific CURP
+                this.scanCooldowns[curp] = now;
                 this.curpInput = '';
                 this.lastStudent = null; // Clear previous student display
                 this.lastStatus = '';
@@ -370,7 +424,6 @@ new class extends Component {
                         playLocalSound('success');
                         this.registerAttendanceBackground(curp);
                         
-                        setTimeout(() => { this.scanCooldown = false; }, 1500);
                         return;
                     }
                 }
@@ -378,7 +431,6 @@ new class extends Component {
                 // 2. Fallback to Livewire
                 $wire.curp = curp;
                 await $wire.processScan();
-                setTimeout(() => { this.scanCooldown = false; }, 3000);
             },
 
             async registerAttendanceBackground(curp) {
@@ -450,8 +502,19 @@ new class extends Component {
             },
 
             onScanSuccess(decodedText) {
-                if (this.scanCooldown) return;
                 this.handleScan(decodedText);
+            },
+
+            async connectHID() {
+                if (typeof HidScanner === 'undefined') return;
+                if (await HidScanner.connect()) {
+                    this.updateHidStatus();
+                }
+            },
+
+            updateHidStatus() {
+                this.hidConnected = HidScanner.getConnectedCount();
+                this.hidDeviceNames = HidScanner.getConnectedNames();
             }
         }));
 
