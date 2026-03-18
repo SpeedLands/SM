@@ -82,29 +82,30 @@ new class extends Component {
             }
         }
 
-        try {
-            $attendance = Attendance::updateOrCreate(
-                ['student_id' => $student->id, 'date' => $today],
-                [
-                    'entry_time' => $now->format('H:i:s'),
-                    'status' => $status,
-                ]
-            );
+        $existing = Attendance::where('student_id', $student->id)
+            ->where('date', $today)
+            ->first();
 
-            // If it was an update and not a create, it means it's a "duplicate" scan in terms of logic
-            if (!$attendance->wasRecentlyCreated && $attendance->status !== $status) {
-                // We updated the status, but for the scanner UX we might want to still show it as success or duplicate
-                $this->statusMessage = "Ya se registró asistencia hoy para: $student->name";
-                $this->statusColor = 'amber';
-                $this->lastStatus = 'duplicate';
-                $this->lastStudent = $student->toArray();
-                $this->lastEntryTime = $attendance->entry_time->format('H:i:s');
-                $this->curp = '';
-                $this->dispatch('play-sound', ['type' => 'warning']);
-                return;
-            }
+        if ($existing) {
+            $this->statusMessage = "Ya se registró asistencia hoy para: $student->name";
+            $this->statusColor = 'amber';
+            $this->lastStatus = 'duplicate';
+            $this->lastStudent = $student->toArray();
+            $this->lastEntryTime = $existing->entry_time->format('H:i:s');
+            $this->curp = '';
+            $this->dispatch('play-sound', ['type' => 'warning']);
+            return;
+        }
+
+        try {
+            $attendance = Attendance::create([
+                'student_id' => $student->id,
+                'date' => $today,
+                'entry_time' => $now->format('H:i:s'),
+                'status' => $status,
+            ]);
         } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
-            // Race condition handled: someone else created it, just show as duplicate
+            // Race condition: another request created it just now
             $existing = Attendance::where('student_id', $student->id)->where('date', $today)->first();
             $this->statusMessage = "Ya se registró asistencia hoy para: $student->name";
             $this->statusColor = 'amber';
@@ -233,7 +234,9 @@ new class extends Component {
             <template x-if="lastStatus === 'error'"><flux:icon name="x-circle" class="w-20 h-20 mb-4 text-red-500" /></template>
             <template x-if="!lastStatus"><flux:icon name="qr-code" class="w-20 h-20 mb-4 text-zinc-300 dark:text-zinc-600" /></template>
             
-            <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400" x-text="lastStatus ? 'Listo para siguiente lectura' : 'Esperando lectura...'"></p>
+            <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400" x-text="lastStatus ? 'Listo para siguiente lectura' : 'Esperando lectura...'">
+                {{ $lastStatus ? 'Listo para siguiente lectura' : 'Esperando lectura...' }}
+            </p>
         </div>
     </div>
 
@@ -284,13 +287,13 @@ new class extends Component {
                             'bg-green-500': lastStatus === 'success',
                             'bg-amber-500': lastStatus === 'retardo' || lastStatus === 'duplicate',
                             'bg-red-500': lastStatus === 'error',
-                        }" x-text="statusMessage"></span>
+                        }" x-text="statusMessage">{{ $statusMessage }}</span>
                     <span x-show="lastEntryTime" class="font-mono text-lg font-bold"
                         :class="{
                             'text-green-700 dark:text-green-300': lastStatus === 'success',
                             'text-amber-700 dark:text-amber-300': lastStatus === 'retardo' || lastStatus === 'duplicate',
                             'text-red-700 dark:text-red-300': lastStatus === 'error',
-                        }" x-text="lastEntryTime"></span>
+                        }" x-text="lastEntryTime">{{ $lastEntryTime }}</span>
                 </div>
 
                 <template x-if="lastStudent">

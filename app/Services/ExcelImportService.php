@@ -396,7 +396,7 @@ class ExcelImportService
         return $stats;
     }
 
-    public function importParents(Collection $rows, string $currentGrade, string $currentSection, array $columnMapping): array
+    public function importParents(Collection $rows, string $currentGrade, string $currentSection, array $columnMapping = []): array
     {
         $report = [
             'summary' => [

@@ -91,7 +91,7 @@ it('reports warning when student is not found', function () {
 
 it('reports error for invalid email', function () {
     $rows = collect([
-        ['Padre de ALUMNO', 'not-an-email', '123', '123', 'PARENT', 'N/A'],
+        ['Padre de ALUMNO', 'invalid@@email.com', '123', '123', 'PARENT', 'N/A'],
     ]);
 
     $report = $this->service->importParents($rows, '3º', 'A');
