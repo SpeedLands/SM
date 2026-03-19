@@ -65,12 +65,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         );
     })->name('api.curps');
 
-    // API: Background attendance recording (fire-and-forget from scanner)
     Route::post('api/attendance', function (Request $request) {
         Gate::authorize('teacher-or-admin');
 
         $request->validate([
             'curp' => 'required|string|max:18',
+            'timestamp' => 'nullable|numeric',
         ]);
 
         $curp = trim(strtoupper($request->input('curp')));
@@ -81,7 +81,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
 
         $today = Carbon::today()->toDateString();
-        $now = Carbon::now();
+        $now = $request->has('timestamp')
+            ? Carbon::createFromTimestampMs($request->input('timestamp'))
+            : Carbon::now();
+
         $status = 'PRESENTE';
         $graceMinutes = (int) Setting::get('attendance.grace_minutes', 10);
 

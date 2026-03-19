@@ -197,6 +197,20 @@ new class extends Component {
                 <span x-text="hidConnected ? 'Conectar otro' : 'Conectar Escáner'"></span>
             </button>
         </div>
+        
+        {{-- Sync Status --}}
+        <div x-show="pendingQueue.length > 0" class="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-2" x-cloak>
+            <div class="flex items-center gap-2 text-xs">
+                <span class="inline-flex items-center gap-1" x-bind:class="isSyncingQueue ? 'text-amber-600 animate-pulse' : 'text-zinc-400'">
+                    <flux:icon name="arrow-path" class="w-3 h-3" x-bind:class="isSyncingQueue ? 'animate-spin' : ''" />
+                    <span x-text="pendingQueue.length + (pendingQueue.length === 1 ? ' lectura pendiente' : ' lecturas pendientes')"></span>
+                </span>
+            </div>
+            <div x-show="isSyncingQueue" class="text-[10px] font-bold uppercase tracking-wider text-amber-600">
+                Sincronizando...
+            </div>
+        </div>
+        
         <template x-if="hidConnected && hidDeviceNames">
             <div class="text-[10px] text-zinc-400 italic px-1 truncate" x-text="'Dispositivos: ' + hidDeviceNames"></div>
         </template>
@@ -364,10 +378,15 @@ new class extends Component {
             recentScans: @entangle('recentScans'),
             hidConnected: 0,
             hidDeviceNames: '',
+            
+            // Queue state
+            pendingQueue: [],
+            isSyncingQueue: false,
 
             async init() {
                 this.setupFocus();
                 await this.loadCache();
+                await this.loadPendingQueue();
                 
                 // HID Listener
                 window.addEventListener('hid-scan', (e) => {
@@ -380,6 +399,14 @@ new class extends Component {
                         this.updateHidStatus();
                     }
                 }
+
+                // Start initial sync if there's data
+                this.processQueue();
+            },
+
+            async loadPendingQueue() {
+                if (typeof CurpCache === 'undefined') return;
+                this.pendingQueue = await CurpCache.getQueue();
             },
 
             async loadCache() {
@@ -433,6 +460,12 @@ new class extends Component {
 
             async handleScan(decodedText) {
                 const curp = (decodedText || this.curpInput || '').trim().toUpperCase();
+                
+                // CRITICAL: Clear input immediately to prevent concatenation
+                this.curpInput = '';
+                const input = document.getElementById('scanner-input');
+                if (input) input.value = '';
+
                 if (!curp) return;
 
                 // Per-student cooldown: ignore same CURP if scanned within last 5 seconds
@@ -444,64 +477,83 @@ new class extends Component {
 
                 // Set cooldown immediately for this specific CURP
                 this.scanCooldowns[curp] = now;
-                this.localError = null;
 
-                // Clean up old cooldowns occasionally (optional but good practice)
-                if (Object.keys(this.scanCooldowns).length > 50) {
-                    for (let key in this.scanCooldowns) {
-                        if (now - this.scanCooldowns[key] > 10000) delete this.scanCooldowns[key];
-                    }
-                }
-
-                // 1. Instant identification using local cache
+                // 1. Identification using local cache
+                let studentInfo = null;
                 if (this.cacheReady) {
-                    const cached = await CurpCache.lookup(curp);
-                    if (cached) {
-                        // Instant UI update
-                        this.lastStudent = cached;
-                        this.lastStatus = 'success'; // Default for instant, server will refine
-                        this.statusMessage = 'Identificado';
-                        this.lastEntryTime = new Date().toTimeString().slice(0, 8);
-                        
-                        playLocalSound('success');
-
-                        // Background sync to server
-                        this.registerAttendanceBackground(curp);
-                        
-                        return;
-                    }
+                    studentInfo = await CurpCache.lookup(curp);
                 }
 
-                // 2. Fallback to Livewire for unknown CURPs or if cache fails
-                // Send to server
-                $wire.set('curp', curp);
-                $wire.processScan();
+                if (studentInfo) {
+                    // Instant UI update for known students
+                    this.lastStudent = studentInfo;
+                    this.lastStatus = 'success';
+                    this.statusMessage = 'Identificado (Local)';
+                    this.lastEntryTime = new Date().toTimeString().slice(0, 8);
+                    playLocalSound('success');
+                } else {
+                    // Feedback for unknown students
+                    this.lastStudent = null;
+                    this.lastStatus = 'error';
+                    this.statusMessage = 'CURP No reconocido (Buscando...)';
+                    playLocalSound('warning');
+                }
+
+                // 2. Add to IndexedDB Queue
+                const queueItem = await CurpCache.addToQueue(curp, studentInfo);
+                this.pendingQueue.push(queueItem);
+
+                // 3. Trigger Sync
+                this.processQueue();
             },
 
-            async registerAttendanceBackground(curp) {
-                try {
-                    const res = await fetch('{{ route("api.attendance") }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ curp: curp })
-                    });
-                    const data = await res.json();
-                    
-                    // Refine local status with server data
-                    this.lastStatus = data.duplicate ? 'duplicate' : (data.status === 'RETARDO' ? 'retardo' : 'success');
-                    this.statusMessage = data.duplicate ? 'Ya registrado' : (data.status === 'RETARDO' ? 'RETARDO Registrado' : 'ASISTENCIA Registrada');
-                    this.lastEntryTime = data.entry_time;
-                    
-                    if (data.status === 'RETARDO') playLocalSound('warning');
+            async processQueue() {
+                if (this.isSyncingQueue || this.pendingQueue.length === 0) return;
+                this.isSyncingQueue = true;
 
-                    // Sync Livewire state to keep recentScans in sync
-                    $wire.$refresh();
-                } catch (e) {
-                    console.error('Background attendance failed:', e);
+                while (this.pendingQueue.length > 0) {
+                    const item = this.pendingQueue[0];
+                    console.log('Sincronizando:', item.curp);
+
+                    try {
+                        const res = await fetch('{{ route("api.attendance") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ 
+                                curp: item.curp,
+                                timestamp: item.timestamp
+                            })
+                        });
+
+                        if (!res.ok) throw new Error('Network error');
+
+                        const data = await res.json();
+                        
+                        // Update UI with server refinement
+                        this.lastStatus = data.duplicate ? 'duplicate' : (data.status === 'RETARDO' ? 'retardo' : 'success');
+                        this.statusMessage = data.duplicate ? 'Ya registrado' : (data.status === 'RETARDO' ? 'RETARDO Registrado' : 'ASISTENCIA Registrada');
+                        this.lastEntryTime = data.entry_time;
+                        
+                        // Success! Remove from IDB and Local State
+                        await CurpCache.removeFromQueue(item.timestamp);
+                        this.pendingQueue.shift();
+                        
+                        // Refresh Livewire recentScans
+                        $wire.$refresh();
+
+                    } catch (e) {
+                        console.warn('Sync failed for CURP:', item.curp, e);
+                        // If network fails (120kbps/offline), wait 5 seconds and retry
+                        await new Promise(r => setTimeout(r, 5000));
+                        // Break the loop and let it be re-triggered by next scan or manual poll
+                        break; 
+                    }
                 }
+
+                this.isSyncingQueue = false;
             },
 
             toggleCamera() {

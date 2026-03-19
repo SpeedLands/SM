@@ -3,8 +3,9 @@
  */
 const CurpCache = {
     dbName: 'sm_curp_cache',
-    dbVersion: 1,
+    dbVersion: 2,
     storeName: 'students',
+    queueStoreName: 'pending_scans',
     db: null,
 
     async init(fetchUrl) {
@@ -15,10 +16,15 @@ const CurpCache = {
 
             request.onupgradeneeded = (e) => {
                 const db = e.target.result;
+                // Students Store
                 if (!db.objectStoreNames.contains(this.storeName)) {
                     db.createObjectStore(this.storeName, { keyPath: 'id' });
                     const store = e.target.transaction.objectStore(this.storeName);
                     store.createIndex('curp', 'curp', { unique: true });
+                }
+                // Queue Store
+                if (!db.objectStoreNames.contains(this.queueStoreName)) {
+                    db.createObjectStore(this.queueStoreName, { keyPath: 'timestamp' });
                 }
             };
 
@@ -87,6 +93,46 @@ const CurpCache = {
             const req = indexedDB.deleteDatabase(this.dbName);
             req.onsuccess = () => resolve();
             req.onerror = () => reject();
+        });
+    },
+
+    // Queue Management
+    async addToQueue(curp, studentInfo = null) {
+        if (!this.db) return;
+        return new Promise((resolve, reject) => {
+            const tx = this.db.transaction(this.queueStoreName, 'readwrite');
+            const store = tx.objectStore(this.queueStoreName);
+            const item = {
+                curp,
+                studentInfo,
+                timestamp: Date.now(),
+                attempts: 0
+            };
+            store.put(item);
+            tx.oncomplete = () => resolve(item);
+            tx.onerror = (e) => reject(e);
+        });
+    },
+
+    async getQueue() {
+        if (!this.db) return [];
+        return new Promise((resolve) => {
+            const tx = this.db.transaction(this.queueStoreName, 'readonly');
+            const store = tx.objectStore(this.queueStoreName);
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => resolve([]);
+        });
+    },
+
+    async removeFromQueue(timestamp) {
+        if (!this.db) return;
+        return new Promise((resolve, reject) => {
+            const tx = this.db.transaction(this.queueStoreName, 'readwrite');
+            const store = tx.objectStore(this.queueStoreName);
+            store.delete(timestamp);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e);
         });
     }
 };
