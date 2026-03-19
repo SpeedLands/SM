@@ -87,11 +87,13 @@ new class extends Component {
     public function openCreateModal(): void
     {
         $this->reset(['userId', 'userName', 'userEmail', 'userRole', 'userPhone', 'userOccupation', 'userPassword', 'showPassword']);
+        $this->resetValidation();
         $this->showUserModal = true;
     }
 
     public function editUser(User $user): void
     {
+        $this->resetValidation();
         $this->userId = $user->id;
         $this->userName = $user->name;
         $this->userEmail = $user->email;

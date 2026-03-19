@@ -59,6 +59,7 @@ new class extends Component {
     public function openCreateModal(): void
     {
         $this->authorize('teacher-or-admin');
+        $this->resetValidation();
         $this->resetForm();
         $this->showCreateModal = true;
     }
@@ -132,6 +133,7 @@ new class extends Component {
     public function editCitation(string $id): void
     {
         $this->authorize('teacher-or-admin');
+        $this->resetValidation();
         $citation = Citation::findOrFail($id);
 
         $this->editingCitationId = $citation->id;

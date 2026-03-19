@@ -14,6 +14,7 @@ new class extends Component {
     public int $currentMonth;
     public ?string $selectedDate = null;
     public bool $showOffcanvas = false;
+    public bool $onlyActiveCycle = true;
 
     // Data for selected day
     public array $dayServices = [];
@@ -24,6 +25,14 @@ new class extends Component {
 
     // Dates with events (for badges)
     public array $datesWithEvents = [];
+
+    public function updatedOnlyActiveCycle(): void
+    {
+        $this->loadDatesWithEvents();
+        if ($this->selectedDate) {
+            $this->loadDayActivities($this->selectedDate);
+        }
+    }
 
     public function mount(): void
     {
@@ -58,10 +67,15 @@ new class extends Component {
 
     public function loadDatesWithEvents(): void
     {
-        $activeCycle = Cycle::where('is_active', true)->first();
-        if (!$activeCycle) {
-            $this->datesWithEvents = [];
-            return;
+        $activeCycleId = null;
+        if ($this->onlyActiveCycle) {
+            $activeCycle = Cycle::where('is_active', true)->first();
+            if ($activeCycle) {
+                $activeCycleId = $activeCycle->id;
+            } else {
+                $this->datesWithEvents = [];
+                return;
+            }
         }
 
         $startOfMonth = Carbon::create($this->currentYear, $this->currentMonth, 1)->startOfMonth();
@@ -79,8 +93,11 @@ new class extends Component {
         ];
 
         foreach ($models as $model => $column) {
-            $query = $model::where('cycle_id', $activeCycle->id)
-                ->whereBetween($column, [$startOfMonth, $endOfMonth]);
+            $query = $model::whereBetween($column, [$startOfMonth, $endOfMonth]);
+            
+            if ($activeCycleId) {
+                $query->where('cycle_id', $activeCycleId);
+            }
             
             if ($model === Notice::class) {
                 $query->whereNotNull('event_date');
@@ -124,50 +141,44 @@ new class extends Component {
 
     protected function loadDayActivities(string $date): void
     {
-        $activeCycle = Cycle::where('is_active', true)->first();
-        if (!$activeCycle) {
-            $this->dayServices = [];
-            $this->dayNotices = [];
-            $this->dayCitations = [];
-            $this->dayExams = [];
-            return;
+        $activeCycleId = null;
+        if ($this->onlyActiveCycle) {
+            $activeCycle = Cycle::where('is_active', true)->first();
+            if ($activeCycle) {
+                $activeCycleId = $activeCycle->id;
+            }
         }
 
         $targetDate = Carbon::parse($date);
 
         // Community Services
-        $this->dayServices = CommunityService::with('student')
-            ->where('cycle_id', $activeCycle->id)
-            ->whereDate('scheduled_date', $targetDate)
-            ->get()
-            ->toArray();
+        $query = CommunityService::with('student')
+            ->whereDate('scheduled_date', $targetDate);
+        if ($activeCycleId) $query->where('cycle_id', $activeCycleId);
+        $this->dayServices = $query->get()->toArray();
 
         // Citations
-        $this->dayCitations = Citation::with('student', 'teacher')
-            ->where('cycle_id', $activeCycle->id)
-            ->whereDate('citation_date', $targetDate)
-            ->get()
-            ->toArray();
+        $query = Citation::with('student', 'teacher')
+            ->whereDate('citation_date', $targetDate);
+        if ($activeCycleId) $query->where('cycle_id', $activeCycleId);
+        $this->dayCitations = $query->get()->toArray();
 
         // Notices with event_date
-        $this->dayNotices = Notice::with('author')
-            ->where('cycle_id', $activeCycle->id)
-            ->whereDate('event_date', $targetDate)
-            ->get()
-            ->toArray();
+        $query = Notice::with('author')
+            ->whereDate('event_date', $targetDate);
+        if ($activeCycleId) $query->where('cycle_id', $activeCycleId);
+        $this->dayNotices = $query->get()->toArray();
 
         // Exams
-        $this->dayExams = ExamSchedule::where('cycle_id', $activeCycle->id)
-            ->whereDate('exam_date', $targetDate)
-            ->get()
-            ->toArray();
+        $query = ExamSchedule::whereDate('exam_date', $targetDate);
+        if ($activeCycleId) $query->where('cycle_id', $activeCycleId);
+        $this->dayExams = $query->get()->toArray();
 
         // Reports
-        $this->dayReports = Report::with('student', 'teacher', 'infraction')
-            ->where('cycle_id', $activeCycle->id)
-            ->whereDate('date', $targetDate)
-            ->get()
-            ->toArray();
+        $query = Report::with('student', 'teacher', 'infraction')
+            ->whereDate('date', $targetDate);
+        if ($activeCycleId) $query->where('cycle_id', $activeCycleId);
+        $this->dayReports = $query->get()->toArray();
     }
 
     public function getCalendarDays(): array
@@ -226,6 +237,9 @@ new class extends Component {
             <flux:text class="text-zinc-500 dark:text-zinc-400">Vista general de actividades escolares por fecha.</flux:text>
         </div>
         <div class="flex items-center gap-2">
+            <div class="mr-2 border-r border-zinc-200 dark:border-zinc-700 pr-4">
+                <flux:switch wire:model.live="onlyActiveCycle" label="Solo ciclo activo" />
+            </div>
             <flux:button variant="ghost" icon="chevron-left" wire:click="previousMonth" />
             <flux:button variant="subtle" wire:click="goToToday">Hoy</flux:button>
             <flux:button variant="ghost" icon="chevron-right" wire:click="nextMonth" />

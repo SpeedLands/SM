@@ -60,6 +60,7 @@ new class extends Component {
     public function openCreateModal(?string $studentId = null): void
     {
         $this->authorize('teacher-or-admin');
+        $this->resetValidation();
         $this->resetForm();
         if ($studentId) {
             $this->selectStudent($studentId);
@@ -82,6 +83,7 @@ new class extends Component {
     public function editService(string $id): void
     {
         $this->authorize('teacher-or-admin');
+        $this->resetValidation();
 
         $service = CommunityService::findOrFail($id);
         $this->editingServiceId = $service->id;

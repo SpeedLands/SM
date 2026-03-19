@@ -116,6 +116,10 @@ class DataImporter extends Component
     {
         $this->updatePreview();
 
+        if (! $this->parentFile && $this->parentSheetIndex !== null && (string) $this->targetSheetIndex === (string) $this->parentSheetIndex) {
+            $this->parentSheetIndex = null;
+        }
+
         if ($this->targetSheetIndex !== null && is_numeric($this->targetSheetIndex)) {
             $sheet = collect($this->sheets)->firstWhere('index', (int) $this->targetSheetIndex);
             if ($sheet && isset($sheet['header'])) {
@@ -160,10 +164,19 @@ class DataImporter extends Component
 
     public function import()
     {
-        $this->validate([
+        $rules = [
             'targetSheetIndex' => 'required|integer',
             'importType' => 'required|string',
-            'parentSheetIndex' => 'nullable|integer|different:targetSheetIndex',
+        ];
+
+        if (! $this->parentFile) {
+            $rules['parentSheetIndex'] = 'nullable|integer|different:targetSheetIndex';
+        } else {
+            $rules['parentSheetIndex'] = 'nullable|integer';
+        }
+
+        $this->validate($rules, [
+            'parentSheetIndex.different' => 'La hoja de padres no puede ser la misma que la principal.',
         ]);
 
         // Timeout Prevention: Limit row counts based on type

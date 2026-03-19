@@ -138,6 +138,7 @@ new class extends Component {
     {
         if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
+        $this->resetValidation();
         $this->reset(['studentId', 'name', 'curp', 'birthDate', 'turn', 'siblingsCount', 'birthOrder', 'classGroupId', 'address', 'allergies', 'medicalConditions', 'emergencyContact', 'otherContact', 'motherName', 'fatherName', 'motherWorkplace', 'fatherWorkplace', 'photo', 'currentPhotoUrl']);
         $this->birthDate = now()->subYears(12)->format('Y-m-d');
         $this->showStudentModal = true;
@@ -260,6 +261,7 @@ new class extends Component {
     {
         if (!auth()->user()->isViewStaff()) abort(403);
         $this->authorize('teacher-or-admin');
+        $this->resetValidation();
         $student = Student::with(['pii', 'currentCycleAssociation', 'parents'])->findOrFail($id);
         
         $this->studentId = $student->id;

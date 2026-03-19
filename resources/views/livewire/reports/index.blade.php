@@ -80,6 +80,7 @@ new class extends Component {
     public function openCreateModal(): void
     {
         $this->authorize('teacher-or-admin');
+        $this->resetValidation();
         $this->resetForm();
         $this->showReportModal = true;
     }
@@ -100,6 +101,7 @@ new class extends Component {
     public function editReport(string $id): void
     {
         $this->authorize('teacher-or-admin');
+        $this->resetValidation();
 
         $report = Report::findOrFail($id);
         $this->editingReport = $report;
@@ -683,7 +685,6 @@ new class extends Component {
                 <!-- Student Search -->
                 <div class="relative">
                     <flux:input wire:model.live.debounce.300ms="studentSearch" label="Buscar Alumno (Nombre)" icon="user" placeholder="Escriba al menos 3 caracteres..." autofocus />
-                    <flux:error name="selectedStudentId" />
                     @if(count($studentResults) > 0)
                     <div class="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden">
                         @foreach($studentResults as $student)

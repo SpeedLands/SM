@@ -62,6 +62,7 @@ new class extends Component {
         if (!auth()->user()->isViewStaff()) {
             abort(403);
         }
+        $this->resetValidation();
 
         $this->subject = '';
         $this->editingExamId = null;
@@ -71,6 +72,7 @@ new class extends Component {
     public function editExam(string $id): void
     {
         if (!auth()->user()->isViewStaff()) abort(403);
+        $this->resetValidation();
 
         $exam = ExamSchedule::findOrFail($id);
         $this->editingExamId = $id;
