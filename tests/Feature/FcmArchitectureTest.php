@@ -17,7 +17,7 @@ function createFcmServiceMock()
     $service->shouldAllowMockingProtectedMethods();
 
     // Initialize protected properties bypassing constructor
-    $reflection = new \ReflectionClass(FcmService::class);
+    $reflection = new ReflectionClass(FcmService::class);
 
     $projectId = $reflection->getProperty('projectId');
     $projectId->setAccessible(true);

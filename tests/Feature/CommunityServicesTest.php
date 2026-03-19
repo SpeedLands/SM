@@ -6,6 +6,7 @@ use App\Models\Infraction;
 use App\Models\Report;
 use App\Models\Student;
 use App\Models\User;
+use Carbon\Carbon;
 use Livewire\Volt\Volt;
 
 test('admins can assign community service', function () {
@@ -19,7 +20,7 @@ test('admins can assign community service', function () {
         ->assertSee($student->name)
         ->call('selectStudent', $student->id)
         ->set('activity', 'Limpieza de patio')
-        ->set('scheduledDate', now()->next(\Carbon\Carbon::MONDAY)->format('Y-m-d'))
+        ->set('scheduledDate', now()->next(Carbon::MONDAY)->format('Y-m-d'))
         ->call('save')
         ->assertHasNoErrors()
         ->assertSee('Limpieza de patio');
@@ -39,7 +40,7 @@ test('status transitions work correctly', function () {
         'student_id' => $student->id,
         'assigned_by_id' => $admin->id,
         'activity' => 'Test activity',
-        'scheduled_date' => now()->next(\Carbon\Carbon::MONDAY),
+        'scheduled_date' => now()->next(Carbon::MONDAY),
         'status' => 'PENDING',
     ]);
 
@@ -80,7 +81,7 @@ test('it suggests students with 3 reports', function () {
         'student_id' => $student->id,
         'assigned_by_id' => $admin->id,
         'activity' => 'Reparación',
-        'scheduled_date' => now()->next(\Carbon\Carbon::MONDAY),
+        'scheduled_date' => now()->next(Carbon::MONDAY),
         'status' => 'PENDING',
     ]);
 

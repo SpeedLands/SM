@@ -4,9 +4,10 @@ use App\Models\Cycle;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\ExcelImportService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->activeCycle = Cycle::factory()->create(['is_active' => true]);
@@ -91,7 +92,7 @@ it('reports warning when student is not found', function () {
 
 it('reports error for invalid email', function () {
     $rows = collect([
-        ['Padre de ALUMNO', 'not-an-email', '123', '123', 'PARENT', 'N/A'],
+        ['Padre de ALUMNO', 'invalid@@email.com', '123', '123', 'PARENT', 'N/A'],
     ]);
 
     $report = $this->service->importParents($rows, '3º', 'A');

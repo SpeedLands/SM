@@ -1,10 +1,11 @@
 <?php
 
+use Illuminate\Contracts\Console\Kernel;
 use Maatwebsite\Excel\Facades\Excel;
 
 require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 
 function normalize($str)
 {
@@ -46,7 +47,7 @@ foreach ($filesToCheck as $file) {
                 }
             }
         }
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         echo "Error reading $file: ".$e->getMessage()."\n";
     }
 }

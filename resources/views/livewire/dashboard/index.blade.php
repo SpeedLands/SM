@@ -149,6 +149,30 @@ new class extends Component {
         </div>
     </div>
 
+    @if(auth()->user()->isViewStaff())
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="{{ route('global-scanner') }}" class="group relative p-1 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 shadow-lg hover:shadow-indigo-500/25 transition-all active:scale-[0.98]">
+                <div class="bg-white dark:bg-zinc-900 rounded-[calc(1rem-3px)] p-4 flex items-center gap-4">
+                    <div class="size-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                        <flux:icon icon="qr-code" size="lg" variant="solid" />
+                    </div>
+                    <div>
+                        <div class="text-sm font-black uppercase tracking-tight text-zinc-900 dark:text-white">Escaneo Rápido</div>
+                        <div class="text-[10px] text-zinc-500">Asistencia y Consultas</div>
+                    </div>
+                    <flux:icon icon="chevron-right" size="sm" class="ms-auto text-zinc-300 group-hover:text-indigo-500 transition-colors" />
+                </div>
+            </a>
+            
+            <a href="{{ route('reports.index', ['open_create' => true]) }}" class="group p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-blue-500/50 hover:bg-blue-50/10 transition-all active:scale-[0.98] flex items-center gap-4">
+                <div class="size-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                    <flux:icon icon="plus" size="sm" variant="solid" />
+                </div>
+                <div class="text-xs font-bold uppercase tracking-tight">Nuevo Reporte</div>
+            </a>
+        </div>
+    @endif
+
     @if(auth()->user()->isParent() && ($totalPending ?? 0) > 0)
         <flux:callout variant="danger" heading="Trámites Pendientes de Atención" icon="exclamation-triangle">
             Tienes {{ $totalPending }} documento(s) o aviso(s) que requieren tu firma o revisión.
@@ -211,7 +235,7 @@ new class extends Component {
                 </div>
                 <div class="space-y-4">
                     @forelse($recentReports as $report)
-                        <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-zinc-100 dark:hover:border-zinc-800">
+                        <a href="{{ route('reports.index', ['search' => $report->student->name]) }}" class="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-zinc-100 dark:hover:border-zinc-800">
                             <div class="size-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
                                 <flux:icon icon="document" size="sm" />
                             </div>
@@ -220,7 +244,7 @@ new class extends Component {
                                 <div class="text-xs text-zinc-500 truncate">{{ $report->subject }}</div>
                             </div>
                             <div class="text-xs font-medium text-zinc-400">{{ $report->date ? $report->date->diffForHumans() : '' }}</div>
-                        </div>
+                        </a>
                     @empty
                         <div class="text-center py-8 text-zinc-500 italic text-sm">No hay reportes recientes registrados.</div>
                     @endforelse
@@ -235,7 +259,7 @@ new class extends Component {
                 </div>
                 <div class="space-y-4">
                     @forelse($upcomingCitations as $citation)
-                        <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-zinc-100 dark:hover:border-zinc-800">
+                        <a href="{{ route('citations.index', ['search' => $citation->student->name]) }}" class="flex items-center gap-4 p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-zinc-100 dark:hover:border-zinc-800">
                             <div class="size-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0 text-amber-600">
                                 <flux:icon icon="calendar" size="sm" />
                             </div>
@@ -247,7 +271,7 @@ new class extends Component {
                                 <div class="text-sm font-bold text-zinc-900 dark:text-white">{{ $citation->citation_date->format('d/m/Y') }}</div>
                                 <div class="text-[10px] text-zinc-500">{{ $citation->citation_date->format('H:i') }}</div>
                             </div>
-                        </div>
+                        </a>
                     @empty
                         <div class="text-center py-8 text-zinc-500 italic text-sm">No hay citatorios pendientes.</div>
                     @endforelse
@@ -458,7 +482,7 @@ new class extends Component {
                     <flux:heading size="lg" class="mb-6">Citatorios Próximos</flux:heading>
                     <div class="space-y-4">
                         @forelse($citations as $citation)
-                            <div class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20 flex gap-4">
+                            <a href="{{ route('citations.index', ['search' => $citation->student->name]) }}" class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20 flex gap-4 hover:bg-amber-100 dark:hover:bg-amber-900/20 transition-colors">
                                 <div class="shrink-0">
                                     <div class="size-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600">
                                         <flux:icon icon="calendar" size="sm" />
@@ -471,7 +495,7 @@ new class extends Component {
                                         {{ $citation->citation_date->format('d/m/Y') }} a las {{ $citation->citation_date->format('H:i') }}
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         @empty
                             <div class="text-center py-6 text-zinc-500 italic text-sm border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl">
                                 No tienes citatorios pendientes.

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\ExamScheduleFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ExamSchedule extends Model
 {
-    /** @use HasFactory<\Database\Factories\ExamScheduleFactory> */
+    /** @use HasFactory<ExamScheduleFactory> */
     use HasFactory, HasUuids;
 
     public $timestamps = false;

@@ -89,6 +89,18 @@ new class extends Component {
         $this->eventTime = now()->format('10:00');
     }
 
+    public function openCreateModal(): void
+    {
+        $this->authorize('teacher-or-admin');
+        $this->resetValidation();
+        $this->reset(['editingNoticeId', 'title', 'content', 'type', 'targetAudience', 'targetGrades', 'targetClassGroups', 'targetStudentId', 'studentSearch', 'requiresAuthorization', 'endDate']);
+        $this->type = 'GENERAL';
+        $this->targetAudience = 'PARENTS';
+        $this->eventDate = now()->format('Y-m-d');
+        $this->eventTime = now()->format('10:00');
+        $this->showCreateModal = true;
+    }
+
     public function saveNotice(): void
     {
         $this->authorize('teacher-or-admin');
@@ -104,7 +116,7 @@ new class extends Component {
         ], [
             'title.required' => 'El título del aviso es obligatorio.',
             'content.required' => 'El contenido o mensaje del aviso es obligatorio.',
-            'targetStudentId.required_if' => 'Debe seleccionar un alumno para este aviso.',
+            'targetStudentId.required_if' => 'Debe seleccionar un alumno.',
             'eventDate.required_if' => 'La fecha de inicio es obligatoria para trabajo en casa.',
             'endDate.required_if' => 'La fecha de término es obligatoria para trabajo en casa.',
             'endDate.after_or_equal' => 'La fecha de término debe ser igual o posterior a la de inicio.',
@@ -176,6 +188,7 @@ new class extends Component {
     public function editNotice(string $id): void
     {
         $this->authorize('teacher-or-admin');
+        $this->resetValidation();
         $notice = Notice::findOrFail($id);
         
         $this->editingNoticeId = $notice->id;
@@ -385,7 +398,7 @@ new class extends Component {
             <flux:text class="text-zinc-500">Mural digital de avisos escolares.</flux:text>
         </div>
         @if($isStaff)
-            <flux:button variant="primary" icon="plus" wire:click="$set('showCreateModal', true)">Nuevo Aviso</flux:button>
+            <flux:button variant="primary" icon="plus" wire:click="openCreateModal">Nuevo Aviso</flux:button>
         @endif
     </div>
 
@@ -397,6 +410,7 @@ new class extends Component {
                 <option value="GENERAL">General</option>
                 <option value="URGENT">Urgente</option>
                 <option value="EVENT">Evento</option>
+                <option value="TRABAJO_EN_CASA">Trabajo en Casa</option>
             </flux:select>
             <div class="flex items-center gap-2 px-2">
                 <flux:switch wire:model.live="onlyActiveCycle" label="Solo ciclo activo" />
@@ -731,6 +745,8 @@ new class extends Component {
                                     Alumno seleccionado correctamente.
                                 </div>
                             @endif
+
+                            <flux:error name="targetStudentId" />
                         </div>
                     @endif
 

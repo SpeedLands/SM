@@ -12,7 +12,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Concerns\ToArray;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ExcelImportService
 {
@@ -26,11 +28,11 @@ class ExcelImportService
         }
 
         // Load the spreadsheet to get actual sheet names
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
+        $spreadsheet = IOFactory::load($file->getRealPath());
         $sheetNames = $spreadsheet->getSheetNames();
 
         // Get the data from all sheets
-        $sheets = Excel::toArray(new class implements \Maatwebsite\Excel\Concerns\ToArray
+        $sheets = Excel::toArray(new class implements ToArray
         {
             public function array(array $array)
             {
@@ -147,14 +149,14 @@ class ExcelImportService
         bool $dryRun = false,
         array $parentColumnMapping = []
     ): array {
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
+        $spreadsheet = IOFactory::load($file->getRealPath());
         $sheetNames = $spreadsheet->getSheetNames();
         $sheetName = $sheetNames[$sheetIndex] ?? '';
 
         // Extract grade and section from sheet name (e.g., "3A" -> "3º", "A")
         $context = $this->extractGradeAndSection($sheetName);
 
-        $sheets = Excel::toArray(new class implements \Maatwebsite\Excel\Concerns\ToArray
+        $sheets = Excel::toArray(new class implements ToArray
         {
             public function array(array $array)
             {
@@ -171,7 +173,7 @@ class ExcelImportService
         // Handle separate parent file if provided
         $parentRows = null;
         if ($parentFile) {
-            $parentSpreadsheet = Excel::toArray(new class implements \Maatwebsite\Excel\Concerns\ToArray
+            $parentSpreadsheet = Excel::toArray(new class implements ToArray
             {
                 public function array(array $array)
                 {
@@ -283,27 +285,34 @@ class ExcelImportService
             return [];
         }
 
+        // Optimization: Use whereDoesntHave/whereHas with count constraints directly in the query
+        // to avoid loading hundreds of students into memory.
         $incompleteStudents = Student::whereHas('cycleAssociations', function ($q) use ($activeCycle) {
             $q->where('cycle_id', $activeCycle->id);
         })
-            ->withCount(['parents as father_count' => function ($q) {
-                $q->where('relationship', 'PADRE');
+            ->where(function ($query) {
+                $query->whereDoesntHave('parents', function ($q) {
+                    $q->where('relationship', 'PADRE');
+                })
+                    ->orWhereDoesntHave('parents', function ($q) {
+                        $q->where('relationship', 'MADRE');
+                    });
+            })
+            ->with(['parents' => function ($q) {
+                $q->select('id', 'name')->whereIn('relationship', ['PADRE', 'MADRE']);
             }])
-            ->withCount(['parents as mother_count' => function ($q) {
-                $q->where('relationship', 'MADRE');
-            }])
-            ->get()
-            ->filter(function ($student) {
-                return $student->father_count == 0 || $student->mother_count == 0;
-            });
+            ->get();
 
         $items = [];
         foreach ($incompleteStudents as $student) {
+            $hasFather = $student->parents->contains(fn ($p) => $p->pivot->relationship === 'PADRE');
+            $hasMother = $student->parents->contains(fn ($p) => $p->pivot->relationship === 'MADRE');
+
             $missing = [];
-            if ($student->father_count == 0) {
+            if (! $hasFather) {
                 $missing[] = 'PADRE';
             }
-            if ($student->mother_count == 0) {
+            if (! $hasMother) {
                 $missing[] = 'MADRE';
             }
 
@@ -387,7 +396,7 @@ class ExcelImportService
         return $stats;
     }
 
-    public function importParents(Collection $rows, string $currentGrade, string $currentSection, array $columnMapping): array
+    public function importParents(Collection $rows, string $currentGrade, string $currentSection, array $columnMapping = []): array
     {
         $report = [
             'summary' => [
@@ -602,14 +611,14 @@ class ExcelImportService
                     ];
                 } else {
                     $user->name = $concatenatedName;
-                    
-                    if (!empty($phone)) {
+
+                    if (! empty($phone)) {
                         $user->phone = $phone;
                     }
-                    if (!empty($occupation)) {
+                    if (! empty($occupation)) {
                         $user->occupation = $occupation;
                     }
-                    
+
                     $user->save();
 
                     // Optimization: Direct update without redundant check to save time
@@ -695,7 +704,8 @@ class ExcelImportService
         // Global search because typos are common and the grade/section context might be wrong.
         static $allStudentsCache = null;
         if ($allStudentsCache === null) {
-            $allStudentsCache = Student::all(); // Load once per import session
+            // Optimization: Only load name and id to save memory
+            $allStudentsCache = Student::select('id', 'name')->get();
         }
         $candidates = $allStudentsCache;
 
@@ -811,7 +821,7 @@ class ExcelImportService
 
                 // Handle PII data
                 $pii = $student->pii()->firstOrNew(['student_id' => $student->id]);
-                
+
                 $address = trim((string) ($row[$addressIdx] ?? ''));
                 if ($address !== '') {
                     $pii->address_encrypted = $address;

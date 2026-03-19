@@ -1,10 +1,11 @@
 <?php
 
+use Illuminate\Contracts\Console\Kernel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 
 $finalData = json_decode(file_get_contents('tmp/final_student_records.json'), true);
 
@@ -40,7 +41,7 @@ foreach ($groups as $group => $studentNames) {
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save($file);
         echo "Saved $file\n";
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         echo 'Error: '.$e->getMessage()."\n";
     }
     echo "\n";

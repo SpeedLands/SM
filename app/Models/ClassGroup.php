@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\ClassGroupFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ClassGroup extends Model
 {
-    /** @use HasFactory<\Database\Factories\ClassGroupFactory> */
+    /** @use HasFactory<ClassGroupFactory> */
     use HasFactory, HasUuids;
 
     public $timestamps = false;

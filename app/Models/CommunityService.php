@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\CommunityServiceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class CommunityService extends Model
 {
-    /** @use HasFactory<\Database\Factories\CommunityServiceFactory> */
+    /** @use HasFactory<CommunityServiceFactory> */
     use HasFactory;
 
     protected $keyType = 'string';
@@ -63,7 +65,7 @@ class CommunityService extends Model
         parent::boot();
         static::creating(function ($model) {
             if (empty($model->id)) {
-                $model->id = (string) \Illuminate\Support\Str::uuid();
+                $model->id = (string) Str::uuid();
             }
         });
     }

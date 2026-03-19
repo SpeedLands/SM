@@ -2,10 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\ClassGroup;
+use App\Models\Cycle;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ClassGroup>
+ * @extends Factory<ClassGroup>
  */
 class ClassGroupFactory extends Factory
 {
@@ -19,7 +21,7 @@ class ClassGroupFactory extends Factory
         return [
             'grade' => $this->faker->randomElement(['1º', '2º', '3º']),
             'section' => $this->faker->randomElement(['A', 'B', 'C', 'D', 'G', 'H', 'I']),
-            'cycle_id' => \App\Models\Cycle::factory(),
+            'cycle_id' => Cycle::factory(),
         ];
     }
 }

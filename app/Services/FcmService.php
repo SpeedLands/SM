@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -81,8 +82,8 @@ class FcmService
             // UNREGISTERED: The token is no longer valid.
             // INVALID_ARGUMENT: The token is malformed.
             if ($errorCode === 'UNREGISTERED' || $errorCode === 'INVALID_ARGUMENT') {
-                Log::warning('FCM Token Invalidated: Clearing subscription.', ['token' => $deviceToken]);
-                \App\Models\PushSubscription::where('fcm_token', $deviceToken)->delete();
+                Log::warning('FCM Token Invalidated: Clearing token for user.', ['token' => $deviceToken]);
+                User::where('fcm_token', $deviceToken)->update(['fcm_token' => null]);
             }
 
             return false;

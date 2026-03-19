@@ -9,15 +9,17 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CredentialController extends Controller
 {
-    public function show(Student $student): \Illuminate\Http\Response
+    public function show(Student $student): Response
     {
         return $this->generatePdf([$student]);
     }
 
-    public function bulk(\Illuminate\Http\Request $request): \Illuminate\Http\Response
+    public function bulk(Request $request): Response
     {
         $ids = $request->input('ids', []);
         $students = Student::whereIn('id', $ids)->get();
@@ -29,7 +31,7 @@ class CredentialController extends Controller
         return $this->generatePdf($students, $request->input('scale', 1.0));
     }
 
-    protected function generatePdf($students, $scale = 1.0): \Illuminate\Http\Response
+    protected function generatePdf($students, $scale = 1.0): Response
     {
         $activeCycle = Cycle::where('is_active', true)->first();
         $cycleName = $activeCycle ? $activeCycle->name : '2025 - 2026';

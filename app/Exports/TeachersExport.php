@@ -3,6 +3,8 @@
 namespace App\Exports;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
@@ -28,9 +30,9 @@ class TeachersExport extends StringValueBinder implements FromCollection, Should
                 $passwordColumn = $user->plain_password ?? '';
 
                 if ($this->generatePasswords) {
-                    $newPassword = \Illuminate\Support\Str::password(8, letters: true, numbers: true, symbols: false, spaces: false);
+                    $newPassword = Str::password(8, letters: true, numbers: true, symbols: false, spaces: false);
                     $user->update([
-                        'password' => \Illuminate\Support\Facades\Hash::make($newPassword),
+                        'password' => Hash::make($newPassword),
                         'plain_password' => $newPassword,
                     ]);
                     $passwordColumn = $newPassword;

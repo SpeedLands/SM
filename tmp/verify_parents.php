@@ -37,7 +37,7 @@ foreach ($groups as $group) {
             $phone = $parentSheet->getCellByColumnAndRow(3, $row)->getValue();
             echo "    Row $row: $name | Phone: $phone\n";
         }
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         echo '  Error: '.$e->getMessage()."\n";
     }
     echo "\n";

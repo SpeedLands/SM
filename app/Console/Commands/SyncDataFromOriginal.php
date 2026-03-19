@@ -2,7 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Student;
+use App\Models\User;
 use Illuminate\Console\Command;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class SyncDataFromOriginal extends Command
 {
@@ -48,7 +51,7 @@ class SyncDataFromOriginal extends Command
         $this->info("Cargando archivo: {$filePath}...");
 
         try {
-            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($filePath);
+            $spreadsheet = IOFactory::load($filePath);
         } catch (\Exception $e) {
             $this->error('Error cargando el archivo: '.$e->getMessage());
 
@@ -85,7 +88,7 @@ class SyncDataFromOriginal extends Command
         }
 
         // Scan DB
-        $students = \App\Models\Student::all();
+        $students = Student::all();
         $deletedCount = 0;
         $toDelete = [];
 
@@ -133,7 +136,7 @@ class SyncDataFromOriginal extends Command
         // Cleanup orphan parents (only if not dry-run)
         $this->newLine();
         $this->info('Revisando padres huérfanos...');
-        $orphanParents = \App\Models\User::where('role', 'PARENT')
+        $orphanParents = User::where('role', 'PARENT')
             ->whereDoesntHave('students')
             ->get();
 

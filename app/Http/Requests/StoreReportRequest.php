@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreReportRequest extends FormRequest
@@ -17,7 +19,7 @@ class StoreReportRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -31,7 +33,7 @@ class StoreReportRequest extends FormRequest
                 'date',
                 'before_or_equal:tomorrow',
                 function ($attribute, $value, $fail) {
-                    if ($value && \Carbon\Carbon::parse($value)->isWeekend()) {
+                    if ($value && Carbon::parse($value)->isWeekend()) {
                         $fail('No se pueden registrar reportes para fines de semana.');
                     }
                 },

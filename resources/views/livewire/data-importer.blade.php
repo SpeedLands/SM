@@ -109,7 +109,12 @@
                             <option value="">{{ $parentFile ? 'Seleccionar del archivo de padres...' : 'Opcional: Misma hoja o diferente del archivo principal...' }}</option>
                             @php $pSheets = $parentFile ? $parentFileSheets : $sheets; @endphp
                             @foreach($pSheets as $sheet)
-                                <option value="{{ $sheet['index'] }}">{{ $sheet['name'] }} ({{ $sheet['rows_count'] }} filas)</option>
+                                @php
+                                    $isDisabled = !$parentFile && (string)$sheet['index'] === (string)$targetSheetIndex;
+                                @endphp
+                                <option value="{{ $sheet['index'] }}" @disabled($isDisabled)>
+                                    {{ $sheet['name'] }} ({{ $sheet['rows_count'] }} filas){!! $isDisabled ? ' &mdash; <i>(Ya seleccionada como principal)</i>' : '' !!}
+                                </option>
                             @endforeach
                         </flux:select>
                     @endif

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\CitationFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Citation extends Model
 {
-    /** @use HasFactory<\Database\Factories\CitationFactory> */
+    /** @use HasFactory<CitationFactory> */
     use HasFactory, HasUuids;
 
     public $timestamps = false;

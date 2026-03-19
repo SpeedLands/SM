@@ -116,6 +116,10 @@ class DataImporter extends Component
     {
         $this->updatePreview();
 
+        if (! $this->parentFile && $this->parentSheetIndex !== null && (string) $this->targetSheetIndex === (string) $this->parentSheetIndex) {
+            $this->parentSheetIndex = null;
+        }
+
         if ($this->targetSheetIndex !== null && is_numeric($this->targetSheetIndex)) {
             $sheet = collect($this->sheets)->firstWhere('index', (int) $this->targetSheetIndex);
             if ($sheet && isset($sheet['header'])) {
@@ -160,16 +164,26 @@ class DataImporter extends Component
 
     public function import()
     {
-        $this->validate([
+        $rules = [
             'targetSheetIndex' => 'required|integer',
             'importType' => 'required|string',
-            'parentSheetIndex' => 'nullable|integer|different:targetSheetIndex',
+        ];
+
+        if (! $this->parentFile) {
+            $rules['parentSheetIndex'] = 'nullable|integer|different:targetSheetIndex';
+        } else {
+            $rules['parentSheetIndex'] = 'nullable|integer';
+        }
+
+        $this->validate($rules, [
+            'parentSheetIndex.different' => 'La hoja de padres no puede ser la misma que la principal.',
         ]);
 
-        // Timeout Prevention: Limit row counts
+        // Timeout Prevention: Limit row counts based on type
+        $limit = ($this->importType === 'PARENTS') ? 300 : 150;
         $mainSheetInfo = collect($this->sheets)->firstWhere('index', (int) $this->targetSheetIndex);
-        if ($mainSheetInfo && $mainSheetInfo['rows_count'] > 61) { // 60 data rows + 1 header
-            $this->addError('import', "El archivo principal tiene {$mainSheetInfo['rows_count']} filas. Para evitar que el servidor se sature, el límite es de 60 registros por subida (generalmente un grupo a la vez).");
+        if ($mainSheetInfo && $mainSheetInfo['rows_count'] > ($limit + 1)) {
+            $this->addError('import', "El archivo principal tiene {$mainSheetInfo['rows_count']} filas. El límite para {$this->importType} es de {$limit} registros por subida para evitar que el servidor se sature.");
 
             return;
         }
@@ -177,8 +191,8 @@ class DataImporter extends Component
         if ($this->parentSheetIndex !== null && $this->parentSheetIndex !== '') {
             $parentSource = $this->parentFile ? $this->parentFileSheets : $this->sheets;
             $parentSheetInfo = collect($parentSource)->firstWhere('index', (int) $this->parentSheetIndex);
-            if ($parentSheetInfo && $parentSheetInfo['rows_count'] > 121) { // 120 data rows + 1 header
-                $this->addError('import', "El archivo de padres tiene {$parentSheetInfo['rows_count']} filas. El límite es de 120 registros para evitar que la página marque error de tiempo de espera.");
+            if ($parentSheetInfo && $parentSheetInfo['rows_count'] > 301) { // 300 data rows + 1 header
+                $this->addError('import', "El archivo de padres tiene {$parentSheetInfo['rows_count']} filas. El límite es de 300 registros para evitar que la página marque error de tiempo de espera.");
 
                 return;
             }

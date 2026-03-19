@@ -25,7 +25,7 @@ foreach ($files as $file) {
             }
             echo '    Headers: '.implode(' | ', $headers)."\n";
         }
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         echo 'Error: '.$e->getMessage()."\n";
     }
     echo "\n";

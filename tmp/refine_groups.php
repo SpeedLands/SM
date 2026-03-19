@@ -162,7 +162,7 @@ foreach ($mismatches as $m) {
         // SAVE UPDATED TARGET
         $writerTo = IOFactory::createWriter($ssTo, 'Xlsx');
         $writerTo->save($toPath);
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         echo "ERROR processing {$m['name']}: ".$e->getMessage()."\n";
         echo $e->getTraceAsString()."\n";
     }

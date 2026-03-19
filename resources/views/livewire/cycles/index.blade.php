@@ -35,7 +35,7 @@ new class extends Component {
     public bool $showDeleteCycleModal = false;
 
     protected $rules = [
-        'name' => 'required|string|max:50',
+        'name' => ['required', 'string', 'regex:/^\d{4}-\d{4}$/', 'max:9'],
         'start_date' => 'required|date',
         'end_date' => 'required|date|after:start_date',
         'is_active' => 'boolean',
@@ -43,11 +43,13 @@ new class extends Component {
 
     protected $messages = [
         'name.required' => 'El nombre del ciclo es obligatorio.',
+        'name.regex' => 'El nombre del ciclo debe tener el formato AAAA-AAAA (ej: 2024-2025).',
         'start_date.required' => 'La fecha de inicio es obligatoria.',
         'end_date.required' => 'La fecha de fin es obligatoria.',
         'end_date.after' => 'La fecha de fin debe ser posterior a la de inicio.',
         'grade.required' => 'El grado es obligatorio.',
         'section.required' => 'La sección es obligatoria.',
+        'tutorId.exists' => 'El tutor seleccionado no es válido.',
     ];
 
     public function mount(): void
@@ -76,8 +78,10 @@ new class extends Component {
         $this->dispatch('cycle-saved');
     }
 
-    public function edit(Cycle $cycle): void
+    public function edit(string $id): void
     {
+        $this->resetValidation();
+        $cycle = Cycle::findOrFail($id);
         $this->editing = $cycle;
         $this->name = $cycle->name;
         $this->start_date = $cycle->start_date->format('Y-m-d');
@@ -91,9 +95,9 @@ new class extends Component {
         $this->reset(['name', 'start_date', 'end_date', 'is_active']);
     }
 
-    public function confirmDelete(Cycle $cycle): void
+    public function confirmDelete(string $id): void
     {
-        $this->cycleToDelete = $cycle;
+        $this->cycleToDelete = Cycle::findOrFail($id);
         $this->showDeleteCycleModal = true;
     }
 
@@ -122,6 +126,9 @@ new class extends Component {
     // Group Management Methods
     public function openGroupsModal(string $cycleId): void
     {
+        $this->resetValidation();
+        $this->reset(['grade', 'section', 'tutorId']);
+        $this->editingGroup = null;
         $this->groupCycle = Cycle::findOrFail($cycleId);
         $this->showGroupsModal = true;
     }
@@ -140,6 +147,8 @@ new class extends Component {
             'section' => 'required|string',
             'tutorId' => 'nullable|exists:users,id',
         ], [
+            'grade.required' => 'El grado es obligatorio.',
+            'section.required' => 'La sección es obligatoria.',
             'grade.unique' => 'Este grupo (grado y sección) ya está registrado en este ciclo.',
         ]);
 
@@ -174,6 +183,7 @@ new class extends Component {
 
     public function cancelGroupEdit(): void
     {
+        $this->resetValidation();
         $this->editingGroup = null;
         $this->reset(['grade', 'section', 'tutorId']);
     }
@@ -345,7 +355,7 @@ new class extends Component {
                                 <td class="py-4 px-2 text-right">
                                     <div class="flex justify-end gap-1">
                                         <flux:button variant="ghost" size="sm" icon="users" title="Gestionar grupos" wire:click="openGroupsModal('{{ $cycle->id }}')" />
-                                        <flux:button variant="ghost" size="sm" icon="pencil" title="Editar ciclo" wire:click="edit({{ $cycle->id }})" />
+                                        <flux:button variant="ghost" size="sm" icon="pencil" title="Editar ciclo" wire:click="edit('{{ $cycle->id }}')" />
                                         @if($cycle->groups_count === 0 && $cycle->reports_count === 0 && $cycle->notices_count === 0 && $cycle->citations_count === 0)
                                             <flux:button variant="ghost" size="sm" icon="trash" title="Eliminar ciclo" wire:click="confirmDelete('{{ $cycle->id }}')" />
                                         @else
@@ -365,8 +375,7 @@ new class extends Component {
         </div>
     </div>
 
-    <!-- Groups Modal -->
-    <flux:modal wire:model.self="showGroupsModal" class="md:w-160">
+    <flux:modal wire:model.self="showGroupsModal" class="md:w-160" @close="$wire.cancelGroupEdit()">
         <div class="space-y-6">
             <header>
                 <flux:heading size="lg">Grupos del Ciclo: {{ $groupCycle?->name }}</flux:heading>

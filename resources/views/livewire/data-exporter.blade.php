@@ -168,7 +168,7 @@ new #[Layout('components.layouts.app')] class extends Component {
                                 <option value="{{ $cycle->id }}">{{ $cycle->name }}</option>
                             @endforeach
                         </flux:select>
-                        <flux:select wire:model.live="parentGroupId" placeholder="Todos los grupos" class="w-1/2">
+                        <flux:select wire:model.live="parentGroupId" class="w-1/2">
                             <option value="">Todos los grupos</option>
                             @foreach ($this->parentGroups as $group)
                                 <option value="{{ $group->id }}">{{ $group->grade }} {{ $group->section }}</option>
@@ -214,7 +214,7 @@ new #[Layout('components.layouts.app')] class extends Component {
                                 <option value="{{ $cycle->id }}">{{ $cycle->name }}</option>
                             @endforeach
                         </flux:select>
-                        <flux:select wire:model.live="groupId" placeholder="Todos los grupos" class="w-1/2">
+                        <flux:select wire:model.live="groupId" class="w-1/2">
                             <option value="">Todos los grupos</option>
                             @foreach ($this->groups as $group)
                                 <option value="{{ $group->id }}">{{ $group->grade }} {{ $group->section }}</option>

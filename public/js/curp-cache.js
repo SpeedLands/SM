@@ -1,145 +1,174 @@
 /**
- * CurpCache - IndexedDB-based local cache for student CURP lookups.
- * Pre-loads all CURPs on scanner pages to enable instant client-side validation
- * and reduce server round-trips during QR scanning.
- * Cache is destroyed on page leave for security.
+ * CurpCache - Reusable IndexedDB utility for student identification.
  */
 const CurpCache = {
-    DB_NAME: 'sm_curp_cache',
-    STORE_NAME: 'students',
-    DB_VERSION: 1,
+    dbName: 'sm_curp_cache',
+    dbVersion: 2,
+    storeName: 'students',
+    queueStoreName: 'pending_scans',
+    db: null,
 
-    _db: null,
-
-    async _open() {
-        if (this._db) return this._db;
+    async init(fetchUrl) {
+        if (this.db) return this.count();
 
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+            const request = indexedDB.open(this.dbName, this.dbVersion);
 
-            request.onerror = () => reject(request.error);
-
-            request.onsuccess = () => {
-                this._db = request.result;
-                resolve(this._db);
-            };
-
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                if (!db.objectStoreNames.contains(this.STORE_NAME)) {
-                    db.createObjectStore(this.STORE_NAME, { keyPath: 'curp' });
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                // Students Store
+                if (!db.objectStoreNames.contains(this.storeName)) {
+                    db.createObjectStore(this.storeName, { keyPath: 'id' });
+                    const store = e.target.transaction.objectStore(this.storeName);
+                    store.createIndex('curp', 'curp', { unique: true });
+                }
+                // Queue Store
+                if (!db.objectStoreNames.contains(this.queueStoreName)) {
+                    db.createObjectStore(this.queueStoreName, { keyPath: 'timestamp' });
                 }
             };
+
+            request.onsuccess = async (e) => {
+                this.db = e.target.result;
+                const count = await this.count();
+                if (count === 0 && fetchUrl) {
+                    await this.refresh(fetchUrl);
+                }
+                resolve(await this.count());
+            };
+
+            request.onerror = (e) => reject(e);
         });
     },
 
-    /**
-     * Fetch all CURPs from the server and store in IndexedDB.
-     */
-    async populate(apiUrl) {
-        const response = await fetch(apiUrl, {
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            credentials: 'same-origin',
+    async count() {
+        if (!this.db) return 0;
+        return new Promise((resolve) => {
+            const tx = this.db.transaction(this.storeName, 'readonly');
+            const store = tx.objectStore(this.storeName);
+            const request = store.count();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => resolve(0);
         });
+    },
 
-        if (!response.ok) throw new Error('Error al cargar CURPs: ' + response.status);
-
+    async refresh(fetchUrl) {
+        if (!this.db) return;
+        
+        const response = await fetch(fetchUrl);
         const students = await response.json();
-        const db = await this._open();
 
         return new Promise((resolve, reject) => {
-            const tx = db.transaction(this.STORE_NAME, 'readwrite');
-            const store = tx.objectStore(this.STORE_NAME);
-
+            const tx = this.db.transaction(this.storeName, 'readwrite');
+            const store = tx.objectStore(this.storeName);
             store.clear();
 
-            for (const student of students) {
-                store.put(student);
-            }
+            students.forEach(s => store.put(s));
 
             tx.oncomplete = () => resolve(students.length);
-            tx.onerror = () => reject(tx.error);
+            tx.onerror = (e) => reject(e);
         });
     },
 
-    /**
-     * Look up a CURP in the local cache. Returns student object or null.
-     */
     async lookup(curp) {
-        const db = await this._open();
-
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction(this.STORE_NAME, 'readonly');
-            const store = tx.objectStore(this.STORE_NAME);
-            const request = store.get(curp.trim().toUpperCase());
-
-            request.onsuccess = () => resolve(request.result || null);
-            request.onerror = () => reject(request.error);
-        });
-    },
-
-    /**
-     * Initialize the cache: always fetches fresh data on page load.
-     */
-    async init(apiUrl) {
-        return await this.populate(apiUrl);
-    },
-
-    /**
-     * Force-refresh the cache.
-     */
-    async refresh(apiUrl) {
-        return await this.populate(apiUrl);
-    },
-
-    /**
-     * Destroy the cache: close DB, delete database, clear references.
-     */
-    async destroy() {
-        if (this._db) {
-            this._db.close();
-            this._db = null;
-        }
+        if (!this.db) return null;
+        curp = curp.trim().toUpperCase();
+        
         return new Promise((resolve) => {
-            const request = indexedDB.deleteDatabase(this.DB_NAME);
-            request.onsuccess = () => resolve();
-            request.onerror = () => resolve(); // resolve even on error
-            request.onblocked = () => resolve();
+            const tx = this.db.transaction(this.storeName, 'readonly');
+            const store = tx.objectStore(this.storeName);
+            const index = store.index('curp');
+            const request = index.get(curp);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => resolve(null);
         });
     },
+
+    async destroy() {
+        if (this.db) {
+            this.db.close();
+            this.db = null;
+        }
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.deleteDatabase(this.dbName);
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject();
+        });
+    },
+
+    // Queue Management
+    async addToQueue(curp, studentInfo = null) {
+        if (!this.db) return;
+        return new Promise((resolve, reject) => {
+            const tx = this.db.transaction(this.queueStoreName, 'readwrite');
+            const store = tx.objectStore(this.queueStoreName);
+            const item = {
+                curp,
+                studentInfo,
+                timestamp: Date.now(),
+                attempts: 0
+            };
+            store.put(item);
+            tx.oncomplete = () => resolve(item);
+            tx.onerror = (e) => reject(e);
+        });
+    },
+
+    async getQueue() {
+        if (!this.db) return [];
+        return new Promise((resolve) => {
+            const tx = this.db.transaction(this.queueStoreName, 'readonly');
+            const store = tx.objectStore(this.queueStoreName);
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => resolve([]);
+        });
+    },
+
+    async removeFromQueue(timestamp) {
+        if (!this.db) return;
+        return new Promise((resolve, reject) => {
+            const tx = this.db.transaction(this.queueStoreName, 'readwrite');
+            const store = tx.objectStore(this.queueStoreName);
+            store.delete(timestamp);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e);
+        });
+    }
 };
 
 /**
- * Play a sound locally without a server round-trip (Web Audio API).
+ * Global sound utility using Web Audio API (No MP3s needed)
  */
 function playLocalSound(type) {
     const sequences = {
-        'success': [[660, 0.15], [880, 0.15]],
-        'error':   [[440, 0.2],  [220, 0.3]],
-        'warning': [[520, 0.15], [520, 0.15]],
+        'success': [[660, 0.1], [880, 0.15]],
+        'warning': [[520, 0.1], [520, 0.1]],
+        'error':   [[440, 0.15], [220, 0.25]],
     };
 
-    const seq = sequences[type];
-    if (!seq) return;
+    if (!sequences[type]) return;
 
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') ctx.resume();
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
 
-    seq.forEach(([freq, dur], i) => {
-        setTimeout(() => {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, ctx.currentTime);
-            gain.gain.setValueAtTime(0.12, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + dur);
-        }, i * 200);
-    });
+        sequences[type].forEach(([freq, dur], i) => {
+            setTimeout(() => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + dur);
+            }, i * 150);
+        });
+    } catch (e) {
+        console.warn('Web Audio not supported:', e);
+    }
 }

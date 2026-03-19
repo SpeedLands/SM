@@ -1,5 +1,15 @@
 <?php
 
+use App\Http\Controllers\CredentialController;
+use App\Http\Controllers\ExportController;
+use App\Http\Controllers\FcmController;
+use App\Livewire\DataImporter;
+use App\Models\Attendance;
+use App\Models\Setting;
+use App\Models\Student;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -16,19 +26,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('can:admin-only')->group(function () {
         Volt::route('cycles', 'cycles.index')->name('cycles.index');
         Volt::route('users', 'users.index')->name('users.index');
-        Route::get('importar-datos', \App\Livewire\DataImporter::class)->name('data-importer');
+        Route::get('importar-datos', DataImporter::class)->name('data-importer');
         Volt::route('exportar-datos', 'data-exporter')->name('data-exporter');
 
-        Route::get('exportar/maestros', [\App\Http\Controllers\ExportController::class, 'teachers'])->name('export.teachers');
-        Route::get('exportar/padres', [\App\Http\Controllers\ExportController::class, 'parents'])->name('export.parents');
-        Route::get('exportar/alumnos', [\App\Http\Controllers\ExportController::class, 'students'])->name('export.students');
-        Route::get('exportar/asistencias', [\App\Http\Controllers\ExportController::class, 'attendance'])->name('export.attendance');
+        Route::get('exportar/maestros', [ExportController::class, 'teachers'])->name('export.teachers');
+        Route::get('exportar/padres', [ExportController::class, 'parents'])->name('export.parents');
+        Route::get('exportar/alumnos', [ExportController::class, 'students'])->name('export.students');
+        Route::get('exportar/asistencias', [ExportController::class, 'attendance'])->name('export.attendance');
     });
     Volt::route('reglamento', 'regulations.index')->name('regulations.index');
     Volt::route('alumnos', 'students.index')->name('students.index');
     Volt::route('alumnos/promover', 'students.promote-students')->name('students.promote');
-    Route::get('alumnos/{student}/credencial', [\App\Http\Controllers\CredentialController::class, 'show'])->name('students.credential');
-    Route::post('alumnos/credenciales/bulk', [\App\Http\Controllers\CredentialController::class, 'bulk'])->name('students.credential.bulk');
+    Route::get('alumnos/{student}/credencial', [CredentialController::class, 'show'])->name('students.credential');
+    Route::post('alumnos/credenciales/bulk', [CredentialController::class, 'bulk'])->name('students.credential.bulk');
     Volt::route('reportes', 'reports.index')->name('reports.index');
     Volt::route('servicio-comunitario', 'community-services.index')->name('community-services.index');
     Volt::route('avisos', 'notices.index')->name('notices.index');
@@ -45,58 +55,61 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // API: Bulk CURP data for local scanner cache
     Route::get('api/curps', function () {
-        \Illuminate\Support\Facades\Gate::authorize('teacher-or-admin');
+        Gate::authorize('teacher-or-admin');
 
         return response()->json(
-            \App\Models\Student::select('id', 'curp', 'name', 'grade', 'group_name', 'turn')
+            Student::select('id', 'curp', 'name', 'grade', 'group_name', 'turn')
                 ->whereNotNull('curp')
                 ->where('curp', '!=', '')
                 ->get()
         );
     })->name('api.curps');
 
-    // API: Background attendance recording (fire-and-forget from scanner)
-    Route::post('api/attendance', function (\Illuminate\Http\Request $request) {
-        \Illuminate\Support\Facades\Gate::authorize('teacher-or-admin');
+    Route::post('api/attendance', function (Request $request) {
+        Gate::authorize('teacher-or-admin');
 
         $request->validate([
             'curp' => 'required|string|max:18',
+            'timestamp' => 'nullable|numeric',
         ]);
 
         $curp = trim(strtoupper($request->input('curp')));
-        $student = \App\Models\Student::where('curp', $curp)->first();
+        $student = Student::where('curp', $curp)->first();
 
-        if (!$student) {
+        if (! $student) {
             return response()->json(['status' => 'error', 'message' => 'CURP no encontrado'], 404);
         }
 
-        $today = \Illuminate\Support\Carbon::today()->toDateString();
-        $now = \Illuminate\Support\Carbon::now();
+        $today = Carbon::today()->toDateString();
+        $now = $request->has('timestamp')
+            ? Carbon::createFromTimestampMs($request->input('timestamp'))
+            : Carbon::now();
+
         $status = 'PRESENTE';
-        $graceMinutes = (int) \App\Models\Setting::get('attendance.grace_minutes', 10);
+        $graceMinutes = (int) Setting::get('attendance.grace_minutes', 10);
 
         if ($student->turn === 'MATUTINO') {
-            $entryTime = \App\Models\Setting::get('attendance.matutino_entry_time', '07:30');
-            $threshold = \Illuminate\Support\Carbon::createFromFormat('H:i', $entryTime)->addMinutes($graceMinutes);
+            $entryTime = Setting::get('attendance.matutino_entry_time', '07:30');
+            $threshold = Carbon::createFromFormat('H:i', $entryTime)->addMinutes($graceMinutes);
             if ($now->greaterThan($threshold)) {
                 $status = 'RETARDO';
             }
         } elseif ($student->turn === 'VESPERTINO') {
-            $entryTime = \App\Models\Setting::get('attendance.vespertino_entry_time', '13:30');
-            $threshold = \Illuminate\Support\Carbon::createFromFormat('H:i', $entryTime)->addMinutes($graceMinutes);
+            $entryTime = Setting::get('attendance.vespertino_entry_time', '13:30');
+            $threshold = Carbon::createFromFormat('H:i', $entryTime)->addMinutes($graceMinutes);
             if ($now->greaterThan($threshold)) {
                 $status = 'RETARDO';
             }
         }
 
-        $attendance = \App\Models\Attendance::updateOrCreate(
+        $attendance = Attendance::updateOrCreate(
             ['student_id' => $student->id, 'date' => $today],
             ['entry_time' => $now->format('H:i:s'), 'status' => $status]
         );
 
         return response()->json([
             'status' => $status,
-            'duplicate' => !$attendance->wasRecentlyCreated,
+            'duplicate' => ! $attendance->wasRecentlyCreated,
             'entry_time' => $now->format('H:i:s'),
             'student_name' => $student->name,
         ]);
@@ -175,6 +188,4 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 });
-Route::post('/fcm-token', [\App\Http\Controllers\PushSubscriptionController::class, 'storeLegacyToken'])->name('fcm-token')->middleware('auth');
-Route::post('/push/subscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'store'])->name('push.subscribe')->middleware('auth');
-Route::post('/push/unsubscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'destroy'])->name('push.unsubscribe')->middleware('auth');
+Route::post('/fcm-token', [FcmController::class, 'storeToken'])->name('fcm-token')->middleware('auth');

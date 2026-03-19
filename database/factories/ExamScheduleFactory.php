@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\ExamSchedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ExamSchedule>
+ * @extends Factory<ExamSchedule>
  */
 class ExamScheduleFactory extends Factory
 {
