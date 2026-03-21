@@ -69,50 +69,74 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Gate::authorize('teacher-or-admin');
 
         $request->validate([
-            'curp' => 'required|string|max:18',
-            'timestamp' => 'nullable|numeric',
+            'scans' => 'required|array',
+            'scans.*.curp' => 'required|string|max:18',
+            'scans.*.timestamp' => 'nullable|numeric',
         ]);
 
-        $curp = trim(strtoupper($request->input('curp')));
-        $student = Student::where('curp', $curp)->first();
-
-        if (! $student) {
-            return response()->json(['status' => 'error', 'message' => 'CURP no encontrado'], 404);
-        }
-
+        $results = [];
         $today = Carbon::today()->toDateString();
-        $now = $request->has('timestamp')
-            ? Carbon::createFromTimestampMs($request->input('timestamp'))
-            : Carbon::now();
-
-        $status = 'PRESENTE';
         $graceMinutes = (int) Setting::get('attendance.grace_minutes', 10);
+        $matutinoEntryTime = Setting::get('attendance.matutino_entry_time', '07:30');
+        $vespertinoEntryTime = Setting::get('attendance.vespertino_entry_time', '13:30');
 
-        if ($student->turn === 'MATUTINO') {
-            $entryTime = Setting::get('attendance.matutino_entry_time', '07:30');
-            $threshold = Carbon::createFromFormat('H:i', $entryTime)->addMinutes($graceMinutes);
-            if ($now->greaterThan($threshold)) {
-                $status = 'RETARDO';
+        foreach ($request->input('scans') as $scan) {
+            $curp = trim(strtoupper($scan['curp']));
+            $student = Student::where('curp', $curp)->first();
+
+            if (! $student) {
+                $results[] = [
+                    'curp' => $curp,
+                    'timestamp' => $scan['timestamp'] ?? null,
+                    'status' => 'error',
+                    'message' => 'CURP no encontrado'
+                ];
+                continue;
             }
-        } elseif ($student->turn === 'VESPERTINO') {
-            $entryTime = Setting::get('attendance.vespertino_entry_time', '13:30');
-            $threshold = Carbon::createFromFormat('H:i', $entryTime)->addMinutes($graceMinutes);
-            if ($now->greaterThan($threshold)) {
-                $status = 'RETARDO';
+
+            $now = isset($scan['timestamp'])
+                ? Carbon::createFromTimestampMs($scan['timestamp'])
+                : Carbon::now();
+
+            $status = 'PRESENTE';
+
+            if ($student->turn === 'MATUTINO') {
+                $threshold = Carbon::createFromFormat('H:i', $matutinoEntryTime)->addMinutes($graceMinutes);
+                if ($now->greaterThan($threshold)) {
+                    $status = 'RETARDO';
+                }
+            } elseif ($student->turn === 'VESPERTINO') {
+                $threshold = Carbon::createFromFormat('H:i', $vespertinoEntryTime)->addMinutes($graceMinutes);
+                if ($now->greaterThan($threshold)) {
+                    $status = 'RETARDO';
+                }
+            }
+
+            try {
+                $attendance = Attendance::updateOrCreate(
+                    ['student_id' => $student->id, 'date' => $today],
+                    ['entry_time' => $now->format('H:i:s'), 'status' => $status]
+                );
+
+                $results[] = [
+                    'curp' => $curp,
+                    'timestamp' => $scan['timestamp'] ?? null,
+                    'status' => $status,
+                    'duplicate' => ! $attendance->wasRecentlyCreated,
+                    'entry_time' => $now->format('H:i:s'),
+                    'student_name' => $student->name,
+                ];
+            } catch (\Exception $e) {
+                $results[] = [
+                    'curp' => $curp,
+                    'timestamp' => $scan['timestamp'] ?? null,
+                    'status' => 'error',
+                    'message' => 'Error al guardar',
+                ];
             }
         }
 
-        $attendance = Attendance::updateOrCreate(
-            ['student_id' => $student->id, 'date' => $today],
-            ['entry_time' => $now->format('H:i:s'), 'status' => $status]
-        );
-
-        return response()->json([
-            'status' => $status,
-            'duplicate' => ! $attendance->wasRecentlyCreated,
-            'entry_time' => $now->format('H:i:s'),
-            'student_name' => $student->name,
-        ]);
+        return response()->json(['results' => $results]);
     })->name('api.attendance');
 
     Route::post('toggle-view', function () {

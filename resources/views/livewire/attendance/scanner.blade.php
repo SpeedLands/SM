@@ -141,9 +141,9 @@ new class extends Component {
 
 <div class="max-w-2xl mx-auto py-8 px-4 space-y-6" x-data="scannerComponent()">
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    {{-- CURP local cache & HID Support --}}
-    <script src="/js/curp-cache.js"></script>
-    <script src="/js/hid-scanner.js"></script>
+    {{-- CURP local cache & HID Support (With cache buster) --}}
+    <script src="/js/curp-cache.js?v={{ filemtime(public_path('js/curp-cache.js')) }}"></script>
+    <script src="/js/hid-scanner.js?v={{ filemtime(public_path('js/hid-scanner.js')) }}"></script>
     {{-- Header --}}
     <div class="flex items-center gap-3">
         <flux:button :href="route('attendance.index')" icon="arrow-left" variant="subtle" size="sm"
@@ -386,6 +386,11 @@ new class extends Component {
             async init() {
                 this.setupFocus();
                 await this.loadCache();
+                
+                if (typeof CurpCache !== 'undefined') {
+                    await CurpCache.requestPersistentStorage();
+                }
+                
                 await this.loadPendingQueue();
                 
                 // HID Listener
@@ -402,6 +407,19 @@ new class extends Component {
 
                 // Start initial sync if there's data
                 this.processQueue();
+
+                // Listen for network becoming available
+                window.addEventListener('online', () => {
+                    console.log('Internet restaurado. Intentando sincronizar...');
+                    this.processQueue();
+                });
+
+                // Tries to sync every 15 seconds if there are pending items
+                setInterval(() => {
+                    if (this.pendingQueue.length > 0 && navigator.onLine) {
+                        this.processQueue();
+                    }
+                }, 15000);
             },
 
             async loadPendingQueue() {
@@ -512,44 +530,88 @@ new class extends Component {
                 this.isSyncingQueue = true;
 
                 while (this.pendingQueue.length > 0) {
-                    const item = this.pendingQueue[0];
-                    console.log('Sincronizando:', item.curp);
+                    const batch = this.pendingQueue.slice(0, 50);
+                    console.log('Sincronizando lote de:', batch.length);
 
                     try {
+                        const payload = batch.map(item => ({ curp: item.curp, timestamp: item.timestamp }));
                         const res = await fetch('{{ route("api.attendance") }}', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
-                            body: JSON.stringify({ 
-                                curp: item.curp,
-                                timestamp: item.timestamp
-                            })
+                            body: JSON.stringify({ scans: payload })
                         });
 
-                        if (!res.ok) throw new Error('Network error');
+                        if (!res.ok) {
+                            if (res.status >= 400 && res.status !== 429 && res.status !== 503) {
+                                throw new Error('ServerError');
+                            }
+                            throw new Error('Network error');
+                        }
 
                         const data = await res.json();
+                        let playError = false;
+                        let playSuccess = false;
                         
-                        // Update UI with server refinement
-                        this.lastStatus = data.duplicate ? 'duplicate' : (data.status === 'RETARDO' ? 'retardo' : 'success');
-                        this.statusMessage = data.duplicate ? 'Ya registrado' : (data.status === 'RETARDO' ? 'RETARDO Registrado' : 'ASISTENCIA Registrada');
-                        this.lastEntryTime = data.entry_time;
+                        // Process results
+                        for (const result of data.results) {
+                            const itemIndex = this.pendingQueue.findIndex(q => q.timestamp === result.timestamp);
+                            if (itemIndex > -1) {
+                                const item = this.pendingQueue[itemIndex];
+                                
+                                if (result.status === 'error') {
+                                    this.lastStatus = 'error';
+                                    this.statusMessage = 'Servidor rechazó registro: ' + item.curp;
+                                    playError = true;
+                                } else {
+                                    this.lastStatus = result.duplicate ? 'duplicate' : (result.status === 'RETARDO' ? 'retardo' : 'success');
+                                    this.statusMessage = result.duplicate ? 'Ya registrado' : (result.status === 'RETARDO' ? 'RETARDO Registrado' : 'ASISTENCIA Registrada');
+                                    this.lastEntryTime = result.entry_time;
+                                    if (result.status !== 'error') playSuccess = true;
+                                }
+                                
+                                await CurpCache.removeFromQueue(item.timestamp);
+                                this.pendingQueue.splice(itemIndex, 1);
+                            }
+                        }
                         
-                        // Success! Remove from IDB and Local State
-                        await CurpCache.removeFromQueue(item.timestamp);
-                        this.pendingQueue.shift();
+                        // Solo reproducir sonido si hay algo que reportar pero sin spam
+                        if (playError) playLocalSound('error');
+                        else if (playSuccess) playLocalSound('success');
                         
-                        // Refresh Livewire recentScans
+                        // Refresh Livewire recentScans manually if needed or via element
                         $wire.$refresh();
 
                     } catch (e) {
-                        console.warn('Sync failed for CURP:', item.curp, e);
-                        // If network fails (120kbps/offline), wait 5 seconds and retry
-                        await new Promise(r => setTimeout(r, 5000));
-                        // Break the loop and let it be re-triggered by next scan or manual poll
-                        break; 
+                        console.warn('Sync failed for batch:', e);
+                        
+                        if (typeof CurpCache !== 'undefined') {
+                            for (const item of batch) {
+                                const updatedItem = await CurpCache.incrementAttempt(item.timestamp);
+                                
+                                // Remove from queue if it failed permanently (e.g. 500) or hit max attempts
+                                if (e.message === 'ServerError' || (updatedItem && updatedItem.attempts >= 3)) {
+                                    console.error('Eliminando registro de la fila por fallos repetidos o error permanente:', item.curp);
+                                    await CurpCache.removeFromQueue(item.timestamp);
+                                    this.pendingQueue = this.pendingQueue.filter(q => q.timestamp !== item.timestamp);
+                                    
+                                    this.lastStatus = 'error';
+                                    this.statusMessage = 'Error permanente en lote';
+                                    this.curpInput = '';
+                                    
+                                    playLocalSound('error');
+                                }
+                            }
+                        }
+
+                        if (e.message !== 'ServerError') {
+                            // If network fails (120kbps/offline), wait 5 seconds and retry
+                            await new Promise(r => setTimeout(r, 5000));
+                            // Break the loop and let it be re-triggered by next scan or manual poll
+                            break; 
+                        }
                     }
                 }
 

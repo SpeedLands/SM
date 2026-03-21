@@ -401,8 +401,8 @@ new class extends Component {
                         </flux:select>
                     </div>
                     <div>
-                        <flux:select label="Tutor" wire:model="tutorId" class="w-full">
-                            <option value="">Seleccione tutor...</option>
+                        <flux:select label="Asesor" wire:model="tutorId" class="w-full">
+                            <option value="">Seleccione asesor...</option>
                             @foreach($teachers as $teacher)
                                 <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
                             @endforeach
