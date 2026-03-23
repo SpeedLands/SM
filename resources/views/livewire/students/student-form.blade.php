@@ -10,6 +10,7 @@ use App\Models\Cycle;
 use App\Models\StudentCycleAssociation;
 use Livewire\WithFileUploads;
 use Flux\Flux;
+use Illuminate\Validation\Rule;
 
 new class extends Component {
     use WithFileUploads;
@@ -25,7 +26,7 @@ new class extends Component {
     #[Validate('required|string|max:255')]
     public string $name = '';
 
-    #[Validate('nullable|string|size:18')]
+    #[Validate('nullable|string|min:16|max:18')]
     public string $curp = '';
 
     #[Validate('required|in:MATUTINO,VESPERTINO')]
@@ -53,6 +54,7 @@ new class extends Component {
     public function openCreate(): void
     {
         $this->reset(['studentId', 'name', 'curp', 'turn', 'classGroupId', 'address', 'emergencyContact', 'otherContact', 'parentSearch', 'selectedParentId', 'parentSearchResults', 'currentParents', 'photo', 'photoPreview']);
+        $this->resetValidation();
         $this->show = true;
     }
 
@@ -60,6 +62,7 @@ new class extends Component {
     public function openEdit(string $id): void
     {
         $this->reset(['studentId', 'name', 'curp', 'turn', 'classGroupId', 'address', 'emergencyContact', 'otherContact', 'parentSearch', 'selectedParentId', 'parentSearchResults', 'currentParents', 'photo', 'photoPreview']);
+        $this->resetValidation();
         
         $student = Student::with(['parents', 'currentCycleAssociation'])->findOrFail($id);
         
@@ -119,7 +122,22 @@ new class extends Component {
 
     public function save(): void
     {
-        $this->validate();
+        $this->validate([
+            'name' => 'required|string|max:255',
+            'curp' => [
+                'nullable',
+                'string',
+                'min:16',
+                'max:18',
+                Rule::unique('students', 'curp')->ignore($this->studentId),
+            ],
+            'turn' => 'required|in:MATUTINO,VESPERTINO',
+            'classGroupId' => 'required|exists:class_groups,id',
+            'address' => 'nullable|string',
+            'emergencyContact' => 'nullable|string',
+            'otherContact' => 'nullable|string',
+            'photo' => 'nullable|image|max:2048',
+        ]);
 
         \Illuminate\Support\Facades\DB::transaction(function () {
             $group = ClassGroup::findOrFail($this->classGroupId);
@@ -246,6 +264,7 @@ new class extends Component {
                                 placeholder="ABCD010101XXXXX000" 
                                 class="uppercase"
                                 x-on:input="$el.value = $el.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 18); $wire.curp = $el.value"
+                                subtitle="18 caracteres o 16 para extranjeros"
                             />
 
                             <flux:select label="Turno" wire:model="turn">
@@ -321,7 +340,6 @@ new class extends Component {
                                                 <div class="text-xs font-bold">{{ $parent->name }}</div>
                                                 <div class="text-[10px] text-zinc-500">{{ $parent->email }}</div>
                                             </div>
-                                        </div>
                                         @if($selectedParentId === $parent->id)
                                             <flux:icon icon="check" size="sm" class="text-blue-600" />
                                         @endif
