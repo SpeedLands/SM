@@ -1,15 +1,11 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CredentialController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FcmController;
+use App\Http\Controllers\ViewToggleController;
 use App\Livewire\DataImporter;
-use App\Models\Attendance;
-use App\Models\Setting;
-use App\Models\Student;
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -53,115 +49,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('asistencia/escanear', 'attendance.scanner')->name('attendance.scanner');
     Volt::route('escaneo-rapido', 'global-scanner')->name('global-scanner');
 
-    // API: Bulk CURP data for local scanner cache
-    Route::get('api/curps', function () {
-        Gate::authorize('teacher-or-admin');
+    // API: Attendance system
+    Route::get('api/curps', [AttendanceController::class, 'curps'])->name('api.curps');
+    Route::post('api/attendance', [AttendanceController::class, 'store'])->name('api.attendance');
 
-        return response()->json(
-            Student::select('id', 'curp', 'name', 'grade', 'group_name', 'turn')
-                ->whereNotNull('curp')
-                ->where('curp', '!=', '')
-                ->get()
-        );
-    })->name('api.curps');
-
-    Route::post('api/attendance', function (Request $request) {
-        Gate::authorize('teacher-or-admin');
-
-        $request->validate([
-            'curp' => 'required|string|max:18',
-            'timestamp' => 'nullable|numeric',
-        ]);
-
-        $curp = trim(strtoupper($request->input('curp')));
-        $student = Student::where('curp', $curp)->first();
-
-        if (! $student) {
-            return response()->json(['status' => 'error', 'message' => 'CURP no encontrado'], 404);
-        }
-
-        $today = Carbon::today()->toDateString();
-        $now = $request->has('timestamp')
-            ? Carbon::createFromTimestampMs($request->input('timestamp'))
-            : Carbon::now();
-
-        $status = 'PRESENTE';
-        $graceMinutes = (int) Setting::get('attendance.grace_minutes', 10);
-
-        if ($student->turn === 'MATUTINO') {
-            $entryTime = Setting::get('attendance.matutino_entry_time', '07:30');
-            $threshold = Carbon::createFromFormat('H:i', $entryTime)->addMinutes($graceMinutes);
-            if ($now->greaterThan($threshold)) {
-                $status = 'RETARDO';
-            }
-        } elseif ($student->turn === 'VESPERTINO') {
-            $entryTime = Setting::get('attendance.vespertino_entry_time', '13:30');
-            $threshold = Carbon::createFromFormat('H:i', $entryTime)->addMinutes($graceMinutes);
-            if ($now->greaterThan($threshold)) {
-                $status = 'RETARDO';
-            }
-        }
-
-        $attendance = Attendance::updateOrCreate(
-            ['student_id' => $student->id, 'date' => $today],
-            ['entry_time' => $now->format('H:i:s'), 'status' => $status]
-        );
-
-        return response()->json([
-            'status' => $status,
-            'duplicate' => ! $attendance->wasRecentlyCreated,
-            'entry_time' => $now->format('H:i:s'),
-            'student_name' => $student->name,
-        ]);
-    })->name('api.attendance');
-
-    Route::post('toggle-view', function () {
-        $user = auth()->user();
-        if (! $user->hasStudents()) {
-            return back();
-        }
-
-        $current = session('active_view', 'staff');
-        $new = $current === 'staff' ? 'parent' : 'staff';
-
-        session(['active_view' => $new]);
-
-        // If switching TO parent view, and we are on a restricted route, redirect to dashboard
-        if ($new === 'parent') {
-            $restrictedRoutes = [
-                'users.index',
-                'cycles.index',
-                'infractions.index',
-                'students.index',
-                'students.promote',
-                'students.credential',
-                'students.credential.bulk',
-                'calendar.index',
-                'attendance.index',
-                'attendance.scanner',
-                'data-importer',
-                'data-exporter',
-                'export.teachers',
-                'export.parents',
-                'export.students',
-                'export.attendance',
-                'settings.attendance',
-            ];
-            $currentRouteName = request()->header('Referer') ? app('router')->getRoutes()->match(app('request')->create(request()->header('Referer')))->getName() : null;
-
-            if (in_array($currentRouteName, $restrictedRoutes)) {
-                return redirect()->route('dashboard')->with('notify', [
-                    'message' => 'Cambiando a vista de Padre',
-                    'variant' => 'success',
-                ]);
-            }
-        }
-
-        return back()->with('notify', [
-            'message' => 'Cambiando a vista de '.($new === 'parent' ? 'Padre' : 'Personal'),
-            'variant' => 'success',
-        ]);
-    })->name('toggle-view');
+    Route::post('toggle-view', ViewToggleController::class)->name('toggle-view');
 });
 
 Route::middleware(['auth'])->group(function () {

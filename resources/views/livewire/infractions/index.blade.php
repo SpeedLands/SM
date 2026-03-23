@@ -35,12 +35,14 @@ new class extends Component {
 
     public function openCreateModal(): void
     {
+        $this->resetValidation();
         $this->resetForm();
         $this->showModal = true;
     }
 
     public function openEditModal(Infraction $infraction): void
     {
+        $this->resetValidation();
         $this->editingInfraction = $infraction;
         $this->description = $infraction->description;
         $this->severity = $infraction->severity;

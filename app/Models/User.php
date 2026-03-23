@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Services\FcmService;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,21 +17,12 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, HasUuids, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * Cache for hasStudents check to avoid repeated DB queries.
      */
     protected ?bool $hasStudentsCache = null;
-
-    protected static function booted(): void
-    {
-        static::creating(function (User $user) {
-            if (! $user->id) {
-                $user->id = (string) Str::uuid();
-            }
-        });
-    }
 
     protected $keyType = 'string';
 

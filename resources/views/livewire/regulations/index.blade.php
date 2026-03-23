@@ -27,6 +27,7 @@ new class extends Component {
         if (!auth()->user()->isAdmin() || !auth()->user()->isViewStaff()) {
             return;
         }
+        $this->resetValidation();
         $this->isEditing = !$this->isEditing;
     }
 

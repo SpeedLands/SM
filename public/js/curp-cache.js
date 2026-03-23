@@ -134,6 +134,39 @@ const CurpCache = {
             tx.oncomplete = () => resolve();
             tx.onerror = (e) => reject(e);
         });
+    },
+
+    async incrementAttempt(timestamp) {
+        if (!this.db) return;
+        return new Promise((resolve, reject) => {
+            const tx = this.db.transaction(this.queueStoreName, 'readwrite');
+            const store = tx.objectStore(this.queueStoreName);
+            const request = store.get(timestamp);
+            request.onsuccess = () => {
+                const item = request.result;
+                if (item) {
+                    item.attempts = (item.attempts || 0) + 1;
+                    store.put(item);
+                    tx.oncomplete = () => resolve(item);
+                } else {
+                    resolve(null);
+                }
+            };
+            request.onerror = (e) => reject(e);
+        });
+    },
+
+    async requestPersistentStorage() {
+        if (navigator.storage && navigator.storage.persist) {
+            const isPersisted = await navigator.storage.persisted();
+            if (!isPersisted) {
+                const result = await navigator.storage.persist();
+                console.log('Persistent storage granted:', result);
+                return result;
+            }
+            return true;
+        }
+        return false;
     }
 };
 

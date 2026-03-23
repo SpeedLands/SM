@@ -68,7 +68,7 @@ test('scanner prevents duplicate attendance for the same day', function () {
 
     Attendance::create([
         'student_id' => $this->student->id,
-        'date' => Carbon::today(),
+        'date' => now()->toDateString(),
         'status' => 'PRESENTE',
         'entry_time' => '07:55',
     ]);
@@ -78,7 +78,7 @@ test('scanner prevents duplicate attendance for the same day', function () {
         ->set('curp', 'TESTCURP1234567890')
         ->call('processScan')
         ->assertSet('statusColor', 'amber')
-        ->assertSee('Ya se registró asistencia hoy');
+        ->assertSet('statusMessage', 'Ya se registró asistencia hoy');
 
     expect(Attendance::where('student_id', $this->student->id)->count())->toBe(1);
 });
@@ -95,6 +95,7 @@ test('admin can manually change attendance status in index', function () {
 
     Volt::actingAs($this->admin)
         ->test('attendance.index')
+        ->set('cycle_id', $this->cycle->id)
         ->set('date', date('Y-m-d'))
         ->set('grade', $group->grade)
         ->set('group_id', $group->id)
@@ -102,4 +103,33 @@ test('admin can manually change attendance status in index', function () {
 
     $attendance = Attendance::where('student_id', $this->student->id)->first();
     expect($attendance->status)->toBe('JUSTIFICADO');
+});
+
+test('admin can mark all students in a group as present', function () {
+    $group = ClassGroup::factory()->create(['cycle_id' => $this->cycle->id]);
+    $student2 = Student::factory()->create();
+
+    StudentCycleAssociation::create([
+        'student_id' => $this->student->id,
+        'cycle_id' => $this->cycle->id,
+        'class_group_id' => $group->id,
+    ]);
+
+    StudentCycleAssociation::create([
+        'student_id' => $student2->id,
+        'cycle_id' => $this->cycle->id,
+        'class_group_id' => $group->id,
+    ]);
+
+    Volt::actingAs($this->admin)
+        ->test('attendance.index')
+        ->set('cycle_id', $this->cycle->id)
+        ->set('date', date('Y-m-d'))
+        ->set('grade', $group->grade)
+        ->set('group_id', $group->id)
+        ->call('markAllPresent')
+        ->assertDispatched('notify');
+
+    expect(Attendance::where('student_id', $this->student->id)->where('status', 'PRESENTE')->exists())->toBeTrue();
+    expect(Attendance::where('student_id', $student2->id)->where('status', 'PRESENTE')->exists())->toBeTrue();
 });

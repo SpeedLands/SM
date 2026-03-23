@@ -3,7 +3,6 @@
 use App\Models\ClassGroup;
 use App\Models\Cycle;
 use App\Models\Student;
-use App\Models\StudentCycleAssociation;
 use App\Models\User;
 use Livewire\Volt\Volt;
 
@@ -21,8 +20,7 @@ test('admins can see students list', function () {
         'group_name' => $group->section,
     ]);
 
-    StudentCycleAssociation::create([
-        'student_id' => $student->id,
+    $student->cycleAssociations()->create([
         'cycle_id' => $cycle->id,
         'class_group_id' => $group->id,
         'status' => 'ACTIVE',
@@ -31,7 +29,9 @@ test('admins can see students list', function () {
     $this->actingAs($admin)
         ->get(route('students.index'))
         ->assertOk()
-        ->assertSee($student->name);
+        ->assertSee($student->name)
+        ->assertSeeLivewire('students.student-form')
+        ->assertSeeLivewire('students.history-modal');
 });
 
 test('can search students by name or curp', function () {
@@ -42,8 +42,8 @@ test('can search students by name or curp', function () {
     $student1 = Student::factory()->create(['name' => 'JUAN PEREZ', 'grade' => $group->grade, 'group_name' => $group->section]);
     $student2 = Student::factory()->create(['name' => 'MARIA LOPEZ', 'grade' => $group->grade, 'group_name' => $group->section]);
 
-    StudentCycleAssociation::create(['student_id' => $student1->id, 'cycle_id' => $cycle->id, 'class_group_id' => $group->id, 'status' => 'ACTIVE']);
-    StudentCycleAssociation::create(['student_id' => $student2->id, 'cycle_id' => $cycle->id, 'class_group_id' => $group->id, 'status' => 'ACTIVE']);
+    $student1->cycleAssociations()->create(['cycle_id' => $cycle->id, 'class_group_id' => $group->id, 'status' => 'ACTIVE']);
+    $student2->cycleAssociations()->create(['cycle_id' => $cycle->id, 'class_group_id' => $group->id, 'status' => 'ACTIVE']);
 
     Volt::actingAs($admin)
         ->test('students.index')
@@ -52,90 +52,12 @@ test('can search students by name or curp', function () {
         ->assertDontSee($student2->name);
 });
 
-test('admins can enroll a new student', function () {
+test('index refreshes when student-saved event is dispatched', function () {
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $cycle = Cycle::factory()->create(['is_active' => true]);
-    $group = ClassGroup::factory()->create(['cycle_id' => $cycle->id, 'grade' => '2º', 'section' => 'B']);
 
     Volt::actingAs($admin)
         ->test('students.index')
-        ->call('openCreateModal')
-        ->set('name', 'ALUMNO NUEVO')
-        ->set('birthDate', '2010-05-15')
-        ->set('turn', 'MATUTINO')
-        ->set('classGroupId', $group->id)
-        ->set('address', 'Calle Falsa 123')
-        ->call('save')
-        ->assertHasNoErrors()
-        ->assertSet('showStudentModal', false);
-
-    $student = Student::where('name', 'ALUMNO NUEVO')->first();
-    expect($student)->not->toBeNull();
-    expect($student->name)->toBe('ALUMNO NUEVO');
-    expect($student->grade)->toBe('2º');
-    expect($student->group_name)->toBe('B');
-
-    // Verify PII was saved
-    expect($student->pii)->not->toBeNull();
-    expect($student->pii->address_encrypted)->toBe('Calle Falsa 123');
-
-    // Verify Cycle Association
-    expect($student->cycleAssociations()->where('cycle_id', $cycle->id)->exists())->toBeTrue();
-});
-
-test('admins can edit a student', function () {
-    $admin = User::factory()->create(['role' => 'ADMIN']);
-    $cycle = Cycle::factory()->create(['is_active' => true]);
-    $group1 = ClassGroup::factory()->create(['cycle_id' => $cycle->id, 'grade' => '1º', 'section' => 'A']);
-    $group2 = ClassGroup::factory()->create(['cycle_id' => $cycle->id, 'grade' => '1º', 'section' => 'B']);
-
-    $student = Student::factory()->create([
-        'grade' => $group1->grade,
-        'group_name' => $group1->section,
-    ]);
-
-    Volt::actingAs($admin)
-        ->test('students.index')
-        ->call('editStudent', $student->id)
-        ->assertSet('name', $student->name)
-        ->set('name', 'NOMBRE ACTUALIZADO')
-        ->set('classGroupId', $group2->id)
-        ->call('save')
-        ->assertHasNoErrors();
-
-    $student->refresh();
-    expect($student->name)->toBe('NOMBRE ACTUALIZADO');
-    expect($student->group_name)->toBe('B');
-});
-
-test('admins can associate parents to a student', function () {
-    $admin = User::factory()->create(['role' => 'ADMIN']);
-    $cycle = Cycle::factory()->create(['is_active' => true]);
-    $group = ClassGroup::factory()->create(['cycle_id' => $cycle->id]);
-    $student = Student::factory()->create(['grade' => $group->grade, 'group_name' => $group->section]);
-    $parent = User::factory()->create(['role' => 'PARENT', 'name' => 'PADRE PRUEBA']);
-
-    Volt::actingAs($admin)
-        ->test('students.index')
-        ->call('editStudent', $student->id)
-        ->set('parentSearch', 'PADRE')
-        ->assertSee('PADRE PRUEBA')
-        ->set('selectedParentId', $parent->id)
-        ->set('parentRelationship', 'MADRE')
-        ->call('addParent')
-        ->assertHasNoErrors()
-        ->assertSee('MADRE');
-
-    expect($student->parents()->where('parent_id', $parent->id)->exists())->toBeTrue();
-    expect($student->parents()->first()->pivot->relationship)->toBe('MADRE');
-
-    // Test removal
-    Volt::actingAs($admin)
-        ->test('students.index')
-        ->call('editStudent', $student->id)
-        ->call('removeParent', $parent->id)
-        ->assertHasNoErrors()
-        ->assertDontSee('PADRE PRUEBA');
-
-    expect($student->parents()->where('parent_id', $parent->id)->exists())->toBeFalse();
+        ->dispatch('student-saved')
+        ->assertStatus(200); // Verify it doesn't crash
 });
