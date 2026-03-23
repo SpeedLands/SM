@@ -81,3 +81,26 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 });
 Route::post('/fcm-token', [FcmController::class, 'storeToken'])->name('fcm-token')->middleware('auth');
+
+Route::post('/push-subscribe', function (\Illuminate\Http\Request $request) {
+    $request->validate([
+        'type' => 'required|string|in:webpush,fcm',
+        'endpoint' => 'required_if:type,webpush|string',
+        'keys.p256dh' => 'required_if:type,webpush|string',
+        'keys.auth' => 'required_if:type,webpush|string',
+    ]);
+
+    $user = auth()->user();
+
+    \App\Models\PushSubscription::updateOrCreate(
+        ['user_id' => $user->id, 'endpoint' => $request->input('endpoint')],
+        [
+            'type' => $request->input('type'),
+            'p256dh_key' => $request->input('keys.p256dh'),
+            'auth_key' => $request->input('keys.auth'),
+            'user_agent' => $request->userAgent(),
+        ]
+    );
+
+    return response()->json(['message' => 'Subscription stored successfully.']);
+})->name('push.subscribe')->middleware('auth');
