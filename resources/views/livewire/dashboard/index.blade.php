@@ -10,6 +10,14 @@ use App\Models\CommunityService;
 use Livewire\Volt\Component;
 
 new class extends Component {
+    public string $infractionGrade = '';
+    public string $infractionGroup = '';
+
+    public function updatedInfractionGrade(): void
+    {
+        $this->infractionGroup = '';
+    }
+
     public function with(): array
     {
         $user = auth()->user();
@@ -74,10 +82,13 @@ new class extends Component {
                 ->toArray()
             : [];
 
-        // Reports by infraction type (top infractions)
+        // Reports by infraction type (top infractions) — filterable by grade/group
         $reportsByInfraction = $activeCycle
             ? Report::where('cycle_id', $activeCycle->id)
                 ->join('infractions', 'reports.infraction_id', '=', 'infractions.id')
+                ->join('students', 'reports.student_id', '=', 'students.id')
+                ->when($this->infractionGrade, fn($q) => $q->where('students.grade', $this->infractionGrade))
+                ->when($this->infractionGroup, fn($q) => $q->where('students.group_name', $this->infractionGroup))
                 ->selectRaw('infractions.description, infractions.severity, COUNT(*) as total')
                 ->groupBy('infractions.id', 'infractions.description', 'infractions.severity')
                 ->orderByDesc('total')
@@ -89,6 +100,17 @@ new class extends Component {
                 ])
                 ->values()
                 ->toArray()
+            : [];
+
+        // Available grades and groups for the infraction filter
+        $availableGrades = $activeCycle
+            ? Student::whereHas('cycleAssociations', fn($q) => $q->where('cycle_id', $activeCycle->id))
+                ->distinct()->orderBy('grade')->pluck('grade')->toArray()
+            : [];
+        $availableGroups = $activeCycle
+            ? Student::whereHas('cycleAssociations', fn($q) => $q->where('cycle_id', $activeCycle->id))
+                ->when($this->infractionGrade, fn($q) => $q->where('grade', $this->infractionGrade))
+                ->distinct()->orderBy('group_name')->pluck('group_name')->toArray()
             : [];
 
         // Absences by classroom (grade + group) within active cycle dates
@@ -114,6 +136,8 @@ new class extends Component {
             'upcomingCitations' => $upcomingCitations,
             'reportsByClassroom' => $reportsByClassroom,
             'reportsByInfraction' => $reportsByInfraction,
+            'availableGrades' => $availableGrades,
+            'availableGroups' => $availableGroups,
             'attendanceByClassroom' => $attendanceByClassroom,
             'activeCycle' => $activeCycle,
             'isAdmin' => true,
@@ -419,13 +443,38 @@ new class extends Component {
 
         <!-- Reports by Infraction Type -->
         <div class="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm" x-data="{ showAllInf: false }">
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-4">
                 <flux:heading size="lg">Tipos de Reporte más Frecuentes</flux:heading>
                 <flux:badge size="sm" color="zinc">Ciclo Activo</flux:badge>
             </div>
 
+            {{-- Grade & Group Filters --}}
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+                <div class="flex-1 min-w-[120px] max-w-[180px]">
+                    <select wire:model.live="infractionGrade" class="w-full text-sm rounded-lg border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Todos los grados</option>
+                        @foreach($availableGrades as $grade)
+                            <option value="{{ $grade }}">{{ $grade }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex-1 min-w-[120px] max-w-[180px]">
+                    <select wire:model.live="infractionGroup" class="w-full text-sm rounded-lg border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Todos los grupos</option>
+                        @foreach($availableGroups as $group)
+                            <option value="{{ $group }}">{{ $group }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @if($infractionGrade || $infractionGroup)
+                    <flux:button variant="ghost" size="sm" icon="x-mark" wire:click="$set('infractionGrade', ''); $set('infractionGroup', '')">
+                        Limpiar
+                    </flux:button>
+                @endif
+            </div>
+
             @if(count($reportsByInfraction) === 0)
-                <div class="text-center py-8 text-zinc-500 italic text-sm">No hay reportes registrados en el ciclo activo.</div>
+                <div class="text-center py-8 text-zinc-500 italic text-sm">No hay reportes registrados{{ $infractionGrade || $infractionGroup ? ' con los filtros seleccionados' : ' en el ciclo activo' }}.</div>
             @else
                 <table class="w-full text-left text-sm">
                     <thead>
