@@ -118,6 +118,16 @@ new class extends Component {
         }
 
         $this->cycleToDelete->delete();
+        
+        // Clear references
+        if ($this->groupCycle && $this->groupCycle->id === $this->cycleToDelete->id) {
+            $this->groupCycle = null;
+        }
+        if ($this->editing && $this->editing->id === $this->cycleToDelete->id) {
+            $this->editing = null;
+            $this->reset(['name', 'start_date', 'end_date', 'is_active']);
+        }
+
         $this->cycleToDelete = null;
         $this->showDeleteCycleModal = false;
         $this->dispatch('cycle-saved');
@@ -207,6 +217,13 @@ new class extends Component {
 
         $cycleId = $this->groupToDelete->cycle_id;
         $this->groupToDelete->delete();
+        
+        // Clear references
+        if ($this->editingGroup && $this->editingGroup->id === $this->groupToDelete->id) {
+            $this->editingGroup = null;
+            $this->reset(['grade', 'section', 'tutorId']);
+        }
+
         $this->groupToDelete = null;
         $this->showDeleteGroupModal = false;
         

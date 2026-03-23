@@ -35,14 +35,22 @@ class Notice extends Model
         'date',
     ];
 
-    protected $casts = [
-        'requires_authorization' => 'boolean',
-        'event_date' => 'date',
-        'end_date' => 'date',
-        'date' => 'datetime',
-        'target_grades' => 'array',
-        'target_class_groups' => 'array',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'requires_authorization' => 'boolean',
+            'event_date' => 'date',
+            'end_date' => 'date',
+            'date' => 'datetime',
+            'target_grades' => 'array',
+            'target_class_groups' => 'array',
+        ];
+    }
 
     public function author(): BelongsTo
     {

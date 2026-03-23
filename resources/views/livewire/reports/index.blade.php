@@ -323,7 +323,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="space-y-6" x-data="{ showFilters: false }">
+<div class="space-y-6">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
             <flux:heading size="xl" level="1">Reportes Disciplinarios</flux:heading>
@@ -339,26 +339,23 @@ new class extends Component {
         @endif
     </div>
 
-    {{-- Filtros Rápidos (Pills for mobile style) --}}
-    <div class="flex flex-wrap gap-2 sm:hidden pb-2 overflow-x-auto no-scrollbar">
-        @if($search) <flux:badge variant="solid" color="zinc" class="shrink-0">"{{ $search }}"</flux:badge> @endif
-        @if($status)
-        <flux:badge variant="solid" color="zinc" class="shrink-0">
-            {{ match($status) { 'PENDING_SIGNATURE' => 'Pendiente de Firma', 'SIGNED' => 'Firmado', default => $status } }}
-        </flux:badge>
-        @endif
-        @if($severity)
-        <flux:badge variant="solid" color="zinc" class="shrink-0">
-            {{ match($severity) { 'NORMAL' => 'Normal', 'GRAVE' => 'Grave', default => $severity } }}
-        </flux:badge>
-        @endif
-        @if($onlyActiveCycle) <flux:badge variant="solid" color="zinc" class="shrink-0">Ciclo Activo</flux:badge> @endif
-        @if($onlyPending) <flux:badge variant="solid" color="zinc" class="shrink-0">Pendientes</flux:badge> @endif
-        <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="showFilters = !showFilters" />
-    </div>
+    <x-filter-bar class="mb-6">
+        <x-slot:pills>
+            @if($search) <flux:badge variant="solid" color="zinc" class="shrink-0">"{{ $search }}"</flux:badge> @endif
+            @if($status)
+            <flux:badge variant="solid" color="zinc" class="shrink-0">
+                {{ match($status) { 'PENDING_SIGNATURE' => 'Pendiente de Firma', 'SIGNED' => 'Firmado', default => $status } }}
+            </flux:badge>
+            @endif
+            @if($severity)
+            <flux:badge variant="solid" color="zinc" class="shrink-0">
+                {{ match($severity) { 'NORMAL' => 'Normal', 'GRAVE' => 'Grave', default => $severity } }}
+            </flux:badge>
+            @endif
+            @if($onlyActiveCycle) <flux:badge variant="solid" color="zinc" class="shrink-0">Ciclo Activo</flux:badge> @endif
+            @if($onlyPending) <flux:badge variant="solid" color="zinc" class="shrink-0">Pendientes</flux:badge> @endif
+        </x-slot:pills>
 
-    <!-- Filters -->
-    <div x-show="showFilters" class="sm:block! p-6 rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 shadow-sm transition-all mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <flux:field class="md:col-span-2">
                 <flux:label>Búsqueda</flux:label>
@@ -391,7 +388,7 @@ new class extends Component {
                 @endif
             </div>
         </div>
-    </div>
+    </x-filter-bar>
 
     @if(auth()->user()->isViewStaff())
     <!-- Reports Table (Staff View) -->
@@ -442,9 +439,7 @@ new class extends Component {
             </div>
         </div>
         @empty
-        <div class="py-12 text-center text-zinc-500 italic bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-dashed border-zinc-300">
-            No se encontraron reportes.
-        </div>
+        <x-empty-state icon="document-text" heading="Sin reportes" description="No se encontraron reportes." class="bg-zinc-50 dark:bg-zinc-800/50 border border-dashed border-zinc-300" />
         @endforelse
         <div class="mt-4">
             {{ $reports->links() }}
@@ -594,13 +589,7 @@ new class extends Component {
             </div>
         </div>
         @empty
-        <div class="py-20 text-center">
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-300 dark:text-zinc-600 mb-4">
-                <flux:icon icon="check-circle" size="xl" />
-            </div>
-            <flux:heading size="md" class="text-zinc-400">Sin reportes registrados</flux:heading>
-            <flux:text class="text-zinc-500">No se han encontrado incidencias disciplinarias para sus hijos en este ciclo.</flux:text>
-        </div>
+        <x-empty-state icon="check-circle" heading="Sin reportes registrados" description="No se han encontrado incidencias disciplinarias para sus hijos en este ciclo." class="py-20" />
         @endforelse
         <div class="mt-4">
             {{ $reports->links() }}

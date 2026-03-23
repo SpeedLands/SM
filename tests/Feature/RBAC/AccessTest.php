@@ -81,7 +81,6 @@ test('parent cannot open student registration modal', function () {
     $parent = User::factory()->parent()->create();
 
     Volt::actingAs($parent)
-        ->test('students.index')
-        ->call('openCreateModal')
+        ->test('students.student-form')
         ->assertForbidden();
 });
