@@ -132,7 +132,7 @@ new class extends Component {
             $parentIds = $student->parents->pluck('id')->toArray();
 
             if (!empty($parentIds)) {
-                \App\Jobs\SendBulkFcmNotifications::dispatch(
+                \App\Jobs\SendBulkFcmNotifications::dispatchInChunks(
                     $parentIds,
                     'Nuevo Servicio Comunitario Asignado',
                     "Se ha asignado una actividad de servicio comunitario para {$student->name}: {$this->activity}.",

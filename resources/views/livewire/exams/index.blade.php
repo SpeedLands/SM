@@ -150,7 +150,7 @@ new class extends Component {
             $parents = $students->flatMap(fn($s) => $s->parents)->unique('id');
 
             if ($parents->isNotEmpty()) {
-                \App\Jobs\SendBulkFcmNotifications::dispatch(
+                \App\Jobs\SendBulkFcmNotifications::dispatchInChunks(
                     $parents->pluck('id')->toArray(),
                     'Nuevo Examen Programado',
                     "Se ha programado un examen de {$this->subject} para el {$exam->exam_date->format('d/m/Y')}.",

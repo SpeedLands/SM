@@ -185,7 +185,7 @@ new class extends Component {
             $parentIds = $student->parents->pluck('id')->toArray();
 
             if (!empty($parentIds)) {
-                \App\Jobs\SendBulkFcmNotifications::dispatch(
+                \App\Jobs\SendBulkFcmNotifications::dispatchInChunks(
                     $parentIds,
                     'Nuevo Reporte Disciplinario',
                     "Se ha registrado un reporte para {$student->name}: {$infraction->description}",

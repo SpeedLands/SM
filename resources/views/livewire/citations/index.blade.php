@@ -112,7 +112,7 @@ new class extends Component {
             $parentIds = $student->parents->pluck('id')->toArray();
 
             if (!empty($parentIds)) {
-                \App\Jobs\SendBulkFcmNotifications::dispatch(
+                \App\Jobs\SendBulkFcmNotifications::dispatchInChunks(
                     $parentIds,
                     'Nuevo Citatorio Escolar',
                     "Se ha generado un citatorio para los padres de {$student->name}.",

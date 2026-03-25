@@ -20,12 +20,17 @@ class SendBulkFcmNotifications implements ShouldQueue
     /**
      * The number of times the job may be attempted.
      */
-    public $tries = 3;
+    public int $tries = 3;
+
+    /**
+     * The number of seconds the job can run before timing out.
+     */
+    public int $timeout = 120;
 
     /**
      * The number of seconds to wait before retrying the job.
      */
-    public $backoff = [60, 300, 600];
+    public array $backoff = [60, 300, 600];
 
     /**
      * Create a new job instance.
@@ -39,11 +44,34 @@ class SendBulkFcmNotifications implements ShouldQueue
     ) {}
 
     /**
+     * Split a large list of user IDs into smaller jobs to avoid timeouts.
+     */
+    public static function dispatchInChunks(array $userIds, string $title, string $body, array $data = [], ?string $url = null, int $chunkSize = 50): void
+    {
+        if (empty($userIds)) {
+            return;
+        }
+
+        $chunks = array_chunk($userIds, $chunkSize);
+
+        Log::info('Dispatching push notifications in chunks', [
+            'total_users' => count($userIds),
+            'chunks' => count($chunks),
+            'chunk_size' => $chunkSize,
+        ]);
+
+        foreach ($chunks as $index => $chunk) {
+            static::dispatch($chunk, $title, $body, $data, $url)
+                ->delay(now()->addSeconds($index * 5));
+        }
+    }
+
+    /**
      * Execute the job.
      */
     public function handle(FcmService $fcmService, WebPushService $webPushService): void
     {
-        Log::info('Starting Bulk Push Sending', ['count' => count($this->userIds)]);
+        Log::info('Processing push notification chunk', ['users_in_chunk' => count($this->userIds)]);
 
         // Send FCM notifications
         PushSubscription::whereIn('user_id', $this->userIds)
@@ -62,11 +90,10 @@ class SendBulkFcmNotifications implements ShouldQueue
                             $this->url
                         );
 
-                        // Small delay to prevent hitting rate limits too fast
-                        usleep(50000); // 50ms
+                        usleep(50000); // 50ms rate-limit delay
                     } catch (\Exception $e) {
                         Log::error('Individual FCM Sending Failed', [
-                            'user_id' => $user->id,
+                            'user_id' => $subscription->user_id,
                             'error' => $e->getMessage(),
                         ]);
                     }
@@ -79,7 +106,7 @@ class SendBulkFcmNotifications implements ShouldQueue
             ->where('type', 'webpush')
             ->whereNotNull('p256dh_key')
             ->whereNotNull('auth_key')
-            ->chunk(100, function ($subscriptions) use ($webPushService, &$webPushBatch) {
+            ->chunk(100, function ($subscriptions) use (&$webPushBatch) {
                 foreach ($subscriptions as $subscription) {
                     $webPushBatch[] = [
                         'subscription' => $subscription,
@@ -96,6 +123,6 @@ class SendBulkFcmNotifications implements ShouldQueue
             Log::info('Web Push Batch Results', $results);
         }
 
-        Log::info('Bulk Push Sending Completed');
+        Log::info('Push notification chunk completed', ['users_in_chunk' => count($this->userIds)]);
     }
 }

@@ -168,7 +168,7 @@ new class extends Component {
             $parentIds = $students->flatMap(fn($s) => $s->parents)->pluck('id')->unique()->toArray();
             
             if (!empty($parentIds)) {
-                \App\Jobs\SendBulkFcmNotifications::dispatch(
+                \App\Jobs\SendBulkFcmNotifications::dispatchInChunks(
                     $parentIds,
                     'Nuevo Aviso Escolar: ' . $this->title,
                     Str::limit($this->content, 100),
