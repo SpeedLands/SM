@@ -50,6 +50,17 @@ new class extends Component {
 }; ?>
 
 <div class="max-w-2xl mx-auto py-8 px-4 space-y-6" x-data="globalScannerComponent()">
+    {{-- Lost Focus Overlay Warning --}}
+    <div x-show="!windowHasFocus && !localUseCamera" class="fixed inset-0 z-50 bg-red-600/95 flex flex-col items-center justify-center text-white p-8" style="display: none;" x-transition>
+        <flux:icon name="exclamation-triangle" class="w-32 h-32 mb-6 animate-bounce text-white drop-shadow-lg" />
+        <h1 class="text-4xl md:text-5xl font-black uppercase text-center mb-4 drop-shadow-md">¡Pantalla Desenfocada!</h1>
+        <p class="text-xl md:text-2xl text-center font-bold mb-8 opacity-90">El registro está Pausado.</p>
+        <p class="max-w-md text-center mb-8">Si intentas usar el escáner mientras estás en otra aplicación, los datos se perderán porque la ventana no está activa.</p>
+        <button x-on:click="window.focus(); document.getElementById('global-scanner-input').focus();" class="px-8 py-4 bg-white text-red-600 font-black rounded-full text-2xl hover:bg-zinc-100 uppercase tracking-widest shadow-2xl transition transform hover:scale-105">
+            Volver al Escáner
+        </button>
+    </div>
+
     {{-- html5-qrcode CDN --}}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     {{-- CURP local cache & HID Support --}}
@@ -319,6 +330,7 @@ new class extends Component {
             scanCooldowns: {}, // Map of CURP -> Timestamp
             isStarting: false,
             curpInput: '',
+            windowHasFocus: true,
 
             // Cache state
             cacheReady: false,
@@ -335,6 +347,10 @@ new class extends Component {
             lastEntryTime: @entangle('lastEntryTime'),
 
             async init() {
+                this.windowHasFocus = document.hasFocus();
+                window.addEventListener('focus', () => this.windowHasFocus = true);
+                window.addEventListener('blur', () => this.windowHasFocus = false);
+
                 this.setupFocus();
                 await this.loadCache();
 

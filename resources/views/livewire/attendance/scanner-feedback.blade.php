@@ -12,14 +12,11 @@ new class extends Component
 
 <div x-show="lastStudent || (statusMessage && lastStatus === 'error')" x-cloak
     class="rounded-3xl p-6 border-2 transition-all duration-500 shadow-lg backdrop-blur-sm"
-    style="background-color: var(--{{ $lastStatus === 'success' ? 'green' : ($lastStatus === 'error' ? 'red' : 'amber') }}-50, #{{ match($lastStatus) { 'success' => 'f0fdf4', 'error' => 'fef2f2', default => 'fffbeb' } }}); 
-           border-color: var(--{{ $lastStatus === 'success' ? 'green' : ($lastStatus === 'error' ? 'red' : 'amber') }}-200, #{{ match($lastStatus) { 'success' => 'bbfc7', 'error' => 'fecaca', default => 'fef3c7' } }});"
     :class="{
-        'dark:bg-green-950/20 dark:border-green-800/50': lastStatus === 'success',
-        'dark:bg-amber-950/20 dark:border-amber-800/50': lastStatus === 'retardo' || lastStatus === 'duplicate',
-        'dark:bg-red-950/20 dark:border-red-800/50': lastStatus === 'error',
+        'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800/50': lastStatus === 'success',
+        'bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800/50': lastStatus === 'retardo' || lastStatus === 'duplicate',
+        'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800/50': lastStatus === 'error',
     }">
-    @if($lastStudent || ($statusMessage && $lastStatus === 'error') || $lastStatus === 'duplicate')
     <div class="flex items-center gap-6">
         <div class="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-inner"
             :class="{
@@ -64,5 +61,4 @@ new class extends Component
             </template>
         </div>
     </div>
-    @endif
 </div>

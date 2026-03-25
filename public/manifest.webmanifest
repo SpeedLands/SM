@@ -1,21 +1,51 @@
 {
-    "name": "SM Application",
+    "name": "Gestión Escolar SM",
     "short_name": "SM",
+    "description": "Plataforma de gestión escolar integral para el seguimiento de asistencias, generación de reportes académicos, avisos institucionales y comunicación entre docentes y padres de familia.",
+    "id": "sm-pwa-v1",
     "start_url": "/",
     "display": "standalone",
+    "display_override": ["window-controls-overlay", "standalone"],
     "background_color": "#ffffff",
     "theme_color": "#0ea5a4",
+    "lang": "es-MX",
+    "dir": "ltr",
+    "orientation": "portrait",
+    "scope": "/",
+    "categories": ["education", "productivity"],
     "icons": [
         {
             "src": "/apple-touch-icon.png",
-            "sizes": "192x192",
-            "type": "image/png"
+            "sizes": "166x166",
+            "type": "image/png",
+            "purpose": "any"
         },
         {
-            "src": "/apple-touch-icon.png",
-            "sizes": "512x512",
-            "type": "image/png"
+            "src": "/favicon.svg",
+            "sizes": "192x192 512x512",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
         }
     ],
+    "shortcuts": [
+        {
+            "name": "Escanear Asistencia",
+            "short_name": "Asistencia",
+            "description": "Abrir el escáner de códigos QR para registrar asistencia",
+            "url": "/asistencia/escanear",
+            "icons": [{ "src": "/favicon.ico", "sizes": "64x64" }]
+        },
+        {
+            "name": "Panel de Control",
+            "short_name": "Dashboard",
+            "description": "Ver resumen de actividades y estadísticas",
+            "url": "/dashboard",
+            "icons": [{ "src": "/favicon.ico", "sizes": "64x64" }]
+        }
+    ],
+    "launch_handler": {
+        "client_mode": "focus-existing"
+    },
+    "prefer_related_applications": false,
     "gcm_sender_id": "103953800507"
 }

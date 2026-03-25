@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 
 class FixPiiEncryption extends Command
 {
@@ -28,7 +30,7 @@ class FixPiiEncryption extends Command
         $this->info('Starting PII encryption fix...');
 
         // 1. Fix StudentPii table
-        $piiRecords = \Illuminate\Support\Facades\DB::table('student_pii')->get();
+        $piiRecords = DB::table('student_pii')->get();
         $piiCount = 0;
 
         foreach ($piiRecords as $record) {
@@ -43,18 +45,18 @@ class FixPiiEncryption extends Command
                 'father_name_encrypted',
                 'other_contact_encrypted',
                 'mother_workplace_encrypted',
-                'father_workplace_encrypted'
+                'father_workplace_encrypted',
             ];
 
             foreach ($fields as $field) {
                 $value = $record->$field;
-                if ($value && !$this->isValidEncryption($value)) {
-                    $updates[$field] = \Illuminate\Support\Facades\Crypt::encryptString($value);
+                if ($value && ! $this->isValidEncryption($value)) {
+                    $updates[$field] = Crypt::encryptString($value);
                 }
             }
 
-            if (!empty($updates)) {
-                \Illuminate\Support\Facades\DB::table('student_pii')
+            if (! empty($updates)) {
+                DB::table('student_pii')
                     ->where('student_id', $record->student_id)
                     ->update($updates);
                 $piiCount++;
@@ -64,17 +66,17 @@ class FixPiiEncryption extends Command
         $this->info("Fixed {$piiCount} StudentPii records.");
 
         // 2. Fix User table (plain_password)
-        $users = \Illuminate\Support\Facades\DB::table('users')
+        $users = DB::table('users')
             ->whereNotNull('plain_password')
             ->get();
         $userCount = 0;
 
         foreach ($users as $user) {
-            if (!$this->isValidEncryption($user->plain_password)) {
-                \Illuminate\Support\Facades\DB::table('users')
+            if (! $this->isValidEncryption($user->plain_password)) {
+                DB::table('users')
                     ->where('id', $user->id)
                     ->update([
-                        'plain_password' => \Illuminate\Support\Facades\Crypt::encryptString($user->plain_password)
+                        'plain_password' => Crypt::encryptString($user->plain_password),
                     ]);
                 $userCount++;
             }
@@ -90,7 +92,8 @@ class FixPiiEncryption extends Command
     protected function isValidEncryption(string $value): bool
     {
         try {
-            \Illuminate\Support\Facades\Crypt::decryptString($value);
+            Crypt::decryptString($value);
+
             return true;
         } catch (\Exception $e) {
             return false;

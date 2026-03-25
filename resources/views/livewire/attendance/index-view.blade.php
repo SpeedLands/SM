@@ -5,17 +5,20 @@
             <flux:heading size="xl">Asistencia</flux:heading>
             <flux:subheading>Control diario de asistencia por grupo</flux:subheading>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             @if($group_id)
                 <flux:button wire:click="markAllPresent" icon="check-circle" variant="filled" size="sm"
                     wire:confirm="¿Marcar a todos como presentes?"
                     wire:loading.attr="disabled"
                     title="Marcar todos como presentes"
-                    class="hidden sm:inline-flex">
+                    class="flex-1 sm:flex-none whitespace-nowrap">
                     <span wire:loading.remove wire:target="markAllPresent">Todos presentes</span>
                     <span wire:loading wire:target="markAllPresent">Guardando...</span>
                 </flux:button>
             @endif
+            <flux:button :href="route('attendance.group-stats')" icon="chart-bar" variant="ghost" size="sm" title="Ver estadísticas por grupo" class="flex-1 sm:flex-none">
+                Estadísticas
+            </flux:button>
             <flux:button :href="route('attendance.scanner')" icon="qr-code" variant="primary" size="sm" title="Escanear código QR" class="w-full sm:w-auto">
                 Escáner
             </flux:button>
@@ -77,10 +80,16 @@
                     </div>
 
                     <div class="flex justify-between items-center bg-zinc-50 dark:bg-zinc-800/20 p-2 rounded-2xl gap-1">
-                        @foreach(['PRESENTE', 'FALTA', 'RETARDO', 'JUSTIFICADO', 'TRABAJO_EN_CASA'] as $status)
+                        @foreach([
+                            'PRESENTE' => 'bg-green-500', 
+                            'FALTA' => 'bg-red-500', 
+                            'RETARDO' => 'bg-amber-500', 
+                            'JUSTIFICADO' => 'bg-sky-500', 
+                            'TRABAJO_EN_CASA' => 'bg-blue-600'
+                        ] as $status => $bgColor)
                             <button wire:click="setStatus('{{ $student->id }}', '{{ $status }}')"
                                 class="flex-1 h-12 rounded-xl flex items-center justify-center transition-all
-                                {{ $attendance?->status === $status ? 'bg-'.($status === 'PRESENTE' ? 'green-500' : ($status === 'FALTA' ? 'red-500' : ($status === 'RETARDO' ? 'amber-500' : ($status === 'JUSTIFICADO' ? 'sky-400' : 'blue-600')))).' text-white shadow-lg' : 'text-zinc-400 dark:text-zinc-600 hover:bg-zinc-200' }}">
+                                {{ $attendance?->status === $status ? $bgColor . ' text-white shadow-lg' : 'text-zinc-400 dark:text-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-800' }}">
                                 <flux:icon :name="match($status) {
                                     'PRESENTE' => 'check',
                                     'FALTA' => 'x-mark',
@@ -127,10 +136,16 @@
                                 </td>
                                 <td class="py-4 px-6">
                                     <div class="flex items-center justify-end gap-1.5">
-                                        @foreach(['PRESENTE' => 'green-500', 'FALTA' => 'red-500', 'RETARDO' => 'amber-500', 'JUSTIFICADO' => 'sky-400', 'TRABAJO_EN_CASA' => 'blue-600'] as $st => $color)
+                                        @foreach([
+                                            'PRESENTE' => 'bg-green-500 hover:bg-green-600', 
+                                            'FALTA' => 'bg-red-500 hover:bg-red-600', 
+                                            'RETARDO' => 'bg-amber-500 hover:bg-amber-600', 
+                                            'JUSTIFICADO' => 'bg-sky-500 hover:bg-sky-600', 
+                                            'TRABAJO_EN_CASA' => 'bg-blue-600 hover:bg-blue-700'
+                                        ] as $st => $colorClasses)
                                             <button wire:click="setStatus('{{ $student->id }}', '{{ $st }}')"
                                                 class="w-8 h-8 rounded-lg flex items-center justify-center transition-all
-                                                {{ $attendance?->status === $st ? 'bg-'.$color.' text-white shadow-lg scale-110' : 'bg-transparent text-zinc-400 dark:text-zinc-600 hover:text-'.$color.' hover:bg-'.$color.'/10' }}">
+                                                {{ $attendance?->status === $st ? $colorClasses . ' text-white shadow-lg scale-110' : 'bg-transparent text-zinc-400 dark:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800' }}">
                                                 <flux:icon :name="match($st) {
                                                     'PRESENTE' => 'check',
                                                     'FALTA' => 'x-mark',

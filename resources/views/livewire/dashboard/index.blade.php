@@ -10,6 +10,14 @@ use App\Models\CommunityService;
 use Livewire\Volt\Component;
 
 new class extends Component {
+    public string $infractionGrade = '';
+    public string $infractionGroup = '';
+
+    public function updatedInfractionGrade(): void
+    {
+        $this->infractionGroup = '';
+    }
+
     public function with(): array
     {
         $user = auth()->user();
@@ -74,6 +82,37 @@ new class extends Component {
                 ->toArray()
             : [];
 
+        // Reports by infraction type (top infractions) — filterable by grade/group
+        $reportsByInfraction = $activeCycle
+            ? Report::where('cycle_id', $activeCycle->id)
+                ->join('infractions', 'reports.infraction_id', '=', 'infractions.id')
+                ->join('students', 'reports.student_id', '=', 'students.id')
+                ->when($this->infractionGrade, fn($q) => $q->where('students.grade', $this->infractionGrade))
+                ->when($this->infractionGroup, fn($q) => $q->where('students.group_name', $this->infractionGroup))
+                ->selectRaw('infractions.description, infractions.severity, COUNT(*) as total')
+                ->groupBy('infractions.id', 'infractions.description', 'infractions.severity')
+                ->orderByDesc('total')
+                ->get()
+                ->map(fn($r) => [
+                    'description' => $r->description,
+                    'severity' => $r->severity,
+                    'total' => $r->total,
+                ])
+                ->values()
+                ->toArray()
+            : [];
+
+        // Available grades and groups for the infraction filter
+        $availableGrades = $activeCycle
+            ? Student::whereHas('cycleAssociations', fn($q) => $q->where('cycle_id', $activeCycle->id))
+                ->distinct()->orderBy('grade')->pluck('grade')->toArray()
+            : [];
+        $availableGroups = $activeCycle
+            ? Student::whereHas('cycleAssociations', fn($q) => $q->where('cycle_id', $activeCycle->id))
+                ->when($this->infractionGrade, fn($q) => $q->where('grade', $this->infractionGrade))
+                ->distinct()->orderBy('group_name')->pluck('group_name')->toArray()
+            : [];
+
         // Absences by classroom (grade + group) within active cycle dates
         $attendanceByClassroom = $activeCycle
             ? Attendance::join('students', 'attendances.student_id', '=', 'students.id')
@@ -96,6 +135,9 @@ new class extends Component {
             'recentReports' => $recentReports,
             'upcomingCitations' => $upcomingCitations,
             'reportsByClassroom' => $reportsByClassroom,
+            'reportsByInfraction' => $reportsByInfraction,
+            'availableGrades' => $availableGrades,
+            'availableGroups' => $availableGroups,
             'attendanceByClassroom' => $attendanceByClassroom,
             'activeCycle' => $activeCycle,
             'isAdmin' => true,
@@ -151,19 +193,6 @@ new class extends Component {
 
     @if(auth()->user()->isViewStaff())
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="{{ route('global-scanner') }}" class="group relative p-1 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 shadow-lg hover:shadow-indigo-500/25 transition-all active:scale-[0.98]">
-                <div class="bg-white dark:bg-zinc-900 rounded-[calc(1rem-3px)] p-4 flex items-center gap-4">
-                    <div class="size-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
-                        <flux:icon icon="qr-code" size="lg" variant="solid" />
-                    </div>
-                    <div>
-                        <div class="text-sm font-black uppercase tracking-tight text-zinc-900 dark:text-white">Escaneo Rápido</div>
-                        <div class="text-[10px] text-zinc-500">Asistencia y Consultas</div>
-                    </div>
-                    <flux:icon icon="chevron-right" size="sm" class="ms-auto text-zinc-300 group-hover:text-indigo-500 transition-colors" />
-                </div>
-            </a>
-            
             <a href="{{ route('reports.index', ['open_create' => true]) }}" class="group p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-blue-500/50 hover:bg-blue-50/10 transition-all active:scale-[0.98] flex items-center gap-4">
                 <div class="size-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
                     <flux:icon icon="plus" size="sm" variant="solid" />
@@ -397,6 +426,90 @@ new class extends Component {
                     @endif
                 @endif
             </div>
+        </div>
+
+        <!-- Reports by Infraction Type -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm" x-data="{ showAllInf: false }">
+            <div class="flex items-center justify-between mb-4">
+                <flux:heading size="lg">Tipos de Reporte más Frecuentes</flux:heading>
+                <flux:badge size="sm" color="zinc">Ciclo Activo</flux:badge>
+            </div>
+
+            {{-- Grade & Group Filters --}}
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+                <div class="flex-1 min-w-30 max-w-45">
+                    <select wire:model.live="infractionGrade" class="w-full text-sm rounded-lg border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Todos los grados</option>
+                        @foreach($availableGrades as $grade)
+                            <option value="{{ $grade }}">{{ $grade }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex-1 min-w-30 max-w-45">
+                    <select wire:model.live="infractionGroup" class="w-full text-sm rounded-lg border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Todos los grupos</option>
+                        @foreach($availableGroups as $group)
+                            <option value="{{ $group }}">{{ $group }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @if($infractionGrade || $infractionGroup)
+                    <flux:button variant="ghost" size="sm" icon="x-mark" wire:click="$set('infractionGrade', ''); $set('infractionGroup', '')">
+                        Limpiar
+                    </flux:button>
+                @endif
+            </div>
+
+            @if(count($reportsByInfraction) === 0)
+                <div class="text-center py-8 text-zinc-500 italic text-sm">No hay reportes registrados{{ $infractionGrade || $infractionGroup ? ' con los filtros seleccionados' : ' en el ciclo activo' }}.</div>
+            @else
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="border-b border-zinc-200 dark:border-zinc-700 text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                            <th class="py-2 px-2 font-semibold">#</th>
+                            <th class="py-2 px-2 font-semibold">Infracción</th>
+                            <th class="py-2 px-2 font-semibold">Severidad</th>
+                            <th class="py-2 px-2 text-right font-semibold">Reportes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                        @foreach($reportsByInfraction as $index => $infraction)
+                            <tr
+                                x-show="showAllInf || {{ $index }} < 5"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 -translate-y-1"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                            >
+                                <td class="py-3 px-2 text-zinc-400 font-mono text-xs">{{ $index + 1 }}</td>
+                                <td class="py-3 px-2">
+                                    <span class="text-sm font-medium text-zinc-900 dark:text-white">{{ $infraction['description'] }}</span>
+                                </td>
+                                <td class="py-3 px-2">
+                                    <flux:badge size="sm" :color="$infraction['severity'] === 'GRAVE' ? 'red' : 'zinc'">{{ $infraction['severity'] }}</flux:badge>
+                                </td>
+                                <td class="py-3 px-2 text-right">
+                                    <span class="inline-flex items-center gap-1.5 font-bold {{ $index === 0 ? 'text-red-600 dark:text-red-400' : 'text-zinc-900 dark:text-white' }}">
+                                        @if($index === 0)
+                                            <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                                        @endif
+                                        {{ $infraction['total'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                @if(count($reportsByInfraction) > 5)
+                    <div class="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 text-center">
+                        <flux:button variant="ghost" size="sm" x-on:click="showAllInf = !showAllInf">
+                            <span x-show="!showAllInf">Mostrar todos ({{ count($reportsByInfraction) }})</span>
+                            <span x-show="showAllInf" x-cloak>Mostrar solo Top 5</span>
+                        </flux:button>
+                    </div>
+                @endif
+            @endif
         </div>
     @endif
 

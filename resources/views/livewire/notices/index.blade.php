@@ -40,6 +40,7 @@ new class extends Component {
     public array $signatureStats = [];
     public $signedList = [];
     public $pendingList = [];
+    public array $groupStats = [];
     public string $activeTab = 'signed';
 
     public function updatingSearch(): void
@@ -237,6 +238,7 @@ new class extends Component {
         // Get signed list
         $this->signedList = $notice->signatures->map(fn($s) => [
             'student_name' => $s->student->name,
+            'student_grade_group' => $s->student->grade . $s->student->group_name,
             'parent_name' => $s->parent->name,
             'date' => $s->signed_at->format('d/m/Y H:i'),
             'authorized' => $notice->requires_authorization ? $s->authorized : null,
@@ -246,8 +248,36 @@ new class extends Component {
         $signedStudentIds = $notice->signatures->pluck('student_id')->toArray();
         $this->pendingList = $notice->getExpectedRecipientsQuery()
             ->whereNotIn('id', $signedStudentIds)
-            ->get(['name'])
+            ->get()->map(fn($s) => [
+                'name' => $s->name,
+                'grade_group' => $s->grade . $s->group_name,
+            ])
             ->toArray();
+
+        // Calculate group stats
+        $groupStatsMap = [];
+        
+        // Combine signed and pending to get totals per group
+        foreach ($this->signedList as $item) {
+            $group = $item['student_grade_group'];
+            if (!isset($groupStatsMap[$group])) {
+                $groupStatsMap[$group] = ['signed' => 0, 'pending' => 0, 'total' => 0];
+            }
+            $groupStatsMap[$group]['signed']++;
+            $groupStatsMap[$group]['total']++;
+        }
+        
+        foreach ($this->pendingList as $item) {
+            $group = $item['grade_group'];
+            if (!isset($groupStatsMap[$group])) {
+                $groupStatsMap[$group] = ['signed' => 0, 'pending' => 0, 'total' => 0];
+            }
+            $groupStatsMap[$group]['pending']++;
+            $groupStatsMap[$group]['total']++;
+        }
+        
+        ksort($groupStatsMap);
+        $this->groupStats = $groupStatsMap;
             
         $this->activeTab = 'signed';
         $this->showSignaturesModal = true;
@@ -497,9 +527,9 @@ new class extends Component {
                                     {{ substr($student->name, 0, 1) }}
                                 </div>
                                 <div>
-                                    <div class="flex items-center gap-2">
+                                    <div class="flex items-center gap-2 mb-1">
                                         <flux:text size="xs" class="uppercase tracking-widest font-black text-zinc-400">Aviso para:</flux:text>
-                                        <span class="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-[10px] font-bold">{{ $student->name }}</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-[10px] font-bold">{{ $student->name }} - {{ $student->grade }}{{ $student->group_name }}</span>
                                     </div>
                                     <flux:heading level="3" size="lg" class="mt-0.5">{{ $notice->title }}</flux:heading>
                                 </div>
@@ -637,7 +667,7 @@ new class extends Component {
                                             <div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] font-bold">
                                                 {{ substr($student->name, 0, 1) }}
                                             </div>
-                                            <span class="text-sm font-medium">{{ $student->name }}</span>
+                                            <span class="text-sm font-medium">{{ $student->name }} - {{ $student->grade }}{{ $student->group_name }}</span>
                                         </div>
                                     </td>
                                     <td class="py-4 px-2 text-center text-xs">
@@ -858,6 +888,16 @@ new class extends Component {
                                     <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400"></div>
                                 @endif
                             </button>
+                            <button 
+                                type="button"
+                                wire:click="$set('activeTab', 'groups')"
+                                class="px-4 py-2 text-sm font-medium transition-colors relative {{ $activeTab === 'groups' ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300' }}"
+                            >
+                                Por Grupo ({{ count($groupStats) }})
+                                @if($activeTab === 'groups')
+                                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400"></div>
+                                @endif
+                            </button>
                         </div>
 
                         @if($activeTab === 'signed')
@@ -865,7 +905,7 @@ new class extends Component {
                                 @forelse($signedList as $item)
                                     <div class="flex items-center justify-between p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
                                         <div class="whitespace-normal wrap-break-word">
-                                            <flux:text font="medium">{{ $item['student_name'] }}</flux:text>
+                                            <flux:text font="medium">{{ $item['student_name'] }} <span class="text-sm font-normal text-zinc-500">({{ $item['student_grade_group'] }})</span></flux:text>
                                             <flux:text size="xs" class="text-zinc-500">Firmado por: {{ $item['parent_name'] }}</flux:text>
                                         </div>
                                         <div class="text-right">
@@ -887,11 +927,11 @@ new class extends Component {
                                     </div>
                                 @endforelse
                             </div>
-                        @else
+                        @elseif($activeTab === 'pending')
                             <div class="max-h-80 overflow-y-auto space-y-2 pr-2 animate-in fade-in duration-200">
                                 @forelse($pendingList as $item)
                                     <div class="p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
-                                        <flux:text font="medium">{{ $item['name'] }}</flux:text>
+                                        <flux:text font="medium">{{ $item['name'] }} <span class="text-sm font-normal text-zinc-500">({{ $item['grade_group'] }})</span></flux:text>
                                         <flux:text size="xs" class="text-zinc-500">Esperando firma del tutor</flux:text>
                                     </div>
                                 @empty
@@ -900,6 +940,47 @@ new class extends Component {
                                         ¡Todos han firmado! 🎉
                                     </div>
                                 @endforelse
+                            </div>
+                        @elseif($activeTab === 'groups')
+                            <div class="max-h-80 overflow-y-auto animate-in fade-in duration-200">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="sticky top-0 bg-white dark:bg-zinc-900 z-10">
+                                        <tr class="border-b border-zinc-200 dark:border-zinc-700 text-zinc-500">
+                                            <th class="py-2 px-1 font-semibold uppercase tracking-wider text-[10px]">Grado/Grupo</th>
+                                            <th class="py-2 px-1 font-semibold uppercase tracking-wider text-[10px] text-center">Firmados</th>
+                                            <th class="py-2 px-1 font-semibold uppercase tracking-wider text-[10px] text-center">Faltan</th>
+                                            <th class="py-2 px-1 font-semibold uppercase tracking-wider text-[10px] text-center">Total</th>
+                                            <th class="py-2 px-1 font-semibold uppercase tracking-wider text-[10px] text-right">%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                                        @foreach($groupStats as $group => $stats)
+                                            @php $percentage = $stats['total'] > 0 ? round(($stats['signed'] / $stats['total']) * 100) : 0; @endphp
+                                            <tr>
+                                                <td class="py-3 px-1 font-bold text-zinc-700 dark:text-zinc-300">{{ $group }}</td>
+                                                <td class="py-3 px-1 text-center">
+                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full {{ $stats['signed'] > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-zinc-100 text-zinc-400' }} text-xs font-bold">
+                                                        {{ $stats['signed'] }}
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-1 text-center">
+                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full {{ $stats['pending'] > 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-zinc-100 text-zinc-400' }} text-xs font-bold">
+                                                        {{ $stats['pending'] }}
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-1 text-center font-medium text-zinc-500">{{ $stats['total'] }}</td>
+                                                <td class="py-3 px-1 text-right">
+                                                    <div class="flex items-center justify-end gap-2">
+                                                        <div class="w-12 h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden hidden sm:block">
+                                                            <div class="h-full bg-blue-500" style="width: {{ $percentage }}%"></div>
+                                                        </div>
+                                                        <span class="text-xs font-black {{ $percentage == 100 ? 'text-green-600' : 'text-blue-600' }}">{{ $percentage }}%</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         @endif
                     </div>
