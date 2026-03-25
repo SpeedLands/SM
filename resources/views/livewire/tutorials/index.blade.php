@@ -3632,7 +3632,12 @@ new class extends Component {
 
             {$step(4, 'Se abrirá un cuadro con múltiples opciones. Presione el botón de <strong>"Agregar a Inicio"</strong>.')}
 
-            {$img('descargarAppIOS/Paso4.png', 'Opciones disponibles con Agregar a Inicio')}
+            <div class='not-prose my-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm bg-zinc-50 dark:bg-zinc-800/30'>
+                <img src='/images/tutorials%20fathers/descargarAppIOS/Paso4.gif' alt='Animación del paso Agregar a Inicio' class='w-full h-auto' loading='lazy' />
+                <div class='px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'>
+                    <p class='text-xs text-zinc-500 dark:text-zinc-400 italic m-0'>Animación del paso Agregar a Inicio</p>
+                </div>
+            </div>
 
             {$step(5, 'Se abrirá un cuadro de personalización donde podrá cambiar el nombre a la app (o mantener el nombre por defecto). También tendrá la opción de <strong>"Abrir como app web"</strong>. Favor de mantener esta opción habilitada.')}
 
