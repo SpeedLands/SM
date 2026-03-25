@@ -46,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Attendance System
     Volt::route('asistencia', 'attendance.index')->name('attendance.index');
+    Volt::route('asistencia/estadisticas', 'attendance.group-stats')->name('attendance.group-stats');
     Volt::route('asistencia/escanear', 'attendance.scanner')->name('attendance.scanner');
     Volt::route('escaneo-rapido', 'global-scanner')->name('global-scanner');
 

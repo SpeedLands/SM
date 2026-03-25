@@ -25,6 +25,7 @@ document.addEventListener('alpine:init', () => {
         // Queue state
         pendingQueue: [],
         isSyncingQueue: false,
+        windowHasFocus: true,
 
         async init() {
             this.lastStudent = config.lastStudent;
@@ -32,6 +33,10 @@ document.addEventListener('alpine:init', () => {
             this.statusMessage = config.statusMessage;
             this.lastEntryTime = config.lastEntryTime;
             this.recentScans = config.recentScans;
+
+            this.windowHasFocus = document.hasFocus();
+            window.addEventListener('focus', () => this.windowHasFocus = true);
+            window.addEventListener('blur', () => this.windowHasFocus = false);
 
             this.setupFocus();
             await this.loadCache(config.apiCurpsUrl);
@@ -64,11 +69,17 @@ document.addEventListener('alpine:init', () => {
             });
 
             // Tries to sync every 15 seconds if there are pending items
-            setInterval(() => {
-                if (this.pendingQueue.length > 0 && navigator.onLine) {
-                    this.processQueue(config.apiAttendanceUrl, config.csrfToken);
-                }
-            }, 15000);
+            // Use setTimeout recursion to avoid blocking the main thread in a tight interval
+            const scheduleSync = () => {
+                setTimeout(() => {
+                    if (this.pendingQueue.length > 0 && navigator.onLine) {
+                        // Defer the actual sync work off the current call stack
+                        queueMicrotask(() => this.processQueue(config.apiAttendanceUrl, config.csrfToken));
+                    }
+                    scheduleSync();
+                }, 15000);
+            };
+            scheduleSync();
         },
 
         async loadPendingQueue() {
@@ -119,9 +130,10 @@ document.addEventListener('alpine:init', () => {
             document.addEventListener('click', () => {
                 if (!this.localUseCamera) input?.focus();
             });
+            // Use setTimeout 0 to defer focus so the keydown handler finishes quickly
             document.addEventListener('keydown', (e) => {
                 if (this.localUseCamera) return;
-                if (e.target !== input) input?.focus();
+                if (e.target !== input) setTimeout(() => input?.focus(), 0);
             });
         },
 
@@ -154,6 +166,18 @@ document.addEventListener('alpine:init', () => {
                 this.statusMessage = 'Identificado (Local)';
                 this.lastEntryTime = new Date().toTimeString().slice(0, 8);
                 if (window.playLocalSound) window.playLocalSound('success');
+                
+                // Add to recentScans for instant feedback
+                let scansArray = Array.isArray(this.recentScans) ? this.recentScans : [];
+                scansArray.unshift({
+                    curp: curp,
+                    name: studentInfo.name,
+                    time: new Date().toTimeString().slice(0, 5),
+                    status: 'PRESENTE',
+                    color: 'green'
+                });
+                if (scansArray.length > 5) scansArray.pop();
+                this.recentScans = scansArray;
             } else {
                 this.lastStudent = null;
                 this.lastStatus = 'error';
@@ -203,47 +227,55 @@ document.addEventListener('alpine:init', () => {
                             const item = this.pendingQueue[itemIndex];
                             
                             if (result.status === 'error') {
+                                // If the server explicitly says "error" but it's a structural error (not a temporary one)
+                                // we might want to log it, but attendance is critical.
+                                // For now, we only remove if the error is "not found" or similar permanent rejections.
+                                console.error('Server rejected scan:', result.message, item.curp);
                                 this.lastStatus = 'error';
                                 this.statusMessage = 'Servidor rechazó registro: ' + item.curp;
                                 playError = true;
+                                
+                                // Remove permanent errors to avoid clogging the queue
+                                await CurpCache.removeFromQueue(item.timestamp);
+                                this.pendingQueue.splice(itemIndex, 1);
                             } else {
                                 this.lastStatus = result.duplicate ? 'duplicate' : (result.status === 'RETARDO' ? 'retardo' : 'success');
                                 this.statusMessage = result.duplicate ? 'Ya registrado' : (result.status === 'RETARDO' ? 'RETARDO Registrado' : 'ASISTENCIA Registrada');
                                 this.lastEntryTime = result.entry_time;
                                 if (result.status !== 'error') playSuccess = true;
+                                
+                                // Update recent scan UI with server confirmation
+                                const recentItem = this.recentScans.find(s => s.curp === item.curp);
+                                if (recentItem) {
+                                    recentItem.status = result.duplicate ? 'DUPLICADO' : result.status;
+                                    recentItem.color = result.duplicate ? 'amber' : (result.status === 'RETARDO' ? 'orange' : 'green');
+                                }
+
+                                await CurpCache.removeFromQueue(item.timestamp);
+                                this.pendingQueue.splice(itemIndex, 1);
                             }
-                            
-                            await CurpCache.removeFromQueue(item.timestamp);
-                            this.pendingQueue.splice(itemIndex, 1);
                         }
                     }
                     
                     if (playError && window.playLocalSound) window.playLocalSound('error');
                     else if (playSuccess && window.playLocalSound) window.playLocalSound('success');
-                    
-                    // Refresh Livewire if possible
-                    if (window.Livewire) {
-                        window.Livewire.all().filter(c => c.name === 'attendance.scanner').forEach(c => c.$refresh());
-                    }
 
                 } catch (e) {
-                    console.warn('Sync failed for batch:', e);
+                    console.warn('Sync failed (likely network/offline or 503):', e);
+                    // CRITICAL: We DO NOT remove items from the queue on network failure or 503.
+                    // We just break the loop and wait for the next auto-sync or network event.
+                    
+                    // We only increment attempts for analytics or if we want to eventually flag them,
+                    // but we NEVER remove them unless the server confirms receipt or permanent failure.
                     if (typeof CurpCache !== 'undefined') {
                         for (const item of batch) {
-                            const updatedItem = await CurpCache.incrementAttempt(item.timestamp);
-                            if (e.message === 'ServerError' || (updatedItem && updatedItem.attempts >= 3)) {
-                                await CurpCache.removeFromQueue(item.timestamp);
-                                this.pendingQueue = this.pendingQueue.filter(q => q.timestamp !== item.timestamp);
-                                this.lastStatus = 'error';
-                                this.statusMessage = 'Error permanente en lote';
-                                if (window.playLocalSound) window.playLocalSound('error');
-                            }
+                            await CurpCache.incrementAttempt(item.timestamp);
                         }
                     }
-                    if (e.message !== 'ServerError') {
-                        await new Promise(r => setTimeout(r, 5000));
-                        break; 
-                    }
+                    
+                    // Wait 5 seconds before retrying (will break the while loop for this trigger)
+                    await new Promise(resolve => { setTimeout(resolve, 5000); });
+                    break;
                 }
             }
             this.isSyncingQueue = false;

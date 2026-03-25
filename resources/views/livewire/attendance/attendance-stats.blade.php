@@ -1,10 +1,15 @@
 <?php
 use Livewire\Volt\Component;
+use Livewire\Attributes\Reactive;
 
 new class extends Component {
+    #[Reactive]
     public $presentes = 0;
+    #[Reactive]
     public $faltas = 0;
+    #[Reactive]
     public $retardos = 0;
+    #[Reactive]
     public $pendientes = 0;
 }; ?>
 

@@ -1,24 +1,689 @@
 {
-    "name": "SM Application",
-    "short_name": "SM",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#0ea5a4",
-    "lang": "en",
-    "scope": "/",
-    "icons": [
+  "protocol_handlers": [
+    {
+      "protocol": "mailto",
+      "url": "/newEmail?to=%s"
+    }
+  ],
+  "name": "Gesti\u00f3n Escolar SM",
+  "short_name": "SM",
+  "description": "Plataforma de gesti\u00f3n escolar integral para el seguimiento de asistencias, generaci\u00f3n de reportes acad\u00e9micos, avisos institucionales y comunicaci\u00f3n entre docentes y padres de familia.",
+  "id": "sm-pwa-v1",
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay"
+  ],
+  "background_color": "#ffffff",
+  "theme_color": "#0ea5a4",
+  "lang": "es-MX",
+  "dir": "ltr",
+  "orientation": "portrait",
+  "scope": "/",
+  "categories": [
+    "education",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/manifest-icon-192.maskable.png",
+      "sizes": "177x196",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/manifest-icon-192.maskable.png",
+      "sizes": "177x196",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/manifest-icon-512.maskable.png",
+      "sizes": "497x516",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/manifest-icon-512.maskable.png",
+      "sizes": "497x516",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/windows/LargeTile.scale-100.png",
+      "sizes": "310x310",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/LargeTile.scale-125.png",
+      "sizes": "387x387",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/LargeTile.scale-150.png",
+      "sizes": "465x465",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/LargeTile.scale-200.png",
+      "sizes": "620x620",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/LargeTile.scale-400.png",
+      "sizes": "1240x1240",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/SmallTile.scale-100.png",
+      "sizes": "71x71",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/SmallTile.scale-125.png",
+      "sizes": "88x88",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/SmallTile.scale-150.png",
+      "sizes": "106x106",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/SmallTile.scale-200.png",
+      "sizes": "142x142",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/SmallTile.scale-400.png",
+      "sizes": "284x284",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/SplashScreen.scale-100.png",
+      "sizes": "620x300",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/SplashScreen.scale-125.png",
+      "sizes": "775x375",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/SplashScreen.scale-150.png",
+      "sizes": "930x450",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/SplashScreen.scale-200.png",
+      "sizes": "1240x600",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/SplashScreen.scale-400.png",
+      "sizes": "1600x774",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square150x150Logo.scale-100.png",
+      "sizes": "150x150",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square150x150Logo.scale-125.png",
+      "sizes": "187x187",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square150x150Logo.scale-150.png",
+      "sizes": "225x225",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square150x150Logo.scale-200.png",
+      "sizes": "300x300",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square150x150Logo.scale-400.png",
+      "sizes": "600x600",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-20.png",
+      "sizes": "20x20",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-24.png",
+      "sizes": "24x24",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-30.png",
+      "sizes": "30x30",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-36.png",
+      "sizes": "36x36",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-40.png",
+      "sizes": "40x40",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-44.png",
+      "sizes": "44x44",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-60.png",
+      "sizes": "60x60",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-80.png",
+      "sizes": "80x80",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-lightunplated_targetsize-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-20.png",
+      "sizes": "20x20",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-24.png",
+      "sizes": "24x24",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-30.png",
+      "sizes": "30x30",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-36.png",
+      "sizes": "36x36",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-40.png",
+      "sizes": "40x40",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-44.png",
+      "sizes": "44x44",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-60.png",
+      "sizes": "60x60",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-80.png",
+      "sizes": "80x80",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.altform-unplated_targetsize-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.scale-100.png",
+      "sizes": "44x44",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.scale-125.png",
+      "sizes": "55x55",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.scale-150.png",
+      "sizes": "66x66",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.scale-200.png",
+      "sizes": "88x88",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.scale-400.png",
+      "sizes": "176x176",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-20.png",
+      "sizes": "20x20",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-24.png",
+      "sizes": "24x24",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-30.png",
+      "sizes": "30x30",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-36.png",
+      "sizes": "36x36",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-40.png",
+      "sizes": "40x40",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-44.png",
+      "sizes": "44x44",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-60.png",
+      "sizes": "60x60",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-80.png",
+      "sizes": "80x80",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Square44x44Logo.targetsize-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/StoreLogo.scale-100.png",
+      "sizes": "50x50",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/StoreLogo.scale-125.png",
+      "sizes": "62x62",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/StoreLogo.scale-150.png",
+      "sizes": "75x75",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/StoreLogo.scale-200.png",
+      "sizes": "100x100",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/StoreLogo.scale-400.png",
+      "sizes": "200x200",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Wide310x150Logo.scale-100.png",
+      "sizes": "310x150",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Wide310x150Logo.scale-125.png",
+      "sizes": "387x187",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Wide310x150Logo.scale-150.png",
+      "sizes": "465x225",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Wide310x150Logo.scale-200.png",
+      "sizes": "620x300",
+      "type": "image/png"
+    },
+    {
+      "src": "/windows/Wide310x150Logo.scale-400.png",
+      "sizes": "1240x600",
+      "type": "image/png"
+    },
+    {
+      "src": "/android/launchericon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/android/launchericon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android/launchericon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "/android/launchericon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/android/launchericon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/android/launchericon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/100.png",
+      "sizes": "100x100",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/114.png",
+      "sizes": "114x114",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/120.png",
+      "sizes": "120x120",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/167.png",
+      "sizes": "167x167",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/20.png",
+      "sizes": "20x20",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/29.png",
+      "sizes": "29x29",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/40.png",
+      "sizes": "40x40",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/50.png",
+      "sizes": "50x50",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/57.png",
+      "sizes": "57x57",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/58.png",
+      "sizes": "58x58",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/60.png",
+      "sizes": "60x60",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/76.png",
+      "sizes": "76x76",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/80.png",
+      "sizes": "80x80",
+      "type": "image/png"
+    },
+    {
+      "src": "/ios/87.png",
+      "sizes": "87x87",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/screenshots/screenshot-pc-0.png",
+      "sizes": "1600x770",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/images/screenshots/screenshot-pc-1.png",
+      "sizes": "1600x773",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/images/screenshots/screenshot-mobile-1.png",
+      "sizes": "362x803",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/images/screenshots/screenshot-mobile-2.png",
+      "sizes": "362x798",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/images/screenshots/screenshot-mobile-3.png",
+      "sizes": "365x802",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/images/screenshots/screenshot-mobile-4.png",
+      "sizes": "363x802",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/images/screenshots/screenshot-mobile-5.png",
+      "sizes": "362x803",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Escanear Asistencia",
+      "short_name": "Asistencia",
+      "description": "Abrir el esc\u00e1ner de c\u00f3digos QR para registrar asistencia",
+      "url": "/asistencia/escanear",
+      "icons": [
         {
-            "src": "/apple-touch-icon.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "/apple-touch-icon.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
+          "src": "/favicon.ico",
+          "sizes": "64x64"
         }
-    ]
+      ]
+    },
+    {
+      "name": "Panel de Control",
+      "short_name": "Dashboard",
+      "description": "Ver resumen de actividades y estad\u00edsticas",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/favicon.ico",
+          "sizes": "64x64"
+        }
+      ]
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "prefer_related_applications": false,
+  "gcm_sender_id": "103953800507",
+  "related_applications": []
 }

@@ -193,19 +193,6 @@ new class extends Component {
 
     @if(auth()->user()->isViewStaff())
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="{{ route('global-scanner') }}" class="group relative p-1 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 shadow-lg hover:shadow-indigo-500/25 transition-all active:scale-[0.98]">
-                <div class="bg-white dark:bg-zinc-900 rounded-[calc(1rem-3px)] p-4 flex items-center gap-4">
-                    <div class="size-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
-                        <flux:icon icon="qr-code" size="lg" variant="solid" />
-                    </div>
-                    <div>
-                        <div class="text-sm font-black uppercase tracking-tight text-zinc-900 dark:text-white">Escaneo Rápido</div>
-                        <div class="text-[10px] text-zinc-500">Asistencia y Consultas</div>
-                    </div>
-                    <flux:icon icon="chevron-right" size="sm" class="ms-auto text-zinc-300 group-hover:text-indigo-500 transition-colors" />
-                </div>
-            </a>
-            
             <a href="{{ route('reports.index', ['open_create' => true]) }}" class="group p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-blue-500/50 hover:bg-blue-50/10 transition-all active:scale-[0.98] flex items-center gap-4">
                 <div class="size-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
                     <flux:icon icon="plus" size="sm" variant="solid" />
@@ -450,7 +437,7 @@ new class extends Component {
 
             {{-- Grade & Group Filters --}}
             <div class="flex flex-wrap items-center gap-3 mb-6">
-                <div class="flex-1 min-w-[120px] max-w-[180px]">
+                <div class="flex-1 min-w-30 max-w-45">
                     <select wire:model.live="infractionGrade" class="w-full text-sm rounded-lg border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Todos los grados</option>
                         @foreach($availableGrades as $grade)
@@ -458,7 +445,7 @@ new class extends Component {
                         @endforeach
                     </select>
                 </div>
-                <div class="flex-1 min-w-[120px] max-w-[180px]">
+                <div class="flex-1 min-w-30 max-w-45">
                     <select wire:model.live="infractionGroup" class="w-full text-sm rounded-lg border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Todos los grupos</option>
                         @foreach($availableGroups as $group)
