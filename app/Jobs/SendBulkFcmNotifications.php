@@ -21,6 +21,11 @@ class SendBulkFcmNotifications implements ShouldQueue
     public $tries = 3;
 
     /**
+     * The number of seconds the job can run before timing out.
+     */
+    public $timeout = 180;
+
+    /**
      * The number of seconds to wait before retrying the job.
      */
     public $backoff = [60, 300, 600];
@@ -41,11 +46,36 @@ class SendBulkFcmNotifications implements ShouldQueue
      */
     public function handle(FcmService $fcmService): void
     {
-        Log::info('Starting Bulk FCM Sending', ['count' => count($this->userIds)]);
+        $totalCount = count($this->userIds);
+
+        // If we have more than 100 users, split into smaller independent jobs
+        // to avoid exceeding the worker timeout (especially given the 50ms sleep delay).
+        if ($totalCount > 100) {
+            $chunks = array_chunk($this->userIds, 100);
+
+            Log::info('Chunking Bulk FCM Sending', [
+                'total_users' => $totalCount,
+                'total_chunks' => count($chunks),
+            ]);
+
+            foreach ($chunks as $chunk) {
+                static::dispatch(
+                    $chunk,
+                    $this->title,
+                    $this->body,
+                    $this->data,
+                    $this->url
+                );
+            }
+
+            return;
+        }
+
+        Log::info('Processing FCM Notification Chunk', ['count' => $totalCount]);
 
         User::whereIn('id', $this->userIds)
             ->whereNotNull('fcm_token')
-            ->chunkById(100, function ($users) use ($fcmService) {
+            ->chunkById(50, function ($users) use ($fcmService) {
                 foreach ($users as $user) {
                     try {
                         $fcmService->sendNotification(
@@ -58,8 +88,8 @@ class SendBulkFcmNotifications implements ShouldQueue
                             $this->url
                         );
 
-                        // Small delay to prevent hitting rate limits too fast
-                        usleep(50000); // 50ms
+                        // Small delay to prevent hitting FCM rate limits too fast (50ms)
+                        usleep(50000);
                     } catch (\Exception $e) {
                         Log::error('Individual FCM Sending Failed', [
                             'user_id' => $user->id,
@@ -69,6 +99,6 @@ class SendBulkFcmNotifications implements ShouldQueue
                 }
             });
 
-        Log::info('Bulk FCM Sending Completed');
+        Log::info('FCM Notification Chunk Completed');
     }
 }

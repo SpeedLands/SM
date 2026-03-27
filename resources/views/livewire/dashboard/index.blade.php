@@ -206,7 +206,7 @@ new class extends Component {
         <flux:callout variant="danger" heading="Trámites Pendientes de Atención" icon="exclamation-triangle">
             Tienes {{ $totalPending }} documento(s) o aviso(s) que requieren tu firma o revisión.
             <x-slot name="actions">
-                <flux:button size="sm" variant="primary" href="{{ route('reports.index') }}" icon="pencil-square">Revisar Pendientes</flux:button>
+                <flux:button size="sm" variant="primary" href="{{ auth()->user()->getPendingTargetRoute() }}" icon="pencil-square">Revisar Pendientes</flux:button>
             </x-slot>
         </flux:callout>
     @endif
@@ -335,7 +335,8 @@ new class extends Component {
                                     x-transition:enter="transition ease-out duration-200"
                                     x-transition:enter-start="opacity-0 -translate-y-1"
                                     x-transition:enter-end="opacity-100 translate-y-0"
-                                    class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                                    class="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer"
+                                    onclick="window.location.href='{{ route('reports.index', ['gradeFilter' => $classroom['grade'], 'groupFilter' => $classroom['group']]) }}'"
                                 >
                                     <td class="py-3 px-2 text-zinc-400 font-mono text-xs">{{ $index + 1 }}</td>
                                     <td class="py-3 px-2">
@@ -570,7 +571,7 @@ new class extends Component {
                                         <div class="size-2 rounded-full bg-red-500 animate-pulse"></div>
                                         <span class="text-xs font-bold text-red-700 dark:text-red-400">{{ $studentPending }} Trámite(s) Pendiente(s)</span>
                                     </div>
-                                    <flux:button size="xs" variant="ghost" icon="chevron-right" href="{{ route('reports.index') }}" />
+                                    <flux:button size="xs" variant="ghost" icon="chevron-right" href="{{ auth()->user()->getPendingTargetRoute($student->id) }}" />
                                 </div>
                             @endif
 

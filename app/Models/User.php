@@ -364,6 +364,40 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the most relevant route based on pending notifications.
+     */
+    public function getPendingTargetRoute(?string $studentId = null): string
+    {
+        if ($studentId) {
+            if ($this->getUnsignedNoticesCount($studentId) > 0) {
+                return route('notices.index');
+            }
+            if ($this->getUnsignedCitationsCount($studentId) > 0) {
+                return route('citations.index');
+            }
+            if ($this->getUnsignedCommunityServicesCount($studentId) > 0) {
+                return route('community-services.index');
+            }
+
+            return route('reports.index');
+        }
+
+        $summary = $this->getPendingNotificationsSummary();
+
+        if ($summary['notices'] > 0) {
+            return route('notices.index');
+        }
+        if ($summary['citations'] > 0) {
+            return route('citations.index');
+        }
+        if ($summary['services'] > 0) {
+            return route('community-services.index');
+        }
+
+        return route('reports.index');
+    }
+
+    /**
      * Send a FCM notification to this user.
      */
     public function sendFcmNotification(string $title, string $body, array $data = [], ?string $icon = null, ?string $image = null, ?string $url = null): bool

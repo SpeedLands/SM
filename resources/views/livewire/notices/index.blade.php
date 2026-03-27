@@ -42,6 +42,7 @@ new class extends Component {
     public $pendingList = [];
     public array $groupStats = [];
     public string $activeTab = 'signed';
+    public ?string $groupFilter = null;
 
     public function updatingSearch(): void
     {
@@ -231,6 +232,7 @@ new class extends Component {
         $this->authorize('teacher-or-admin');
         $notice = Notice::with(['signatures.parent', 'signatures.student'])->findOrFail($id);
         $this->viewingSignaturesNoticeId = $notice->id;
+        $this->groupFilter = null;
         
         $stats = $notice->getSignatureStats();
         $this->signatureStats = $stats;
@@ -249,6 +251,7 @@ new class extends Component {
         $this->pendingList = $notice->getExpectedRecipientsQuery()
             ->whereNotIn('id', $signedStudentIds)
             ->get()->map(fn($s) => [
+                'id' => $s->id,
                 'name' => $s->name,
                 'grade_group' => $s->grade . $s->group_name,
             ])
@@ -902,7 +905,18 @@ new class extends Component {
 
                         @if($activeTab === 'signed')
                             <div class="max-h-80 overflow-y-auto space-y-2 pr-2 animate-in fade-in duration-200">
-                                @forelse($signedList as $item)
+                                @if($groupFilter)
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-bold border border-blue-100 dark:border-blue-800 shadow-sm">
+                                            <flux:icon icon="funnel" variant="micro" class="shrink-0" />
+                                            <span>Filtro: {{ $groupFilter }}</span>
+                                            <button type="button" wire:click="$set('groupFilter', null)" class="ml-1 p-0.5 hover:bg-blue-200 dark:hover:bg-blue-700 rounded-md transition-colors" title="Quitar filtro">
+                                                <flux:icon icon="x-mark" variant="micro" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endif
+                                @forelse(collect($signedList)->when($groupFilter, fn($c) => $c->where('student_grade_group', $groupFilter)) as $item)
                                     <div class="flex items-center justify-between p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
                                         <div class="whitespace-normal wrap-break-word">
                                             <flux:text font="medium">{{ $item['student_name'] }} <span class="text-sm font-normal text-zinc-500">({{ $item['student_grade_group'] }})</span></flux:text>
@@ -929,10 +943,32 @@ new class extends Component {
                             </div>
                         @elseif($activeTab === 'pending')
                             <div class="max-h-80 overflow-y-auto space-y-2 pr-2 animate-in fade-in duration-200">
-                                @forelse($pendingList as $item)
-                                    <div class="p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
-                                        <flux:text font="medium">{{ $item['name'] }} <span class="text-sm font-normal text-zinc-500">({{ $item['grade_group'] }})</span></flux:text>
-                                        <flux:text size="xs" class="text-zinc-500">Esperando firma del tutor</flux:text>
+                                @if($groupFilter)
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-bold border border-blue-100 dark:border-blue-800 shadow-sm">
+                                            <flux:icon icon="funnel" variant="micro" class="shrink-0" />
+                                            <span>Filtro: {{ $groupFilter }}</span>
+                                            <button type="button" wire:click="$set('groupFilter', null)" class="ml-1 p-0.5 hover:bg-blue-200 dark:hover:bg-blue-700 rounded-md transition-colors" title="Quitar filtro">
+                                                <flux:icon icon="x-mark" variant="micro" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endif
+                                @forelse(collect($pendingList)->when($groupFilter, fn($c) => $c->where('grade_group', $groupFilter)) as $item)
+                                    <div class="p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm flex items-center justify-between group/item">
+                                        <div>
+                                            <flux:text font="medium">{{ $item['name'] }} <span class="text-sm font-normal text-zinc-500">({{ $item['grade_group'] }})</span></flux:text>
+                                            <flux:text size="xs" class="text-zinc-500">Esperando firma del tutor</flux:text>
+                                        </div>
+                                        <flux:button 
+                                            variant="ghost" 
+                                            size="sm" 
+                                            icon="document-plus" 
+                                            title="Asignar reporte" 
+                                            href="{{ route('reports.index', ['open_create' => 1, 'student_id' => $item['id'] ?? '', 'student_name' => $item['name']]) }}"
+                                            wire:navigate
+                                            class="text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                        />
                                     </div>
                                 @empty
                                     <div class="py-16 text-center text-green-600 dark:text-green-400 font-medium">
@@ -959,14 +995,24 @@ new class extends Component {
                                             <tr>
                                                 <td class="py-3 px-1 font-bold text-zinc-700 dark:text-zinc-300">{{ $group }}</td>
                                                 <td class="py-3 px-1 text-center">
-                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full {{ $stats['signed'] > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-zinc-100 text-zinc-400' }} text-xs font-bold">
+                                                    <button 
+                                                        type="button"
+                                                        wire:click="$set('groupFilter', '{{ $group }}'); $set('activeTab', 'signed')"
+                                                        class="inline-flex items-center justify-center w-6 h-6 rounded-full {{ $stats['signed'] > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200' : 'bg-zinc-100 text-zinc-400' }} text-xs font-bold transition-colors cursor-pointer"
+                                                        title="Ver firmados de {{ $group }}"
+                                                    >
                                                         {{ $stats['signed'] }}
-                                                    </span>
+                                                    </button>
                                                 </td>
                                                 <td class="py-3 px-1 text-center">
-                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full {{ $stats['pending'] > 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-zinc-100 text-zinc-400' }} text-xs font-bold">
+                                                    <button 
+                                                        type="button"
+                                                        wire:click="$set('groupFilter', '{{ $group }}'); $set('activeTab', 'pending')"
+                                                        class="inline-flex items-center justify-center w-6 h-6 rounded-full {{ $stats['pending'] > 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 hover:bg-amber-200' : 'bg-zinc-100 text-zinc-400' }} text-xs font-bold transition-colors cursor-pointer"
+                                                        title="Ver pendientes de {{ $group }}"
+                                                    >
                                                         {{ $stats['pending'] }}
-                                                    </span>
+                                                    </button>
                                                 </td>
                                                 <td class="py-3 px-1 text-center font-medium text-zinc-500">{{ $stats['total'] }}</td>
                                                 <td class="py-3 px-1 text-right">

@@ -14,6 +14,8 @@ new class extends Component {
 
     public string $search = '';
     public string $statusFilter = '';
+    public string $gradeFilter = '';
+    public string $groupFilter = '';
     public bool $onlyActiveCycle = true;
 
     // Modal state
@@ -22,6 +24,7 @@ new class extends Component {
     // Form fields
     public string $studentSearch = '';
     public ?string $selectedStudentId = null;
+    public ?string $assignedById = null;
     public string $activity = '';
     public string $description = '';
     public string $scheduledDate = '';
@@ -46,8 +49,19 @@ new class extends Component {
         $this->resetPage();
     }
 
+    public function updatingGradeFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingGroupFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function mount(): void
     {
+        $this->assignedById = auth()->id();
         $this->scheduledDate = now()->format('Y-m-d');
         // Open create modal automatically when navigated with query params
         if (request()->query('open_create')) {
@@ -71,6 +85,7 @@ new class extends Component {
     public function resetForm(): void
     {
         $this->reset(['selectedStudentId', 'studentSearch', 'activity', 'description']);
+        $this->assignedById = auth()->id();
         $this->scheduledDate = now()->format('Y-m-d');
     }
 
@@ -89,6 +104,7 @@ new class extends Component {
         $this->editingServiceId = $service->id;
         $this->selectedStudentId = $service->student_id;
         $this->studentSearch = $service->student->name;
+        $this->assignedById = $service->assigned_by_id;
         $this->activity = $service->activity;
         $this->description = $service->description ?? '';
         $this->scheduledDate = Carbon::parse($service->scheduled_date)->format('Y-m-d');
@@ -112,6 +128,7 @@ new class extends Component {
         $data = [
             'cycle_id' => $activeCycle->id,
             'student_id' => $this->selectedStudentId,
+            'assigned_by_id' => $this->assignedById,
             'activity' => $this->activity,
             'description' => $this->description,
             'scheduled_date' => $this->scheduledDate,
@@ -122,7 +139,6 @@ new class extends Component {
             $service->update($data);
             $message = 'Servicio comunitario actualizado.';
         } else {
-            $data['assigned_by_id'] = auth()->id();
             $data['status'] = 'PENDING';
             $service = CommunityService::create($data);
             $message = 'Servicio comunitario asignado.';
@@ -219,6 +235,8 @@ new class extends Component {
             })
             ->when($this->onlyActiveCycle && $activeCycle, fn($q) => $q->where('community_services.cycle_id', $activeCycle->id))
             ->when($this->statusFilter, fn($q) => $q->where('community_services.status', $this->statusFilter))
+            ->when($this->gradeFilter, fn($q) => $q->where('students.grade', $this->gradeFilter))
+            ->when($this->groupFilter, fn($q) => $q->where('students.group_name', $this->groupFilter))
             ->when($this->search, function ($q) {
                 $q->where(function ($sq) {
                     $sq->where('students.name', 'like', "%{$this->search}%")
@@ -257,6 +275,8 @@ new class extends Component {
             'services' => $services,
             'suggestedStudents' => $suggestedStudents,
             'studentResults' => $studentResults,
+            'availableGroups' => $activeCycle ? \App\Models\ClassGroup::where('cycle_id', $activeCycle->id)->select('section')->distinct()->orderBy('section')->get() : collect(),
+            'staffMembers' => auth()->user()->isViewStaff() ? \App\Models\User::whereIn('role', ['ADMIN', 'TEACHER'])->orderBy('name')->get() : collect(),
         ];
     }
 }; ?>
@@ -302,6 +322,8 @@ new class extends Component {
             {{ match($statusFilter) { 'PENDING' => 'Pendiente', 'COMPLETED' => 'Completado', 'MISSED' => 'Incumplido', default => $statusFilter } }}
         </flux:badge>
         @endif
+        @if($gradeFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">Grado: {{ $gradeFilter }}</flux:badge> @endif
+        @if($groupFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">Grupo: {{ $groupFilter }}</flux:badge> @endif
         @if($onlyActiveCycle) <flux:badge variant="solid" color="zinc" class="shrink-0">Ciclo Activo</flux:badge> @endif
         <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="showFilters = !showFilters" />
     </div>
@@ -321,6 +343,26 @@ new class extends Component {
                     <option value="PENDING">Pendientes</option>
                     <option value="COMPLETED">Completados</option>
                     <option value="MISSED">No asistió</option>
+                </flux:select>
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Grado</flux:label>
+                <flux:select wire:model.live="gradeFilter">
+                    <option value="">Todos los grados</option>
+                    <option value="1º">1º</option>
+                    <option value="2º">2º</option>
+                    <option value="3º">3º</option>
+                </flux:select>
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Grupo</flux:label>
+                <flux:select wire:model.live="groupFilter">
+                    <option value="">Todos los grupos</option>
+                    @foreach($availableGroups as $group)
+                        <option value="{{ $group->section }}">{{ $group->section }}</option>
+                    @endforeach
                 </flux:select>
             </flux:field>
 
@@ -635,6 +677,12 @@ new class extends Component {
                 <flux:textarea wire:model="description" label="Instrucciones adicionales" placeholder="Opcional..." rows="3" />
 
                 <flux:input type="date" wire:model="scheduledDate" label="Fecha de Cumplimiento" description="Disponible de lunes a sábado. No se permite programar los domingos." />
+
+                <flux:select label="Asignado por" wire:model="assignedById">
+                    @foreach($staffMembers as $staff)
+                        <option value="{{ $staff->id }}">{{ $staff->name }} ({{ $staff->role === 'ADMIN' ? 'Admin' : 'Docente' }})</option>
+                    @endforeach
+                </flux:select>
             </div>
 
             <div class="flex gap-2">
