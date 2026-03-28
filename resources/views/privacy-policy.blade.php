@@ -93,7 +93,6 @@
                                 <li>Correo electrónico</li>
                                 <li>Número de teléfono</li>
                                 <li>Ocupación</li>
-                                <li>Fotografía de perfil (opcional)</li>
                             </ul>
                         </div>
 
@@ -161,7 +160,6 @@
                         <ul class="list-disc list-inside space-y-2">
                             <li><strong>Cifrado de datos sensibles:</strong> La información médica, direcciones y datos de contacto de emergencia se almacenan cifrados en la base de datos.</li>
                             <li><strong>Contraseñas protegidas:</strong> Las contraseñas de los usuarios se almacenan utilizando algoritmos de hash seguros; nunca se guardan en texto plano.</li>
-                            <li><strong>Autenticación segura:</strong> La Aplicación soporta autenticación de dos factores (2FA) para mayor protección de las cuentas.</li>
                             <li><strong>Comunicación cifrada:</strong> Toda la comunicación entre el dispositivo y el servidor se realiza a través de HTTPS/TLS.</li>
                             <li><strong>Control de acceso:</strong> El acceso a la información está restringido por roles (administrador, docente, padre de familia), limitando la visualización de datos según el perfil del usuario.</li>
                         </ul>
