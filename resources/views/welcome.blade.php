@@ -127,6 +127,7 @@
             </div>
             <div class="flex gap-10 text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest">
                 <a href="#" class="hover:text-zinc-900 dark:hover:text-white transition-colors">{{ __('About SM') }}</a>
+                <a href="{{ route('privacy-policy') }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors">{{ __('Privacy Policy') }}</a>
                 <a href="#" class="hover:text-zinc-900 dark:hover:text-white transition-colors">{{ __('Contact Support') }}</a>
             </div>
         </footer>

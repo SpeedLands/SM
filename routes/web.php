@@ -14,6 +14,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy-policy');
+
 Volt::route('dashboard', 'dashboard.index')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
