@@ -5,6 +5,7 @@ use App\Models\User;
 use App\Services\FcmService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 
 uses(RefreshDatabase::class);
 
@@ -102,4 +103,19 @@ test('send bulk fcm notifications job processes users and calls fcm service', fu
     $job->handle($service);
 
     Http::assertSentCount(5);
+});
+
+test('send bulk fcm notifications job chunks itself if user count exceeds 100', function () {
+    Queue::fake();
+    $userIds = array_fill(0, 150, 'user-id');
+    $service = createFcmServiceMock();
+
+    $job = new SendBulkFcmNotifications($userIds, 'Bulk Title', 'Bulk Body');
+    $job->handle($service);
+
+    Queue::assertPushed(SendBulkFcmNotifications::class, function ($job) {
+        return count($job->userIds) <= 100;
+    });
+
+    Queue::assertPushed(SendBulkFcmNotifications::class, 2);
 });

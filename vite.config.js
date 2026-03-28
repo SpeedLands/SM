@@ -26,6 +26,10 @@ export default defineConfig({
                 background_color: '#ffffff',
                 theme_color: '#0ea5a4',
                 icons: [
+                    { src: '/favicon.ico', sizes: '64x64', type: 'image/x-icon' },
+                    { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' },
+                    { src: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+                    { src: '/apple-icon-180.png', sizes: '180x180', type: 'image/png' },
                     { src: '/apple-touch-icon.png', sizes: '192x192', type: 'image/png' },
                     { src: '/apple-touch-icon.png', sizes: '512x512', type: 'image/png' }
                 ]

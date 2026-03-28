@@ -12,6 +12,8 @@ new class extends Component {
 
     public string $search = '';
     public string $statusFilter = '';
+    public string $gradeFilter = '';
+    public string $groupFilter = '';
     public bool $onlyActiveCycle = true;
 
     // Create Modal
@@ -21,6 +23,7 @@ new class extends Component {
     public ?string $deletingCitationId = null;
     public string $studentSearch = '';
     public ?string $selectedStudentId = null;
+    public ?string $teacherId = null;
     public string $reason = '';
     public string $citationDate = '';
     public string $citationTime = '';
@@ -40,8 +43,19 @@ new class extends Component {
         $this->resetPage();
     }
 
+    public function updatingGradeFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingGroupFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function mount(): void
     {
+        $this->teacherId = auth()->id();
         $this->citationDate = now()->format('Y-m-d');
         $this->citationTime = '08:00';
         // Open create modal automatically when navigated with query params
@@ -67,6 +81,7 @@ new class extends Component {
     public function resetForm(): void
     {
         $this->reset(['selectedStudentId', 'studentSearch', 'reason']);
+        $this->teacherId = auth()->id();
         $this->citationDate = now()->format('Y-m-d');
         $this->citationTime = '08:00';
     }
@@ -87,6 +102,7 @@ new class extends Component {
             $citation = Citation::findOrFail($this->editingCitationId);
             $citation->update([
                 'student_id' => $this->selectedStudentId,
+                'teacher_id' => $this->teacherId,
                 'reason' => $this->reason,
                 'citation_date' => \Carbon\Carbon::parse($this->citationDate . ' ' . $this->citationTime),
             ]);
@@ -101,7 +117,7 @@ new class extends Component {
             $citation = Citation::create([
                 'cycle_id' => $activeCycle->id,
                 'student_id' => $this->selectedStudentId,
-                'teacher_id' => auth()->id(),
+                'teacher_id' => $this->teacherId,
                 'reason' => $this->reason,
                 'citation_date' => \Carbon\Carbon::parse($this->citationDate . ' ' . $this->citationTime),
                 'status' => 'PENDING',
@@ -139,6 +155,7 @@ new class extends Component {
         $this->editingCitationId = $citation->id;
         $this->selectedStudentId = $citation->student_id;
         $this->studentSearch = $citation->student->name;
+        $this->teacherId = $citation->teacher_id;
         $this->reason = $citation->reason;
         $this->citationDate = $citation->citation_date->format('Y-m-d');
         $this->citationTime = $citation->citation_date->format('H:i');
@@ -185,20 +202,21 @@ new class extends Component {
         $user = auth()->user();
         $isStaff = $user->isViewStaff();
 
-        $query = Citation::with(['student', 'teacher'])
-            ->when($this->onlyActiveCycle && $activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
-            ->orderBy('citation_date', 'asc');
-
         if ($isStaff) {
-            $citations = $query->select('citations.*')
+            $citations = Citation::with(['student', 'teacher'])
+                ->select('citations.*')
+                ->join('students', 'citations.student_id', '=', 'students.id')
+                ->when($this->onlyActiveCycle && $activeCycle, fn($q) => $q->where('cycle_id', $activeCycle->id))
                 ->when($this->statusFilter, fn($q) => $q->where('citations.status', $this->statusFilter))
+                ->when($this->gradeFilter, fn($q) => $q->where('students.grade', $this->gradeFilter))
+                ->when($this->groupFilter, fn($q) => $q->where('students.group_name', $this->groupFilter))
                 ->when($this->search, function ($q) {
-                    $q->join('students', 'citations.student_id', '=', 'students.id')
-                        ->where(function ($sq) {
-                            $sq->where('students.name', 'like', "%{$this->search}%")
-                                ->orWhere('citations.reason', 'like', "%{$this->search}%");
-                        });
+                    $q->where(function ($sq) {
+                        $sq->where('students.name', 'like', "%{$this->search}%")
+                            ->orWhere('citations.reason', 'like', "%{$this->search}%");
+                    });
                 })
+                ->orderBy('citation_date', 'asc')
                 ->paginate(10);
         } else {
             $studentIds = $user->students->pluck('id');
@@ -212,6 +230,8 @@ new class extends Component {
             'studentResults' => $isStaff && strlen($this->studentSearch) >= 3 && !$this->selectedStudentId
                 ? Student::where('name', 'like', "%{$this->studentSearch}%")->limit(5)->get()
                 : [],
+            'availableGroups' => $activeCycle ? \App\Models\ClassGroup::where('cycle_id', $activeCycle->id)->select('section')->distinct()->orderBy('section')->get() : collect(),
+            'staffMembers' => $isStaff ? \App\Models\User::whereIn('role', ['ADMIN', 'TEACHER'])->orderBy('name')->get() : collect(),
         ];
     }
 }; ?>
@@ -236,6 +256,8 @@ new class extends Component {
             {{ match($statusFilter) { 'PENDING' => 'Pendiente', 'ATTENDED' => 'Asistió', 'NO_SHOW' => 'Inasistencia', default => $statusFilter } }}
         </flux:badge>
         @endif
+        @if($gradeFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">Grado: {{ $gradeFilter }}</flux:badge> @endif
+        @if($groupFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">Grupo: {{ $groupFilter }}</flux:badge> @endif
         @if($onlyActiveCycle) <flux:badge variant="solid" color="zinc" class="shrink-0">Ciclo Activo</flux:badge> @endif
         <flux:button variant="ghost" size="xs" icon="funnel" class="ml-auto" title="Mostrar/ocultar filtros" x-on:click="showFilters = !showFilters" />
     </div>
@@ -255,6 +277,26 @@ new class extends Component {
                     <option value="PENDING">Pendientes</option>
                     <option value="ATTENDED">Asistió</option>
                     <option value="NO_SHOW">No asistió</option>
+                </flux:select>
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Grado</flux:label>
+                <flux:select wire:model.live="gradeFilter">
+                    <option value="">Todos los grados</option>
+                    <option value="1º">1º</option>
+                    <option value="2º">2º</option>
+                    <option value="3º">3º</option>
+                </flux:select>
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Grupo</flux:label>
+                <flux:select wire:model.live="groupFilter">
+                    <option value="">Todos los grupos</option>
+                    @foreach($availableGroups as $group)
+                        <option value="{{ $group->section }}">{{ $group->section }}</option>
+                    @endforeach
                 </flux:select>
             </flux:field>
 
@@ -283,7 +325,7 @@ new class extends Component {
                 <flux:text size="xs" class="font-bold uppercase text-[9px] text-zinc-400 mb-1">Motivo:</flux:text>
                 <div class="line-clamp-2">{{ $citation->reason }}</div>
                 @if($citation->teacher)
-                <div class="text-[10px] text-zinc-400 mt-1">Generado por: {{ $citation->teacher->name }}</div>
+                <div class="text-[10px] text-zinc-400 mt-1">Citado por: {{ $citation->teacher->name }}</div>
                 @endif
             </div>
 
@@ -348,7 +390,7 @@ new class extends Component {
                     </td>
                     <td class="py-4 px-2">
                         <div class="font-medium max-w-xs truncate" title="{{ $citation->reason }}">{{ $citation->reason }}</div>
-                        <div class="text-[10px] text-zinc-400">Generado por: {{ $citation->teacher->name }}</div>
+                        <div class="text-[10px] text-zinc-400">Citado por: {{ $citation->teacher->name }}</div>
                     </td>
                     <td class="py-4 px-2 text-center">
                         @if($citation->parent_signature)
@@ -560,6 +602,16 @@ new class extends Component {
                         <flux:error name="citationTime" />
                     </flux:field>
                 </div>
+
+                <flux:field>
+                    <flux:label>Citado por</flux:label>
+                    <flux:select wire:model="teacherId">
+                        @foreach($staffMembers as $staff)
+                            <option value="{{ $staff->id }}">{{ $staff->name }} ({{ $staff->role === 'ADMIN' ? 'Admin' : 'Docente' }})</option>
+                        @endforeach
+                    </flux:select>
+                    <flux:error name="teacherId" />
+                </flux:field>
 
                 <flux:field>
                     <flux:label>Motivo de la Cita</flux:label>

@@ -18,6 +18,8 @@ new class extends Component {
     public string $search = '';
     public string $status = '';
     public string $severity = '';
+    public string $gradeFilter = '';
+    public string $groupFilter = '';
     public bool $onlyActiveCycle = true;
     public bool $onlyPending = false;
 
@@ -30,6 +32,7 @@ new class extends Component {
     // Form fields
     public string $studentSearch = '';
     public ?string $selectedStudentId = null;
+    public ?string $teacherId = null;
     public ?string $infractionId = null;
     public string $subject = '';
     public string $description = '';
@@ -51,6 +54,16 @@ new class extends Component {
         $this->resetPage();
     }
 
+    public function updatingGradeFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingGroupFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function updatingOnlyPending(): void
     {
         $this->resetPage();
@@ -63,6 +76,7 @@ new class extends Component {
 
     public function mount(): void
     {
+        $this->teacherId = auth()->id();
         $this->reportDate = now()->format('Y-m-d');
         $this->reportTime = now()->format('H:i');
         // Open create modal automatically when navigated with query params
@@ -74,6 +88,14 @@ new class extends Component {
 
         if ($search = request()->query('search')) {
             $this->search = $search;
+        }
+
+        if ($grade = request()->query('gradeFilter')) {
+            $this->gradeFilter = $grade;
+        }
+
+        if ($group = request()->query('groupFilter')) {
+            $this->groupFilter = $group;
         }
     }
 
@@ -88,6 +110,7 @@ new class extends Component {
     public function resetForm(): void
     {
         $this->reset(['editingReport', 'selectedStudentId', 'studentSearch', 'infractionId', 'subject', 'description']);
+        $this->teacherId = auth()->id();
         $this->reportDate = now()->format('Y-m-d');
         $this->reportTime = now()->format('H:i');
     }
@@ -107,6 +130,7 @@ new class extends Component {
         $this->editingReport = $report;
         $this->selectedStudentId = $report->student_id;
         $this->studentSearch = $report->student->name;
+        $this->teacherId = $report->teacher_id;
         $this->infractionId = $report->infraction_id;
         $this->subject = $report->subject ?? '';
         $this->description = $report->description;
@@ -164,6 +188,7 @@ new class extends Component {
         $data = [
             'cycle_id' => $activeCycle->id,
             'student_id' => $this->selectedStudentId,
+            'teacher_id' => $this->teacherId,
             'infraction_id' => $this->infractionId,
             'subject' => $this->subject,
             'description' => $this->description,
@@ -174,7 +199,6 @@ new class extends Component {
             $this->editingReport->update($data);
             $message = 'Reporte actualizado exitosamente.';
         } else {
-            $data['teacher_id'] = auth()->id();
             $data['status'] = 'PENDING_SIGNATURE';
             $report = Report::create($data);
             $message = 'Reporte registrado exitosamente.';
@@ -294,6 +318,8 @@ new class extends Component {
                 $q->join('infractions', 'reports.infraction_id', '=', 'infractions.id')
                     ->where('infractions.severity', $this->severity);
             })
+            ->when($this->gradeFilter, fn($q) => $q->where('students.grade', $this->gradeFilter))
+            ->when($this->groupFilter, fn($q) => $q->where('students.group_name', $this->groupFilter))
             ->when($this->onlyPending, fn($q) => $q->where('reports.status', 'PENDING_SIGNATURE'))
             ->when($this->search, function ($q) {
                 $q->where(function ($sq) {
@@ -319,6 +345,8 @@ new class extends Component {
             'infractions' => $infractions,
             'studentResults' => $studentResults,
             'activeCycle' => $activeCycle,
+            'availableGroups' => $activeCycle ? \App\Models\ClassGroup::where('cycle_id', $activeCycle->id)->select('section')->distinct()->orderBy('section')->get() : collect(),
+            'staffMembers' => auth()->user()->isViewStaff() ? \App\Models\User::whereIn('role', ['ADMIN', 'TEACHER'])->orderBy('name')->get() : collect(),
         ];
     }
 }; ?>
@@ -352,6 +380,8 @@ new class extends Component {
                 {{ match($severity) { 'NORMAL' => 'Normal', 'GRAVE' => 'Grave', default => $severity } }}
             </flux:badge>
             @endif
+            @if($gradeFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">Grado: {{ $gradeFilter }}</flux:badge> @endif
+            @if($groupFilter) <flux:badge variant="solid" color="zinc" class="shrink-0">Grupo: {{ $groupFilter }}</flux:badge> @endif
             @if($onlyActiveCycle) <flux:badge variant="solid" color="zinc" class="shrink-0">Ciclo Activo</flux:badge> @endif
             @if($onlyPending) <flux:badge variant="solid" color="zinc" class="shrink-0">Pendientes</flux:badge> @endif
         </x-slot:pills>
@@ -377,6 +407,26 @@ new class extends Component {
                     <option value="">Todas las gravedades</option>
                     <option value="NORMAL">Normal</option>
                     <option value="GRAVE">Grave</option>
+                </flux:select>
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Grado</flux:label>
+                <flux:select wire:model.live="gradeFilter">
+                    <option value="">Todos los grados</option>
+                    <option value="1º">1º</option>
+                    <option value="2º">2º</option>
+                    <option value="3º">3º</option>
+                </flux:select>
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Grupo</flux:label>
+                <flux:select wire:model.live="groupFilter">
+                    <option value="">Todos los grupos</option>
+                    @foreach($availableGroups as $group)
+                        <option value="{{ $group->section }}">{{ $group->section }}</option>
+                    @endforeach
                 </flux:select>
             </flux:field>
 
@@ -422,7 +472,7 @@ new class extends Component {
                 @endif
                 <div class="line-clamp-2 italic text-zinc-500">{{ $report->description }}</div>
                 @if($report->teacher)
-                <div class="text-[10px] text-zinc-400 mt-1">Generado por: {{ $report->teacher->name }}</div>
+                <div class="text-[10px] text-zinc-400 mt-1">Asignado por: {{ $report->teacher->name }}</div>
                 @endif
             </div>
 
@@ -475,7 +525,7 @@ new class extends Component {
                         @endif
                         <div class="text-xs text-zinc-500 whitespace-normal line-clamp-2 italic">{{ $report->description }}</div>
                         @if($report->teacher)
-                        <div class="text-[10px] text-zinc-400">Generado por: {{ $report->teacher->name }}</div>
+                        <div class="text-[10px] text-zinc-400">Asignado por: {{ $report->teacher->name }}</div>
                         @endif
                     </td>
                     <td class="py-4 px-2 text-center">
@@ -625,7 +675,7 @@ new class extends Component {
                         @endif
                         <div class="text-xs text-zinc-500 whitespace-normal line-clamp-2 italic">{{ $report->description }}</div>
                         @if($report->teacher)
-                        <div class="text-[10px] text-zinc-400">Generado por: {{ $report->teacher->name }}</div>
+                        <div class="text-[10px] text-zinc-400">Asignado por: {{ $report->teacher->name }}</div>
                         @endif
                     </td>
                     <td class="py-4 px-2 text-center">
@@ -708,6 +758,12 @@ new class extends Component {
                 <flux:input wire:model="subject" label="Asunto / Materia (Opcional)" placeholder="Ej: Clase de Matemáticas, Receso..." />
 
                 <flux:textarea wire:model="description" label="Descripción de los hechos" placeholder="Detalle lo sucedido de forma objetiva..." rows="4" />
+
+                <flux:select label="Asignado por" wire:model="teacherId">
+                    @foreach($staffMembers as $staff)
+                        <option value="{{ $staff->id }}">{{ $staff->name }} ({{ $staff->role === 'ADMIN' ? 'Admin' : 'Docente' }})</option>
+                    @endforeach
+                </flux:select>
             </div>
 
             <div class="flex gap-2">

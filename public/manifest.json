@@ -26,6 +26,21 @@
   ],
   "icons": [
     {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "166x166",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-icon-180.png",
+      "sizes": "165x184",
+      "type": "image/png"
+    },
+    {
       "src": "/manifest-icon-192.maskable.png",
       "sizes": "177x196",
       "type": "image/png",
