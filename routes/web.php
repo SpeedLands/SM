@@ -14,6 +14,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy-policy');
+
 Volt::route('dashboard', 'dashboard.index')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
@@ -29,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('exportar/padres', [ExportController::class, 'parents'])->name('export.parents');
         Route::get('exportar/alumnos', [ExportController::class, 'students'])->name('export.students');
         Route::get('exportar/asistencias', [ExportController::class, 'attendance'])->name('export.attendance');
+        Route::get('exportar/reportes', [ExportController::class, 'reports'])->name('export.reports');
     });
     Volt::route('reglamento', 'regulations.index')->name('regulations.index');
     Volt::route('alumnos', 'students.index')->name('students.index');

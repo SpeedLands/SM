@@ -117,11 +117,18 @@
                             body: JSON.stringify({ token: currentToken })
                         })
                         .then(response => response.json())
-                        .then(data => console.log('FCM Token Updated:', data))
-                        .catch(err => console.error('Error updating FCM token:', err));
+                        .then(data => {
+                            console.log('FCM Token Updated:', data);
+                            window.dispatchEvent(new CustomEvent('fcm-token-received', { detail: { token: currentToken } }));
+                        })
+                        .catch(err => {
+                            console.error('Error updating FCM token:', err);
+                            window.dispatchEvent(new CustomEvent('fcm-error-occurred', { detail: { error: 'Error al persistir el token en el servidor.' } }));
+                        });
                     }
                 }).catch((err) => {
                     console.error('An error occurred while retrieving token. ', err);
+                    window.dispatchEvent(new CustomEvent('fcm-error-occurred', { detail: { error: err.message || err.toString() } }));
                 });
             }
 

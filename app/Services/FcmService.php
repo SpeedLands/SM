@@ -42,6 +42,25 @@ class FcmService
                 'title' => $title,
                 'body' => $body,
             ],
+            'android' => [
+                'priority' => 'high',
+                'notification' => [
+                    'sound' => 'default',
+                    'channel_id' => 'default_channel',
+                    'click_action' => $url ?? null,
+                ],
+            ],
+            'apns' => [
+                'headers' => [
+                    'apns-priority' => '10',
+                ],
+                'payload' => [
+                    'aps' => [
+                        'sound' => 'default',
+                        'content-available' => 1,
+                    ],
+                ],
+            ],
             'webpush' => [
                 'headers' => [
                     'Urgency' => 'high',
@@ -60,6 +79,8 @@ class FcmService
 
         if ($image) {
             $message['notification']['image'] = $image;
+            $message['android']['notification']['image'] = $image;
+            $message['apns']['fcm_options']['image'] = $image;
             $message['webpush']['notification']['image'] = $image;
         }
 
@@ -93,6 +114,69 @@ class FcmService
         Log::info('FCM Notification Sent Successfully', ['token' => $deviceToken]);
 
         return true;
+    }
+
+    /**
+     * Send a test push notification and return detailed error info if it fails.
+     * This is useful for debugging on devices like iOS where console is not available.
+     */
+    public function sendTestNotification(string $deviceToken): array
+    {
+        $accessToken = $this->getAccessToken();
+        if (! $accessToken) {
+            return [
+                'success' => false,
+                'status' => 'UNAUTHENTICATED',
+                'code' => 401,
+                'message' => 'Failed to generate FCM access token from service account credentials.',
+                'details' => []
+            ];
+        }
+
+        $fcmUrl = "https://fcm.googleapis.com/v1/projects/{$this->projectId}/messages:send";
+
+        $message = [
+            'token' => $deviceToken,
+            'notification' => [
+                'title' => 'Prueba de Notificación',
+                'body' => 'Si estás viendo esto, las notificaciones funcionan correctamente.',
+            ],
+            'webpush' => [
+                'headers' => [
+                    'Urgency' => 'high',
+                ],
+                'notification' => [
+                    'title' => 'Prueba de Notificación',
+                    'body' => 'Si estás viendo esto, las notificaciones funcionan correctamente en Web/PWA.',
+                    'icon' => '/apple-touch-icon.png',
+                    'click_action' => '/',
+                ],
+            ],
+            'apns' => [
+                'payload' => [
+                    'aps' => [
+                        'sound' => 'default',
+                    ],
+                ],
+            ],
+        ];
+
+        $response = Http::withToken($accessToken)->post($fcmUrl, ['message' => $message]);
+
+        if ($response->failed()) {
+            $error = $response->json('error') ?? [];
+            return [
+                'success' => false,
+                'status' => $error['status'] ?? 'UNKNOWN_ERROR',
+                'code' => $error['code'] ?? $response->status(),
+                'message' => $error['message'] ?? $response->body(),
+                'details' => $error['details'] ?? [],
+            ];
+        }
+
+        return [
+            'success' => true,
+        ];
     }
 
     /**

@@ -1,0 +1,16 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.gestionescolar.sm",
+      "sha256_cert_fingerprints": [
+        "77:B7:E1:66:97:10:00:B1:1D:D0:41:BF:85:32:30:53:24:06:BF:90:47:99:24:A5:A1:56:0E:EA:B9:E6:46:CD",
+        "3C:55:5C:C2:41:2B:0F:D3:5B:8A:7D:3D:A4:BD:35:4D:BC:3A:5D:79:4D:33:71:FD:3E:9A:5C:D7:4A:D9:69:14"
+      ]
+    }
+  }
+]

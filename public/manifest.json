@@ -677,7 +677,7 @@
       "url": "/asistencia/escanear",
       "icons": [
         {
-          "src": "/favicon.ico",
+          "src": "/ios/64.png",
           "sizes": "64x64"
         }
       ]
@@ -689,7 +689,7 @@
       "url": "/dashboard",
       "icons": [
         {
-          "src": "/favicon.ico",
+          "src": "/ios/64.png",
           "sizes": "64x64"
         }
       ]

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\AttendanceExport;
 use App\Exports\ParentsExport;
+use App\Exports\ReportsExport;
 use App\Exports\StudentsExport;
 use App\Exports\StudentsWithParentsExport;
 use App\Exports\TeachersExport;
@@ -70,5 +71,18 @@ class ExportController extends Controller
         $filename = 'asistencia_'.now()->format('Y-m-d').'.xlsx';
 
         return Excel::download(new AttendanceExport($groupId, $month, $year), $filename);
+    }
+
+    public function reports(Request $request)
+    {
+        Gate::authorize('admin-only');
+
+        $groupId = $request->query('group_id');
+        $studentId = $request->query('student_id');
+        $allCycles = $request->boolean('all_cycles');
+
+        $filename = 'reportes_'.now()->format('Y-m-d').'.xlsx';
+
+        return Excel::download(new ReportsExport($groupId, $studentId, $allCycles), $filename);
     }
 }
